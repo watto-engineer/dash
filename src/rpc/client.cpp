@@ -90,6 +90,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "listsinceblock", 1, "target_confirmations" },
     { "listsinceblock", 2, "include_watchonly" },
     { "listsinceblock", 3, "include_removed" },
+    { "scantxoutset", 1, "scanobjects" },
     { "sendmany", 1, "amounts" },
     { "sendmany", 2, "minconf" },
     { "sendmany", 3, "addlocked" },
