@@ -34,13 +34,24 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint256 nAccumulatorCheckpoint;
 
     CBlockHeader()
     {
         SetNull();
     }
 
-    SERIALIZE_METHODS(CBlockHeader, obj) { READWRITE(obj.nVersion, obj.hashPrevBlock, obj.hashMerkleRoot, obj.nTime, obj.nBits, obj.nNonce); }
+    SERIALIZE_METHODS(CBlockHeader, obj) {
+    READWRITE(obj.nVersion);
+    READWRITE(obj.hashPrevBlock);
+    READWRITE(obj.hashMerkleRoot);
+    READWRITE(obj.nTime);
+    READWRITE(obj.nBits);
+    READWRITE(obj.nNonce);
+    //zerocoin active, header changes to include accumulator checksum
+    if(obj.nVersion > 7)
+        READWRITE(obj.nAccumulatorCheckpoint);
+    }
 
     void SetNull()
     {
@@ -50,6 +61,7 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        nAccumulatorCheckpoint.SetNull();
     }
 
     bool IsNull() const
@@ -193,6 +205,9 @@ public:
     // network and disk
     std::vector<CTransactionRef> vtx;
 
+    // ppcoin: block signature - signed by one of the coin base txout[N]'s owner
+    std::vector<unsigned char> vchBlockSig;
+
     // memory only
     mutable bool fChecked;
 
@@ -211,12 +226,15 @@ public:
     {
         READWRITEAS(CBlockHeader, obj);
         READWRITE(obj.vtx);
+        if(obj.vtx.size() > 1 && obj.vtx[1]->IsCoinStake())
+            READWRITE(obj.vchBlockSig);
     }
 
     void SetNull()
     {
         CBlockHeader::SetNull();
         vtx.clear();
+        vchBlockSig.clear();
         fChecked = false;
     }
 
@@ -230,6 +248,16 @@ public:
         block.nBits          = nBits;
         block.nNonce         = nNonce;
         return block;
+    }
+
+    bool IsProofOfStake() const
+    {
+        return (vtx.size() > 1 && vtx[1]->IsCoinStake());
+    }
+
+    bool IsProofOfWork() const
+    {
+        return !IsProofOfStake();
     }
 
     std::string ToString() const;
