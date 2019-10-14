@@ -186,6 +186,10 @@ enum opcodetype
     // More crypto
     OP_CHECKDATASIG = 0xba,
     OP_CHECKDATASIGVERIFY = 0xbb,
+    // zerocoin
+    OP_ZEROCOINMINT = 0xc1,
+    OP_ZEROCOINSPEND = 0xc2,
+    OP_ZEROCOINPUBLICSPEND = 0xc3,
 
     // template matching params
     OP_SMALLINTEGER = 0xfa,
@@ -541,6 +545,11 @@ public:
     bool IsPayToPublicKeyHash() const;
 
     bool IsPayToScriptHash() const;
+
+    bool StartsWithOpcode(const opcodetype opcode) const;
+    bool IsZerocoinMint() const;
+    bool IsZerocoinSpend() const;
+    bool IsZerocoinPublicSpend() const;
 
     /** Used for obsolete pay-to-pubkey addresses indexing. */
     bool IsPayToPublicKey() const;

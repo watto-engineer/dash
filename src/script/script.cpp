@@ -386,3 +386,23 @@ bool CScriptNum::MinimallyEncode(std::vector<uint8_t>& data)
     data = {};
     return true;
 }
+
+bool CScript::StartsWithOpcode(const opcodetype opcode) const
+{
+    return (!this->empty() && (*this)[0] == opcode);
+}
+
+bool CScript::IsZerocoinMint() const
+{
+    return StartsWithOpcode(OP_ZEROCOINMINT);
+}
+
+bool CScript::IsZerocoinSpend() const
+{
+    return StartsWithOpcode(OP_ZEROCOINSPEND);
+}
+
+bool CScript::IsZerocoinPublicSpend() const
+{
+    return StartsWithOpcode(OP_ZEROCOINPUBLICSPEND);
+}
