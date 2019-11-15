@@ -25,6 +25,8 @@ const char* GetTxnOutputType(txnouttype t)
     case TX_SCRIPTHASH: return "scripthash";
     case TX_MULTISIG: return "multisig";
     case TX_NULL_DATA: return "nulldata";
+    case TX_GRP_PUBKEYHASH: return "grouppubkeyhash";
+    case TX_GRP_SCRIPTHASH: return "groupscripthash";
     }
     return nullptr;
 }
@@ -117,6 +119,16 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
         return TX_MULTISIG;
     }
 
+    std::vector<unsigned char> group;
+    std::vector<unsigned char> groupQty;
+    // group will always be the last entity in vSolutionsRet
+    // group quantity will be the second to last
+    if (!group.empty())
+    {
+        vSolutionsRet.push_back(groupQty);
+        vSolutionsRet.push_back(group);
+    }
+
     vSolutionsRet.clear();
     return TX_NONSTANDARD;
 }
@@ -134,12 +146,12 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
         addressRet = pubKey.GetID();
         return true;
     }
-    else if (whichType == TX_PUBKEYHASH)
+    else if ((whichType == TX_PUBKEYHASH) || (whichType == TX_GRP_PUBKEYHASH))
     {
         addressRet = CKeyID(uint160(vSolutions[0]));
         return true;
     }
-    else if (whichType == TX_SCRIPTHASH)
+    else if ((whichType == TX_SCRIPTHASH) || (whichType == TX_GRP_SCRIPTHASH))
     {
         addressRet = CScriptID(uint160(vSolutions[0]));
         return true;
@@ -148,6 +160,11 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
     return false;
 }
 
+bool ExtractDestination(const CScript &scriptPubKey, CTxDestination &addressRet)
+{
+    txnouttype whichType;
+    return ExtractDestinationAndType(scriptPubKey, addressRet, whichType);
+}
 bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet)
 {
     addressRet.clear();

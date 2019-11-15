@@ -105,10 +105,12 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
     case TX_NULL_DATA:
         return false;
     case TX_PUBKEY:
+    case TX_GRP_PUBKEYHASH:
         if (!CreateSig(creator, sigdata, provider, sig, CPubKey(vSolutions[0]), scriptPubKey, sigversion)) return false;
         ret.push_back(std::move(sig));
         return true;
-    case TX_PUBKEYHASH: {
+    case TX_PUBKEYHASH:
+    case TX_GRP_PUBKEYHASH: {
         CKeyID keyID = CKeyID(uint160(vSolutions[0]));
         CPubKey pubkey;
         if (!GetPubKey(provider, sigdata, keyID, pubkey)) {
@@ -122,6 +124,7 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
         return true;
     }
     case TX_SCRIPTHASH:
+    case TX_GRP_SCRIPTHASH:
         h160 = uint160(vSolutions[0]);
         if (GetCScript(provider, sigdata, h160, scriptRet)) {
             ret.push_back(std::vector<unsigned char>(scriptRet.begin(), scriptRet.end()));
@@ -177,7 +180,7 @@ bool ProduceSignature(const SigningProvider& provider, const BaseSignatureCreato
     bool P2SH = false;
     CScript subscript;
 
-    if (solved && whichType == TX_SCRIPTHASH)
+    if (solved && (whichType == TX_SCRIPTHASH || whichType == TX_GRP_SCRIPTHASH))
     {
         // Solver returns the subscript that needs to be evaluated;
         // the final scriptSig is the signatures from that

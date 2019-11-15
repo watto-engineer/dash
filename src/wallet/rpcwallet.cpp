@@ -34,6 +34,7 @@
 #include <wallet/load.h>
 #include <wallet/rpcwallet.h>
 #include <wallet/scriptpubkeyman.h>
+#include <wallet/tokengroupwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletdb.h>
 #include <wallet/walletutil.h>
