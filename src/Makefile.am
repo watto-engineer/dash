@@ -150,6 +150,7 @@ BITCOIN_CORE_H = \
   compat/sanity.h \
   compressor.h \
   consensus/consensus.h \
+  consensus/tokengroups.h \
   consensus/tx_verify.h \
   core_io.h \
   core_memusage.h \
@@ -282,6 +283,7 @@ BITCOIN_CORE_H = \
   wallet/walletdb.h \
   wallet/walletutil.h \
   wallet/coinselection.h \
+  wallet/tokengroupwallet.h \
   warnings.h \
   zbytz/accumulators.h \
   zbytz/accumulatorcheckpoints.h \
@@ -320,6 +322,7 @@ libdash_server_a_SOURCES = \
   checkpoints.cpp \
   coinjoin/coinjoin.cpp \
   coinjoin/coinjoin-server.cpp \
+  consensus/tokengroups.cpp \
   consensus/tx_verify.cpp \
   dsnotificationinterface.cpp \
   evo/cbtx.cpp \
@@ -434,6 +437,7 @@ libdash_wallet_a_SOURCES = \
   wallet/init.cpp \
   wallet/rpcdump.cpp \
   wallet/rpcwallet.cpp \
+  wallet/tokengroupwallet.cpp \
   wallet/wallet.cpp \
   wallet/walletdb.cpp \
   wallet/walletutil.cpp \
@@ -621,6 +625,7 @@ libdash_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
   bip39.cpp \
+  bytzaddrenc.cpp \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \

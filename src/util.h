@@ -299,6 +299,14 @@ public:
 extern ArgsManager gArgs;
 
 /**
+ * Convert string into true/false
+ *
+ * @param strValue String to parse as a boolean
+ * @return true or false
+ */
+bool InterpretBool(const std::string &strValue);
+
+/**
  * Format a string to be used as group of options in help messages
  *
  * @param message Group name (e.g. "RPC server options:")

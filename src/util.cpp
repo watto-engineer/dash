@@ -228,7 +228,7 @@ bool DirIsWritable(const fs::path& directory)
  * For a more extensive discussion of this topic (and a wide range of opinions
  * on the Right Way to change this code), see PR12713.
  */
-static bool InterpretBool(const std::string& strValue)
+bool InterpretBool(const std::string& strValue)
 {
     if (strValue.empty())
         return true;

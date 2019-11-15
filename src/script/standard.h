@@ -62,6 +62,8 @@ enum txnouttype
     TX_SCRIPTHASH,
     TX_MULTISIG,
     TX_NULL_DATA, //!< unspendable OP_RETURN script that carries data
+    TX_GRP_PUBKEYHASH,
+    TX_GRP_SCRIPTHASH
 };
 
 class CNoDestination {
@@ -113,6 +115,7 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
  * addressRet is populated with a single value and nRequiredRet is set to 1.
  * Returns true if successful.
  */
+bool ExtractDestinationAndType(const CScript& scriptPubKey, CTxDestination &addressRet, txnouttype &whichType);
 bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet);
 
 /**

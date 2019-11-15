@@ -8,6 +8,7 @@
 #define BITCOIN_WALLET_WALLET_H
 
 #include <amount.h>
+#include <consensus/tokengroups.h>
 #include <policy/feerate.h>
 #include <saltedhasher.h>
 #include <streams.h>
@@ -194,6 +195,23 @@ struct COutputEntry
     CTxDestination destination;
     CAmount amount;
     int vout;
+};
+
+struct CGroupedOutputEntry : public COutputEntry
+{
+    CTokenGroupID grp;
+    CAmount grpAmount;
+    CGroupedOutputEntry(const CTokenGroupID &grp,
+        CAmount grpAmount,
+        const CTxDestination &dest,
+        CAmount amt,
+        int outidx)
+        : grp(grp), grpAmount(grpAmount)
+    {
+        destination = dest;
+        amount = amt;
+        vout = outidx;
+    }
 };
 
 /** A transaction with a merkle branch linking it to the block chain. */
@@ -489,6 +507,21 @@ public:
     void GetAmounts(std::list<COutputEntry>& listReceived,
                     std::list<COutputEntry>& listSent, CAmount& nFee, std::string& strSentAccount, const isminefilter& filter) const;
 
+    // Get all transaction amounts, including group information
+    void GetAmounts(std::list<CGroupedOutputEntry> &listReceived,
+        std::list<CGroupedOutputEntry> &listSent,
+        CAmount &nFee,
+        std::string &strSentAccount,
+        const isminefilter &filter) const;
+
+    // Get transactions for the passed group
+    void GetGroupAmounts(const CTokenGroupID &grp,
+        std::list<COutputEntry> &listReceived,
+        std::list<COutputEntry> &listSent,
+        CAmount &nFee,
+        std::string &strSentAccount,
+        const isminefilter &filter) const;
+
     bool IsFromMe(const isminefilter& filter) const
     {
         return (GetDebit(filter) > 0);
@@ -567,6 +600,10 @@ public:
     int Priority() const;
 
     std::string ToString() const;
+    COutPoint GetOutPoint() const { return COutPoint(tx->GetHash(), i); }
+    /** returns the value of this output in satoshis */
+    CAmount GetValue() const { return tx->tx->vout[i].nValue; }
+    CScript GetScriptPubKey() const { return tx->tx->vout[i].scriptPubKey; }
 };
 
 
@@ -899,6 +936,13 @@ public:
      * populate vCoins with vector of available COutputs.
      */
     void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlySafe=true, const CCoinControl *coinControl = nullptr, const CAmount& nMinimumAmount = 1, const CAmount& nMaximumAmount = MAX_MONEY, const CAmount& nMinimumSumAmount = MAX_MONEY, const uint64_t nMaximumCount = 0, const int nMinDepth = 0, const int nMaxDepth = 9999999) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+
+    /**
+     * populate vCoins with vector of available COutputs, filtered by the passed lambda function.
+       Returns the number of matches.
+     */
+    unsigned int FilterCoins(std::vector<COutput> &vCoins,
+        std::function<bool(const CWalletTx *, const CTxOut *)>) const;
 
     /**
      * Return list of available coins and locked coins grouped by non-change output address.
