@@ -19,12 +19,12 @@
 #include <rpc/util.h>
 #include <timedata.h>
 #include <txmempool.h>
+#include <tokens/tokengroupwallet.h>
 #include <util.h>
 #include <utilmoneystr.h>
 #include <validation.h>
 #include <wallet/coincontrol.h>
 #include <wallet/rpcwallet.h>
-#include <wallet/tokengroupwallet.h>
 #include <wallet/wallet.h>
 #include <wallet/walletdb.h>
 #include <wallet/walletutil.h>

@@ -26,9 +26,10 @@
 #include <script/sign.h>
 #include <timedata.h>
 #include <txmempool.h>
+#include <tokens/tokengroupwallet.h>
 #include <utilmoneystr.h>
 #include <wallet/fees.h>
-#include <wallet/tokengroupwallet.h>
+
 #include <coinjoin/coinjoin-client.h>
 #include <coinjoin/coinjoin-client-options.h>
 #include <governance/governance.h>

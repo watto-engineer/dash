@@ -7,6 +7,7 @@
 #include <boost/assign/list_of.hpp>
 #include <algorithm>
 
+#include "consensus/tokengroups.h"
 #include "wallet/db.h"
 #include "kernel.h"
 #include "policy/policy.h"
@@ -422,6 +423,10 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
         //verify signature and script
         if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, txPrev->vout[txin.prevout.n].nValue)))
             return error("%s : VerifySignature failed on coinstake %s", __func__, tx.GetHash().GetHex());
+
+        if (IsOutputGrouped(txPrev->vout[txin.prevout.n])) {
+            return error("%s : Grouped input not allowed in coinstake (%s)", __func__, tx.GetHash().GetHex());
+        }
 
         CStake* bytzInput = new CStake();
         bytzInput->SetInput(txPrev, txin.prevout.n);

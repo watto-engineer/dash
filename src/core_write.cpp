@@ -5,6 +5,7 @@
 #include <core_io.h>
 
 #include <consensus/consensus.h>
+#include <consensus/tokengroups.h>
 #include <consensus/validation.h>
 #include <key_io.h>
 #include <primitives/transaction.h>
@@ -12,10 +13,10 @@
 #include <script/standard.h>
 #include <serialize.h>
 #include <streams.h>
+#include <tokens/tokengroupdescription.h>
 #include <univalue.h>
 #include <util.h>
 #include <utilmoneystr.h>
-#include <utilstrencodings.h>
 
 #include <spentindex.h>
 

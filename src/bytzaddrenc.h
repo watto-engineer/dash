@@ -2,17 +2,16 @@
 // Copyright (c) 2018 The ION Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef BITCOIN_BYTZADDRENC_H
-#define BITCOIN_BYTZADDRENC_H
+#ifndef BYTZADDRENC_H
+#define BYTZADDRENC_H
 
 #include "script/standard.h"
-#include "consensus/tokengroups.h"
 
 #include <string>
 #include <vector>
 
 class CChainParams;
-//class CTokenGroupID;
+class CTokenGroupID;
 
 enum BytzAddrType : uint8_t
 {
@@ -23,6 +22,8 @@ enum BytzAddrType : uint8_t
 
 std::string EncodeBytzAddr(const CTxDestination &, const CChainParams &);
 std::string EncodeBytzAddr(const std::vector<uint8_t> &id, const BytzAddrType addrtype, const CChainParams &params);
+std::string EncodeTokenGroup(const CTokenGroupID &grp, const CChainParams &params);
+std::string EncodeTokenGroup(const CTokenGroupID &grp);
 
 struct BytzAddrContent
 {

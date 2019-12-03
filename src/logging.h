@@ -80,6 +80,7 @@ namespace BCLog {
         //Start Bytz
         ZEROCOIN    = ((uint64_t)1 << 61),
         STAKING     = ((uint64_t)1 << 62),
+        TOKEN       = ((uint64_t)1 << 63),
         //End Bytz
 
         NET_NETCONN = NET | NETCONN, // use this to have something logged in NET and NETCONN as well

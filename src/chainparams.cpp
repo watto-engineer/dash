@@ -387,6 +387,9 @@ public:
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytz";
+        consensus.strTokenManagementKey = "sYG1qGUtbTdNRYtFsKvnY3GvuauF3eVwhT";
+        consensus.nOpGroupNewRequiredConfirmations = 1;
+
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -609,6 +612,8 @@ public:
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytztest";
+        consensus.strTokenManagementKey = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
+        consensus.nOpGroupNewRequiredConfirmations = 1;
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -794,6 +799,8 @@ public:
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytztest";
+        consensus.strTokenManagementKey = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
+        consensus.nOpGroupNewRequiredConfirmations = 1;
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -977,6 +984,9 @@ public:
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytzreg";
+        consensus.strTokenManagementKey = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
+        consensus.nOpGroupNewRequiredConfirmations = 1;
+
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

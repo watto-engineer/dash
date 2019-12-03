@@ -61,6 +61,9 @@
 #include <warnings.h>
 #include <walletinitinterface.h>
 
+#include <tokens/tokengroupmanager.h>
+#include <tokens/tokendb.h>
+
 #include <zbytz/accumulatorcheckpoints.h>
 #include <zbytz/zerocoindb.h>
 
@@ -335,6 +338,7 @@ void PrepareShutdown()
         deterministicMNManager.reset();
         evoDb.reset();
         zerocoinDB.reset();
+        pTokenDB.reset();
     }
     g_wallet_init_interface.Stop();
 
@@ -507,6 +511,7 @@ void SetupServerArgs()
     gArgs.AddArg("-addressindex", strprintf("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)", DEFAULT_ADDRESSINDEX), false, OptionsCategory::INDEXING);
     gArgs.AddArg("-reindex", "Rebuild chain state and block index from the blk*.dat files on disk", false, OptionsCategory::INDEXING);
     gArgs.AddArg("-reindex-chainstate", "Rebuild chain state from the currently indexed blocks", false, OptionsCategory::INDEXING);
+    gArgs.AddArg("-reindex-tokens", "Rebuld the token database", false, OptionsCategory::INDEXING);
     gArgs.AddArg("-spentindex", strprintf("Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)", DEFAULT_SPENTINDEX), false, OptionsCategory::INDEXING);
     gArgs.AddArg("-timestampindex", strprintf("Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)", DEFAULT_TIMESTAMPINDEX), false, OptionsCategory::INDEXING);
     gArgs.AddArg("-txindex", strprintf("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)", DEFAULT_TXINDEX), false, OptionsCategory::INDEXING);
@@ -1971,6 +1976,8 @@ bool AppInitMain()
                 deterministicMNManager.reset(new CDeterministicMNManager(*evoDb));
                 zerocoinDB.reset();
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
+                pTokenDB.reset();
+                pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
 
                 llmq::InitLLMQSystem(*evoDb, false, fReset || fReindexChainState);
 
@@ -2052,6 +2059,20 @@ bool AppInitMain()
 
                 // Load Accumulator Checkpoints according to network (main/test/regtest)
                 assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
+
+                tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
+
+                // Drop all information from the tokenDB and repopulate
+                if (gArgs.GetBoolArg("-reindextokens", false)) {
+                    uiInterface.InitMessage(_("Reindexing token database..."));
+                    if (!ReindexTokenDB(strLoadError))
+                        break;
+                }
+
+                // load token data
+                uiInterface.InitMessage(_("Loading token data..."));
+                if (!pTokenDB->LoadTokensFromDB(strLoadError))
+                    break;
 
                 pcoinsdbview.reset(new CCoinsViewDB(nCoinDBCache, false, fReset || fReindexChainState));
                 pcoinscatcher.reset(new CCoinsViewErrorCatcher(pcoinsdbview.get()));
