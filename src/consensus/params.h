@@ -122,6 +122,8 @@ struct Params {
     /** ATP parameters */
     int64_t ATPStartHeight;
     std::string WagerrAddrPrefix;
+    std::string strTokenManagementKey;
+    int nOpGroupNewRequiredConfirmations;
 
     /** Zerocoin - retired functionality */
     int64_t nZerocoinStartHeight;

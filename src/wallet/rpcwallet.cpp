@@ -16,6 +16,7 @@
 #include <rpc/rawtransaction_util.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
+#include <tokens/tokengroupwallet.h>
 #include <script/descriptor.h>
 #include <util/bip32.h>
 #include <util/fees.h>

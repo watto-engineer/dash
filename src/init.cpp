@@ -80,6 +80,8 @@
 #include <spork.h>
 #include <walletinitinterface.h>
 
+#include <tokens/tokengroupmanager.h>
+#include <tokens/tokendb.h>
 #include <zwgr/accumulatorcheckpoints.h>
 #include <zwgr/zerocoindb.h>
 
@@ -354,6 +356,7 @@ void PrepareShutdown(NodeContext& node)
         deterministicMNManager.reset();
         evoDb.reset();
         zerocoinDB.reset();
+        pTokenDB.reset();
     }
     for (const auto& client : node.chain_clients) {
         client->stop();
@@ -553,6 +556,7 @@ void SetupServerArgs(NodeContext& node)
     argsman.AddArg("-addressindex", strprintf("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)", DEFAULT_ADDRESSINDEX), ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
     argsman.AddArg("-reindex", "Rebuild chain state and block index from the blk*.dat files on disk", ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
     argsman.AddArg("-reindex-chainstate", "Rebuild chain state from the currently indexed blocks. When in pruning mode or if blocks on disk might be corrupted, use full -reindex instead.", ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
+    argsman.AddArg("-reindex-tokens", "Rebuld the token database", ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
     argsman.AddArg("-spentindex", strprintf("Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)", DEFAULT_SPENTINDEX), ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
     argsman.AddArg("-timestampindex", strprintf("Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)", DEFAULT_TIMESTAMPINDEX), ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
     argsman.AddArg("-txindex", strprintf("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)", DEFAULT_TXINDEX), ArgsManager::ALLOW_ANY, OptionsCategory::INDEXING);
@@ -2044,6 +2048,8 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 deterministicMNManager.reset(new CDeterministicMNManager(*evoDb, *node.connman));
                 zerocoinDB.reset();
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
+                pTokenDB.reset();
+                pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
                 llmq::quorumSnapshotManager.reset();
                 llmq::quorumSnapshotManager.reset(new llmq::CQuorumSnapshotManager(*evoDb));
 
@@ -2051,6 +2057,20 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
                 // Load Accumulator Checkpoints according to network (main/test/regtest)
                 assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
+
+                tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
+
+                // Drop all information from the tokenDB and repopulate
+                if (gArgs.GetBoolArg("-reindextokens", false)) {
+                    uiInterface.InitMessage(_("Reindexing token database..."));
+                    if (!ReindexTokenDB(strLoadError))
+                        break;
+                }
+
+                // load token data
+                uiInterface.InitMessage(_("Loading token data..."));
+                if (!pTokenDB->LoadTokensFromDB(strLoadError))
+                    break;
 
                 if (fReset) {
                     pblocktree->WriteReindexing(true);

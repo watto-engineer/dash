@@ -293,6 +293,11 @@ BITCOIN_CORE_H = \
   threadsafety.h \
   threadinterrupt.h \
   timedata.h \
+  tokens/tokendb.h \
+  tokens/tokengroupconfiguration.h \
+  tokens/tokengroupdescription.h \
+  tokens/tokengroupmanager.h \
+  tokens/tokengroupwallet.h \
   torcontrol.h \
   txdb.h \
   txmempool.h \
@@ -346,7 +351,6 @@ BITCOIN_CORE_H = \
   wallet/wallettool.h \
   wallet/walletutil.h \
   wallet/coinselection.h \
-  wallet/tokengroupwallet.h \
   warnings.h \
   zwgr/accumulators.h \
   zwgr/accumulatorcheckpoints.h \
@@ -388,7 +392,6 @@ libbitcoin_server_a_SOURCES = \
   coinjoin/coinjoin.cpp \
   coinjoin/options.cpp \
   coinjoin/server.cpp \
-  consensus/tokengroups.cpp \
   consensus/tx_verify.cpp \
   dbwrapper.cpp \
   dsnotificationinterface.cpp \
@@ -473,6 +476,7 @@ libbitcoin_server_a_SOURCES = \
   spork.cpp \
   statsd_client.cpp \
   timedata.cpp \
+  tokens/tokendb.cpp \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
@@ -551,6 +555,11 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/bdb.cpp \
   wallet/coincontrol.cpp \
   wallet/context.cpp \
+  tokens/rpctokens.cpp \
+  tokens/tokengroupconfiguration.cpp \
+  tokens/tokengroupdescription.cpp \
+  tokens/tokengroupmanager.cpp \
+  tokens/tokengroupwallet.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
   wallet/fees.cpp \
@@ -558,7 +567,6 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/psbtwallet.cpp \
   wallet/rpcdump.cpp \
   wallet/rpcwallet.cpp \
-  wallet/tokengroupwallet.cpp \
   wallet/salvage.cpp \
   wallet/scriptpubkeyman.cpp \
   wallet/wallet.cpp \
@@ -747,6 +755,7 @@ libbitcoin_common_a_SOURCES = \
   chainparams.cpp \
   coins.cpp \
   compressor.cpp \
+  consensus/tokengroups.cpp \
   core_read.cpp \
   core_write.cpp \
   dstencode.cpp \

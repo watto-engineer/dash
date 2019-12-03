@@ -5,10 +5,10 @@
 #include "wagerraddrenc.h"
 #include "bech32.h"
 #include "chainparams.h"
+#include "consensus/tokengroups.h"
 #include "pubkey.h"
 #include "script/script.h"
 #include "utilstrencodings.h"
-#include "validation.h"
 
 #include <boost/variant/static_visitor.hpp>
 
@@ -104,6 +104,16 @@ std::string EncodeWagerrAddr(const std::vector<uint8_t> &id, const WagerrAddrTyp
 std::string EncodeWagerrAddr(const CTxDestination &dst, const CChainParams &params)
 {
     return boost::apply_visitor(WagerrAddrEncoder(params), dst);
+}
+
+std::string EncodeTokenGroup(const CTokenGroupID &grp, const CChainParams &params)
+{
+    return EncodeWagerrAddr(grp.bytes(), WagerrAddrType::GROUP_TYPE, params);
+}
+
+std::string EncodeTokenGroup(const CTokenGroupID &grp)
+{
+    return EncodeTokenGroup(grp, Params());
 }
 
 CTxDestination DecodeWagerrAddr(const std::string &addr, const CChainParams &params)

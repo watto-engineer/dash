@@ -2,17 +2,16 @@
 // Copyright (c) 2018 The ION Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef BITCOIN_WAGERRADDRENC_H
-#define BITCOIN_WAGERRADDRENC_H
+#ifndef WAGERRADDRENC_H
+#define WAGERRADDRENC_H
 
 #include "script/standard.h"
-#include "consensus/tokengroups.h"
 
 #include <string>
 #include <vector>
 
 class CChainParams;
-//class CTokenGroupID;
+class CTokenGroupID;
 
 enum WagerrAddrType : uint8_t
 {
@@ -23,6 +22,8 @@ enum WagerrAddrType : uint8_t
 
 std::string EncodeWagerrAddr(const CTxDestination &, const CChainParams &);
 std::string EncodeWagerrAddr(const std::vector<uint8_t> &id, const WagerrAddrType addrtype, const CChainParams &params);
+std::string EncodeTokenGroup(const CTokenGroupID &grp, const CChainParams &params);
+std::string EncodeTokenGroup(const CTokenGroupID &grp);
 
 struct WagerrAddrContent
 {

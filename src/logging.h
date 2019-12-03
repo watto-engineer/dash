@@ -79,6 +79,7 @@ namespace BCLog {
         //Start Wagerr
         ZEROCOIN    = ((uint64_t)1 << 61),
         STAKING     = ((uint64_t)1 << 62),
+        TOKEN       = ((uint64_t)1 << 63),
         //End Wagerr
 
         ALL         = ~(uint64_t)0,

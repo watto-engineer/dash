@@ -26,6 +26,7 @@
 #include <script/sign.h>
 #include <script/signingprovider.h>
 #include <txmempool.h>
+#include <tokens/tokengroupwallet.h>
 #include <util/bip32.h>
 #include <util/error.h>
 #include <util/fees.h>
@@ -37,7 +38,6 @@
 #include <wallet/coincontrol.h>
 #include <wallet/coinselection.h>
 #include <wallet/fees.h>
-#include <wallet/tokengroupwallet.h>
 #include <warnings.h>
 
 #include <coinjoin/client.h>

@@ -182,6 +182,7 @@ const CLogCategoryDesc LogCategories[] =
     //Start Wagerr
     {BCLog::ZEROCOIN, "zerocoin"},
     {BCLog::STAKING, "staking"},
+    {BCLog::TOKEN, "token"},
     //End Wagerr
 };
 

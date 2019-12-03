@@ -66,6 +66,10 @@
 
 #include <statsd_client.h>
 
+#include <tokens/tokendb.h>
+#include <tokens/tokengroupmanager.h>
+#include <tokens/tokengroupwallet.h>
+
 #include <libzerocoin/bignum.h>
 #include <zwgr/accumulators.h>
 #include <zwgr/zwgrchain.h>
@@ -215,6 +219,7 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 
 std::unique_ptr<CBlockTreeDB> pblocktree;
 std::unique_ptr<CZerocoinDB> zerocoinDB;
+std::unique_ptr<CTokenDB> pTokenDB;
 
 // See definition for documentation
 static void FindFilesToPruneManual(ChainstateManager& chainman, std::set<int>& setFilesToPrune, int nManualPruneHeight);
@@ -561,10 +566,31 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     // Disallow any OP_GROUP txs from entering the mempool until OP_GROUP is enabled.
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
     // potentially causing this node to create a bad block.
-    if ((unsigned int)chainActive.Tip()->nHeight < chainparams.GetConsensus().ATPStartHeight) {
-        if (IsAnyTxOutputGrouped(tx))
+    if (IsAnyOutputGrouped(tx)) {
+        if ((unsigned int)chainActive.Tip()->nHeight < chainparams.GetConsensus().ATPStartHeight)
+        {
             return state.Invalid(ValidationInvalid::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "premature-op_group-tx");
+        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated()){
+            for (const CTxOut &txout : tx.vout)
+            {
+                CTokenGroupInfo grp(txout.scriptPubKey);
+                if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
+                    return state.DoS(0, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
+                }
+            }
+        }
+     }
+/** TODO (FornaxA): Spork settings
+    //Temporarily disable new token creation during management mode
+    if (GetAdjustedTime() > GetSporkValue(SPORK_10_TOKENGROUP_MAINTENANCE_MODE) && IsAnyOutputGroupedCreation(tx)) {
+        if (IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN)) {
+            LogPrintf("%s: Management token creation during token group management mode\n", __func__);
+        } else {
+            return state.DoS(0, error("%s : new token creation is not possible during token group management mode",
+                            __func__), REJECT_INVALID, "token-group-management");
+        }
     }
+*/
 
     // Rather not work on nonstandard transactions (unless -testnet/-regtest)
     std::string reason;
@@ -1352,12 +1378,34 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
     if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs())
     {
-        if (((unsigned int)chainActive.Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) &&
-            !CheckTokenGroups(tx, state, inputs))
-        {
-            return state.DoS(0, false, REJECT_MALFORMED, "token-group-imbalance", false,
-                strprintf("Token group inputs and outputs do not balance"));
-        }
+        if ((unsigned int)chainActive.Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) {
+            std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
+            CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
+            if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
+                return state.DoS(0, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
+
+            //Check that all token transactions paid their XDM fees
+            CAmount nXDMFees = 0;
+            if (!fScriptChecks) {
+                if (IsAnyOutputGrouped(tx)) {
+                    if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
+                        return state.DoS(0, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
+                        return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false, REJECT_MALFORMED, "bad-mnhf-payloadtoken-group-imbalance");
+                    }
+                    if (!tokenGroupManager->ManagementTokensCreated()){
+                        for (const CTxOut &txout : tx.vout)
+                        {
+                            CTokenGroupInfo grp(txout.scriptPubKey);
+                            if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
+                                return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
+                            }
+                        }
+                    }
+                }
+            } else {
+                LogPrint(BCLog::TOKEN, "%s - XDM fee payment check skipped on sync\n", __func__);
+            }
+       }
 
         if (pvChecks)
             pvChecks->reserve(tx.vin.size());
@@ -1567,6 +1615,8 @@ int ApplyTxInUndo(Coin&& undo, CCoinsViewCache& view, const COutPoint& out)
  *  When FAILED is returned, view is left in an indeterminate state. */
 DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view)
 {
+    std::vector<CTokenGroupID> toRemoveTokenGroupIDs;
+
     AssertLockHeld(cs_main);
     assert(m_quorum_block_processor);
 
@@ -1600,6 +1650,13 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
     //! Zerocoin
     std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpends;
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
+
+    //! ATP
+    std::vector<CTokenGroupCreation> newTokenGroups;
+    unsigned int nXDMCountInBlock = 0;
+    unsigned int nMagicCountInBlock = 0;
+    CAmount nXDMMint = 0;
+    CAmount nMagicMint = 0;
 
     if (!UndoSpecialTxsInBlock(block, pindex, *m_quorum_block_processor)) {
         return DISCONNECT_FAILED;
@@ -1712,10 +1769,18 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 }
 
             }
+            if (IsAnyOutputGroupedCreation(tx)) {
+                CTokenGroupID toRemoveTokenGroupID;
+                if (tokenGroupManager->RemoveTokenGroup(tx, toRemoveTokenGroupID))
+                    toRemoveTokenGroupIDs.push_back(toRemoveTokenGroupID);
+            }
             // At this point, all of txundo.vprevout should have been moved out.
         }
     }
-
+    if (!pTokenDB->EraseTokenGroupBatch(toRemoveTokenGroupIDs)) {
+        AbortNode("Failed to erase token group creations");
+        return DISCONNECT_FAILED;
+    }
 
     if (fSpentIndex) {
         if (!pblocktree->UpdateSpentIndex(spentIndex)) {
@@ -2193,6 +2258,29 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                         spentIndex.push_back(std::make_pair(CSpentIndexKey(input.prevout.hash, input.prevout.n), CSpentIndexValue(txhash, j, pindex->nHeight, prevout.nValue, addressType, hashBytes)));
                     }
                 }
+            if (IsAnyOutputGroupedCreation(*tx)) {
+                if (pindex->nHeight < chainparams.GetConsensus().ATPStartHeight) {
+                    return state.DoS(0, false, REJECT_NONSTANDARD, "premature-op_group-tx");
+                }
+                //Disable new token creation during management mode
+/*
+                if (block.nTime > GetSporkValue(SPORK_10_TOKENGROUP_MAINTENANCE_MODE) && !IsInitialBlockDownload()) {
+                    if (IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN)) {
+                        LogPrintf("%s: Management token creation during token group management mode\n", __func__);
+                    } else {
+                        return state.DoS(0, error("%s : new token creation is not possible during token group management mode",
+                                        __func__), REJECT_INVALID, "token-group-management");
+                    }
+                }
+*/
+                CTokenGroupCreation newTokenGroupCreation;
+                if (CreateTokenGroup(tx, newTokenGroupCreation)) {
+                    newTokenGroups.push_back(newTokenGroupCreation);
+                } else {
+                    return state.Invalid(false, REJECT_INVALID, "bad OP_GROUP");
+                }
+            }
+
             // Check that zWAGERR mints are not already known
             if (tx->HasZerocoinMintOutputs()) {
                 for (auto& out : tx->vout) {
@@ -2352,6 +2440,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     // END DASH
 
+    //Track zWAGERR money supply in the block index
+    if (!UpdateZWGRSupply(block, pindex, fJustCheck))
+        return state.DoS(100, error("%s: Failed to calculate new zWAGERR supply for block=%s height=%d", __func__,
+                                    block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
+
+    // Track XDM money supply in the block index
+    pindex->nXDMTransactions = nXDMCountInBlock;
+
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
     if (!ValidateAccumulatorCheckpoint(block, pindex, mapAccumulators)) {
@@ -2398,6 +2494,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (fTimestampIndex)
         if (!pblocktree->WriteTimestampIndex(CTimestampIndexKey(pindex->nTime, pindex->GetBlockHash())))
             return AbortNode(state, "Failed to write timestamp index");
+    if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
+        return AbortNode(state, "Failed to write token creation data");
+    if (!tokenGroupManager->AddTokenGroups(newTokenGroups)) {
+        return AbortNode(state, "Failed to add token creation data");
+    }
 
     assert(pindex->phashBlock);
     // add this block to the view's block chain
