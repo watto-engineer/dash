@@ -150,6 +150,9 @@ UniValue blockheaderToJSON(const CBlockIndex* tip, const CBlockIndex* blockindex
     if (pnext)
         result.pushKV("nextblockhash", pnext->GetBlockHash().GetHex());
 
+    result.pushKV("modifier", strprintf("%016x", blockindex->nStakeModifier));
+    result.pushKV("modifierV2", blockindex->nStakeModifierV2.GetHex());
+
     result.pushKV("chainlock", llmq::chainLocksHandler->HasChainLock(blockindex->nHeight, blockindex->GetBlockHash()));
 
     return result;
@@ -207,6 +210,9 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* tip, const CBlockIn
         result.pushKV("previousblockhash", blockindex->pprev->GetBlockHash().GetHex());
     if (pnext)
         result.pushKV("nextblockhash", pnext->GetBlockHash().GetHex());
+
+    result.pushKV("modifier", strprintf("%016x", blockindex->nStakeModifier));
+    result.pushKV("modifierV2", blockindex->nStakeModifierV2.GetHex());
 
     result.pushKV("chainlock", chainLock);
 
