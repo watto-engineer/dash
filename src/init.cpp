@@ -31,6 +31,7 @@
 #include <policy/feerate.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
+#include <pos/staking-manager.h>
 #include <rpc/server.h>
 #include <rpc/register.h>
 #include <rpc/blockchain.h>
@@ -657,6 +658,12 @@ void SetupServerArgs()
     gArgs.AddArg("-rpcuser=<user>", "Username for JSON-RPC connections", false, OptionsCategory::RPC);
     gArgs.AddArg("-rpcworkqueue=<n>", strprintf("Set the depth of the work queue to service RPC calls (default: %d)", DEFAULT_HTTP_WORKQUEUE), true, OptionsCategory::RPC);
     gArgs.AddArg("-server", "Accept command line and JSON-RPC commands", false, OptionsCategory::RPC);
+
+#ifdef ENABLE_WALLET
+    gArgs.AddArg("-staking=<n>", strprintf(_("Enable staking functionality (0-1, default: %u)"), 1), false, OptionsCategory::BLOCK_CREATION);
+    gArgs.AddArg("-bytzstake=<n>", strprintf(_("Enable or disable staking functionality for BYTZ inputs (0-1, default: %u)"), 1), false, OptionsCategory::BLOCK_CREATION);
+    gArgs.AddArg("-reservebalance=<n>", "Keep the specified amount available for spending at all times (default: 0)", false, OptionsCategory::BLOCK_CREATION);
+#endif // ENABLE_WALLET
 
     gArgs.AddArg("-statsenabled", strprintf("Publish internal stats to statsd (default: %u)", DEFAULT_STATSD_ENABLE), false, OptionsCategory::STATSD);
     gArgs.AddArg("-statshost=<ip>", strprintf("Specify statsd host (default: %s)", DEFAULT_STATSD_HOST), false, OptionsCategory::STATSD);
@@ -2334,6 +2341,34 @@ bool AppInitMain()
     }
 
     llmq::StartLLMQSystem();
+
+    // ********************************************************* Step 10d: setup and schedule Bytz-specific functionality
+
+#ifdef ENABLE_WALLET
+
+    std::vector<CWallet*> wallets = GetWallets();
+    if (!HasWallets() || wallets.size() < 1) {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
+        stakingManager->fEnableStaking = false;
+        stakingManager->fEnableBYTZStaking = false;
+    } else {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
+        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
+        stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
+    }
+
+    if (gArgs.IsArgSet("-reservebalance")) {
+        CAmount n = 0;
+        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), n)) {
+            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
+        }
+        stakingManager->nReserveBalance = n;
+    }
+
+    if (stakingManager->fEnableStaking) {
+        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 1 * 1000);
+    }
+#endif // ENABLE_WALLET
 
     // ********************************************************* Step 11: import blocks
 

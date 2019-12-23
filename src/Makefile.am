@@ -227,6 +227,8 @@ BITCOIN_CORE_H = \
   pos/checks.h \
   pos/kernel.h \
   pos/stakeinput.h \
+  pos/staker.h \
+  pos/staking-manager.h \
   pow.h \
   protocol.h \
   random.h \
@@ -436,6 +438,8 @@ libdash_wallet_a_SOURCES = \
   coinjoin/coinjoin-util.cpp \
   interfaces/wallet.cpp \
   keepass.cpp \
+  pos/staker.cpp \
+  pos/staking-manager.cpp \
   tokens/rpctokens.cpp \
   tokens/tokengroupconfiguration.cpp \
   tokens/tokengroupdescription.cpp \

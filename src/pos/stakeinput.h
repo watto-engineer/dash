@@ -26,7 +26,8 @@ public:
     virtual CBlockIndex* GetIndexFrom() = 0;
     virtual bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) = 0;
     virtual bool GetTxFrom(CTransactionRef& tx) = 0;
-    virtual CAmount GetValue() = 0;
+    virtual bool GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const = 0;
+    virtual CAmount GetValue() const = 0;
     virtual bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal) = 0;
     virtual bool GetModifier(uint64_t& nStakeModifier) = 0;
     virtual bool IsZBYTZ() = 0;
@@ -62,7 +63,8 @@ public:
 
     CBlockIndex* GetIndexFrom() override;
     bool GetTxFrom(CTransactionRef& tx) override;
-    CAmount GetValue() override;
+    bool GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const override;
+    CAmount GetValue() const override;
     bool GetModifier(uint64_t& nStakeModifier) override;
     CDataStream GetUniqueness() override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
@@ -92,7 +94,8 @@ public:
 
     CBlockIndex* GetIndexFrom() override;
     bool GetTxFrom(CTransactionRef& tx) override;
-    CAmount GetValue() override;
+    bool GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const override;
+    CAmount GetValue() const override;
     bool GetModifier(uint64_t& nStakeModifier) override;
     CDataStream GetUniqueness() override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;

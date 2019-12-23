@@ -10,6 +10,7 @@
 #include "primitives/block.h"
 #include "keystore.h"
 
+bool GetKeyIDFromUTXO(const CTxOut& txout, CKeyID& keyID);
 bool SignBlockWithKey(CBlock& block, const CKey& key);
 bool SignBlock(CBlock& block, const CKeyStore& keystore);
 bool CheckBlockSignature(const CBlock& block);

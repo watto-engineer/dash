@@ -69,7 +69,7 @@ CBlockIndex* CZStake::GetIndexFrom()
     return pindexFrom;
 }
 
-CAmount CZStake::GetValue()
+CAmount CZStake::GetValue() const
 {
     return denom * COIN;
 }
@@ -179,6 +179,11 @@ bool CZStake::GetTxFrom(CTransactionRef& tx)
     return false;
 }
 
+bool CZStake::GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const
+{
+    return false;
+}
+
 /*
 bool CZStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 {
@@ -206,13 +211,19 @@ bool CStake::GetTxFrom(CTransactionRef& tx)
     return true;
 }
 
+bool CStake::GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const
+{
+    scriptPubKeyKernel = txFrom->vout[nPosition].scriptPubKey;
+    return true;
+}
+
 bool CStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
     txIn = CTxIn(txFrom->GetHash(), nPosition);
     return true;
 }
 
-CAmount CStake::GetValue()
+CAmount CStake::GetValue() const
 {
     return txFrom->vout[nPosition].nValue;
 }
@@ -244,10 +255,6 @@ bool CStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount n
         scriptPubKey = scriptPubKeyKernel;
 
     vout.emplace_back(CTxOut(0, scriptPubKey));
-
-    // Calculate if we need to split the output
-    if (nTotal / 2 > (CAmount)(2000 * COIN))
-        vout.emplace_back(CTxOut(0, scriptPubKey));
 
     return true;
 }

@@ -13,6 +13,7 @@
 #include <net.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
+#include <pos/staker.h>
 #include <rpc/mining.h>
 #include <rpc/rawtransaction.h>
 #include <rpc/server.h>
@@ -2516,7 +2517,7 @@ UniValue walletpassphrase(const JSONRPCRequest& request)
             "\nExamples:\n"
             "\nUnlock the wallet for 60 seconds\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +
-            "\nUnlock the wallet for 60 seconds but allow CoinJoin only\n"
+            "\nUnlock the wallet for 60 seconds but allow CoinJoin and staking only\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60 true") +
             "\nLock the wallet again (before 60 seconds)\n"
             + HelpExampleCli("walletlock", "") +
@@ -3964,7 +3965,7 @@ UniValue generate(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "No coinbase script available");
     }
 
-    return generateBlocks(coinbase_script, num_generate, max_tries, true);
+    return generateHybridBlocks(coinbase_script, num_generate, max_tries, true, pwallet);
 }
 #else
 UniValue generate(const JSONRPCRequest& request)

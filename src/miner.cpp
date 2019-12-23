@@ -15,11 +15,16 @@
 #include <consensus/merkle.h>
 #include <consensus/validation.h>
 #include <hash.h>
+#include <init.h>
+#include <keystore.h>
 #include <net.h>
 #include <policy/feerate.h>
 #include <policy/policy.h>
+#include <pos/kernel.h>
+#include <pos/stakeinput.h>
 #include <pow.h>
 #include <primitives/transaction.h>
+#include <script/sign.h>
 #include <script/standard.h>
 #include <timedata.h>
 #include <util.h>
@@ -27,6 +32,10 @@
 #include <masternode/masternode-payments.h>
 #include <masternode/masternode-sync.h>
 #include <validationinterface.h>
+
+#ifdef ENABLE_WALLET
+#include <wallet/wallet.h>
+#endif
 
 #include <evo/specialtx.h>
 #include <evo/cbtx.h>
@@ -107,8 +116,32 @@ void BlockAssembler::resetBlock()
     nFees = 0;
 }
 
-std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn)
+bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx) {
+    // Calculate if we need to split the output
+    if (coinstakeTx->vout.size() != 2)
+        return false;
+    CAmount nValue = coinstakeTx->vout[1].nValue;
+    if (nValue / 2 > (CAmount)(2000 * COIN)) {
+        coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
+        coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
+    } else {
+        return false;
+    }
+    return true;
+}
+
+std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn,
+                                    std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, unsigned int nTxNewTime)
 {
+    CBasicKeyStore tempKeystore;
+#ifdef ENABLE_WALLET
+    std::vector<CWallet*> wallets = GetWallets();
+    const CKeyStore& keystore = wallets.size() < 1 ? tempKeystore : *wallets[0];
+#else
+    const CKeyStore& keystore = tempKeystore;
+#endif
+
+    bool fPos = (pCoinstakeTx != nullptr);
     int64_t nTimeStart = GetTimeMicros();
 
     resetBlock();
@@ -123,6 +156,11 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblock->vtx.emplace_back();
     pblocktemplate->vTxFees.push_back(-1); // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
+    if (fPos) {
+        pblock->vtx.emplace_back(MakeTransactionRef(*pCoinstakeTx));
+        pblocktemplate->vTxFees.push_back(-1); // updated at end
+        pblocktemplate->vTxSigOps.push_back(-1); // updated at end
+    }
 
     LOCK2(cs_main, mempool.cs);
 
@@ -139,7 +177,11 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (chainparams.MineBlocksOnDemand())
         pblock->nVersion = gArgs.GetArg("-blockversion", pblock->nVersion);
 
-    pblock->nTime = GetAdjustedTime();
+    if (fPos) {
+        pblock->nTime = nTxNewTime;
+    } else {
+        pblock->nTime = GetAdjustedTime();
+    }
     const int64_t nMedianTimePast = pindexPrev->GetMedianTimePast();
 
     nLockTimeCutoff = (STANDARD_LOCKTIME_VERIFY_FLAGS & LOCKTIME_MEDIAN_TIME_PAST)
@@ -174,13 +216,20 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
     coinbaseTx.vout.resize(1);
-    coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+    if (!fPos)
+        coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
 
     // NOTE: unlike in bitcoin, we need to pass PREVIOUS block height here
     CAmount blockReward = nFees + GetBlockSubsidy(pindexPrev->nBits, pindexPrev->nHeight, Params().GetConsensus());
 
     // Compute regular coinbase transaction.
-    coinbaseTx.vout[0].nValue = blockReward;
+    if (fPos) {
+        coinbaseTx.vout[0].nValue = 0;
+        pCoinstakeTx->vout[1].nValue = blockReward;
+        SplitCoinstakeVouts(pCoinstakeTx);
+    } else {
+        coinbaseTx.vout[0].nValue = blockReward;
+    }
 
     if (!fDIP0003Active_context) {
         coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
@@ -215,11 +264,31 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     // Update coinbase transaction with additional info about masternode and governance payments,
     // get some info back to pass to getblocktemplate
-    FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+    if (fPos) {
+        FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+    // Sign
+        int nIn = 0;
+        for (CTxIn txIn : pCoinstakeTx->vin) {
+            CScript coinstakeInScript;
+            coinstakeInput->GetScriptPubKeyKernel(coinstakeInScript);
+            CTransactionRef coinstakeTxFrom;
+            coinstakeInput->GetTxFrom(coinstakeTxFrom);
+            if (!SignSignature(keystore, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
+                throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
+        }
+    } else {
+        FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+    }
 
     pblock->vtx[0] = MakeTransactionRef(std::move(coinbaseTx));
     pblocktemplate->vTxFees[0] = -nFees;
-
+    if (fPos) {
+        pblock->vtx[1] = MakeTransactionRef(*pCoinstakeTx);
+        pblocktemplate->vTxFees[0] = 0;
+        pblocktemplate->vTxFees[1] = -nFees;
+    } else {
+        pblocktemplate->vTxFees[0] = -nFees;
+    }
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
     UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
@@ -227,6 +296,14 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblock->nNonce         = 0;
     pblocktemplate->nPrevBits = pindexPrev->nBits;
     pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(*pblock->vtx[0]);
+    if (fPos)
+        pblocktemplate->vTxSigOps[1] = GetLegacySigOpCount(*pblock->vtx[1]);
+
+    if (fPos) {
+        unsigned int nExtraNonce = 0;
+        IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
+        LogPrintf("CPUMiner : proof-of-stake block found %s \n", pblock->GetHash().ToString().c_str());
+    }
 
     CValidationState state;
     if (!TestBlockValidity(state, chainparams, *pblock, pindexPrev, false, false)) {
