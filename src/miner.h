@@ -7,6 +7,7 @@
 #define BITCOIN_MINER_H
 
 #include <optional.h>
+#include <key.h>
 #include <primitives/block.h>
 #include <txmempool.h>
 #include <validation.h>
@@ -22,6 +23,7 @@ class CChainParams;
 class CConnman;
 class CGovernanceManager;
 class CScript;
+class CStakeInput;
 class CSporkManager;
 
 namespace Consensus { struct Params; };
@@ -176,7 +178,8 @@ public:
                             llmq::CInstantSendManager& isman, const CTxMemPool& mempool, const CChainParams& params, const Options& options);
 
     /** Construct a new block template with coinbase to scriptPubKeyIn */
-    std::unique_ptr<CBlockTemplate> CreateNewBlock(const CScript& scriptPubKeyIn);
+    std::unique_ptr<CBlockTemplate> CreateNewBlock(const CScript& scriptPubKeyIn,
+            std::shared_ptr<CMutableTransaction> pCoinstakeTx = nullptr, std::shared_ptr<CStakeInput> coinstakeInput = nullptr, unsigned int nTxNewTime = 0);
 
     static Optional<int64_t> m_last_block_num_txs;
     static Optional<int64_t> m_last_block_size;
@@ -187,6 +190,9 @@ private:
     void resetBlock();
     /** Add a tx to the block */
     void AddToBlock(CTxMemPool::txiter iter);
+
+    /** If the coinstake output is above a threshold, split the stake reward in two outputs */
+    bool SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx);
 
     // Methods for how to add transactions to a block.
     /** Add transactions based on feerate including unconfirmed ancestors

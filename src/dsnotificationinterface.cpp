@@ -10,6 +10,7 @@
 #include <dsnotificationinterface.h>
 #include <governance/governance.h>
 #include <masternode/sync.h>
+#include <pos/staking-manager.h>
 #include <validation.h>
 
 #include <evo/deterministicmns.h>
@@ -72,6 +73,7 @@ void CDSNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, con
     for (auto& pair : coinJoinClientManagers) {
         pair.second->UpdatedBlockTip(pindexNew);
     }
+    stakingManager->UpdatedBlockTip(pindexNew);
 #endif // ENABLE_WALLET
 
     isman->UpdatedBlockTip(pindexNew);

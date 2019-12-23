@@ -12,6 +12,7 @@
 #include <node/context.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
+#include <pos/staker.h>
 #include <rpc/blockchain.h>
 #include <rpc/rawtransaction_util.h>
 #include <rpc/server.h>
@@ -1890,7 +1891,7 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
         RPCExamples{
     "\nUnlock the wallet for 60 seconds\n"
     + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +
-    "\nUnlock the wallet for 60 seconds but allow CoinJoin only\n"
+    "\nUnlock the wallet for 60 seconds but allow staking only\n"
     + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60 true") +
     "\nLock the wallet again (before 60 seconds)\n"
     + HelpExampleCli("walletlock", "") +

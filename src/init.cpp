@@ -40,6 +40,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
+#include <pos/staking-manager.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
 #include <rpc/server.h>
@@ -782,6 +783,12 @@ void SetupServerArgs(NodeContext& node)
     argsman.AddArg("-rpcwhitelistdefault", "Sets default behavior for rpc whitelisting. Unless rpcwhitelistdefault is set to 0, if any -rpcwhitelist is set, the rpc server acts as if all rpc users are subject to empty-unless-otherwise-specified whitelists. If rpcwhitelistdefault is set to 1 and no -rpcwhitelist is set, rpc server acts as if all rpc users are subject to empty whitelists.", ArgsManager::ALLOW_BOOL, OptionsCategory::RPC);
     argsman.AddArg("-rpcworkqueue=<n>", strprintf("Set the depth of the work queue to service RPC calls (default: %d)", DEFAULT_HTTP_WORKQUEUE), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::RPC);
     argsman.AddArg("-server", "Accept command line and JSON-RPC commands", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
+
+#ifdef ENABLE_WALLET
+    argsman.AddArg("-staking=<n>", strprintf(_("Enable staking functionality (0-1, default: %u)"), 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
+    argsman.AddArg("-wagerrstake=<n>", strprintf(_("Enable or disable staking functionality for WAGERR inputs (0-1, default: %u)"), 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
+    argsman.AddArg("-reservebalance=<n>", "Keep the specified amount available for spending at all times (default: 0)", ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
+#endif // ENABLE_WALLET
 
     argsman.AddArg("-statsenabled", strprintf("Publish internal stats to statsd (default: %u)", DEFAULT_STATSD_ENABLE), ArgsManager::ALLOW_ANY, OptionsCategory::STATSD);
     argsman.AddArg("-statshost=<ip>", strprintf("Specify statsd host (default: %s)", DEFAULT_STATSD_HOST), ArgsManager::ALLOW_ANY, OptionsCategory::STATSD);
@@ -2436,6 +2443,34 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
     }
 
     llmq::StartLLMQSystem();
+
+    // ********************************************************* Step 10d: setup and schedule Wagerr-specific functionality
+
+#ifdef ENABLE_WALLET
+
+    std::vector<CWallet*> wallets = GetWallets();
+    if (!HasWallets() || wallets.size() < 1) {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
+        stakingManager->fEnableStaking = false;
+        stakingManager->fEnableWAGERRStaking = false;
+    } else {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
+        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
+        stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
+    }
+
+    if (gArgs.IsArgSet("-reservebalance")) {
+        CAmount n = 0;
+        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), n)) {
+            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
+        }
+        stakingManager->nReserveBalance = n;
+    }
+
+    if (stakingManager->fEnableStaking) {
+        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 1 * 1000);
+    }
+#endif // ENABLE_WALLET
 
     // ********************************************************* Step 11: import blocks
 

@@ -2681,6 +2681,13 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
             }
             if(!found) continue;
 
+            if (nCoinType == CoinType::STAKABLE_COINS) {
+                if (pcoin->tx->vout[i].IsZerocoinMint())
+                    continue;
+                if (IsOutputGrouped(pcoin->tx->vout[i]))
+                    continue;
+            }
+
             if (pcoin->tx->vout[i].nValue < nMinimumAmount || pcoin->tx->vout[i].nValue > nMaximumAmount)
                 continue;
 

@@ -254,6 +254,8 @@ BITCOIN_CORE_H = \
   pos/checks.h \
   pos/kernel.h \
   pos/stakeinput.h \
+  pos/staker.h \
+  pos/staking-manager.h \
   pow.h \
   protocol.h \
   psbt.h \
@@ -555,6 +557,8 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/bdb.cpp \
   wallet/coincontrol.cpp \
   wallet/context.cpp \
+  pos/staker.cpp \
+  pos/staking-manager.cpp \
   tokens/rpctokens.cpp \
   tokens/tokengroupconfiguration.cpp \
   tokens/tokengroupdescription.cpp \
