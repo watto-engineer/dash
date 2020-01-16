@@ -29,6 +29,9 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
     } else if (!tgAtomCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ATOM") {
         this->tgAtomCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
+    } else if (!tgElectronCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "XELEC") {
+        this->tgElectronCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
+        return true;
     }
     return false;
 }
@@ -52,6 +55,11 @@ bool CTokenGroupManager::MatchesDarkMatter(CTokenGroupID tgID) {
 bool CTokenGroupManager::MatchesAtom(CTokenGroupID tgID) {
     if (!tgAtomCreation) return false;
     return tgID == tgAtomCreation->tokenGroupInfo.associatedGroup;
+}
+
+bool CTokenGroupManager::MatchesElectron(CTokenGroupID tgID) {
+    if (!tgElectronCreation) return false;
+    return tgID == tgElectronCreation->tokenGroupInfo.associatedGroup;
 }
 
 bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups) {
@@ -99,6 +107,8 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
             tgDarkMatterCreation.reset();
         } else if (MatchesAtom(tokenGroupInfo.associatedGroup)) {
             tgAtomCreation.reset();
+        } else if (MatchesElectron(tokenGroupInfo.associatedGroup)) {
+            tgElectronCreation.reset();
         }
 
         std::map<CTokenGroupID, CTokenGroupCreation>::iterator iter = mapTokenGroups.find(tokenGroupInfo.associatedGroup);
@@ -168,6 +178,12 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
         return true;
     };
     return false;
+}
+
+bool CTokenGroupManager::ManagementTokensCreated(int nHeight) {
+    // if (!ElectronTokensCreated() && nHeight >= Params().GetConsensus().POSPOWStartHeight)
+    //    return false;
+    return MagicTokensCreated() && DarkMatterTokensCreated() && AtomTokensCreated();
 }
 
 unsigned int CTokenGroupManager::GetTokenTxStats(const CTransaction &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId,

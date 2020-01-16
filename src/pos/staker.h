@@ -13,8 +13,9 @@
 class CWallet;
 class CBlockIndex;
 class CMutableTransaction;
+class CReserveKey;
 
 /** Generate mixed POS/POW blocks (mine or stake) */
-UniValue generateHybridBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
+UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
 
 #endif // POS_STAKER_H

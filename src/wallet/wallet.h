@@ -1167,6 +1167,9 @@ public:
 
     bool DelAddressBook(const CTxDestination& address);
 
+    bool GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey);
+    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CTokenGroupID &grpID, const CAmount amount);
+    bool GetKeyForMining(std::shared_ptr<CReserveKey> &reservedKey, CPubKey &pubkey);
     unsigned int GetKeyPoolSize() const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     //! signify that a particular wallet feature is now used. this may change nWalletVersion and nWalletMaxVersion if those are lower

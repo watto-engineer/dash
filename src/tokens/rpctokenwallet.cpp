@@ -884,7 +884,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     ret.push_back(Pair("outputs", retOutputs));
 */
 
-    if (tokenGroupManager->ManagementTokensCreated()) {
+    if (tokenGroupManager->ManagementTokensCreated(chainActive.Height())) {
         ret.push_back(Pair("xdm_available", tokenGroupManager->TokenValueFromAmount(totalXDMAvailable, tokenGroupManager->GetDarkMatterID())));
         ret.push_back(Pair("xdm_needed", tokenGroupManager->TokenValueFromAmount(XDMFeeNeeded, tokenGroupManager->GetDarkMatterID())));
     }

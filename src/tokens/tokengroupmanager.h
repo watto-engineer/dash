@@ -26,6 +26,7 @@ private:
     std::unique_ptr<CTokenGroupCreation> tgMagicCreation;
     std::unique_ptr<CTokenGroupCreation> tgDarkMatterCreation;
     std::unique_ptr<CTokenGroupCreation> tgAtomCreation;
+    std::unique_ptr<CTokenGroupCreation> tgElectronCreation;
 
 public:
     CTokenGroupManager();
@@ -49,18 +50,19 @@ public:
     bool MatchesMagic(CTokenGroupID tgID);
     bool MatchesDarkMatter(CTokenGroupID tgID);
     bool MatchesAtom(CTokenGroupID tgID);
+    bool MatchesElectron(CTokenGroupID tgID);
 
     CTokenGroupID GetMagicID() { return tgMagicCreation->tokenGroupInfo.associatedGroup; };
     CTokenGroupID GetDarkMatterID() { return tgDarkMatterCreation->tokenGroupInfo.associatedGroup; };
     CTokenGroupID GetAtomID() { return tgAtomCreation->tokenGroupInfo.associatedGroup; };
+    CTokenGroupID GetElectronID() { return tgElectronCreation->tokenGroupInfo.associatedGroup; };
 
     bool MagicTokensCreated() { return tgMagicCreation ? true : false; };
     bool DarkMatterTokensCreated() { return tgDarkMatterCreation ? true : false; };
     bool AtomTokensCreated() { return tgAtomCreation ? true : false; };
+    bool ElectronTokensCreated() { return tgElectronCreation ? true : false; };
 
-    bool ManagementTokensCreated() {
-        return MagicTokensCreated() && DarkMatterTokensCreated() && AtomTokensCreated();
-    }
+    bool ManagementTokensCreated(int nHeight);
 
     unsigned int GetTokenTxStats(const CTransaction &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, unsigned int &nTokenCount, CAmount &nTokenMint);
 

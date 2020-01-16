@@ -226,12 +226,18 @@ UniValue getnewaddress(const JSONRPCRequest& request)
     if (!request.params[0].isNull())
         label = LabelFromValue(request.params[0]);
 
+    std::shared_ptr<CReserveKey> coinbase_key;
+    CPubKey coinbase_pubkey;
+    if (!pwallet->GetKeyForMining(coinbase_key, coinbase_pubkey)){
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "No key for coinbase available");
+    }
     CTxDestination dest;
     std::string error;
     if (!pwallet->GetNewDestination(label, dest, error)) {
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, error);
     }
     return EncodeDestination(dest);
+//    return generateHybridBlocks(coinbase_key, num_generate, max_tries, true, pwallet);
 }
 
 static UniValue getrawchangeaddress(const JSONRPCRequest& request)
