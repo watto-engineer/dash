@@ -4028,20 +4028,18 @@ UniValue generate(const JSONRPCRequest& request)
         max_tries = request.params[1].get_int();
     }
 
-    std::shared_ptr<CReserveScript> coinbase_script;
-    pwallet->GetScriptForMining(coinbase_script);
+    std::shared_ptr<CReserveKey> coinbase_key;
+    CPubKey coinbase_pubkey;
+    if (!pwallet->GetKeyForMining(coinbase_key, coinbase_pubkey)){
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "No key for coinbase available");
+    }
 
     // If the keypool is exhausted, no script is returned at all.  Catch this.
-    if (!coinbase_script) {
+    if (!coinbase_key) {
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
     }
 
-    //throw an error if no script was provided
-    if (coinbase_script->reserveScript.empty()) {
-        throw JSONRPCError(RPC_INTERNAL_ERROR, "No coinbase script available");
-    }
-
-    return generateHybridBlocks(coinbase_script, num_generate, max_tries, true, pwallet);
+    return generateHybridBlocks(coinbase_key, num_generate, max_tries, true, pwallet);
 }
 #else
 UniValue generate(const JSONRPCRequest& request)
