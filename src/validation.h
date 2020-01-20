@@ -214,8 +214,8 @@ CTransactionRef GetTransaction(const CBlockIndex* const block_index, const CTxMe
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, std::shared_ptr<const CBlock> pblock = std::shared_ptr<const CBlock>()) LOCKS_EXCLUDED(cs_main);
 
 double ConvertBitsToDouble(unsigned int nBits);
-CAmount GetBlockSubsidy(int nBits, int nHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly = false);
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int nReallocActivationHeight = std::numeric_limits<int>::max() /* not activated */, bool isZBYTZStake = false);
+CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, const bool fPos, bool fSuperblockPartOnly);
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZWGRStake = false);
 
 /** Guess verification progress (as a fraction between 0.0=genesis and 1.0=current tip). */
 double GuessVerificationProgress(const ChainTxData& data, const CBlockIndex* pindex);

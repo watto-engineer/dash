@@ -65,7 +65,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
                 }
                 std::shared_ptr<CReserveScript> coinbase_script;
                 CTokenGroupID grpID = tokenGroupManager->GetElectronID();
-                CAmount amount = GetBlockSubsidy(chainActive.Tip()->nBits, nHeight, params);
+                CAmount amount = GetBlockSubsidy(chainActive.Tip()->nBits, nHeight, params, false, false);
                 if (!pwallet->GetScriptForHybridMining(coinbase_script, coinbaseKey, grpID, amount)) {
                     throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
                 }

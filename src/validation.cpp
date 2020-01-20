@@ -1055,9 +1055,14 @@ NOTE:   unlike bitcoin we are using PREVIOUS block height here,
         might be a good idea to change this to use prev bits
         but current height to avoid confusion.
 */
-CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly)
+CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, const bool fPos, bool fSuperblockPartOnly)
 {
     int nHeight = nPrevHeight + 1;
+/*
+    if (nHeight >= consensusParams.nPosPowStartHeight & !fPos) {
+        return 0;
+    }
+*/
     if (nHeight >= 107624) return 2710 * COIN;
     if (nHeight >= 67004) return 0 * COIN;
     if (nHeight >= 67001) return 2850000000 * COIN;
@@ -1068,13 +1073,13 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     return 0 * COIN;
 }
 
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int nReallocActivationHeight, bool isZBYTZStake)
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZWGRStake)
 {
     int64_t ret = 0;
 
     if (nHeight >= Params().GetConsensus().nPosStartHeight) {
-        if (isZBYTZStake){
-            //When zBYTZ is staked, masternode gets less BYTZ
+        if (isZWGRStake){
+            //When zWAGERR is staked, masternode gets less WAGERR
             return blockValue > 2410 * COIN ? 2410 * COIN : 0;
         } else {
             return blockValue > 2440 * COIN ? 2440 * COIN : blockValue * 0.9;
@@ -2413,7 +2418,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // DASH : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
 
     // TODO: resync data (both ways?) and try to reprocess this block later.
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->pprev->nBits, pindex->pprev->nHeight, chainparams.GetConsensus());
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->pprev->nBits, pindex->pprev->nHeight, chainparams.GetConsensus(), block.IsProofOfStake(), false);
     std::string strError = "";
 
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
