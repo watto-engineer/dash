@@ -37,8 +37,8 @@ CAmount GroupCoinSelection(const std::vector<COutput> &coins, CAmount amt, std::
 uint64_t RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey);
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalAvailable, CAmount totalNeeded, CAmount totalGroupedAvailable, CAmount totalGroupedNeeded,
-    CAmount totalXDMAvailable, CAmount totalXDMNeeded, CTokenGroupID grpID, CWallet *wallet);
+    CAmount totalBytzNeeded, CAmount totalGroupedNeeded,
+    CAmount totalXDMNeeded, CTokenGroupID grpID, CWallet *wallet);
 
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet);
 void GroupSend(CTransactionRef &txNew, const CTokenGroupID &grpID, const std::vector<CRecipient> &outputs,
