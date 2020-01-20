@@ -254,7 +254,7 @@ bool CStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount n
     } else
         scriptPubKey = scriptPubKeyKernel;
 
-    vout.emplace_back(CTxOut(0, scriptPubKey));
+    vout.emplace_back(CTxOut(nTotal, scriptPubKey));
 
     return true;
 }

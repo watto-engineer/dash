@@ -2458,6 +2458,9 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
     }
+    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
+        stakingManager->fEnableStaking = false;
+    }
 
     if (gArgs.IsArgSet("-reservebalance")) {
         CAmount n = 0;

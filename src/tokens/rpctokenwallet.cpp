@@ -1441,7 +1441,7 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: wrong vout nr");
     }
 
-    pwallet->AvailableCoins(availableCoins, false, nullptr, true, 0);
+    pwallet->AvailableCoins(availableCoins, true, nullptr, 0);
     if (availableCoins.empty()) {
         throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: provided output is not available");
     }
