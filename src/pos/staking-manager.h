@@ -29,6 +29,10 @@ private:
     const CBlockIndex* tipIndex{nullptr};
     CWallet* pwallet = nullptr;
 
+    int64_t nMintableLastCheck;
+    bool fMintableCoins;
+    unsigned int nExtraNonce;
+
 public:
     CStakingManager(CWallet * const pwalletIn = nullptr);
 
@@ -36,7 +40,8 @@ public:
     bool fEnableBYTZStaking;
     CAmount nReserveBalance;
 
-    bool SelectStakeCoins(CWallet * const pwallet, std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight);
+    bool MintableCoins();
+    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight);
     bool CreateCoinStake(const CBlockIndex* pindexPrev, std::shared_ptr<CMutableTransaction>& coinstakeTx, std::shared_ptr<CStakeInput>& coinstakeInput, unsigned int& nTxNewTime);
 
     void UpdatedBlockTip(const CBlockIndex* pindex);

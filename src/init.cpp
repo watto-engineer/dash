@@ -2356,6 +2356,9 @@ bool AppInitMain()
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
     }
+    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
+        stakingManager->fEnableStaking = false;
+    }
 
     if (gArgs.IsArgSet("-reservebalance")) {
         CAmount n = 0;

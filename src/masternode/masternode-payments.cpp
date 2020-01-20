@@ -222,8 +222,13 @@ void FillBlockPayments(CMutableTransaction& txNew, int nBlockHeight, CAmount blo
 
     std::string voutMasternodeStr;
     for (const auto& txout : voutMasternodePaymentsRet) {
-        // subtract MN payment from miner reward
-        txNew.vout[0].nValue -= txout.nValue;
+        // subtract MN payment from miner or staker reward
+        for (auto& rewardTxOut : txNew.vout) {
+            if (rewardTxOut.nValue >= txout.nValue) {
+                rewardTxOut.nValue -= txout.nValue;
+                break;
+            }
+        }
         if (!voutMasternodeStr.empty())
             voutMasternodeStr += ",";
         voutMasternodeStr += txout.ToString();

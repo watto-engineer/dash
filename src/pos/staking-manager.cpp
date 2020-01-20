@@ -5,8 +5,10 @@
 #include "staking-manager.h"
 
 #include "init.h"
+#include "miner.h"
 #include "net.h"
 #include "policy/policy.h"
+#include "pos/blocksignature.h"
 #include "pos/kernel.h"
 #include "pos/stakeinput.h"
 #include "script/sign.h"
@@ -15,19 +17,48 @@
 
 std::shared_ptr<CStakingManager> stakingManager;
 
-CStakingManager::CStakingManager(CWallet * const pwalletIn) {
-    this->pwallet = pwalletIn;
+CStakingManager::CStakingManager(CWallet * const pwalletIn) :
+        nMintableLastCheck(0), fMintableCoins(false), nExtraNonce(0), // Currently unused
+        fEnableStaking(false), fEnableBYTZStaking(false), nReserveBalance(0), pwallet(pwalletIn) {}
+
+bool CStakingManager::MintableCoins()
+{
+    if (pwallet == nullptr) return false;
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    int blockHeight = chainActive.Height();
+
+    std::vector<COutput> vCoins;
+    CCoinControl coin_control;
+    coin_control.nCoinType = CoinType::STAKABLE_COINS;
+    int nMinDepth = blockHeight >= Params().GetConsensus().nBlockStakeModifierV2 ? Params().GetConsensus().nStakeMinDepth : 1;
+    pwallet->AvailableCoins(vCoins, true, &coin_control, 1, MAX_MONEY, MAX_MONEY, 0, nMinDepth);
+    CAmount nAmountSelected = 0;
+
+    for (const COutput &out : vCoins) {
+        if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
+            continue;
+
+        CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
+        //check for maturity (min age/depth)
+        if (HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
+            return true;
+    }
+    return false;
 }
 
-bool CStakingManager::SelectStakeCoins(CWallet * const pwallet, std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight)
+bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight)
 {
+    if (pwallet == nullptr) return false;
+
     LOCK2(cs_main, pwallet->cs_wallet);
     //Add BYTZ
     std::vector<COutput> vCoins;
     CCoinControl coin_control;
     coin_control.nCoinType = CoinType::STAKABLE_COINS;
     int nMinDepth = blockHeight >= Params().GetConsensus().nBlockStakeModifierV2 ? Params().GetConsensus().nStakeMinDepth : 1;
-    pwallet->AvailableCoins(vCoins, true, &coin_control, 1, MAX_MONEY, 0, nMinDepth);
+    pwallet->AvailableCoins(vCoins, true, &coin_control, 1, MAX_MONEY, MAX_MONEY, 0, nMinDepth);
     CAmount nAmountSelected = 0;
 
     if (fEnableBYTZStaking) {
@@ -76,8 +107,8 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
 
     // Get the list of stakable inputs
     std::list<std::unique_ptr<CStakeInput> > listInputs;
-    if (!SelectStakeCoins(pwallet, listInputs, nBalance - nReserveBalance, pindexPrev->nHeight + 1)) {
-        LogPrintf("CreateCoinStake(): selectStakeCoins failed\n");
+    if (!SelectStakeCoins(listInputs, nBalance - nReserveBalance, pindexPrev->nHeight + 1)) {
+        LogPrint(BCLog::STAKING, "CreateCoinStake(): selectStakeCoins failed\n");
         return false;
     }
 
@@ -114,12 +145,12 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
         //iterates each utxo inside of CheckStakeKernelHash()
         if (Stake(pindexPrev, stakeInput.get(), pindexPrev->nBits, nTxNewTime, hashProofOfStake)) {
             // Found a kernel
-            LogPrintf("CreateCoinStake : kernel found\n");
+            LogPrint(BCLog::STAKING, "CreateCoinStake : kernel found\n");
 
-            // add a zero value coinstake output
-            // value will be updated later
-            if (!stakeInput->CreateTxOuts(pwallet, coinstakeTx->vout, 0)) {
-                LogPrintf("%s : failed to get scriptPubKey\n", __func__);
+            // Stake output value is set to stake input value.
+            // Adding stake rewards and potentially splitting outputs is performed in BlockAssembler::CreateNewBlock()
+            if (!stakeInput->CreateTxOuts(pwallet, coinstakeTx->vout, stakeInput->GetValue())) {
+                LogPrint(BCLog::STAKING, "%s : failed to get scriptPubKey\n", __func__);
                 return false;
             }
 
@@ -132,7 +163,7 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
                 uint256 hashTxOut = coinstakeTx->GetHash();
                 CTxIn in;
                 if (!stakeInput->CreateTxIn(pwallet, in, hashTxOut)) {
-                    LogPrintf("%s : failed to create TxIn\n", __func__);
+                    LogPrint(BCLog::STAKING, "%s : failed to create TxIn\n", __func__);
                     coinstakeTx->vin.clear();
                     coinstakeTx->vout.clear();
                     continue;
@@ -166,9 +197,66 @@ void CStakingManager::DoMaintenance(CConnman& connman)
 {
     if (!fEnableStaking) return;
 
+    const Consensus::Params& params = Params().GetConsensus();
+
     CBlockIndex* pindexPrev = chainActive.Tip();
+    int nStakeHeight = pindexPrev->nHeight;
     if (!pindexPrev)
         return;
 
-    // Take structure from BitcoinMiner()
+    // Check block height
+    const bool fPosPhase = (nStakeHeight >= params.nPosStartHeight);
+    if (!fPosPhase) {
+        // no POS for at least 1 block
+        return;
+    }
+
+    //control the amount of times the client will check for mintable coins
+    if (!MintableCoins()) {
+        // No mintable coins
+        return;
+    }
+
+    // Create new block
+    std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
+    std::shared_ptr<CStakeInput> coinstakeInputPtr = nullptr;
+    std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
+    unsigned int nCoinStakeTime;
+    if (CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
+        // Coinstake found. Extract signing key from coinstake
+        try {
+            pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
+        } catch (const std::exception& e) {
+            LogPrint(BCLog::STAKING, "%s: error creating block - %s", __func__, e.what());
+        }
+    } else {
+        return;
+    }
+
+    if (!pblocktemplate.get())
+        return;
+
+    CBlock* pblock = &pblocktemplate->block;
+
+    // Sign block
+    CKeyID keyID;
+    if (!GetKeyIDFromUTXO(pblock->vtx[1]->vout[1], keyID)) {
+        LogPrint(BCLog::STAKING, "%s: failed to find key for PoS", __func__);
+        return;
+    }
+    CKey key;
+    if (!pwallet->GetKey(keyID, key)) {
+        LogPrint(BCLog::STAKING, "%s: failed to get key from keystore", __func__);
+        return;
+    }
+    if (!key.Sign(pblock->GetHash(), pblock->vchBlockSig)) {
+        LogPrint(BCLog::STAKING, "%s: failed to sign block hash with key", __func__);
+        return;
+    }
+
+    /// Process block
+    std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
+    if (!ProcessNewBlock(Params(), shared_pblock, true, nullptr)) {
+        LogPrint(BCLog::STAKING, "%s: ProcessNewBlock, block not accepted", __func__);
+    }
 }
