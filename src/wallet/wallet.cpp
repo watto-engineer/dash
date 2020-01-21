@@ -2685,6 +2685,68 @@ CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
     return nCredit;
 }
 
+CAmount CWalletTx::GetUnlockedCredit(bool fUseCache, const isminefilter& filter) const
+{
+    if (pwallet == 0)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+
+        if (pwallet->IsSpent(hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
+        if (fMasternodeMode && tx->vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT) continue; // do not count MN-like outputs
+
+        nCredit += pwallet->GetCredit(txout, filter);
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetUnlockedCredit() : value out of range");
+    }
+
+    return nCredit;
+}
+
+CAmount CWalletTx::GetLockedCredit(bool fUseCache, const isminefilter& filter) const
+{
+    if (pwallet == 0)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+
+        // Skip spent coins
+        if (pwallet->IsSpent(hashTx, i)) continue;
+
+        if (pwallet->IsLockedCoin(hashTx, i)) {
+            // Add locked coins
+            nCredit += pwallet->GetCredit(txout, filter);
+        } else if (fMasternodeMode && tx->vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT) {
+            // Add masternode collaterals which are handled like locked coins
+            nCredit += pwallet->GetCredit(txout, filter);
+        }
+
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetUnlockedCredit() : value out of range");
+    }
+
+    return nCredit;
+}
+
+CAmount CWalletTx::GetLockedWatchOnlyCredit(const bool& fUseCache) const
+{
+    return GetLockedCredit(fUseCache, ISMINE_WATCH_ONLY);
+}
+
 CAmount CWalletTx::GetChange() const
 {
     if (fChangeCached)
@@ -2979,6 +3041,45 @@ CAmount CWallet::GetImmatureWatchOnlyBalance() const
         LOCK2(cs_main, cs_wallet);
         for (auto pcoin : GetSpendableTXs()) {
             nTotal += pcoin->GetImmatureWatchOnlyCredit();
+        }
+    }
+    return nTotal;
+}
+
+CAmount CWallet::GetUnlockedBalance() const
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetUnlockedCredit();
+        }
+    }
+    return nTotal;
+}
+
+CAmount CWallet::GetLockedBalance() const
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetLockedCredit();
+        }
+    }
+    return nTotal;
+}
+
+CAmount CWallet::GetLockedWatchOnlyBalance() const
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetLockedWatchOnlyCredit();
         }
     }
     return nTotal;
