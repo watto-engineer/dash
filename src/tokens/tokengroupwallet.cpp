@@ -282,12 +282,11 @@ CAmount GroupCoinSelection(const std::vector<COutput> &coins, CAmount amt, std::
     return cur;
 }
 
-uint64_t RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey)
+bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey)
 {
     // The melting authority is consumed.  A wallet can decide to create a child authority or not.
     // In this simple wallet, we will always create a new melting authority if we spend a renewable
     // (CCHILD is set) one.
-    uint64_t totalBytzNeeded = 0;
     CTokenGroupInfo tg(authority.GetScriptPubKey());
 
     if (tg.allowsRenew())
@@ -299,70 +298,54 @@ uint64_t RenewAuthority(const COutput &authority, std::vector<CRecipient> &outpu
         CScript script = GetScriptForDestination(authDest, tg.associatedGroup, (CAmount)(tg.controllingGroupFlags() & GroupAuthorityFlags::ALL_BITS));
         CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
         outputs.push_back(recipient);
-        totalBytzNeeded += GROUPED_SATOSHI_AMT;
     }
 
-    return totalBytzNeeded;
+    return true;
 }
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalBytzNeeded, CAmount totalGroupedNeeded,
-    CAmount totalXDMNeeded, CTokenGroupID grpID, CWallet *wallet)
+    CAmount totalGroupedNeeded, CAmount totalXDMNeeded, CTokenGroupID grpID, CWallet *wallet)
 {
-    CAmount totalBytzAvailable = 0;
     CAmount totalGroupedAvailable = 0;
     CAmount totalXDMAvailable = 0;
     CTokenGroupID XDMGrpID;
-    bool XDMCreated;
 
-    std::string strError;
     CMutableTransaction tx;
     CReserveKey groupChangeKeyReservation(wallet);
-    CReserveKey feeChangeKeyReservation(wallet);
 
-    XDMCreated = tokenGroupManager->DarkMatterTokensCreated();
+    const bool XDMCreated = tokenGroupManager->DarkMatterTokensCreated();
     if (XDMCreated) {
         XDMGrpID = tokenGroupManager->GetDarkMatterID();
     }
-    for (auto coin : chosenCoins)
-    {
-        totalBytzAvailable += coin.GetValue();
-        CTokenGroupInfo tg(coin.GetScriptPubKey());
-        if (!tg.isInvalid() && tg.associatedGroup != NoGroup && !tg.isAuthority())
-        {
-            if (tg.associatedGroup == grpID){
-                totalGroupedAvailable += tg.quantity;
-            } else if (XDMCreated && tg.associatedGroup == XDMGrpID) {
-                totalXDMAvailable += tg.quantity;
-            }
-        }
-    }
 
     {
-        unsigned int approxSize = 0;
-
         // Add group outputs based on the passed recipient data to the tx.
         for (const CRecipient &recipient : outputs)
         {
             CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
             tx.vout.push_back(txout);
-            approxSize += ::GetSerializeSize(txout, SER_DISK, CLIENT_VERSION);
         }
 
-        // Gather data on the provided inputs, and add them to the tx.
-        unsigned int inpSize = 0;
         for (const auto &coin : chosenCoins)
         {
             CTxIn txin(coin.GetOutPoint());
             tx.vin.push_back(txin);
-            inpSize = ::GetSerializeSize(txin, SER_DISK, CLIENT_VERSION) + TX_SIG_SCRIPT_LEN;
-            approxSize += inpSize;
+
+            // Gather data on the provided inputs, and add them to the tx.
+            CTokenGroupInfo tg(coin.GetScriptPubKey());
+            if (!tg.isInvalid() && tg.associatedGroup != NoGroup && !tg.isAuthority())
+            {
+                if (tg.associatedGroup == grpID){
+                    totalGroupedAvailable += tg.quantity;
+                } else if (XDMCreated && tg.associatedGroup == XDMGrpID) {
+                    totalXDMAvailable += tg.quantity;
+                }
+            }
         }
 
         if (totalGroupedAvailable > totalGroupedNeeded) // need to make a group change output
         {
             CPubKey newKey;
-
             if (!groupChangeKeyReservation.GetReservedKey(newKey, true))
                 throw JSONRPCError(
                     RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
@@ -370,7 +353,6 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
             CTxOut txout(GROUPED_SATOSHI_AMT,
                 GetScriptForDestination(newKey.GetID(), grpID, totalGroupedAvailable - totalGroupedNeeded));
             tx.vout.push_back(txout);
-            approxSize += ::GetSerializeSize(txout, SER_DISK, CLIENT_VERSION);
         }
 
         if (totalXDMAvailable > totalXDMNeeded) // need to make a group change output
@@ -384,48 +366,18 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
             CTxOut txout(GROUPED_SATOSHI_AMT,
                 GetScriptForDestination(newKey.GetID(), tokenGroupManager->GetDarkMatterID(), totalXDMAvailable - totalXDMNeeded));
             tx.vout.push_back(txout);
-            approxSize += ::GetSerializeSize(txout, SER_DISK, CLIENT_VERSION);
         }
 
-        // Add another input for the bitcoin used for the fee
-        // this ignores the additional change output
-        approxSize += inpSize * 3;
+        // Now add fee
+        CAmount fee;
+        int nChangePosRet = -1;
+        std::string strError;
+        bool lockUnspents;
+        std::set<int> setSubtractFeeFromOutputs;
+        CCoinControl coinControl;
 
-        // Now add bitcoin fee
-        CAmount fee = GetRequiredFee(approxSize);
-
-        if (totalBytzAvailable < totalBytzNeeded + fee) // need to find a fee input
-        {
-            // find a fee input
-            std::vector<COutput> bchcoins;
-            wallet->FilterCoins(bchcoins, [](const CWalletTx *tx, const CTxOut *out) {
-                CTokenGroupInfo tg(out->scriptPubKey);
-                return NoGroup == tg.associatedGroup;
-            });
-
-            COutput feeCoin(nullptr, 0, 0, false, false, false);
-            if (!NearestGreaterCoin(bchcoins, fee, feeCoin))
-            {
-                strError = strprintf("Not enough funds for fee of %d BYTZ.", FormatMoney(fee));
-                throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-            }
-
-            CTxIn txin(feeCoin.GetOutPoint(), CScript(), std::numeric_limits<unsigned int>::max() - 1);
-            tx.vin.push_back(txin);
-            totalBytzAvailable += feeCoin.GetValue();
-        }
-
-        // make change if input is too big -- its okay to overpay by FEE_FUDGE rather than make dust.
-        if (totalBytzAvailable > totalBytzNeeded + (FEE_FUDGE * fee))
-        {
-            CPubKey newKey;
-
-            if (!feeChangeKeyReservation.GetReservedKey(newKey, true))
-                throw JSONRPCError(
-                    RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-
-            CTxOut txout(totalBytzAvailable - totalBytzNeeded - fee, GetScriptForDestination(newKey.GetID()));
-            tx.vout.push_back(txout);
+        if (!wallet->FundTransaction(tx, fee, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
+            throw JSONRPCError(RPC_WALLET_ERROR, strError);
         }
 
         if (!wallet->SignTransaction(tx))
@@ -454,7 +406,6 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
                                              "wallet.dat and coins were spent in the copy but not marked as spent "
                                              "here.");
 
-    feeChangeKeyReservation.KeepKey();
     groupChangeKeyReservation.KeepKey();
 }
 
@@ -464,8 +415,6 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
     std::string strError;
     std::vector<CRecipient> outputs; // Melt has no outputs (except change)
     CAmount totalAvailable = 0;
-    CAmount totalBchAvailable = 0;
-    CAmount totalBytzNeeded = 0;
     LOCK2(cs_main, wallet->cs_wallet);
 
     // Find melt authority
@@ -506,7 +455,6 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
     // Just pick the first one for now.
     for (auto coin : coins)
     {
-        totalBchAvailable += coin.tx->tx->vout[coin.i].nValue; // The melt authority may have some BCH in it
         authority = coin;
         break;
     }
@@ -533,11 +481,10 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
     chosenCoins.push_back(authority);
 
     CReserveKey childAuthorityKey(wallet);
-    totalBytzNeeded += RenewAuthority(authority, outputs, childAuthorityKey);
+    RenewAuthority(authority, outputs, childAuthorityKey);
     // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
     // This surplus will be melted.
-    ConstructTx(txNew, chosenCoins, outputs, totalBytzNeeded, totalNeeded, 0, grpID,
-        wallet);
+    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, 0, grpID, wallet);
     childAuthorityKey.KeepKey();
 }
 
@@ -613,8 +560,7 @@ void GroupSend(CTransactionRef &txNew,
         }
     }
 
-    ConstructTx(txNew, chosenCoins, outputs, GROUPED_SATOSHI_AMT * outputs.size(), totalNeeded,
-        totalXDMNeeded, grpID, wallet);
+    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, totalXDMNeeded, grpID, wallet);
 }
 
 CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGroupIdFlags flags, uint64_t &nonce)
