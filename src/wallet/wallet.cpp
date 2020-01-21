@@ -1516,17 +1516,78 @@ CAmount CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) c
     return nCredit;
 }
 
-CAmount CWallet::GetChange(const CTransaction& tx) const
+CAmount CWalletTx::GetUnlockedCredit(bool fUseCache, const isminefilter& filter) const
 {
-    CAmount nChange = 0;
-    for (const CTxOut& txout : tx.vout)
-    {
-        nChange += GetChange(txout);
-        if (!MoneyRange(nChange))
-            throw std::runtime_error(std::string(__func__) + ": value out of range");
+    if (pwallet == 0)
+        return 0;
+
+    // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+
+        if (pwallet->IsSpent(hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
+        if (fMasternodeMode && tx->vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT) continue; // do not count MN-like outputs
+
+        nCredit += pwallet->GetCredit(txout, filter);
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetUnlockedCredit() : value out of range");
     }
-    return nChange;
+
+    return nCredit;
 }
+
+CAmount CWalletTx::GetLockedCredit(bool fUseCache, const isminefilter& filter) const
+{
+    if (pwallet == 0)
+        return 0;
+
+   // Must wait until coinbase is safely deep enough in the chain before valuing it
+    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        return 0;
+
+    CAmount nCredit = 0;
+    uint256 hashTx = GetHash();
+    for (unsigned int i = 0; i < tx->vout.size(); i++) {
+        const CTxOut& txout = tx->vout[i];
+
+        // Skip spent coins
+        if (pwallet->IsSpent(hashTx, i)) continue;
+
+        if (pwallet->IsLockedCoin(hashTx, i)) {
+            // Add locked coins
+            nCredit += pwallet->GetCredit(txout, filter);
+        } else if (fMasternodeMode && tx->vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT) {
+            // Add masternode collaterals which are handled like locked coins
+            nCredit += pwallet->GetCredit(txout, filter);
+        }
+
+        if (!MoneyRange(nCredit))
+            throw std::runtime_error("CWalletTx::GetUnlockedCredit() : value out of range");
+    }
+
+    return nCredit;
+}
+
+CAmount CWalletTx::GetLockedWatchOnlyCredit(const bool& fUseCache) const
+{
+    return GetLockedCredit(fUseCache, ISMINE_WATCH_ONLY);
+}
+
+Amount CWallet::GetChange(const CTransaction& tx) const
+
+   CAmount nChange = 0;
+   for (const CTxOut& txout : tx.vout)
+   {
+       nChange += GetChange(txout);
+       if (!MoneyRange(nChange))
+           throw std::runtime_error(std::string(__func__) + ": value out of range");
+   }
+   return nChange;
 
 bool CWallet::IsHDEnabled() const
 {
@@ -2518,6 +2579,44 @@ CAmount CWallet::GetAnonymizableBalance(bool fSkipDenominated, bool fSkipUnconfi
     return nTotal;
 }
 
+Amount CWallet::GetUnlockedBalance() const
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetUnlockedCredit();
+        }
+    }
+    return nTotal;
+}
+
+CAmount CWallet::GetLockedBalance() const
+{
+    CAmount nTotal = 0;
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetLockedCredit();
+        }
+    }
+    return nTotal;
+}
+
+CAmount CWallet::GetLockedWatchOnlyBalance() const
+{
+    CAmount nTotal = 0;
+    {
+       LOCK2(cs_main, cs_wallet);
+        for (auto pcoin : GetSpendableTXs()) {
+            if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
+                nTotal += pcoin->GetLockedWatchOnlyCredit();
+        }
+    }
+    return nTotal;
+}
 // Note: calculated including unconfirmed,
 // that's ok as long as we use it for informational purposes only
 float CWallet::GetAverageAnonymizedRounds() const

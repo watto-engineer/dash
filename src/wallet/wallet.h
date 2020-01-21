@@ -98,6 +98,9 @@ static const CAmount HIGH_MAX_TX_FEE = 100 * HIGH_TX_FEE_PER_KB;
 //! if set, all keys will be derived by using BIP39/BIP44
 static const bool DEFAULT_USE_HD_WALLET = false;
 
+//! Masternode coin amount
+static const CAmount MASTERNODE_COLLATERAL_AMOUNT = 20000 * COIN;
+
 class CCoinControl;
 class CKey;
 class COutput;
@@ -513,6 +516,10 @@ public:
     {
         return CalculateMaximumSignedInputSize(tx->vout[out], pwallet, use_max_sig);
     }
+
+    CAmount GetUnlockedCredit(bool fUseCache=true, const isminefilter& filter = ISMINE_SPENDABLE) const;
+    CAmount GetLockedCredit(bool fUseCache=true, const isminefilter& filter = ISMINE_SPENDABLE) const;
+    CAmount GetLockedWatchOnlyCredit(const bool& fUseCache=true) const;
 
     void GetAmounts(std::list<COutputEntry>& listReceived,
                     std::list<COutputEntry>& listSent, CAmount& nFee, const isminefilter& filter) const;
@@ -1051,6 +1058,10 @@ public:
     CAmount GetAnonymizableBalance(bool fSkipDenominated = false, bool fSkipUnconfirmed = true) const;
     float GetAverageAnonymizedRounds() const;
     CAmount GetNormalizedAnonymizedBalance() const;
+
+    CAmount GetUnlockedBalance() const;
+    CAmount GetLockedBalance() const;
+    CAmount GetLockedWatchOnlyBalance() const;
 
     bool GetBudgetSystemCollateralTX(CTransactionRef& tx, uint256 hash, CAmount amount, const COutPoint& outpoint=COutPoint()/*defaults null*/);
     CAmount GetAvailableBalance(const CCoinControl* coinControl = nullptr) const;

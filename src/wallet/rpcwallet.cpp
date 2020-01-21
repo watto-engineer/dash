@@ -825,6 +825,33 @@ static UniValue getunconfirmedbalance(const JSONRPCRequest &request)
     return ValueFromAmount(pwallet->GetBalance().m_mine_untrusted_pending);
 }
 
+UniValue getextendedbalance(const JSONRPCRequest &request)
+{
+    CWallet * const pwallet = GetWalletForJSONRPCRequest(request);
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() > 0)
+        throw std::runtime_error(
+               "getextendedbalance\n"
+                "Returns extended balance information\n");
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("blocks", (int)chainActive.Height()));
+    obj.push_back(Pair("balance", ValueFromAmount(pwallet->GetBalance())));
+    obj.push_back(Pair("balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedBalance())));
+    obj.push_back(Pair("balance_immature", ValueFromAmount(pwallet->GetImmatureBalance())));
+    obj.push_back(Pair("watchonly_balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedWatchOnlyBalance())));
+    obj.push_back(Pair("watchonly_balance_immature", ValueFromAmount(pwallet->GetImmatureWatchOnlyBalance())));
+    obj.push_back(Pair("balance_unlocked", ValueFromAmount(pwallet->GetUnlockedBalance())));
+    obj.push_back(Pair("balance_locked", ValueFromAmount(pwallet->GetLockedBalance())));
+    obj.push_back(Pair("watchonly_balance_locked", ValueFromAmount(pwallet->GetLockedWatchOnlyBalance())));
+    obj.push_back(Pair("available_balance", ValueFromAmount(pwallet->GetAvailableBalance())));
+    return obj;
+}
 
 static UniValue sendmany(const JSONRPCRequest& request)
 {
@@ -3996,6 +4023,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "getaddressesbylabel",              &getaddressesbylabel,           {"label"} },
     { "wallet",             "getaddressinfo",                   &getaddressinfo,                {"address"} },
     { "wallet",             "getbalance",                       &getbalance,                    {"dummy","minconf","addlocked","include_watchonly", "avoid_reuse"} },
+    { "wallet",             "getextendedbalance",               &getbalance,                    {} },
     { "wallet",             "getnewaddress",                    &getnewaddress,                 {"label"} },
     { "wallet",             "getrawchangeaddress",              &getrawchangeaddress,           {} },
     { "wallet",             "getreceivedbyaddress",             &getreceivedbyaddress,          {"address","minconf","addlocked"} },
