@@ -1059,6 +1059,16 @@ void InitParameterInteraction()
         }
     }
 
+#ifdef ENABLE_WALLET
+    bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
+    if (fDisableWallet) {
+#endif
+        if (gArgs.SoftSetBoolArg("-staking", false))
+            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
+#ifdef ENABLE_WALLET
+    }
+#endif
+
     // Make sure additional indexes are recalculated correctly in VerifyDB
     // (we must reconnect blocks whenever we disconnect them for these indexes to work)
     bool fAdditionalIndexes =
