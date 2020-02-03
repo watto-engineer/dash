@@ -2137,6 +2137,9 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // Get the script flags for this block
     unsigned int flags = GetBlockScriptFlags(pindex, chainparams.GetConsensus());
 
+    if (!SetPOSParameters(block, state, pindex)) {
+        return state.Error("Error setting POS parameters");
+    }
     if (block.IsProofOfStake()) {
         std::unique_ptr<CStakeInput> stake;
         uint256 hashProofOfStake;
@@ -2432,7 +2435,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime5_3 = GetTimeMicros(); nTimeValueValid += nTime5_3 - nTime5_2;
     LogPrint(BCLog::BENCHMARK, "      - IsBlockValueValid: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3 - nTime5_2), nTimeValueValid * MICRO, nTimeValueValid * MILLI / nBlocksTotal);
 
-    if (!IsBlockPayeeValid(*sporkManager, *governance, *block.vtx[0], pindex->nHeight, blockReward)) {
+    if (!IsBlockPayeeValid(*sporkManager, *governance, *block.vtx[0], block.IsProofOfStake() ? block.vtx[1] : nullptr, pindex->nHeight, blockReward)) {
         // NOTE: Do not punish, the node might be missing governance data
         return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(DASH): couldn't find masternode or superblock payments"), REJECT_INVALID, "bad-cb-payee");
     }
@@ -3702,6 +3705,11 @@ CBlockIndex* BlockManager::AddToBlockIndex(const CBlockHeader& block, enum Block
 /** Mark a block as having its data received and checked (up to BLOCK_VALID_TRANSACTIONS). */
 void CChainState::ReceivedBlockTransactions(const CBlock& block, CBlockIndex* pindexNew, const FlatFilePos& pos)
 {
+    pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit());
+
+    if (block.IsProofOfStake()) {
+        pindexNew->SetProofOfStake();
+    }
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
     pindexNew->nFile = pos.nFile;
@@ -4196,29 +4204,6 @@ static FlatFilePos SaveBlockToDisk(const CBlock& block, int nHeight, const CChai
     return blockPos;
 }
 
-// TODO: Find a better place?
-bool AcceptPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex* pindexNew) {
-    AssertLockHeld(cs_main);
-
-    if (!pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit()))
-        return state.Invalid(false, REJECT_INVALID, "time-too-new", strprintf("%s : SetStakeEntropyBit() failed", __func__));
-
-    if (pindexNew->nHeight < Params().GetConsensus().nBlockStakeModifierV2) {
-        uint64_t nStakeModifier = 0;
-        bool fGeneratedStakeModifier = false;
-        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            return state.Invalid(error("%s : ComputeNextStakeModifier() failed", __func__));
-        pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-           return state.DoS(20, error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__));
-    } else {
-        // compute v2 stake modifier
-        ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);
-    }
-    return true;
-}
-
 /** Store block on disk. If dbp is non-nullptr, the file is known to already reside on disk */
 bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex, bool fRequested, const FlatFilePos* dbp, bool* fNewBlock)
 {
@@ -4296,7 +4281,6 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
         if (block.IsProofOfStake()) {
             pindex->SetProofOfStake();
         }
-        AcceptPOSParameters(block, state, pindex);
         ReceivedBlockTransactions(block, pindex, blockPos);
     } catch (const std::runtime_error& e) {
         return AbortNode(state, std::string("System error: ") + e.what());
@@ -4331,8 +4315,10 @@ bool ChainstateManager::ProcessNewBlock(const CChainParams& chainparams, const s
         // Ensure that CheckBlock() passes before calling AcceptBlock, as
         // belt-and-suspenders.
         bool ret = CheckBlock(*pblock, state, chainparams.GetConsensus());
-        if (!CheckBlockSignature(*pblock))
-            return error("ProcessNewBlock() : bad proof-of-stake block signature");
+        if (!CheckBlockSignature(*pblock)) {
+            state.Error("ProcessNewBlock() : bad proof-of-stake block signature");
+            ret = false;
+        }
 
         if (ret) {
             // Store to disk

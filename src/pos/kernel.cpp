@@ -503,3 +503,22 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
     }
     return true;
 }
+
+bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex* pindexNew) {
+    AssertLockHeld(cs_main);
+
+    if (pindexNew->nHeight < Params().GetConsensus().nBlockStakeModifierV2) {
+        uint64_t nStakeModifier = 0;
+        bool fGeneratedStakeModifier = false;
+        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
+            return state.Invalid(error("%s : ComputeNextStakeModifier() failed", __func__));
+        pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
+        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
+        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
+            return state.DoS(20, error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__));
+    } else {
+        // compute v2 stake modifier
+        ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);
+    }
+    return true;
+}

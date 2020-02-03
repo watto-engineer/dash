@@ -163,8 +163,7 @@ bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& go
     return true;
 }
 
-bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager,
-                       const CTransaction& txNew, int nBlockHeight, CAmount blockReward)
+bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CTransactionRef txNewMiner, const CTransactionRef txNewStaker, int nBlockHeight, CAmount blockReward)
 {
     if(fDisableGovernance) {
         //there is no budget data to use to check anything, let's just accept the longest chain
@@ -187,6 +186,8 @@ bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& go
 
     // superblocks started
     // SEE IF THIS IS A VALID SUPERBLOCK
+
+    const CTransaction txNew = txNewStaker ? *txNewStaker : *txNewMiner;
 
     if(AreSuperblocksEnabled(sporkManager)) {
         if(CSuperblockManager::IsSuperblockTriggered(governanceManager, nBlockHeight)) {
