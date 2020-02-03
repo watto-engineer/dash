@@ -140,6 +140,8 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
         if (pwallet->IsLocked(true) || ShutdownRequested())
             return false;
 
+        boost::this_thread::interruption_point();
+
         uint256 hashProofOfStake = uint256();
         nAttempts++;
         //iterates each utxo inside of CheckStakeKernelHash()
