@@ -382,12 +382,9 @@ public:
 
     unsigned int GetStakeEntropyBit() const;
 
-    bool SetStakeEntropyBit(unsigned int nEntropyBit)
+    void SetStakeEntropyBit(unsigned int nEntropyBit)
     {
-        if (nEntropyBit > 1)
-            return false;
         nFlags |= (nEntropyBit ? BLOCK_STAKE_ENTROPY : 0);
-        return true;
     }
 
     bool GeneratedStakeModifier() const
