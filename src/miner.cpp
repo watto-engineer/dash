@@ -243,7 +243,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         pCoinstakeTx->vout[1].nValue = blockReward;
         pCoinstakeTx->vout[1].nValue += blockReward;
     } else if (fHybridPow) {
-        // HybridPow miner is rewarded in XELEC
+        // HybridPow miner is rewarded in WELEC
         coinbaseTx.vout[0].nValue = nFees + GetMasternodePayment(nHeight, blockReward);
     } else {
         coinbaseTx.vout[0].nValue = blockReward;
@@ -297,7 +297,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         }
     } else {
         if (fHybridPow) {
-            // HybridPow miner is rewarded in XELEC
+            // HybridPow miner is rewarded in WELEC
             coinbaseTx.vout[0].nValue = 0;
         }
     }
