@@ -29,7 +29,7 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
     } else if (!tgAtomCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ATOM") {
         this->tgAtomCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
-    } else if (!tgElectronCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "XELEC") {
+    } else if (!tgElectronCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ELEC") {
         this->tgElectronCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
     }
