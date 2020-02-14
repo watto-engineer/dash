@@ -10,19 +10,18 @@
 #include "tokens/tokengroupdescription.h"
 
 #include <unordered_map>
-#include <univalue.h>
 
 class CTokenGroupStatus
 {
 public:
-    UniValue messages;
+    std::string messages;
 
     CTokenGroupStatus() {
-        messages = UniValue(UniValue::VARR);
+        messages = "";
     };
 
     void AddMessage(std::string statusMessage) {
-        messages.push_back(statusMessage);
+        messages = statusMessage;
     }
 };
 
