@@ -134,6 +134,19 @@ std::string CTransaction::ToString() const
     return str;
 }
 
+CAmount CTransaction::GetZerocoinSpent() const
+{
+    CAmount nValueOut = 0;
+    for (const CTxIn& txin : vin) {
+        if(!txin.IsZerocoinSpend())
+            continue;
+
+        nValueOut += txin.nSequence * COIN;
+    }
+
+    return nValueOut;
+}
+
 bool CTransaction::HasZerocoinSpendInputs() const
 {
     for (const CTxIn& txin: vin) {
