@@ -4082,24 +4082,25 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
-    UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("validtime", chainActive.Tip()->nTime > 1471482000));
-    obj.push_back(Pair("haveconnections", !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0));
-    if (pwallet) {
-        obj.push_back(Pair("walletunlocked", !pwallet->IsLocked()));
-        obj.push_back(Pair("mintablecoins", stakingManager->MintableCoins()));
-        obj.push_back(Pair("enoughcoins", stakingManager->nReserveBalance <= pwallet->GetBalance()));
-    }
-    obj.push_back(Pair("mnsync", masternodeSync.IsSynced()));
+    bool fValidTime = chainActive.Tip()->nTime > 1471482000;
+    bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+    bool fWalletUnlocked = !pwallet->IsLocked();
+    bool fMintableCoins = stakingManager->MintableCoins();
+    bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance();
+    bool fMnSync = masternodeSync.IsSynced();
+    bool fStakingStatus = stakingManager->IsStaking();
 
-    bool nStaking = false;
-/*
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
-        nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
-    obj.push_back(Pair("staking status", nStaking));
-*/
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("validtime", fValidTime));
+    obj.push_back(Pair("haveconnections", fHaveConnections));
+    if (pwallet) {
+        obj.push_back(Pair("walletunlocked", fWalletUnlocked));
+        obj.push_back(Pair("mintablecoins", fMintableCoins));
+        obj.push_back(Pair("enoughcoins", fEnoughCoins));
+    }
+    obj.push_back(Pair("mnsync", fMnSync));
+    obj.push_back(Pair("staking_status", fStakingStatus));
+
     return obj;
 }
 

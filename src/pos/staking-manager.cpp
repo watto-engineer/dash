@@ -5,6 +5,7 @@
 #include "staking-manager.h"
 
 #include "init.h"
+#include "masternode/masternode-sync.h"
 #include "miner.h"
 #include "net.h"
 #include "policy/policy.h"
@@ -18,8 +19,9 @@
 std::shared_ptr<CStakingManager> stakingManager;
 
 CStakingManager::CStakingManager(std::shared_ptr<CWallet> pwalletIn) :
-        nMintableLastCheck(0), fMintableCoins(false), nExtraNonce(0), // Currently unused
-        fEnableStaking(false), fEnableBYTZStaking(false), nReserveBalance(0), pwallet(pwalletIn) {}
+        nMintableLastCheck(0), fMintableCoins(false), fLastLoopOrphan(false), nExtraNonce(0), // Currently unused
+        fEnableStaking(false), fEnableBYTZStaking(false), nReserveBalance(0), pwallet(pwalletIn),
+        nHashInterval(22), nLastCoinStakeSearchInterval(0), nLastCoinStakeSearchTime(GetAdjustedTime()) {}
 
 bool CStakingManager::MintableCoins()
 {
@@ -86,8 +88,55 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
     return true;
 }
 
+bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake)
+{
+    int prevHeight = pindexPrev->nHeight;
+
+    // get stake input pindex
+    CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
+    if (!pindexFrom || pindexFrom->nHeight < 1) return error("%s : no pindexfrom", __func__);
+
+    const uint32_t nTimeBlockFrom = pindexFrom->nTime;
+    const int nHeightBlockFrom = pindexFrom->nHeight;
+
+    // check for maturity (min age/depth) requirements
+    if (!HasStakeMinAgeOrDepth(prevHeight + 1, nTimeTx, nHeightBlockFrom, nTimeBlockFrom))
+        return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
+                         __func__, prevHeight + 1, nTimeTx, nTimeBlockFrom, nHeightBlockFrom);
+
+    // iterate the hashing
+    bool fSuccess = false;
+    const unsigned int nHashDrift = 60;
+    const unsigned int nFutureTimeDriftPoS = 180;
+    unsigned int nTryTime = nTimeTx - 1;
+    // iterate from nTimeTx up to nTimeTx + nHashDrift
+    // but not after the max allowed future blocktime drift (3 minutes for PoS)
+    const unsigned int maxTime = std::min(nTimeTx + nHashDrift, (uint32_t)GetAdjustedTime() + nFutureTimeDriftPoS);
+
+    while (nTryTime < maxTime)
+    {
+        //new block came in, move on
+        if (chainActive.Height() != prevHeight)
+            break;
+
+        ++nTryTime;
+
+        // if stake hash does not meet the target then continue to next iteration
+        if (!CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTryTime, hashProofOfStake))
+            continue;
+
+        // if we made it this far, then we have successfully found a valid kernel hash
+        fSuccess = true;
+        nTimeTx = nTryTime;
+        break;
+    }
+
+    mapHashedBlocks.clear();
+    mapHashedBlocks[chainActive.Tip()->nHeight] = GetTime(); //store a time stamp of when we last hashed on this block
+    return fSuccess;
+}
+
 bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared_ptr<CMutableTransaction>& coinstakeTx, std::shared_ptr<CStakeInput>& coinstakeInput, unsigned int& nTxNewTime) {
-    // Needs wallet
     if (pwallet == nullptr || pindexPrev == nullptr)
         return false;
 
@@ -109,12 +158,6 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
     std::list<std::unique_ptr<CStakeInput> > listInputs;
     if (!SelectStakeCoins(listInputs, nBalance - nReserveBalance, pindexPrev->nHeight + 1)) {
         LogPrint(BCLog::STAKING, "CreateCoinStake(): selectStakeCoins failed\n");
-        return false;
-    }
-
-    if (listInputs.empty()) {
-        LogPrint(BCLog::STAKING, "CreateCoinStake(): listInputs empty\n");
-//        MilliSleep(50000);
         return false;
     }
 
@@ -186,6 +229,14 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
     return true;
 }
 
+bool CStakingManager::IsStaking() {
+    bool nStaking = false;
+    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
+        nStaking = true;
+    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
+        nStaking = true;
+}
+
 void CStakingManager::UpdatedBlockTip(const CBlockIndex* pindex)
 {
     LOCK(cs);
@@ -197,29 +248,55 @@ void CStakingManager::UpdatedBlockTip(const CBlockIndex* pindex)
 
 void CStakingManager::DoMaintenance(CConnman& connman)
 {
-    if (!fEnableStaking) return;
-    if (pwallet->IsLocked(true)) return;
-
-    const Consensus::Params& params = Params().GetConsensus();
+    if (!fEnableStaking) return; // Should never happen
 
     CBlockIndex* pindexPrev = chainActive.Tip();
-    int nStakeHeight = pindexPrev->nHeight;
-    if (!pindexPrev)
+    bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+    if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync.IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance()) {
+        nLastCoinStakeSearchInterval = 0;
+        MilliSleep(1 * 60 * 1000); // Wait 1 minute
         return;
+    }
 
-    // Check block height
-    const bool fPosPhase = (nStakeHeight >= params.nPosStartHeight);
+    const int nStakeHeight = pindexPrev->nHeight + 1;
+    const Consensus::Params& params = Params().GetConsensus();
+    const bool fPosPhase = (nStakeHeight >= params.nPosStartHeight);// || (nStakeHeight >= params.PosPowStartHeight);
+
     if (!fPosPhase) {
         // no POS for at least 1 block
+        nLastCoinStakeSearchInterval = 0;
+        MilliSleep(1 * 60 * 1000); // Wait 1 minute
         return;
     }
 
-    //control the amount of times the client will check for mintable coins
+    //search our map of hashed blocks, see if bestblock has been hashed yet
+    if (mapHashedBlocks.count(chainActive.Tip()->nHeight) && !fLastLoopOrphan) {
+        // wait max 5 seconds if recently hashed
+        int nTimePast = GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight];
+        if (nTimePast < nHashInterval && nTimePast >= 0) {
+            MilliSleep(std::min(nHashInterval - nTimePast, (unsigned int)5) * 1000);
+            return;
+        }
+    }
+    fLastLoopOrphan = false;
+
+   //control the amount of times the client will check for mintable coins
     if (!MintableCoins()) {
         // No mintable coins
+        nLastCoinStakeSearchInterval = 0;
+        LogPrint(BCLog::STAKING, "%s: No mintable coins, waiting..\n", __func__);
+        MilliSleep(5 * 60 * 1000); // Wait 5 minutes
         return;
     }
 
+    int64_t nSearchTime = GetAdjustedTime();
+    if (nSearchTime < nLastCoinStakeSearchTime) {
+        MilliSleep((nLastCoinStakeSearchTime - nSearchTime) * 1000); // Wait
+        return;
+    } else {
+        nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
+        nLastCoinStakeSearchTime = nSearchTime;
+    }
     // Create new block
     std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
     std::shared_ptr<CStakeInput> coinstakeInputPtr = nullptr;
@@ -230,7 +307,8 @@ void CStakingManager::DoMaintenance(CConnman& connman)
         try {
             pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
         } catch (const std::exception& e) {
-            LogPrint(BCLog::STAKING, "%s: error creating block - %s", __func__, e.what());
+            LogPrint(BCLog::STAKING, "%s: error creating block, waiting.. - %s", __func__, e.what());
+            MilliSleep(1 * 60 * 1000); // Wait 1 minute
             return;
         }
     } else {
@@ -260,6 +338,8 @@ void CStakingManager::DoMaintenance(CConnman& connman)
     /// Process block
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
     if (!ProcessNewBlock(Params(), shared_pblock, true, nullptr)) {
+        fLastLoopOrphan = true;
         LogPrint(BCLog::STAKING, "%s: ProcessNewBlock, block not accepted", __func__);
+        MilliSleep(10 * 1000); // Wait 10 seconds
     }
 }
