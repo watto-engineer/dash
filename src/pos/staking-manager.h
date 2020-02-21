@@ -17,6 +17,7 @@ class CMutableTransaction;
 class CStakeInput;
 class CStakingManager;
 class CWallet;
+class uint256;
 
 extern std::shared_ptr<CStakingManager> stakingManager;
 
@@ -29,9 +30,15 @@ private:
     const CBlockIndex* tipIndex{nullptr};
     std::shared_ptr<CWallet> pwallet = nullptr;
 
+    std::map<unsigned int, unsigned int> mapHashedBlocks;
+
     int64_t nMintableLastCheck;
     bool fMintableCoins;
+    bool fLastLoopOrphan;
+    int64_t nLastCoinStakeSearchInterval;
+    int64_t nLastCoinStakeSearchTime;
     unsigned int nExtraNonce;
+    const unsigned int nHashInterval;
 
 public:
     CStakingManager(std::shared_ptr<CWallet> pwalletIn = nullptr);
@@ -43,6 +50,8 @@ public:
     bool MintableCoins();
     bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight);
     bool CreateCoinStake(const CBlockIndex* pindexPrev, std::shared_ptr<CMutableTransaction>& coinstakeTx, std::shared_ptr<CStakeInput>& coinstakeInput, unsigned int& nTxNewTime);
+    bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake);
+    bool IsStaking();
 
     void UpdatedBlockTip(const CBlockIndex* pindex);
 

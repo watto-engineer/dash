@@ -321,52 +321,6 @@ bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
     return (contextHeight - utxoFromBlockHeight >= Params().GetConsensus().nStakeMinDepth);
 }
 
-bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake)
-{
-    int prevHeight = pindexPrev->nHeight;
-
-    // get stake input pindex
-    CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
-    if (!pindexFrom || pindexFrom->nHeight < 1) return error("%s : no pindexfrom", __func__);
-
-    const uint32_t nTimeBlockFrom = pindexFrom->nTime;
-    const int nHeightBlockFrom = pindexFrom->nHeight;
-
-    // check for maturity (min age/depth) requirements
-    if (!HasStakeMinAgeOrDepth(prevHeight + 1, nTimeTx, nHeightBlockFrom, nTimeBlockFrom))
-        return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
-                         __func__, prevHeight + 1, nTimeTx, nTimeBlockFrom, nHeightBlockFrom);
-
-    // iterate the hashing
-    bool fSuccess = false;
-    const unsigned int nHashDrift = 60;
-    const unsigned int nFutureTimeDriftPoS = 180;
-    unsigned int nTryTime = nTimeTx - 1;
-    // iterate from nTimeTx up to nTimeTx + nHashDrift
-    // but not after the max allowed future blocktime drift (3 minutes for PoS)
-    const unsigned int maxTime = std::min(nTimeTx + nHashDrift, (uint32_t)GetAdjustedTime() + nFutureTimeDriftPoS);
-
-    while (nTryTime < maxTime)
-    {
-        //new block came in, move on
-        if (chainActive.Height() != prevHeight)
-            break;
-
-        ++nTryTime;
-
-        // if stake hash does not meet the target then continue to next iteration
-        if (!CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTryTime, hashProofOfStake))
-            continue;
-
-        // if we made it this far, then we have successfully found a valid kernel hash
-        fSuccess = true;
-        nTimeTx = nTryTime;
-        break;
-    }
-
-    return fSuccess;
-}
-
 bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
 {
     if (nPreviousBlockHeight < Params().GetConsensus().nBlockZerocoinV2)
