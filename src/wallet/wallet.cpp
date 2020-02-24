@@ -5196,11 +5196,15 @@ bool CWalletTx::IsChainLocked() const
 
 int CWalletTx::GetBlocksToMaturity() const
 {
-    if (!IsCoinBase())
+    if (!(IsCoinBase() || IsCoinStake() || IsAnyOutputGroupedAuthority(*tx)))
         return 0;
     int chain_depth = GetDepthInMainChain();
     assert(chain_depth >= 0); // coinbase tx should not be conflicted
-    return std::max(0, (Params().GetConsensus().nCoinbaseMaturity+1) - chain_depth);
+    int depth = GetDepthInMainChain();
+    int minBlocksToMaturity = 0;
+    if (IsAnyOutputGroupedAuthority(*tx))
+        minBlocksToMaturity = std::max(0, (Consensus::Params().nOpGroupNewRequiredConfirmations + 1) - depth);
+    return std::max(minBlocksToMaturity, (Consensus::Params().nCoinbaseMaturity + 1) - depth);
 }
 
 bool CWalletTx::IsImmatureCoinBase() const
