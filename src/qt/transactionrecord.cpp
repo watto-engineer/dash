@@ -38,7 +38,37 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
     auto node = interfaces::MakeNode();
     auto& coinJoinOptions = node->coinJoinOptions();
 
-    if (nNet > 0 || wtx.is_coinbase)
+    if (wtx.tx->IsCoinStake()) {
+        TransactionRecord sub(hash, nTime);
+        CTxDestination address;
+        if (!ExtractDestination(wtx.tx->vout[1].scriptPubKey, address))
+            return parts;
+
+        isminetype mine = wtx.txout_is_mine[1];
+        if (mine) {
+            // BYTZ stake reward
+            sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+            sub.type = TransactionRecord::StakeMint;
+            sub.credit = nNet;
+            sub.strAddress = EncodeDestination(wtx.txout_address[1]);
+            sub.txDest = wtx.txout_address[1];
+            sub.updateLabel(wallet);
+        } else {
+            //Masternode reward
+            CTxDestination destMN;
+            int nIndexMN = wtx.tx->vout.size() - 1;
+            mine = wtx.txout_is_mine[nIndexMN];
+            if (ExtractDestination(wtx.tx->vout[nIndexMN].scriptPubKey, destMN) && mine) {
+                sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+                sub.type = TransactionRecord::MNReward;
+                sub.credit = wtx.tx->vout[nIndexMN].nValue;
+                sub.strAddress = EncodeDestination(wtx.txout_address[nIndexMN]);
+                sub.txDest = wtx.txout_address[nIndexMN];
+                sub.updateLabel(wallet);
+            }
+        }
+        parts.push_back(sub);
+    } else if (nNet > 0 || wtx.tx->IsCoinBase())
     {
         //
         // Credit
@@ -68,7 +98,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                     sub.strAddress = mapValue["from"];
                     sub.txDest = DecodeDestination(sub.strAddress);
                 }
-                if (wtx.is_coinbase)
+                if (wtx.is_coinbase || wtx.is_coinstake)
                 {
                     // Generated
                     sub.type = TransactionRecord::Generated;
@@ -257,9 +287,10 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
     // Determine transaction status
 
     // Sort order, unrecorded transactions sort to the top
-    status.sortKey = strprintf("%010d-%01d-%010u-%03d",
+    status.sortKey = strprintf("%010d-%01d-%01d-%010u-%03d",
         wtx.block_height,
         wtx.is_coinbase ? 1 : 0,
+        wtx.is_coinstake ? 1 : 0,
         wtx.time_received,
         idx);
     status.countsForBalance = wtx.is_trusted && !(wtx.blocks_to_maturity > 0);

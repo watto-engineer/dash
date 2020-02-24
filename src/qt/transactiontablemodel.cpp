@@ -400,6 +400,11 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
     case TransactionRecord::CoinJoinSend:
         return tr("%1 Send").arg("CoinJoin");
 
+    case TransactionRecord::MNReward:
+        return tr("Masternode Reward");
+    case TransactionRecord::StakeMint:
+        return tr("BYTZ Stake");
+
     default:
         return QString();
     }
@@ -429,6 +434,8 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, b
     case TransactionRecord::RecvWithCoinJoin:
     case TransactionRecord::SendToAddress:
     case TransactionRecord::Generated:
+    case TransactionRecord::StakeMint:
+    case TransactionRecord::MNReward:
     case TransactionRecord::CoinJoinSend:
         return formatAddressLabel(wtx->strAddress, wtx->label, tooltip) + watchAddress;
     case TransactionRecord::SendToOther:
@@ -448,6 +455,8 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
     case TransactionRecord::SendToAddress:
     case TransactionRecord::Generated:
     case TransactionRecord::CoinJoinSend:
+    case TransactionRecord::StakeMint:
+    case TransactionRecord::MNReward:
     case TransactionRecord::RecvWithCoinJoin:
         {
         if (wtx->label.isEmpty()) {
