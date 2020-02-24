@@ -30,7 +30,7 @@ static void ApplyHash(CCoinsStats& stats, CHashWriter& ss, const uint256& hash, 
 {
     if (it == outputs.begin()) {
         ss << hash;
-        ss << VARINT(it->second.nHeight * 2 + it->second.fCoinBase ? 1u : 0u);
+        ss << VARINT(it->second.nHeight * 4 + it->second.fCoinStake ? 2u : 0u + it->second.fCoinBase ? 1u : 0u);
     }
 
     ss << VARINT(it->first + 1);
