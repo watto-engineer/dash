@@ -7,6 +7,7 @@
 #include <consensus/consensus.h>
 #include <primitives/transaction.h>
 #include <script/interpreter.h>
+#include <tokens/groups.h>
 #include <consensus/validation.h>
 
 // TODO remove the following dependencies
@@ -228,8 +229,22 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         const Coin& coin = inputs.AccessCoin(prevout);
         assert(!coin.IsSpent());
 
+        // If prev is coinstake, check that it's matured
+        if (coin.IsCoinStake() && nSpendHeight - coin.nHeight < Params().nCoinbaseMaturity) {
+            return state.Invalid(false,
+                REJECT_INVALID, "bad-txns-premature-spend-of-coinstake",
+                strprintf("tried to spend coinstake at depth %d", nSpendHeight - coin.nHeight));
+        }
+
         // If prev is coinbase, check that it's matured
         if (coin.IsCoinBase() && nSpendHeight - coin.nHeight < Params().nCoinbaseMaturity) {
+            return state.Invalid(false,
+                REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
+                strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
+        }
+
+        // If prev is group authority, check that it's matured
+        if (IsOutputGroupedAuthority(coin.out) && nSpendHeight - coin.nHeight < Params().nOpGroupNewRequiredConfirmations) {
             return state.Invalid(false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
