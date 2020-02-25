@@ -198,6 +198,7 @@ public:
 
     bool WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold);
     bool LoadStakeSplitThreshold(uint64_t nStakeSplitThreshold);
+    bool WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold);
 
     bool ReadCoinJoinSalt(uint256& salt, bool fLegacy = false);
     bool WriteCoinJoinSalt(const uint256& salt);

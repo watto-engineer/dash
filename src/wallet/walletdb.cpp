@@ -14,6 +14,7 @@
 #include <governance/object.h>
 #include <hdchain.h>
 #include <protocol.h>
+#include <reward-manager.h>
 #include <serialize.h>
 #include <sync.h>
 #include <util/system.h>
@@ -191,7 +192,15 @@ bool WalletBatch::WriteMinVersion(int nVersion)
 
 bool WalletBatch::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
 {
-    return WriteIC(DBKeys::STAKE_SPLIT_THRESHOLD), nStakeSplitThreshold);
+    return WriteIC(DBKeys::STAKE_SPLIT_THRESHOLD, nStakeSplitThreshold);
+}
+
+bool WalletBatch::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
+{
+    std::pair<bool, CAmount> pSettings;
+    pSettings.first = fEnable;
+    pSettings.second = nCombineThreshold;
+    return WriteIC(DBKeys::AUTOCOMBINE_SETTINGS, pSettings);
 }
 
 bool WalletBatch::ReadCoinJoinSalt(uint256& salt, bool fLegacy)
@@ -492,6 +501,12 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             uint64_t nStakeSplitThreshold;
             ssValue >> nStakeSplitThreshold;
             pwallet->LoadStakeSplitThreshold(nStakeSplitThreshold);
+        }
+        else if (strType == "autocombinesettings")
+        {
+            std::pair<bool, CAmount> pSettings;
+            ssValue >> pSettings;
+            rewardManager->AutoCombineSettings(pSettings.first, pSettings.second);
         }
     } catch (const std::exception& e) {
         if (strErr.empty()) {

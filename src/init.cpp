@@ -41,6 +41,7 @@
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <pos/staking-manager.h>
+#include <reward-manager.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
 #include <rpc/server.h>
@@ -358,6 +359,7 @@ void PrepareShutdown(NodeContext& node)
         evoDb.reset();
         zerocoinDB.reset();
         pTokenDB.reset();
+        rewardManager.reset();
     }
     for (const auto& client : node.chain_clients) {
         client->stop();
@@ -2067,6 +2069,8 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
                 pTokenDB.reset();
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
+                rewardManager.reset();
+                rewardManager.reset(new CRewardManager());
                 llmq::quorumSnapshotManager.reset();
                 llmq::quorumSnapshotManager.reset(new llmq::CQuorumSnapshotManager(*evoDb));
 
@@ -2467,6 +2471,9 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
+
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
     }
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
         stakingManager->fEnableStaking = false;
@@ -2482,6 +2489,9 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
     if (stakingManager->fEnableStaking) {
         scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
+    }
+    if (rewardManager->fEnableRewardManager) {
+        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 5 * 60 * 1000);
     }
 #endif // ENABLE_WALLET
 

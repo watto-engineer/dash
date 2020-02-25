@@ -262,6 +262,7 @@ BITCOIN_CORE_H = \
   random.h \
   randomenv.h \
   reverse_iterator.h \
+  reward-manager.h \
   rpc/blockchain.h \
   rpc/client.h \
   rpc/mining.h \
@@ -560,6 +561,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/context.cpp \
   pos/staker.cpp \
   pos/staking-manager.cpp \
+  reward-manager.cpp \
   tokens/rpctokenwallet.cpp \
   tokens/tokengroupwallet.cpp \
   wallet/crypter.cpp \
