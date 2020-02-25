@@ -1800,6 +1800,12 @@ uint64_t CWallet::GetStakeSplitThreshold()
     return nStakeSplitThreshold;
 }
 
+bool CWallet::SetAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
+{
+    WalletBatch batch(*database);
+    return batch.WriteAutoCombineSettings(fEnable, nCombineThreshold);
+}
+
 void CWallet::GenerateNewHDChain(const SecureString& secureMnemonic, const SecureString& secureMnemonicPassphrase)
 {
     CHDChain newHdChain;
@@ -3205,7 +3211,7 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
     return ret;
 }
 
-void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth) const
+void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const CCoinControl *coinControl, const CAmount &nMinimumAmount, const CAmount &nMaximumAmount, const CAmount &nMinimumSumAmount, const uint64_t nMaximumCount, const int nMinDepth, const int nMaxDepth, const bool includeGrouped) const
 {
     AssertLockHeld(cs_main);
     AssertLockHeld(cs_wallet);
@@ -3221,7 +3227,7 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
         if (!CheckFinalTx(*pcoin->tx))
             continue;
 
-        if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+        if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
             continue;
 
         int nDepth = pcoin->GetDepthInMainChain();
@@ -3241,6 +3247,9 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
             continue;
 
         for (unsigned int i = 0; i < pcoin->tx->vout.size(); i++) {
+            if (!includeGrouped && IsOutputGrouped(pcoin->tx->vout[i]))
+                continue;
+
             bool found = false;
             if (nCoinType == CoinType::ONLY_FULLY_MIXED) {
                 if (!CCoinJoin::IsDenominatedAmount(pcoin->tx->vout[i].nValue)) continue;

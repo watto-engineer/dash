@@ -13,6 +13,7 @@
 #include <fs.h>
 #include <governance/governance-object.h>
 #include <protocol.h>
+#include <reward-manager.h>
 #include <serialize.h>
 #include <sync.h>
 #include <util.h>
@@ -162,6 +163,14 @@ bool WalletBatch::WriteMinVersion(int nVersion)
 bool WalletBatch::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
 {
     return WriteIC(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
+}
+
+bool WalletBatch::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
+{
+    std::pair<bool, CAmount> pSettings;
+    pSettings.first = fEnable;
+    pSettings.second = nCombineThreshold;
+    return WriteIC(std::string("autocombinesettings"), pSettings);
 }
 
 bool WalletBatch::ReadAccount(const std::string& strAccount, CAccount& account)
@@ -594,6 +603,12 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             uint64_t nStakeSplitThreshold;
             ssValue >> nStakeSplitThreshold;
             pwallet->LoadStakeSplitThreshold(nStakeSplitThreshold);
+        }
+        else if (strType == "autocombinesettings")
+        {
+            std::pair<bool, CAmount> pSettings;
+            ssValue >> pSettings;
+            rewardManager->AutoCombineSettings(pSettings.first, pSettings.second);
         }
     } catch (...)
     {

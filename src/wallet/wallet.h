@@ -943,7 +943,7 @@ public:
     /**
      * populate vCoins with vector of available COutputs.
      */
-    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlySafe=true, const CCoinControl *coinControl = nullptr, const CAmount& nMinimumAmount = 1, const CAmount& nMaximumAmount = MAX_MONEY, const CAmount& nMinimumSumAmount = MAX_MONEY, const uint64_t nMaximumCount = 0, const int nMinDepth = 0, const int nMaxDepth = 9999999) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
+    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlySafe=true, const CCoinControl *coinControl = nullptr, const CAmount& nMinimumAmount = 1, const CAmount& nMaximumAmount = MAX_MONEY, const CAmount& nMinimumSumAmount = MAX_MONEY, const uint64_t nMaximumCount = 0, const int nMinDepth = 0, const int nMaxDepth = 9999999, const bool fIncludeGrouped = false) const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     /**
      * populate vCoins with vector of available COutputs, filtered by the passed lambda function.
@@ -1287,6 +1287,7 @@ public:
     bool SetStakeSplitThreshold(uint64_t newThreshold);
     void LoadStakeSplitThreshold(uint64_t newThreshold);
     uint64_t GetStakeSplitThreshold();
+    bool SetAutoCombineSettings(bool fEnable, CAmount nCombineThreshold);
 
     /**
      * HD Wallet Functions

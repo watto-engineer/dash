@@ -32,6 +32,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <pos/staking-manager.h>
+#include <reward-manager.h>
 #include <rpc/server.h>
 #include <rpc/register.h>
 #include <rpc/blockchain.h>
@@ -340,6 +341,7 @@ void PrepareShutdown()
         evoDb.reset();
         zerocoinDB.reset();
         pTokenDB.reset();
+        rewardManager.reset();
     }
     g_wallet_init_interface.Stop();
 
@@ -1995,6 +1997,8 @@ bool AppInitMain()
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
                 pTokenDB.reset();
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
+                rewardManager.reset();
+                rewardManager.reset(new CRewardManager());
 
                 llmq::InitLLMQSystem(*evoDb, false, fReset || fReindexChainState);
 
@@ -2365,6 +2369,9 @@ bool AppInitMain()
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
+
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
     }
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
         stakingManager->fEnableStaking = false;
@@ -2380,6 +2387,9 @@ bool AppInitMain()
 
     if (stakingManager->fEnableStaking) {
         scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
+    }
+    if (rewardManager->fEnableRewardManager) {
+        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 5 * 60 * 1000);
     }
 #endif // ENABLE_WALLET
 
