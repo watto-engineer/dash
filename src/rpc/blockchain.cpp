@@ -17,7 +17,6 @@
 #include <consensus/tokengroups.h>
 #include <index/blockfilterindex.h>
 #include <index/txindex.h>
-#include <key_io.h>
 #include <node/coinstats.h>
 #include <node/context.h>
 #include <node/utxo_snapshot.h>
@@ -35,6 +34,7 @@
 #include <util/strencodings.h>
 #include <util/validation.h>
 #include <util/system.h>
+#include <dstencode.h>
 #include <validation.h>
 #include <validationinterface.h>
 #include <versionbitsinfo.h>

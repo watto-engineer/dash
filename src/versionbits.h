@@ -15,7 +15,13 @@ static const int32_t VERSIONBITS_TOP_BITS = 0x20000000UL;
 /** What bitmask determines whether versionbits is in use */
 static const int32_t VERSIONBITS_TOP_MASK = 0xE0000000UL;
 /** Total bits available for versionbits */
-static const int32_t VERSIONBITS_NUM_BITS = 29;
+static const int32_t VERSIONBITS_NUM_BITS = 26;
+/** Total bits available for blocktypebits */
+static const int32_t BLOCKTYPEBITS_NUM_BITS = 3;
+/** Bit offset for blocktypebits */
+static const int32_t BLOCKTYPEBITS_OFFSET_BITS = VERSIONBITS_NUM_BITS;
+/** What bitmask reflect the blocktypebits */
+static const int32_t BLOCKTYPEBITS_MASK = 0x1C000000UL;
 
 /** BIP 9 defines a finite-state-machine to deploy a softfork in multiple stages.
  *  State transitions happen during retarget period if conditions are met
@@ -28,6 +34,11 @@ enum class ThresholdState {
     LOCKED_IN, // For one retarget period after the first retarget period with STARTED blocks of which at least threshold have the associated bit set in nVersion.
     ACTIVE,    // For all blocks after the LOCKED_IN retarget period (final state)
     FAILED,    // For all blocks once the first retarget period after the timeout time is hit, if LOCKED_IN wasn't already reached (final state)
+};
+
+enum BlockTypeBits {
+    BLOCKTYPE_STAKING = (0x00UL << BLOCKTYPEBITS_OFFSET_BITS),
+    BLOCKTYPE_MINING  = (0x01UL << BLOCKTYPEBITS_OFFSET_BITS)
 };
 
 // A map that gives the state for blocks whose height is a multiple of Period().

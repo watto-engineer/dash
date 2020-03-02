@@ -12,6 +12,7 @@
 #include <masternode/payments.h>
 #include <net.h>
 #include <netbase.h>
+#include <pos/rewards.h>
 #include <rpc/blockchain.h>
 #include <rpc/server.h>
 #include <rpc/util.h>
@@ -438,7 +439,7 @@ static UniValue masternode_payments(const JSONRPCRequest& request)
 
         std::vector<CTxOut> voutMasternodePayments, voutDummy;
         CMutableTransaction dummyTx;
-        CAmount blockReward = nBlockFees + GetBlockSubsidy(pindex->pprev->nBits, pindex->pprev->nHeight, Params().GetConsensus(), block.IsProofOfStake(), false);
+        CBlockReward blockReward(pindex->nHeight, nBlockFees, block.IsProofOfStake(), Params().GetConsensus());
         FillBlockPayments(*sporkManager, *governance, dummyTx, pindex->nHeight, blockReward, voutMasternodePayments, voutDummy);
 
         UniValue blockObj(UniValue::VOBJ);

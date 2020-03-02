@@ -11,6 +11,7 @@
 #include <primitives/transaction.h>
 #include <script/standard.h>
 #include <timedata.h>
+#include <pos/rewards.h>
 #include <util/strencodings.h>
 #include <validation.h>
 
@@ -366,7 +367,7 @@ bool CSuperblockManager::GetSuperblockPayments(CGovernanceManager& governanceMan
     return true;
 }
 
-bool CSuperblockManager::IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, CAmount blockReward)
+bool CSuperblockManager::IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward)
 {
     // GET BEST SUPERBLOCK, SHOULD MATCH
     LOCK(governanceManager.cs);
@@ -595,7 +596,7 @@ CAmount CSuperblock::GetPaymentsTotalAmount()
 *   - Does this transaction match the superblock?
 */
 
-bool CSuperblock::IsValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward)
+bool CSuperblock::IsValid(const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward)
 {
     // TODO : LOCK(cs);
     // No reason for a lock here now since this method only accesses data
@@ -637,8 +638,8 @@ bool CSuperblock::IsValid(const CTransaction& txNew, int nBlockHeight, CAmount b
 
     // miner and masternodes should not get more than they would usually get
     CAmount nBlockValue = txNew.GetValueOut();
-    if (nBlockValue > blockReward + nPaymentsTotalAmount) {
-        LogPrintf("CSuperblock::IsValid -- ERROR: Block invalid, block value limit exceeded: block %lld, limit %lld\n", nBlockValue, blockReward + nPaymentsTotalAmount);
+    if (nBlockValue > blockReward.GetTotalRewards().amount + nPaymentsTotalAmount) {
+        LogPrintf("CSuperblock::IsValid -- ERROR: Block invalid, block value limit exceeded: block %lld, limit %lld\n", nBlockValue, blockReward.GetTotalRewards().amount + nPaymentsTotalAmount);
         return false;
     }
 

@@ -19,6 +19,7 @@
 #include <net.h>
 #include <node/context.h>
 #include <policy/fees.h>
+#include <pos/rewards.h>
 #include <pow.h>
 #include <rpc/blockchain.h>
 #include <rpc/mining.h>
@@ -579,6 +580,12 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
                 {
                     {RPCResult::Type::ELISION, "", ""},
                 }},
+                {RPCResult::Type::ARR, "minerrewards", "(array) contents of a single transaction to the miner",
+                {
+                     {RPCResult::Type::STR, "amount", "(numeric) amount"},
+                     {RPCResult::Type::STR, "tokenid", "(string) transaction data encoded in hexadecimal (byte-for-byte)"},
+                     {RPCResult::Type::STR, "tokenamount", "(numeric) difference in value between transaction inputs and outputs (in duffs); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one"},
+                }},
                 {RPCResult::Type::STR, "target", "The hash target"},
                 {RPCResult::Type::NUM_TIME, "mintime", "The minimum timestamp appropriate for the next block time, expressed in " + UNIX_EPOCH_TIME},
                 {RPCResult::Type::ARR, "mutable", "list of ways the block template may be changed",
@@ -892,6 +899,19 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     result.pushKV("transactions", transactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->GetValueOut());
+    CBlockReward blockReward(chainActive.Height() + 1,  0, false, Params().GetConsensus());
+    UniValue minerRewardObj(UniValue::VARR);
+    CReward minerReward = blockReward.GetCoinbaseReward();
+    for (const auto& minerTokenReward : minerReward.tokenAmounts) {
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("amount", 1));
+        obj.push_back(Pair("tokenid", HexStr(minerTokenReward.first.bytes())));
+        obj.push_back(Pair("tokenamount", minerTokenReward.second));
+        minerRewardObj.push_back(obj);
+    }
+
+    result.push_back(Pair("minerrewards", minerRewardObj));
+
     result.pushKV("longpollid", ::ChainActive().Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast));
     result.pushKV("target", hashTarget.GetHex());
     result.pushKV("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1);

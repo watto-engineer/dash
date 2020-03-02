@@ -253,6 +253,7 @@ BITCOIN_CORE_H = \
   pos/blocksignature.h \
   pos/checks.h \
   pos/kernel.h \
+  pos/rewards.h \
   pos/stakeinput.h \
   pos/staker.h \
   pos/staking-manager.h \
@@ -462,6 +463,7 @@ libbitcoin_server_a_SOURCES = \
   pos/blocksignature.cpp \
   pos/checks.cpp \
   pos/kernel.cpp \
+  pos/rewards.cpp \
   pos/stakeinput.cpp \
   pow.cpp \
   rest.cpp \

@@ -6,6 +6,7 @@
 #include <qt/test/util.h>
 
 #include <coinjoin/client.h>
+#include <dstencode.h>
 #include <interfaces/chain.h>
 #include <interfaces/node.h>
 #include <qt/bitcoinamountfield.h>
@@ -17,7 +18,6 @@
 #include <qt/transactiontablemodel.h>
 #include <qt/transactionview.h>
 #include <qt/walletmodel.h>
-#include <key_io.h>
 #include <test/util/setup_common.h>
 #include <validation.h>
 #include <wallet/wallet.h>

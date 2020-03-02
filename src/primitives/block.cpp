@@ -8,6 +8,7 @@
 #include <hash.h>
 #include <streams.h>
 #include <tinyformat.h>
+#include <versionbits.h>
 
 uint256 CBlockHeader::GetHash() const
 {
@@ -15,7 +16,11 @@ uint256 CBlockHeader::GetHash() const
     std::vector<unsigned char> vch(80);
     CVectorWriter ss(SER_GETHASH, PROTOCOL_VERSION, vch, 0);
     ss << *this;
-    return HashQuark((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    if ((nVersion & BLOCKTYPEBITS_MASK) == BlockTypeBits::BLOCKTYPE_MINING) {
+        return HashQuark((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    } else {
+        return Hash((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    }
 }
 
 std::string CBlock::ToString() const

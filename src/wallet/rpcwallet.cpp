@@ -7,6 +7,7 @@
 #include <amount.h>
 #include <chainparams.h>
 #include <core_io.h>
+#include <dstencode.h>
 #include <masternode/masternode-sync.h>
 #include <httpserver.h>
 #include <interfaces/chain.h>

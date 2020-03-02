@@ -102,6 +102,7 @@ static const bool DEFAULT_USE_HD_WALLET = false;
 class CCoinControl;
 class CKey;
 class COutput;
+class CReward;
 class CScript;
 class CTxDSIn;
 class CWalletTx;
@@ -1167,7 +1168,7 @@ public:
     bool DelAddressBook(const CTxDestination& address);
 
     bool GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey);
-    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CTokenGroupID &grpID, const CAmount amount);
+    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CReward &reward);
     bool GetKeyForMining(std::shared_ptr<CReserveKey> &reservedKey, CPubKey &pubkey);
     unsigned int GetKeyPoolSize() const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 

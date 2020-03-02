@@ -11,6 +11,7 @@
 #include "miner.h"
 #include "pos/blocksignature.h"
 #include "pos/kernel.h"
+#include "pos/rewards.h"
 #include "pos/staking-manager.h"
 #include "pos/stakeinput.h"
 #include "pow.h"
@@ -30,7 +31,11 @@
 UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet)
 {
     const auto& params = Params().GetConsensus();
+    const bool fRegtest = Params().NetworkIDString() == CBaseChainParams::REGTEST;
     static const int nInnerLoopCount = 0x10000;
+    bool fPosPowPhase;
+    bool fPosPhase;
+    bool fCreatePosBlock;
     int nHeightEnd = 0;
     int nHeight = 0;
 
@@ -43,17 +48,17 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
     UniValue blockHashes(UniValue::VARR);
     while (nHeight < nHeightEnd)
     {
-        const bool fPosPowPhase = false;//nHeight + 1 >= params.nPosPowStartHeight;
-        const bool fPosPhase = nHeight + 1 >= params.nPosStartHeight;// && nHeight + 1 < params.POSPOWStartHeight;
+        fPosPowPhase = false;//nHeight + 1 >= params.nPosPowStartHeight;
+        fPosPhase = true; // fRegtest && (nHeight + 1 >= params.nPosStartHeight && nHeight + 1 < params.nPosPowStartHeight);
         // If nHeight > POS start, wallet should be enabled.
 
-        // Create coinstake if in POS phase and not in POW phase, or if in POS phase and in POW phase during alternating (odd) blocks
-        const bool fCreatePosBlock = fPosPhase || (fPosPowPhase && nHeight % 2);
-        std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
-        std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
+        // Create coinstake if on regtest, in POS phase and not in POW phase, or if in POS phase and in POW phase during alternating (odd) blocks
+        fCreatePosBlock = fRegtest && (fPosPhase || (fPosPowPhase && nHeight % 2));
         std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
         unsigned int nCoinStakeTime;
         if (fCreatePosBlock) {
+            std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
+            std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
             if (stakingManager->CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
                 // Coinstake found. Extract signing key from coinstake
                 pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
@@ -64,9 +69,8 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
                     throw JSONRPCError(RPC_MISC_ERROR, "Error: Mining in hybrid mode, but the Electron token group is not yet created");
                 }
                 std::shared_ptr<CReserveScript> coinbase_script;
-                CTokenGroupID grpID = tokenGroupManager->GetElectronID();
-                CAmount amount = GetBlockSubsidy(chainActive.Tip()->nBits, nHeight, params, false, false);
-                if (!pwallet->GetScriptForHybridMining(coinbase_script, coinbaseKey, grpID, amount)) {
+                CBlockReward reward(nHeight + 1, 0, false, params);
+                if (!pwallet->GetScriptForHybridMining(coinbase_script, coinbaseKey, reward.GetCoinbaseReward())) {
                     throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
                 }
                 pblocktemplate = BlockAssembler(Params()).CreateNewBlock(coinbase_script->reserveScript);

@@ -18,6 +18,7 @@
 #include <key_io.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
+#include <pos/rewards.h>
 #include <policy/settings.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
@@ -4308,7 +4309,7 @@ bool CWallet::GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, con
     return true;
 }
 
-bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CTokenGroupID &grpID, const CAmount amount)
+bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CReward &reward)
 {
     CPubKey pubkey;
     if (!reservedKey->GetReservedKey(pubkey, false))
@@ -4316,7 +4317,13 @@ bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, 
 
     script = reservedKey;
     CTxDestination dst = pubkey.GetID();
-    script->reserveScript = GetScriptForDestination(dst, grpID, amount);
+
+    std::map<CTokenGroupID, CAmount>::const_iterator it = reward.tokenAmounts.begin();
+    if (it == reward.tokenAmounts.end()) {
+        script->reserveScript = CScript();
+    } else {
+        script->reserveScript = GetScriptForDestination(dst, it->first, it->second);
+    }
     return true;
 }
 
