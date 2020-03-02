@@ -5,11 +5,13 @@
 #define BITCOIN_GOVERNANCE_GOVERNANCE_CLASSES_H
 
 #include <base58.h>
+#include <dstencode.h>
 #include <governance/governance.h>
 #include <key.h>
 #include <script/standard.h>
 #include <util.h>
 
+class CBlockReward;
 class CSuperblock;
 class CGovernanceTriggerManager;
 class CSuperblockManager;
@@ -60,7 +62,7 @@ public:
     static bool GetSuperblockPayments(int nBlockHeight, std::vector<CTxOut>& voutSuperblockRet);
     static void ExecuteBestSuperblock(int nBlockHeight);
 
-    static bool IsValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward);
+    static bool IsValid(const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward);
 };
 
 /**
@@ -164,7 +166,7 @@ public:
     bool GetPayment(int nPaymentIndex, CGovernancePayment& paymentRet);
     CAmount GetPaymentsTotalAmount();
 
-    bool IsValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward);
+    bool IsValid(const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward);
     bool IsExpired() const;
 };
 

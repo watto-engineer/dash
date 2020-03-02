@@ -15,7 +15,13 @@ static const int32_t VERSIONBITS_TOP_BITS = 0x20000000UL;
 /** What bitmask determines whether versionbits is in use */
 static const int32_t VERSIONBITS_TOP_MASK = 0xE0000000UL;
 /** Total bits available for versionbits */
-static const int32_t VERSIONBITS_NUM_BITS = 29;
+static const int32_t VERSIONBITS_NUM_BITS = 26;
+/** Total bits available for blocktypebits */
+static const int32_t BLOCKTYPEBITS_NUM_BITS = 3;
+/** Bit offset for blocktypebits */
+static const int32_t BLOCKTYPEBITS_OFFSET_BITS = VERSIONBITS_NUM_BITS;
+/** What bitmask reflect the blocktypebits */
+static const int32_t BLOCKTYPEBITS_MASK = 0x1C000000UL;
 
 enum class ThresholdState {
     DEFINED,
@@ -23,6 +29,11 @@ enum class ThresholdState {
     LOCKED_IN,
     ACTIVE,
     FAILED,
+};
+
+enum BlockTypeBits {
+    BLOCKTYPE_STAKING = (0x00UL << BLOCKTYPEBITS_OFFSET_BITS),
+    BLOCKTYPE_MINING  = (0x01UL << BLOCKTYPEBITS_OFFSET_BITS)
 };
 
 // A map that gives the state for blocks whose height is a multiple of Period().

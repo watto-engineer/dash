@@ -82,6 +82,7 @@ class CCoinControl;
 class CKey;
 class COutput;
 class CReserveKey;
+class CReward;
 class CScript;
 class CTxMemPool;
 class CBlockPolicyEstimator;
@@ -1197,7 +1198,7 @@ public:
 
     void GetScriptForMining(std::shared_ptr<CReserveScript> &script);
     bool GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey);
-    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CTokenGroupID &grpID, const CAmount amount);
+    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CReward &reward);
     bool GetKeyForMining(std::shared_ptr<CReserveKey> &reservedKey, CPubKey &pubkey);
 
     unsigned int GetKeyPoolSize() EXCLUSIVE_LOCKS_REQUIRED(cs_wallet)

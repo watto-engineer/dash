@@ -16,9 +16,9 @@
 #include <core_io.h>
 #include <consensus/tokengroups.h>
 #include <consensus/validation.h>
+#include <dstencode.h>
 #include <validation.h>
 // #include <rpc/index/txindex.h>
-#include <key_io.h>
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <primitives/transaction.h>

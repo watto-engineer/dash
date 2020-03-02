@@ -12,6 +12,7 @@
 #include "pos/blocksignature.h"
 #include "pos/kernel.h"
 #include "pos/stakeinput.h"
+#include "pow.h"
 #include "script/sign.h"
 #include "validation.h"
 #include "wallet/wallet.h"
@@ -63,27 +64,25 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
     pwallet->AvailableCoins(vCoins, true, &coin_control, 1, MAX_MONEY, MAX_MONEY, 0, nMinDepth);
     CAmount nAmountSelected = 0;
 
-    if (fEnableBYTZStaking) {
-        for (const COutput &out : vCoins) {
-            //make sure not to outrun target amount
-            if (nAmountSelected + out.tx->tx->vout[out.i].nValue > nTargetAmount)
-                continue;
+    for (const COutput &out : vCoins) {
+        //make sure not to outrun target amount
+        if (nAmountSelected + out.tx->tx->vout[out.i].nValue > nTargetAmount)
+            continue;
 
-            if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
-                continue;
+        if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
+            continue;
 
-            CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
-            //check for maturity (min age/depth)
-            if (!HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
-                continue;
+        CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
+        //check for maturity (min age/depth)
+        if (!HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
+            continue;
 
-            //add to our stake set
-            nAmountSelected += out.tx->tx->vout[out.i].nValue;
+        //add to our stake set
+        nAmountSelected += out.tx->tx->vout[out.i].nValue;
 
-            std::unique_ptr<CStake> input(new CStake());
-            input->SetInput(out.tx->tx, out.i);
-            listInputs.emplace_back(std::move(input));
-        }
+        std::unique_ptr<CStake> input(new CStake());
+        input->SetInput(out.tx->tx, out.i);
+        listInputs.emplace_back(std::move(input));
     }
     return true;
 }
@@ -185,10 +184,13 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
 
         boost::this_thread::interruption_point();
 
+        CBlockHeader dummyBlockHeader;
+        dummyBlockHeader.nTime = nTxNewTime;
+        unsigned int stakeNBits = GetNextWorkRequired(pindexPrev, &dummyBlockHeader, Params().GetConsensus());
         uint256 hashProofOfStake = uint256();
         nAttempts++;
         //iterates each utxo inside of CheckStakeKernelHash()
-        if (Stake(pindexPrev, stakeInput.get(), pindexPrev->nBits, nTxNewTime, hashProofOfStake)) {
+        if (Stake(pindexPrev, stakeInput.get(), stakeNBits, nTxNewTime, hashProofOfStake)) {
             // Found a kernel
             LogPrint(BCLog::STAKING, "CreateCoinStake : kernel found\n");
 

@@ -21,6 +21,7 @@
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <pos/kernel.h>
+#include <pos/rewards.h>
 #include <pos/stakeinput.h>
 #include <pow.h>
 #include <primitives/transaction.h>
@@ -180,7 +181,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     bool fDIP0003Active_context = nHeight >= chainparams.GetConsensus().DIP0003Height;
     bool fDIP0008Active_context = nHeight >= chainparams.GetConsensus().DIP0008Height;
 
-    pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus(), chainparams.BIP9CheckMasternodesUpgraded());
+    pblock->nVersion = nHeight >= chainparams.GetConsensus().ATPStartHeight ?
+        ComputeBlockVersion(pindexPrev, chainparams.GetConsensus(), fPos, chainparams.BIP9CheckMasternodesUpgraded())
+        : VERSIONBITS_LAST_OLD_BLOCK_VERSION;
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
     if (chainparams.MineBlocksOnDemand())
@@ -228,18 +231,20 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (!fPos)
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
 
-    // NOTE: unlike in bitcoin, we need to pass PREVIOUS block height here
-    CAmount blockReward = nFees + GetBlockSubsidy(pindexPrev->nBits, pindexPrev->nHeight, Params().GetConsensus(), fPos, false);
+    CBlockReward blockReward(nHeight, nFees, fPos, Params().GetConsensus());
 
     // Compute regular coinbase transaction.
     if (fPos) {
         coinbaseTx.vout[0].nValue = 0;
-        pCoinstakeTx->vout[1].nValue += blockReward;
+        // TODO: Add token amounts
+        pCoinstakeTx->vout[1].nValue += blockReward.GetCoinstakeReward().amount;
     } else if (fHybridPow) {
         // HybridPow miner is rewarded in ELEC
-        coinbaseTx.vout[0].nValue = nFees + GetMasternodePayment(nHeight, blockReward);
+        // TODO: Add token amounts
+        coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
     } else {
-        coinbaseTx.vout[0].nValue = blockReward;
+        // TODO: Add token amounts
+        coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
     }
 
     if (!fDIP0003Active_context) {
@@ -278,7 +283,13 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (fPos) {
         SplitCoinstakeVouts(pCoinstakeTx);
         FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
-        // Sign
+        // Unpaid masternode rewards default to the staking node
+        CAmount nMasternodePaymentAmount = 0;
+        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
+            nMasternodePaymentAmount += txout.nValue;
+        }
+        pCoinstakeTx->vout[1].nValue += blockReward.GetMasternodeReward().amount - nMasternodePaymentAmount;
+        // Sign for Bytz
         int nIn = 0;
         for (CTxIn txIn : pCoinstakeTx->vin) {
             CScript coinstakeInScript;
@@ -290,10 +301,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         }
     } else {
         FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
-        if (fHybridPow) {
-            // HybridPow miner is rewarded in ELEC
-            coinbaseTx.vout[0].nValue = 0;
-        }
     }
 
     pblock->vtx[0] = MakeTransactionRef(std::move(coinbaseTx));
@@ -307,7 +314,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     }
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
-    UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
+    if (!fPos)
+        UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
     pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
     pblocktemplate->nPrevBits = pindexPrev->nBits;

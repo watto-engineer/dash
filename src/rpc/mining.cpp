@@ -17,6 +17,7 @@
 #include <miner.h>
 #include <net.h>
 #include <policy/fees.h>
+#include <pos/rewards.h>
 #include <pow.h>
 #include <rpc/blockchain.h>
 #include <rpc/mining.h>
@@ -353,6 +354,14 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
             "  },\n"
             "  \"coinbasevalue\" : n,              (numeric) maximum allowable input to coinbase transaction, including the generation award and transaction fees (in duffs)\n"
             "  \"coinbasetxn\" : { ... },          (json object) information for coinbase transaction\n"
+            "  \"minerrewards\" : [                (array) contents of a single transaction to the miner\n"
+            "      {\n"
+            "         \"amount\": n,                 (numeric) amount \n"
+            "         \"tokenid\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
+            "         \"tokenamount\": n,            (numeric) difference in value between transaction inputs and outputs (in duffs); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one\n"
+            "      }\n"
+            "      ,...\n"
+            "  ],\n"
             "  \"target\" : \"xxxx\",                (string) The hash target\n"
             "  \"mintime\" : xxx,                  (numeric) The minimum timestamp appropriate for next block time in seconds since epoch (Jan 1 1970 GMT)\n"
             "  \"mutable\" : [                     (array of string) list of ways the block template may be changed \n"
@@ -660,6 +669,19 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
     result.pushKV("transactions", transactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->GetValueOut());
+    CBlockReward blockReward(chainActive.Height() + 1,  0, false, Params().GetConsensus());
+    UniValue minerRewardObj(UniValue::VARR);
+    CReward minerReward = blockReward.GetCoinbaseReward();
+    for (const auto& minerTokenReward : minerReward.tokenAmounts) {
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("amount", 1));
+        obj.push_back(Pair("tokenid", HexStr(minerTokenReward.first.bytes())));
+        obj.push_back(Pair("tokenamount", minerTokenReward.second));
+        minerRewardObj.push_back(obj);
+    }
+
+    result.push_back(Pair("minerrewards", minerRewardObj));
+
     result.pushKV("longpollid", chainActive.Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast));
     result.pushKV("target", hashTarget.GetHex());
     result.pushKV("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1);

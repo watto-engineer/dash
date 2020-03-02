@@ -24,6 +24,7 @@
 #include <pos/blocksignature.h>
 #include <pos/checks.h>
 #include <pos/kernel.h>
+#include <pos/rewards.h>
 #include <pow.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
@@ -1177,35 +1178,7 @@ NOTE:   unlike bitcoin we are using PREVIOUS block height here,
 */
 CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, const bool fPos, bool fSuperblockPartOnly)
 {
-    int nHeight = nPrevHeight + 1;
-/*
-    if (nHeight >= consensusParams.nPosPowStartHeight & !fPos) {
-        return 0;
-    }
-*/
-    if (nHeight >= 107624) return 2710 * COIN;
-    if (nHeight >= 67004) return 0 * COIN;
-    if (nHeight >= 67001) return 2850000000 * COIN;
-    if (nHeight >= 312) return 0 * COIN;
-    if (nHeight >= 12) return 10000 * COIN;
-    if (nHeight >= 2) return 0 * COIN;
-    if (nHeight == 1) return 947000000 * COIN;
-    return 0 * COIN;
-}
-
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZBYTZStake)
-{
-    int64_t ret = 0;
-
-    if (nHeight >= Params().GetConsensus().nPosStartHeight) {
-        if (isZBYTZStake){
-            //When zBYTZ is staked, masternode gets less BYTZ
-            return blockValue > 2410 * COIN ? 2410 * COIN : 0;
-        } else {
-            return blockValue > 2440 * COIN ? 2440 * COIN : blockValue * 0.9;
-        }
-    }
-    return 0 * COIN;
+    return GetBlockSubsidyBytz(nPrevHeight, fPos, consensusParams);
 }
 
 bool IsInitialBlockDownload()
@@ -1939,10 +1912,14 @@ void ThreadScriptCheck() {
 // Protected by cs_main
 VersionBitsCache versionbitscache;
 
-int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params& params, bool fCheckMasternodesUpgraded)
+int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params& params, const bool fPos, bool fCheckMasternodesUpgraded)
 {
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
+
+    if (pindexPrev->nHeight + 1 >= params.ATPStartHeight) {
+        nVersion |= BlockTypeBits::BLOCKTYPE_STAKING;
+    }
 
     for (int i = 0; i < (int)Consensus::MAX_VERSION_BITS_DEPLOYMENTS; i++) {
         Consensus::DeploymentPos pos = Consensus::DeploymentPos(i);
@@ -2256,6 +2233,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime2_1 = GetTimeMicros(); nTimeProcessSpecial += nTime2_1 - nTime2;
     LogPrint(BCLog::BENCHMARK, "      - ProcessSpecialTxsInBlock: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime2_1 - nTime2), nTimeProcessSpecial * MICRO, nTimeProcessSpecial * MILLI / nBlocksTotal);
 
+    CAmount coinstakeValueIn = 0;
+    if (block.IsProofOfStake()) {
+        coinstakeValueIn = view.GetValueIn(*(block.vtx[1]));
+    }
+
     for (unsigned int i = 0; i < block.vtx.size(); i++)
     {
         const CTransactionRef tx = block.vtx[i];
@@ -2480,13 +2462,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // DASH : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
 
     // TODO: resync data (both ways?) and try to reprocess this block later.
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->pprev->nBits, pindex->pprev->nHeight, chainparams.GetConsensus(), block.IsProofOfStake(), false);
+    CBlockReward blockReward(pindex->nHeight, nFees, block.IsProofOfStake(), Params().GetConsensus());
     std::string strError = "";
 
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
     LogPrint(BCLog::BENCHMARK, "      - GetBlockSubsidy: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_2 - nTime5_1), nTimeSubsidy * MICRO, nTimeSubsidy * MILLI / nBlocksTotal);
 
-    if (!IsBlockValueValid(block, pindex->nHeight, blockReward, strError)) {
+    if (!IsBlockValueValid(block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
         return state.DoS(0, error("ConnectBlock(DASH): %s", strError), REJECT_INVALID, "bad-cb-amount");
     }
 
@@ -2782,7 +2764,7 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
         for (int i = 0; i < 100 && pindex != nullptr; i++)
         {
             int32_t nExpectedVersion = ComputeBlockVersion(pindex->pprev, chainParams.GetConsensus());
-            if (pindex->nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && (pindex->nVersion & ~nExpectedVersion) != 0)
+            if (pindex->nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && (pindex->nVersion & ~nExpectedVersion & ~BLOCKTYPEBITS_MASK) != 0)
                 ++nUpgraded;
             pindex = pindex->pprev;
         }

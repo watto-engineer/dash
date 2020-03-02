@@ -7,6 +7,7 @@
 #include <clientversion.h>
 #include <init.h>
 #include <netbase.h>
+#include <pos/rewards.h>
 #include <validation.h>
 #include <util.h>
 #include <utilmoneystr.h>
@@ -440,7 +441,7 @@ UniValue masternode_payments(const JSONRPCRequest& request)
 
         std::vector<CTxOut> voutMasternodePayments, voutDummy;
         CMutableTransaction dummyTx;
-        CAmount blockReward = nBlockFees + GetBlockSubsidy(pindex->pprev->nBits, pindex->pprev->nHeight, Params().GetConsensus(), block.IsProofOfStake(), false);
+        CBlockReward blockReward(pindex->nHeight, nBlockFees, block.IsProofOfStake(), Params().GetConsensus());
         FillBlockPayments(dummyTx, pindex->nHeight, blockReward, voutMasternodePayments, voutDummy);
 
         UniValue blockObj(UniValue::VOBJ);
