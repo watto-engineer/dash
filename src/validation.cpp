@@ -1425,23 +1425,19 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
 
             //Check that all token transactions paid their XDM fees
             CAmount nXDMFees = 0;
-            if (!fScriptChecks) {
-                if (IsAnyOutputGrouped(tx)) {
-                    if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
-                        return state.DoS(0, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
-                    }
-                    if (!tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
-                        for (const CTxOut &txout : tx.vout)
-                        {
-                            CTokenGroupInfo grp(txout.scriptPubKey);
-                            if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
-                                return state.DoS(0, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
-                            }
+            if (IsAnyOutputGrouped(tx)) {
+                if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
+                    return state.DoS(0, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
+                }
+                if (!tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
+                    for (const CTxOut &txout : tx.vout)
+                    {
+                        CTokenGroupInfo grp(txout.scriptPubKey);
+                        if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
+                            return state.DoS(0, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
                         }
                     }
                 }
-            } else {
-                LogPrint(BCLog::TOKEN, "%s - XDM fee payment check skipped on sync\n", __func__);
             }
         }
 
