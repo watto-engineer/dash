@@ -184,6 +184,12 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "createrawtokentransaction", 1, "outputs" },
     { "createrawtokentransaction", 2, "token_outputs" },
     { "createrawtokentransaction", 3, "locktime" },
+    { "listunspenttokens", 1, "groupid" },
+    { "listunspenttokens", 1, "minconf" },
+    { "listunspenttokens", 2, "maxconf" },
+    { "listunspenttokens", 3, "addresses" },
+    { "listunspenttokens", 4, "include_unsafe" },
+    { "listunspenttokens", 5, "query_options" },
     // Echo with conversion (For testing only)
     { "echojson", 0, "arg0" },
     { "echojson", 1, "arg1" },

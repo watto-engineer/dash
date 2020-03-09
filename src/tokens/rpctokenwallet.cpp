@@ -1723,12 +1723,249 @@ extern UniValue melttoken(const JSONRPCRequest& request)
     return tx->GetHash().GetHex();
 }
 
+UniValue listunspenttokens(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() > 6)
+        throw std::runtime_error(
+            "listunspenttokens ( minconf maxconf  [\"addresses\",...] [include_unsafe] [query_options])\n"
+            "\nReturns array of unspent transaction outputs\n"
+            "with between minconf and maxconf (inclusive) confirmations.\n"
+            "Optionally filter to only include txouts paid to specified addresses.\n"
+            "\nArguments:\n"
+            "1. \"groupid\"      (string, optional) the token group identifier. Leave empty for all groups.\n"
+            "2. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
+            "3. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
+            "4. \"addresses\"      (string) A json array of Bytz addresses to filter\n"
+            "    [\n"
+            "      \"address\"     (string) Bytz address\n"
+            "      ,...\n"
+            "    ]\n"
+            "5. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
+            "                  See description of \"safe\" attribute below.\n"
+            "6. query_options    (json, optional) JSON with query options\n"
+            "    {\n"
+            "      \"minimumAmount\"    (numeric or string, default=0) Minimum value of each UTXO in " + CURRENCY_UNIT + "\n"
+            "      \"maximumAmount\"    (numeric or string, default=unlimited) Maximum value of each UTXO in " + CURRENCY_UNIT + "\n"
+            "      \"maximumCount\"     (numeric or string, default=unlimited) Maximum number of UTXOs\n"
+            "      \"minimumSumAmount\" (numeric or string, default=unlimited) Minimum sum value of all UTXOs in " + CURRENCY_UNIT + "\n"
+            "    }\n"
+            "\nResult\n"
+            "[                   (array of json object)\n"
+            "  {\n"
+            "    \"txid\" : \"txid\",          (string) the transaction id \n"
+            "    \"vout\" : n,               (numeric) the vout value\n"
+            "    \"address\" : \"address\",    (string) the Bytz address\n"
+            "    \"address\" : \"address\",    (string) the Bytz address\n"
+            "    \"address\" : \"address\",    (string) the Bytz address\n"
+            "    \"account\" : \"account\",    (string) DEPRECATED. The associated account, or \"\" for the default account\n"
+            "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
+            "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
+            "    \"confirmations\" : n,      (numeric) The number of confirmations\n"
+            "    \"redeemScript\" : n        (string) The redeemScript if scriptPubKey is P2SH\n"
+            "    \"spendable\" : xxx,        (bool) Whether we have the private keys to spend this output\n"
+            "    \"solvable\" : xxx,         (bool) Whether we know how to spend this output, ignoring the lack of keys\n"
+            "    \"safe\" : xxx              (bool) Whether this output is considered safe to spend. Unconfirmed transactions\n"
+            "                              from outside keys and unconfirmed replacement transactions are considered unsafe\n"
+            "                              and are not eligible for spending by fundrawtransaction and sendtoaddress.\n"
+            "    \"ps_rounds\" : n           (numeric) The number of PS rounds\n"
+            "  }\n"
+            "  ,...\n"
+            "]\n"
+
+            "\nExamples:\n"
+            + HelpExampleCli("listunspenttokens", "")
+            + HelpExampleCli("listunspenttokens", "\"tion1z0ysghq9vf3r38tpmfd87sf9s9fw6yl59ctnrd0jl905m39d8mfss3v0s8j\" 6 9999999 \"[\\\"idFcVh28YpxoCdJhiVjmsUn1Cq9rpJ6KP6\\\",\\\"XuQQkwA4FYkq2XERzMY2CiAZhJTEDAbtcg\\\"]\"")
+            + HelpExampleRpc("listunspenttokens", "\"\" 6, 9999999 \"[\\\"idFcVh28YpxoCdJhiVjmsUn1Cq9rpJ6KP6\\\",\\\"XuQQkwA4FYkq2XERzMY2CiAZhJTEDAbtcg\\\"]\"")
+            + HelpExampleCli("listunspenttokens", "\"tion1z0ysghq9vf3r38tpmfd87sf9s9fw6yl59ctnrd0jl905m39d8mfss3v0s8j\" 6 9999999 '[]' true '{ \"minimumAmount\": 0.005 }'")
+            + HelpExampleRpc("listunspenttokens", "\"\"6, 9999999, [] , true, { \"minimumAmount\": 0.005 } ")
+        );
+    int curparam = 0;
+
+    bool fIncludeGrouped = true;
+    bool fFilterGrouped = false;
+    CTokenGroupID filterGroupID;
+    if (request.params.size() > curparam && !request.params[curparam].isNull()) {
+        filterGroupID = GetTokenGroup(request.params[curparam].get_str());
+        if (!filterGroupID.isUserGroup()) {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter 1: No group specified");
+        } else {
+            fFilterGrouped = true;
+        }
+        if (filterGroupID == NoGroup) {
+            fIncludeGrouped = false;
+        }
+    }
+    curparam++;
+
+    int nMinDepth = 1;
+    if (request.params.size() > curparam && !request.params[curparam].isNull()) {
+        RPCTypeCheckArgument(request.params[curparam], UniValue::VNUM);
+        nMinDepth = request.params[curparam].get_int();
+    }
+    curparam++;
+
+    int nMaxDepth = 9999999;
+    if (request.params.size() > curparam && !request.params[curparam].isNull()) {
+        RPCTypeCheckArgument(request.params[curparam], UniValue::VNUM);
+        nMaxDepth = request.params[curparam].get_int();
+    }
+    curparam++;
+
+    std::set<CTxDestination> setAddress;
+    if (request.params.size() > curparam && !request.params[curparam].isNull()) {
+        RPCTypeCheckArgument(request.params[curparam], UniValue::VARR);
+        UniValue inputs = request.params[curparam].get_array();
+        for (unsigned int idx = 0; idx < inputs.size(); idx++) {
+            const UniValue& input = inputs[idx];
+            CTxDestination address = DecodeDestination(input.get_str());
+            if (!IsValidDestination(address)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid address: ")+input.get_str());
+            }
+            if (setAddress.count(address))
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ")+input.get_str());
+           setAddress.insert(address);
+        }
+    }
+    curparam++;
+
+    bool include_unsafe = true;
+    if (request.params.size() > curparam && !request.params[curparam].isNull()) {
+        RPCTypeCheckArgument(request.params[curparam], UniValue::VBOOL);
+        include_unsafe = request.params[curparam].get_bool();
+    }
+    curparam++;
+
+    CAmount nMinimumAmount = 0;
+    CAmount nMaximumAmount = MAX_MONEY;
+    CAmount nMinimumSumAmount = MAX_MONEY;
+    uint64_t nMaximumCount = 0;
+    CCoinControl coinControl;
+    coinControl.nCoinType = CoinType::ALL_COINS;
+
+    if (!request.params[curparam].isNull()) {
+        const UniValue& options = request.params[curparam].get_obj();
+
+        // Note: Keep this vector up to date with the options processed below
+        const std::vector<std::string> vecOptions {
+            "minimumAmount",
+            "maximumAmount",
+            "minimumSumAmount",
+            "maximumCount",
+            "coinType"
+        };
+
+        for (const auto& key : options.getKeys()) {
+            if (std::find(vecOptions.begin(), vecOptions.end(), key) == vecOptions.end()) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid key used in query_options JSON object: ") + key);
+            }
+        }
+
+        if (options.exists("minimumAmount"))
+            nMinimumAmount = AmountFromValue(options["minimumAmount"]);
+
+        if (options.exists("maximumAmount"))
+            nMaximumAmount = AmountFromValue(options["maximumAmount"]);
+
+        if (options.exists("minimumSumAmount"))
+            nMinimumSumAmount = AmountFromValue(options["minimumSumAmount"]);
+
+        if (options.exists("maximumCount"))
+            nMaximumCount = options["maximumCount"].get_int64();
+
+        if (options.exists("coinType")) {
+            int64_t nCoinType = options["coinType"].get_int64();
+
+            if (nCoinType < static_cast<int64_t>(CoinType::MIN_COIN_TYPE) || nCoinType > static_cast<int64_t>(CoinType::MAX_COIN_TYPE)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid coinType selected. Available range: %d - %d", static_cast<int64_t>(CoinType::MIN_COIN_TYPE), static_cast<int64_t>(CoinType::MAX_COIN_TYPE)));
+            }
+
+            coinControl.nCoinType = static_cast<CoinType>(nCoinType);
+        }
+    }
+    curparam++;
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
+    UniValue results(UniValue::VARR);
+    std::vector<COutput> vecOutputs;
+    assert(pwallet != nullptr);
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    pwallet->AvailableCoins(vecOutputs, !include_unsafe, nullptr, nMinimumAmount, nMaximumAmount, nMinimumSumAmount, nMaximumCount, nMinDepth, nMaxDepth, fIncludeGrouped);
+    for (const COutput& out : vecOutputs) {
+        CTxDestination address;
+        const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
+
+        CTokenGroupInfo grp(scriptPubKey);
+        CTokenGroupCreation tgCreation;
+        bool fValidGroup = !grp.invalid && grp.associatedGroup != NoGroup && !grp.isAuthority() && tokenGroupManager->GetTokenGroupCreation(grp.associatedGroup, tgCreation);
+
+        if (fFilterGrouped && (!fValidGroup || grp.associatedGroup != filterGroupID))
+            continue;
+
+        bool fValidAddress = ExtractDestination(scriptPubKey, address);
+
+        if (setAddress.size() && (!fValidAddress || !setAddress.count(address)))
+            continue;
+
+        UniValue entry(UniValue::VOBJ);
+        entry.pushKV("txid", out.tx->GetHash().GetHex());
+        entry.pushKV("vout", out.i);
+
+        if (fValidGroup) {
+            entry.pushKV("groupID", EncodeTokenGroup(grp.associatedGroup));
+            entry.pushKV("ticker", tgCreation.tokenGroupDescription.strTicker);
+            entry.pushKV("tokenAmount", tokenGroupManager->TokenValueFromAmount(grp.getAmount(), tgCreation.tokenGroupInfo.associatedGroup));
+        }
+
+        if (fValidAddress) {
+            entry.pushKV("address", EncodeDestination(address));
+
+            if (pwallet->mapAddressBook.count(address)) {
+                entry.pushKV("label", pwallet->mapAddressBook[address].name);
+                if (IsDeprecatedRPCEnabled("accounts")) {
+                    entry.pushKV("account", pwallet->mapAddressBook[address].name);
+                }
+            }
+
+            if (scriptPubKey.IsPayToScriptHash()) {
+                const CScriptID& hash = boost::get<CScriptID>(address);
+                CScript redeemScript;
+                if (pwallet->GetCScript(hash, redeemScript)) {
+                    entry.pushKV("redeemScript", HexStr(redeemScript.begin(), redeemScript.end()));
+                }
+            }
+        }
+
+        entry.pushKV("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
+        entry.pushKV("amount", ValueFromAmount(out.tx->tx->vout[out.i].nValue));
+        entry.pushKV("confirmations", out.nDepth);
+        entry.pushKV("spendable", out.fSpendable);
+        entry.pushKV("solvable", out.fSolvable);
+        entry.pushKV("safe", out.fSafe);
+        entry.pushKV("coinjoin_rounds", pwallet->GetRealOutpointCoinJoinRounds(COutPoint(out.tx->GetHash(), out.i)));
+        results.push_back(entry);
+    }
+
+    return results;
+}
+
 static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
     { "tokens",             "gettokenbalance",          &gettokenbalance,           {} },
     { "tokens",             "listtokentransactions",    &listtokentransactions,     {} },
     { "tokens",             "listtokenssinceblock",     &listtokenssinceblock,      {} },
+    { "tokens",             "listunspenttokens",        &listunspenttokens,         {"groupid","minconf","maxconf","addresses","include_unsafe","query_options"} },
     { "tokens",             "sendtoken",                &sendtoken,                 {} },
     { "tokens",             "configuretoken",           &configuretoken,            {} },
     { "tokens",             "configuremanagementtoken", &configuremanagementtoken,  {} },
