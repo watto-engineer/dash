@@ -3,7 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "tokens/tokengroupwallet.h"
+#include "base58.h"
 #include "core_io.h"
 #include "dstencode.h"
 #include "init.h"
@@ -12,6 +12,7 @@
 #include "rpc/server.h"
 #include "script/tokengroup.h"
 #include "tokens/tokengroupmanager.h"
+#include "tokens/tokengroupwallet.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
 #include "validation.h"
@@ -490,12 +491,170 @@ extern UniValue getsubgroupid(const JSONRPCRequest& request)
     return EncodeTokenGroup(subgrpID);
 };
 
+UniValue createrawtokentransaction(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 3 || request.params.size() > 4)
+        throw std::runtime_error(
+            "createrawtokentransaction [{\"txid\":\"id\",\"vout\":n},...] {\"address\":amount,\"data\":\"hex\",...} ( locktime )\n"
+            "\nCreate a transaction spending the given inputs and creating new outputs.\n"
+            "Outputs can be addresses or data.\n"
+            "Returns hex-encoded raw transaction.\n"
+            "Note that the transaction's inputs are not signed, and\n"
+            "it is not stored in the wallet or transmitted to the network.\n"
+
+            "\nArguments:\n"
+            "1. \"inputs\"                (array, required) A json array of json objects\n"
+            "     [\n"
+            "       {\n"
+            "         \"txid\":\"id\",    (string, required) The transaction id\n"
+            "         \"vout\":n,         (numeric, required) The output number\n"
+            "         \"sequence\":n      (numeric, optional) The sequence number\n"
+            "       } \n"
+            "       ,...\n"
+            "     ]\n"
+            "2. \"outputs\"               (object, required) a json object with outputs\n"
+            "    {\n"
+            "      \"address\": x.xxx,    (numeric or string, required) The key is the address, the numeric value (can be string) is the " + CURRENCY_UNIT + " amount\n"
+            "      \"data\": \"hex\"      (string, required) The key is \"data\", the value is hex encoded data\n"
+            "      ,...\n"
+            "    }\n"
+            "3. \"token_outputs\"         (string, required) a json object with addresses as keys and a json objects with the BYTZ and tokens to send\n"
+            "    {\n"
+            "      \"address\":           (numeric, required) The key is the Bytz address, the value is a json object with an BYTZ amount, tokengroup ID and token value as values\n"
+            "      {\n"
+            "        \"amount\":\"x.xxx\"       (numeric, required) The BYTZ amount\n"
+            "        \"group_id\":\"hex\"       (string, required) The tokengroup ID\n"
+            "        \"token_amount\":\"x.xxx\" (numeric, required) The token amount\n"
+            "      },...\n"
+            "    }\n"
+            "4. locktime                  (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs\n"
+            "\nResult:\n"
+            "\"transaction\"              (string) hex string of the transaction\n"
+
+            "\nExamples:\n"
+            + HelpExampleCli("createrawtokentransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"address\\\":0.01}\" \"{\\\"address\\\": {\\\"amount\\\":0.00000001, \\\"group_id\\\":\\\"asdfasdf\\\", \\\"token_amount\\\":0.1}}\"")
+        );
+
+    RPCTypeCheck(request.params, {UniValue::VARR, UniValue::VOBJ, UniValue::VOBJ, UniValue::VNUM}, true);
+    if (request.params[0].isNull() || request.params[1].isNull() || request.params[2].isNull())
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, arguments 1, 2 and 3 must be non-null");
+
+    UniValue inputs = request.params[0].get_array();
+    UniValue sendTo = request.params[1].get_obj();
+    UniValue sendTokensTo = request.params[2].get_obj();
+
+    CMutableTransaction rawTx;
+
+    if (request.params.size() > 3 && !request.params[3].isNull()) {
+        int64_t nLockTime = request.params[3].get_int64();
+        if (nLockTime < 0 || nLockTime > std::numeric_limits<uint32_t>::max())
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, locktime out of range");
+        rawTx.nLockTime = nLockTime;
+    }
+
+    for (unsigned int idx = 0; idx < inputs.size(); idx++) {
+        const UniValue& input = inputs[idx];
+        const UniValue& o = input.get_obj();
+
+        uint256 txid = ParseHashO(o, "txid");
+
+        const UniValue& vout_v = find_value(o, "vout");
+        if (!vout_v.isNum())
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, missing vout key");
+        int nOutput = vout_v.get_int();
+        if (nOutput < 0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, vout must be positive");
+
+        uint32_t nSequence = (rawTx.nLockTime ? std::numeric_limits<uint32_t>::max() - 1 : std::numeric_limits<uint32_t>::max());
+
+        // set the sequence number if passed in the parameters object
+        const UniValue& sequenceObj = find_value(o, "sequence");
+        if (sequenceObj.isNum()) {
+            int64_t seqNr64 = sequenceObj.get_int64();
+            if (seqNr64 < 0 || seqNr64 > std::numeric_limits<uint32_t>::max())
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, sequence number is out of range");
+            else
+                nSequence = (uint32_t)seqNr64;
+        }
+
+        CTxIn in(COutPoint(txid, nOutput), CScript(), nSequence);
+
+        rawTx.vin.push_back(in);
+    }
+
+    std::set<CTxDestination> setAddress;
+    std::vector<std::string> addrList = sendTo.getKeys();
+    for (const std::string& name_ : addrList) {
+
+        if (name_ == "data") {
+            std::vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
+
+            CTxOut out(0, CScript() << OP_RETURN << data);
+            rawTx.vout.push_back(out);
+        } else {
+            CTxDestination address = DecodeDestination(name_);
+            if (!IsValidDestination(address)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid address: ")+name_);
+            }
+
+            if (setAddress.count(address))
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ")+name_);
+            setAddress.insert(address);
+
+            CScript scriptPubKey = GetScriptForDestination(address);
+            CAmount nAmount = AmountFromValue(sendTo[name_]);
+
+            CTxOut out(nAmount, scriptPubKey);
+            rawTx.vout.push_back(out);
+        }
+    }
+
+    std::set<CTxDestination> setDestinations;
+    std::vector<std::string> tokenAddrList = sendTokensTo.getKeys();
+    for (const std::string& name_ : tokenAddrList) {
+        UniValue recipientObj = sendTokensTo[name_];
+
+        CTxDestination dst = DecodeDestination(name_, Params());
+        if (dst == CTxDestination(CNoDestination())) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid parameter: destination address");
+        }
+        if (setDestinations.count(dst))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ")+name_);
+        setDestinations.insert(dst);
+
+        std::string sTokenGroupID = recipientObj["group_id"].get_str();
+        CTokenGroupID tgID = GetTokenGroup(sTokenGroupID);
+        if (!tgID.isUserGroup()) {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
+        }
+        CTokenGroupCreation tgCreation;
+        if (!tokenGroupManager->GetTokenGroupCreation(tgID, tgCreation)) {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: Token group configuration transaction not found. Has it confirmed?");
+        }
+
+        CAmount nAmount = AmountFromValue(recipientObj["amount"]);
+
+        CAmount nTokenAmount = tokenGroupManager->AmountFromTokenValue(recipientObj["token_amount"], tgID);
+        if (nTokenAmount <= 0)
+            throw JSONRPCError(RPC_TYPE_ERROR, "Invalid parameter: token_amount");
+        CScript script;
+
+        script = GetScriptForDestination(dst, tgID, nTokenAmount);
+        CTxOut txout(nAmount, script);
+
+        rawTx.vout.push_back(txout);
+    }
+
+    return EncodeHexTx(rawTx);
+}
+
 static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
     { "tokens",             "tokeninfo",                &tokeninfo,                 {} },
     { "tokens",             "gettokentransaction",      &gettokentransaction,       {} },
     { "tokens",             "getsubgroupid",            &getsubgroupid,             {} },
+    { "tokens",             "createrawtokentransaction",&createrawtokentransaction, {} },
 };
 
 void RegisterTokensRPCCommands(CRPCTable &t)
