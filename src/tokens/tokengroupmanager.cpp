@@ -233,14 +233,14 @@ bool CTokenGroupManager::TokenMoneyRange(CAmount nValueOut) {
 
 CAmount CTokenGroupManager::AmountFromTokenValue(const UniValue& value, const CTokenGroupID& tgID) {
     if (!value.isNum() && !value.isStr())
-        throw JSONRPCError(RPC_TYPE_ERROR, "Amount is not a number or string");
+        throw JSONRPCError(RPC_TYPE_ERROR, "Token amount is not a number or string");
     CAmount amount;
     CTokenGroupCreation tgCreation;
     GetTokenGroupCreation(tgID, tgCreation);
     if (!ParseFixedPoint(value.getValStr(), tgCreation.tokenGroupDescription.nDecimalPos, &amount))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
+        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid token amount");
     if (!TokenMoneyRange(amount))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Amount out of range");
+        throw JSONRPCError(RPC_TYPE_ERROR, "Token amount out of range");
     return amount;
 }
 
