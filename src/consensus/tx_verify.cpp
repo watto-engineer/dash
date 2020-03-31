@@ -4,6 +4,7 @@
 
 #include <consensus/tx_verify.h>
 
+#include <chainparams.h>
 #include <consensus/consensus.h>
 #include <primitives/transaction.h>
 #include <script/interpreter.h>
@@ -160,7 +161,7 @@ unsigned int GetTransactionSigOpCount(const CTransaction& tx, const CCoinsViewCa
     return nSigOps;
 }
 
-bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight, CAmount& txfee)
+bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight, CAmount& txfee, const Consensus::Params& params)
 {
     // are the actual inputs available?
     if (!inputs.HaveInputs(tx)) {
@@ -174,7 +175,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         assert(!coin.IsSpent());
 
         // If prev is coinstake, check that it's matured
-        if (coin.IsCoinStake() && nSpendHeight - coin.nHeight < Params().nCoinbaseMaturity) {
+        if (coin.IsCoinStake() && nSpendHeight - coin.nHeight < params.nCoinbaseMaturity) {
             return state.Invalid(false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinstake",
                 strprintf("tried to spend coinstake at depth %d", nSpendHeight - coin.nHeight));
@@ -186,7 +187,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         }
 
         // If prev is group authority, check that it's matured
-        if (IsOutputGroupedAuthority(coin.out) && nSpendHeight - coin.nHeight < Params().nOpGroupNewRequiredConfirmations) {
+        if (IsOutputGroupedAuthority(coin.out) && nSpendHeight - coin.nHeight < params.nOpGroupNewRequiredConfirmations) {
             return state.Invalid(false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));

@@ -2199,7 +2199,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 return false;
         } else if (!tx->IsCoinBase())
             CAmount txfee = 0;
-            if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
+            if (!Consensus::CheckTxInputs(*tx, state, view, pindex->nHeight, txfee, Params().GetConsensus())) {
                 if (!IsBlockReason(state.GetReason())) {
                     // CheckTxInputs may return MISSING_INPUTS or
                     // PREMATURE_SPEND but we can't return that, as it's not

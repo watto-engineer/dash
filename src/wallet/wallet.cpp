@@ -5219,8 +5219,8 @@ int CWalletTx::GetBlocksToMaturity() const
     int depth = GetDepthInMainChain();
     int minBlocksToMaturity = 0;
     if (IsAnyOutputGroupedAuthority(*tx))
-        minBlocksToMaturity = std::max(0, (Consensus::Params().nOpGroupNewRequiredConfirmations + 1) - depth);
-    return std::max(minBlocksToMaturity, (Consensus::Params().nCoinbaseMaturity + 1) - depth);
+        minBlocksToMaturity = std::max(0, (Params().GetConsensus().nOpGroupNewRequiredConfirmations + 1) - depth);
+    return std::max(minBlocksToMaturity, (Params().GetConsensus().nCoinbaseMaturity + 1) - depth);
 }
 
 bool CWalletTx::IsImmatureCoinBase() const
