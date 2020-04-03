@@ -2547,6 +2547,9 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                     std::vector<CInv> vInv(1);
                     vInv[0] = CInv(MSG_BLOCK, inv.hash);
                     connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETDATA, vInv));
+
+                    state->nStallingSince = GetTimeMicros();
+                    LogPrint(BCLog::NET, "Stall started peer=%s\n", state->name);
                 }
                 // Download if this is a nice peer, or we have no nice peers and this one might do.
                 bool fFetch = state->fPreferredDownload || (nPreferredDownload == 0 && !pfrom->fOneShot);
@@ -3322,6 +3325,8 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             if (mapBlockIndex.find(pblock->hashPrevBlock) == mapBlockIndex.end()) {
                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), pblock->GetHash()));
                 return true;
+            } else {
+                State(pfrom->GetId())->nStallingSince = 0;
             }
             forceProcessing = true;
         }
