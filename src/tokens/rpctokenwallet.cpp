@@ -243,41 +243,41 @@ static void AcentryToJSON(const CAccountingEntry &acentry, const std::string &st
     }
 }
 
-void ListGroupedTransactions(CWallet * const pwallet,
-    const CTokenGroupID &grp,
+void GetGroupedTransactions(CWallet * const pwallet,
     const CWalletTx &wtx,
     const std::string &strAccount,
     int nMinDepth,
     bool fLong,
     UniValue &ret,
-    const isminefilter &filter)
+    const CAmount nFee,
+    const std::string &strSentAccount,
+    const std::list<CGroupedOutputEntry> &listReceived,
+    const std::list<CGroupedOutputEntry> &listSent)
 {
-    CAmount nFee;
-    std::string strSentAccount;
-    std::list<COutputEntry> listReceived;
-    std::list<COutputEntry> listSent;
-
-    wtx.GetGroupAmounts(grp, listReceived, listSent, nFee, strSentAccount, filter);
-
-    CTokenGroupCreation tgCreation;
-    tokenGroupManager->GetTokenGroupCreation(grp, tgCreation);
-
     bool fAllAccounts = (strAccount == std::string("*"));
     bool involvesWatchonly = wtx.IsFromMe(ISMINE_WATCH_ONLY);
 
     // Sent
     if ((!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
     {
-        for (const COutputEntry &s : listSent)
+        for (const CGroupedOutputEntry &s : listSent)
         {
+            const CTokenGroupInfo tokenGroupInfo(s.grp, s.grpAmount);
+
             UniValue entry(UniValue::VOBJ);
             if (involvesWatchonly || (::IsMine(*pwallet, s.destination) & ISMINE_WATCH_ONLY))
                 entry.push_back(Pair("involvesWatchonly", true));
             entry.push_back(Pair("account", strSentAccount));
             MaybePushAddress(entry, s.destination);
             entry.push_back(Pair("category", "send"));
-            entry.push_back(Pair("groupID", EncodeTokenGroup(grp)));
-            entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(-s.amount, tgCreation.tokenGroupInfo.associatedGroup)));
+            entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
+            if (tokenGroupInfo.isAuthority()){
+                entry.push_back(Pair("outputType", "authority"));
+                entry.push_back(Pair("authorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+            } else {
+                entry.push_back(Pair("outputType", "amount"));
+                entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+            }
             if (pwallet->mapAddressBook.count(s.destination))
                 entry.push_back(Pair("label", pwallet->mapAddressBook[s.destination].name));
             entry.push_back(Pair("vout", s.vout));
@@ -291,13 +291,14 @@ void ListGroupedTransactions(CWallet * const pwallet,
     // Received
     if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth)
     {
-        for (const COutputEntry &r : listReceived)
+        for (const CGroupedOutputEntry &r : listReceived)
         {
             std::string account;
             if (pwallet->mapAddressBook.count(r.destination))
                 account = pwallet->mapAddressBook[r.destination].name;
             if (fAllAccounts || (account == strAccount))
             {
+            const CTokenGroupInfo tokenGroupInfo(r.grp, r.grpAmount);
                 UniValue entry(UniValue::VOBJ);
                 if (involvesWatchonly || (::IsMine(*pwallet, r.destination) & ISMINE_WATCH_ONLY))
                     entry.push_back(Pair("involvesWatchonly", true));
@@ -316,8 +317,14 @@ void ListGroupedTransactions(CWallet * const pwallet,
                 {
                     entry.push_back(Pair("category", "receive"));
                 }
-                entry.push_back(Pair("groupID", EncodeTokenGroup(grp)));
-                entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(r.amount, tgCreation.tokenGroupInfo.associatedGroup)));
+                entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
+                if (tokenGroupInfo.isAuthority()){
+                    entry.push_back(Pair("outputType", "authority"));
+                    entry.push_back(Pair("authorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+                } else {
+                    entry.push_back(Pair("outputType", "amount"));
+                    entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                }
                 if (pwallet->mapAddressBook.count(r.destination))
                     entry.push_back(Pair("label", account));
                 entry.push_back(Pair("vout", r.vout));
@@ -327,6 +334,45 @@ void ListGroupedTransactions(CWallet * const pwallet,
             }
         }
     }
+}
+
+void ListGroupedTransactions(CWallet * const pwallet,
+    const CTokenGroupID &grp,
+    const CWalletTx &wtx,
+    const std::string &strAccount,
+    int nMinDepth,
+    bool fLong,
+    UniValue &ret,
+    const isminefilter &filter)
+{
+    CAmount nFee;
+    std::string strSentAccount;
+    std::list<CGroupedOutputEntry> listReceived;
+    std::list<CGroupedOutputEntry> listSent;
+
+    wtx.GetGroupAmounts(listReceived, listSent, nFee, strSentAccount, filter, [&grp](const CTokenGroupInfo& txgrp){
+        return grp == txgrp.associatedGroup;
+    });
+    GetGroupedTransactions(pwallet, wtx, strAccount, nMinDepth, fLong, ret, nFee, strSentAccount, listReceived, listSent);
+}
+
+void ListAllGroupedTransactions(CWallet * const pwallet,
+    const CWalletTx &wtx,
+    const std::string &strAccount,
+    int nMinDepth,
+    bool fLong,
+    UniValue &ret,
+    const isminefilter &filter)
+{
+    CAmount nFee;
+    std::string strSentAccount;
+    std::list<CGroupedOutputEntry> listReceived;
+    std::list<CGroupedOutputEntry> listSent;
+
+    wtx.GetGroupAmounts(listReceived, listSent, nFee, strSentAccount, filter, [](const CTokenGroupInfo& txgrp){
+        return true;
+    });
+    GetGroupedTransactions(pwallet, wtx, strAccount, nMinDepth, fLong, ret, nFee, strSentAccount, listReceived, listSent);
 }
 
 extern UniValue gettokenbalance(const JSONRPCRequest& request)
@@ -427,13 +473,14 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
-            "listtokentransactions \"groupid\" ( count from includeWatchonly )\n"
+            "listtokentransactions (\"groupid\" count from includeWatchonly )\n"
             "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions for account "
             "'account'.\n"
             "\nArguments:\n"
-            "1. \"groupid\"    (string) the token group identifier\n"
-            "2. count          (numeric, optional, default=10) The number of transactions to return\n"
-            "3. from           (numeric, optional, default=0) The number of transactions to skip\n"
+            "1. \"groupid\"        (string, optional) the token group identifier. Specify \"*\" to return transactions from "
+            "all token groups\n"
+            "2. count            (numeric, optional, default=10) The number of transactions to return\n"
+            "3. from             (numeric, optional, default=0) The number of transactions to skip\n"
             "4. includeWatchonly (bool, optional, default=false) Include transactions to watchonly addresses (see "
             "'importaddress')\n"
             "\nResult:\n"
@@ -507,15 +554,21 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
     unsigned int curparam = 0;
 
     std::string strAccount = "*";
+    bool fAllGroups;
+    CTokenGroupID grpID;
 
-    if (request.params.size() <= curparam)
+    if (request.params.size() > curparam)
     {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
-    }
-    CTokenGroupID grpID = GetTokenGroup(request.params[curparam].get_str());
-    if (!grpID.isUserGroup())
-    {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
+        std::string strGrpID = request.params[curparam].get_str();
+        fAllGroups = (strGrpID == std::string("*"));
+
+        if (!fAllGroups) {
+            grpID = GetTokenGroup(strGrpID);
+            if (!grpID.isUserGroup())
+            {
+                throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
+            }
+        }
     }
 
     curparam++;
@@ -547,8 +600,13 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it)
     {
         CWalletTx *const pwtx = (*it).second.first;
-        if (pwtx != 0)
-            ListGroupedTransactions(pwallet, grpID, *pwtx, strAccount, 0, true, ret, filter);
+        if (pwtx != 0) {
+            if (fAllGroups) {
+                ListAllGroupedTransactions(pwallet, *pwtx, strAccount, 0, true, ret, filter);
+            } else {
+                ListGroupedTransactions(pwallet, grpID, *pwtx, strAccount, 0, true, ret, filter);
+            }
+        }
         CAccountingEntry *const pacentry = (*it).second.second;
         if (pacentry != 0)
             AcentryToJSON(*pacentry, strAccount, ret);
