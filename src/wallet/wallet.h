@@ -521,12 +521,12 @@ public:
         const isminefilter &filter) const;
 
     // Get transactions for the passed group
-    void GetGroupAmounts(const CTokenGroupID &grp,
-        std::list<COutputEntry> &listReceived,
-        std::list<COutputEntry> &listSent,
+    void GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
+        std::list<CGroupedOutputEntry> &listSent,
         CAmount &nFee,
         std::string &strSentAccount,
-        const isminefilter &filter) const;
+        const isminefilter &filter,
+        std::function<bool(const CTokenGroupInfo&)> func) const;
 
     bool IsFromMe(const isminefilter& filter) const
     {

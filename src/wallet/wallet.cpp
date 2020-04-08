@@ -2175,12 +2175,12 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
 
 }
 
-void CWalletTx::GetGroupAmounts(const CTokenGroupID &grp,
-    std::list<COutputEntry> &listReceived,
-    std::list<COutputEntry> &listSent,
+void CWalletTx::GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
+    std::list<CGroupedOutputEntry> &listSent,
     CAmount &nFee,
     std::string &strSentAccount,
-    const isminefilter &filter) const
+    const isminefilter &filter,
+    std::function<bool(const CTokenGroupInfo&)> func) const
 {
     nFee = 0;
     listReceived.clear();
@@ -2225,9 +2225,9 @@ void CWalletTx::GetGroupAmounts(const CTokenGroupID &grp,
         if ((whichType == TX_GRP_PUBKEYHASH) || (whichType == TX_GRP_SCRIPTHASH))
         {
             CTokenGroupInfo txgrp(txout.scriptPubKey);
-            if (grp == txgrp.associatedGroup)
-            {
-                COutputEntry output = {address, txgrp.quantity, (int)i};
+            if (func(txgrp)) {
+                CTokenGroupInfo txgrp(txout.scriptPubKey); // If group is invalid, txgrp zeros its members.
+                CGroupedOutputEntry output(txgrp.associatedGroup, txgrp.quantity, address, txout.nValue, (int)i);
 
                 // If we are debited by the transaction, add the output as a "sent" entry
                 if (nDebit > 0)
