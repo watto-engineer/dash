@@ -272,11 +272,12 @@ void GetGroupedTransactions(CWallet * const pwallet,
             entry.push_back(Pair("category", "send"));
             entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
             if (tokenGroupInfo.isAuthority()){
-                entry.push_back(Pair("outputType", "authority"));
-                entry.push_back(Pair("authorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+                entry.push_back(Pair("tokenType", "authority"));
+                entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
             } else {
-                entry.push_back(Pair("outputType", "amount"));
-                entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                entry.push_back(Pair("tokenType", "amount"));
+                entry.push_back(Pair("tokenValue", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                entry.push_back(Pair("tokenValueSat", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
             }
             if (pwallet->mapAddressBook.count(s.destination))
                 entry.push_back(Pair("label", pwallet->mapAddressBook[s.destination].name));
@@ -319,11 +320,12 @@ void GetGroupedTransactions(CWallet * const pwallet,
                 }
                 entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
                 if (tokenGroupInfo.isAuthority()){
-                    entry.push_back(Pair("outputType", "authority"));
-                    entry.push_back(Pair("authorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+                    entry.push_back(Pair("tokenType", "authority"));
+                    entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
                 } else {
-                    entry.push_back(Pair("outputType", "amount"));
-                    entry.push_back(Pair("tokenAmount", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                    entry.push_back(Pair("tokenType", "amount"));
+                    entry.push_back(Pair("tokenValue", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                    entry.push_back(Pair("tokenValueSat", tokenGroupInfo.getAmount()));
                 }
                 if (pwallet->mapAddressBook.count(r.destination))
                     entry.push_back(Pair("label", account));
@@ -1441,7 +1443,7 @@ extern UniValue listtokenauthorities(const JSONRPCRequest& request)
         retobj.push_back(Pair("vout", coin.i));
         retobj.push_back(Pair("ticker", tgCreation.tokenGroupDescription.strTicker));
         retobj.push_back(Pair("address", EncodeDestination(dest)));
-        retobj.push_back(Pair("groupAuthorities", EncodeGroupAuthority(tgInfo.controllingGroupFlags())));
+        retobj.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tgInfo.controllingGroupFlags())));
         ret.push_back(retobj);
     }
     return ret;
