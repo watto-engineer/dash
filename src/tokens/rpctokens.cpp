@@ -240,7 +240,7 @@ void RpcTokenTxnoutToUniv(const CTxOut& txout,
 
         CTokenGroupDescription tokenGroupDescription = CTokenGroupDescription(txout.scriptPubKey);
 
-        out.pushKV("outputType", "description");
+        out.pushKV("type", "description");
         out.pushKV("ticker", tokenGroupDescription.strTicker);
         out.pushKV("name", tokenGroupDescription.strName);
         out.pushKV("decimalPos", tokenGroupDescription.nDecimalPos);
@@ -258,15 +258,16 @@ void RpcTokenTxnoutToUniv(const CTxOut& txout,
         } else {
             tgTicker = tokenGroupManager->GetTokenGroupTickerByID(tokenGroupInfo.associatedGroup);
         }
-        out.pushKV("groupIdentifier", EncodeTokenGroup(tokenGroupInfo.associatedGroup));
+        out.pushKV("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup));
         if (tokenGroupInfo.isAuthority()){
-            out.pushKV("outputType", "authority");
+            out.pushKV("type", "authority");
             out.pushKV("ticker", tgTicker);
             out.pushKV("authorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags()));
         } else {
-            out.pushKV("outputType", "amount");
+            out.pushKV("type", "amount");
             out.pushKV("ticker", tgTicker);
             out.pushKV("value", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
+            out.pushKV("valueSat", tokenGroupInfo.getAmount());
         }
     }
 }

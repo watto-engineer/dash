@@ -66,7 +66,7 @@ class MyTest (BitcoinTestFramework):
     def subgroupTest(self):
 
         self.nodes[0].generate(1)
-        grp1 = self.nodes[0].token("new")["groupIdentifier"]
+        grp1 = self.nodes[0].token("new")["groupID"]
 
         sg1a = self.nodes[0].token("subgroup", grp1, 1)
         tmp  = self.nodes[0].token("subgroup", grp1, "1")
@@ -161,21 +161,21 @@ class MyTest (BitcoinTestFramework):
         # Create a group, allow wallet to pick an authority address
         t = self.nodes[0].token("new")
         self.checkGroupNew(self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"]))
-        grpId = t["groupIdentifier"]
+        grpId = t["groupID"]
 
         # Create a group to a specific authority address
         t = self.nodes[0].token("new", auth0Addr)
         self.checkGroupNew(self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"]))
-        grp0Id = t["groupIdentifier"]
+        grp0Id = t["groupID"]
 
         # Create a group on behalf of a different node (with an authority address I don't control)
         t = self.nodes[0].token("new", auth1Addr)
         self.checkGroupNew(self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"]))
-        grp1Id = t["groupIdentifier"]
+        grp1Id = t["groupID"]
 
         t = self.nodes[0].token("new", auth2Addr)
         self.checkGroupNew(self.nodes[0].decoderawtransaction(self.nodes[0].gettransaction(t["transaction"])["hex"]))
-        grp2Id = t["groupIdentifier"]
+        grp2Id = t["groupID"]
 
         mint0_0 = self.nodes[0].getnewaddress()
         mint0_1 = self.nodes[0].getnewaddress()
