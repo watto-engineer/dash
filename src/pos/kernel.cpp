@@ -349,7 +349,7 @@ bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
 }
 
 // Check kernel hash target and coinstake signature
-bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight) {
+bool initStakeInput(const CBlock block, std::unique_ptr<CStake>& ionStake, std::unique_ptr<CZStake>& zStake, int nPreviousBlockHeight) {
     const CTransaction tx = *block.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s : called on non-coinstake %s", __func__, tx.GetHash().GetHex());
@@ -363,9 +363,9 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
         if (spend.getSpendType() != libzerocoin::SpendType::STAKE)
             return error("%s: spend is using the wrong SpendType (%d)", __func__, (int)spend.getSpendType());
 
-        stake = std::unique_ptr<CStakeInput>(new CZStake(spend));
+        zStake.reset(new CZStake(spend));
 
-        if (!ContextualCheckZerocoinStake(nPreviousBlockHeight, stake.get()))
+        if (!ContextualCheckZerocoinStake(nPreviousBlockHeight, zStake.get()))
             return error("%s: staked zBYTZ fails context checks", __func__);
     } else {
         // First try finding the previous transaction in database
@@ -383,28 +383,34 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
             return error("%s : Grouped input not allowed in coinstake (%s)", __func__, tx.GetHash().GetHex());
         }
 
-        CStake* bytzInput = new CStake();
-        bytzInput->SetInput(txPrev, txin.prevout.n);
-        stake = std::unique_ptr<CStakeInput>(bytzInput);
+        ionStake.reset(new CStake());
+        ionStake->SetInput(txPrev, txin.prevout.n);
     }
     return true;
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake, const CBlockIndex* pindex)
+bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, const CBlockIndex* pindex)
 {
+    std::unique_ptr<CStake> ionStake;
+    std::unique_ptr<CZStake> zStake;
+
     if (pindex == nullptr || pindex->pprev == nullptr)
         return error("%s : null pindexPrev for block %s", __func__, block.GetHash().GetHex());
     const int nPreviousBlockHeight = pindex->pprev->nHeight;
 
     // Initialize the stake object
-    if(!initStakeInput(block, stake, nPreviousBlockHeight))
+    if(!initStakeInput(block, ionStake, zStake, nPreviousBlockHeight))
         return error("%s : stake input object initialization failed", __func__);
+
+    if (!ionStake && !zStake) {
+        return error("%s : stake input object is null", __func__);
+    }
 
     const CTransactionRef tx = block.vtx[1];
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx->vin[0];
-    CBlockIndex* pindexfrom = stake->GetIndexFrom();
+    CBlockIndex* pindexfrom = ionStake ? ionStake->GetIndexFrom() : zStake->GetIndexFrom();
     if (!pindexfrom)
         return error("%s: Failed to find the block index for stake origin", __func__);
 
@@ -418,7 +424,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
             return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
                              __func__, nPreviousBlockHeight, nTxTime, nBlockFromTime, nBlockFromHeight);
     }
-    if (!CheckStakeKernelHash(pindex->pprev, block.nBits, stake.get(), nTxTime, hashProofOfStake, true)) {
+    if (!CheckStakeKernelHash(pindex->pprev, block.nBits, ionStake ? (CStakeInput*)(ionStake.get()) : (CStakeInput*)(zStake.get()), nTxTime, hashProofOfStake, true)) {
         return error("%s : INFO: check kernel failed on coinstake %s, hashProof=%s", __func__,
                      tx->GetHash().GetHex(), hashProofOfStake.GetHex());
     }
