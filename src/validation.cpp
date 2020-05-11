@@ -2134,19 +2134,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         return state.Error("Error setting POS parameters");
     }
     if (block.IsProofOfStake()) {
-        std::unique_ptr<CStakeInput> stake;
         uint256 hashProofOfStake;
 
-        if (!CheckProofOfStake(block, hashProofOfStake, stake, pindex))
+        if (!CheckProofOfStake(block, hashProofOfStake, pindex)) {
             return error("%s: proof of stake check failed", __func__);
-
-        if (!stake)
-            return error("%s: null stake ptr", __func__);
-
+        }
         uint256 hash = block.GetHash();
         if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
             mapProofOfStake.insert(std::make_pair(hash, hashProofOfStake));
-    }
 
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
     LogPrint(BCLog::BENCHMARK, "    - Fork checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime2 - nTime1), nTimeForks * MICRO, nTimeForks * MILLI / nBlocksTotal);
