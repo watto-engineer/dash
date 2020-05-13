@@ -61,7 +61,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1417713337
+GENESISTIME = 1575851148
 
 class BitcoinTestFramework():
     """Base class for a bitcoin test script.
