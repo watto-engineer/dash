@@ -2326,7 +2326,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 }
 */
                 CTokenGroupCreation newTokenGroupCreation;
-                if (CreateTokenGroup(tx, pindex->GetBlockHash(), newTokenGroupCreation)) {
+                if (CreateTokenGroup(tx, block.GetHash(), newTokenGroupCreation)) {
                     newTokenGroups.push_back(newTokenGroupCreation);
                 } else {
                     return state.Invalid(false, REJECT_INVALID, "bad OP_GROUP");
