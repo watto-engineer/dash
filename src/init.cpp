@@ -2084,16 +2084,14 @@ bool AppInitMain()
                 tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
 
                 // Drop all information from the tokenDB and repopulate
-                if (gArgs.GetBoolArg("-reindextokens", false)) {
-                    uiInterface.InitMessage(_("Reindexing token database..."));
-                    if (!ReindexTokenDB(strLoadError))
+                bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
+                if (!fReindexTokens) {
+                    // ATP: load token data
+                    uiInterface.InitMessage(_("Loading token data..."));
+                    if (!pTokenDB->LoadTokensFromDB(strLoadError)) {
                         break;
+                    }
                 }
-
-                // load token data
-                uiInterface.InitMessage(_("Loading token data..."));
-                if (!pTokenDB->LoadTokensFromDB(strLoadError))
-                    break;
 
                 pcoinsdbview.reset(new CCoinsViewDB(nCoinDBCache, false, fReset || fReindexChainState));
                 pcoinscatcher.reset(new CCoinsViewErrorCatcher(pcoinsdbview.get()));
@@ -2138,6 +2136,18 @@ bool AppInitMain()
 
                 if (!deterministicMNManager->UpgradeDBIfNeeded() || !llmq::quorumBlockProcessor->UpgradeDB()) {
                     strLoadError = _("Error upgrading evo database");
+                    break;
+                }
+
+                if (fReindexTokens) {
+                    uiInterface.InitMessage(_("Reindexing token database..."));
+                    if (!ReindexTokenDB(strLoadError)) {
+                        break;
+                    }
+                }
+
+                uiInterface.InitMessage(_("Verifying tokens..."));
+                if (!VerifyTokenDB(strLoadError)) {
                     break;
                 }
 

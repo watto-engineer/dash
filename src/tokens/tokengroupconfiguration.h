@@ -29,14 +29,15 @@ class CTokenGroupCreation
 {
 public:
     CTransactionRef creationTransaction;
+    uint256 creationBlockHash;
     CTokenGroupInfo tokenGroupInfo;
     CTokenGroupDescription tokenGroupDescription;
     CTokenGroupStatus status;
 
     CTokenGroupCreation() : creationTransaction(MakeTransactionRef()){};
 
-    CTokenGroupCreation(CTransactionRef creationTransaction, CTokenGroupInfo tokenGroupInfo, CTokenGroupDescription tokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
-        : creationTransaction(creationTransaction), tokenGroupInfo(tokenGroupInfo), tokenGroupDescription(tokenGroupDescription), status(tokenGroupStatus) {}
+    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, CTokenGroupDescription tokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
+        : creationTransaction(creationTransaction), creationBlockHash(creationBlockHash), tokenGroupInfo(tokenGroupInfo), tokenGroupDescription(tokenGroupDescription), status(tokenGroupStatus) {}
 
     bool ValidateDescription();
 
@@ -46,6 +47,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(REF(TransactionCompressor(creationTransaction)));
+        READWRITE(creationBlockHash);
         READWRITE(tokenGroupInfo);
         READWRITE(tokenGroupDescription);
     }
@@ -53,7 +55,7 @@ public:
     {
         if (c.tokenGroupInfo.invalid || tokenGroupInfo.invalid)
             return false;
-        return (creationTransaction == c.creationTransaction && tokenGroupInfo == c.tokenGroupInfo && tokenGroupDescription == c.tokenGroupDescription);
+        return (*creationTransaction == *c.creationTransaction && creationBlockHash == c.creationBlockHash && tokenGroupInfo == c.tokenGroupInfo && tokenGroupDescription == c.tokenGroupDescription);
     }
 };
 
@@ -62,6 +64,6 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation);
 
 bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CScript &firstOpReturn);
-bool CreateTokenGroup(CTransactionRef tx, CTokenGroupCreation &newTokenGroupCreation);
+bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation);
 
 #endif

@@ -42,6 +42,7 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
     if (extended) {
         UniValue extendedEntry(UniValue::VOBJ);
         extendedEntry.push_back(Pair("txid", tgCreation.creationTransaction->GetHash().GetHex()));
+        extendedEntry.push_back(Pair("blockHash", tgCreation.creationBlockHash.GetHex()));
         extendedEntry.push_back(Pair("address", EncodeDestination(creationDestination)));
         entry.push_back(Pair("creation", extendedEntry));
     }

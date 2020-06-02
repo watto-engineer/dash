@@ -89,7 +89,7 @@ void CTokenGroupManager::ResetTokenGroups() {
     CTransaction tgTxBytz;
     CTokenGroupDescription tgDescriptionBYTZ("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
     CTokenGroupStatus tokenGroupStatus;
-    CTokenGroupCreation tgCreationBYTZ(MakeTransactionRef(tgTxBytz), tgInfoBYTZ, tgDescriptionBYTZ, tokenGroupStatus);
+    CTokenGroupCreation tgCreationBYTZ(MakeTransactionRef(tgTxBytz), uint256(), tgInfoBYTZ, tgDescriptionBYTZ, tokenGroupStatus);
     mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationBYTZ));
 
 }
