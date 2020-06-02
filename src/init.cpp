@@ -2082,16 +2082,12 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
 
                 // Drop all information from the tokenDB and repopulate
-                if (gArgs.GetBoolArg("-reindextokens", false)) {
-                    uiInterface.InitMessage(_("Reindexing token database..."));
-                    if (!ReindexTokenDB(strLoadError))
+                bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
+                if (!fReindexTokens) {
+                    // ATP: load token data
+                    uiInterface.InitMessage(_("Loading token data..."));
                         break;
                 }
-
-                // load token data
-                uiInterface.InitMessage(_("Loading token data..."));
-                if (!pTokenDB->LoadTokensFromDB(strLoadError))
-                    break;
 
                 if (fReset) {
                     pblocktree->WriteReindexing(true);
@@ -2224,6 +2220,18 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
                 if (!deterministicMNManager->UpgradeDBIfNeeded() || !llmq::quorumBlockProcessor->UpgradeDB()) {
                     strLoadError = _("Error upgrading evo database");
+                    break;
+                }
+
+                if (fReindexTokens) {
+                    uiInterface.InitMessage(_("Reindexing token database..."));
+                    if (!ReindexTokenDB(strLoadError)) {
+                        break;
+                    }
+                }
+
+                uiInterface.InitMessage(_("Verifying tokens..."));
+                if (!VerifyTokenDB(strLoadError)) {
                     break;
                 }
 

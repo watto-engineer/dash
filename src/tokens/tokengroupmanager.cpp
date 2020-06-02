@@ -89,7 +89,7 @@ void CTokenGroupManager::ResetTokenGroups() {
     CTransaction tgTxWagerr;
     CTokenGroupDescription tgDescriptionWAGERR("WAGERR", "Wagerr", 8, "https://wagerr.gg", uint256());
     CTokenGroupStatus tokenGroupStatus;
-    CTokenGroupCreation tgCreationWAGERR(MakeTransactionRef(tgTxWagerr), tgInfoWAGERR, tgDescriptionWAGERR, tokenGroupStatus);
+    CTokenGroupCreation tgCreationWAGERR(MakeTransactionRef(tgTxWagerr), uint256(), tgInfoWAGERR, tgDescriptionWAGERR, tokenGroupStatus);
     mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationWAGERR));
 
 }

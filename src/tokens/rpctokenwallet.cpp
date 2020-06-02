@@ -965,7 +965,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     CTokenGroupDescription tokenGroupDescription(opretScript);
     CTokenGroupStatus tokenGroupStatus;
     CTransaction dummyTransaction;
-    CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
+    CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), uint256(), tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
     tokenGroupCreation.ValidateDescription();
 
     ret.push_back(Pair("ticker", tokenGroupCreation.tokenGroupDescription.strTicker));

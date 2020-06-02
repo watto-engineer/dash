@@ -139,7 +139,7 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
 
 }
 
-bool CreateTokenGroup(CTransactionRef tx, CTokenGroupCreation &newTokenGroupCreation) {
+bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
     CScript firstOpReturn;
     CTokenGroupInfo tokenGroupInfo;
 
@@ -147,7 +147,7 @@ bool CreateTokenGroup(CTransactionRef tx, CTokenGroupCreation &newTokenGroupCrea
 
     CTokenGroupDescription tokenGroupDescription = CTokenGroupDescription(firstOpReturn);
     CTokenGroupStatus tokenGroupStatus;
-    newTokenGroupCreation = CTokenGroupCreation(tx, tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
+    newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
 
     return true;
 }

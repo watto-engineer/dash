@@ -34,5 +34,6 @@ public:
 };
 
 bool ReindexTokenDB(std::string &strError); // Drops db, scans for token creations, but does not populate mapTokenGroups
+bool VerifyTokenDB(std::string &strError); // Fetches all tokens from the DB and verifies that their configuration transactions are valid
 
 #endif //TOKENS_TOKENDB_H
