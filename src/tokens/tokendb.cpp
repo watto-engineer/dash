@@ -87,15 +87,30 @@ bool VerifyTokenDB(std::string &strError) {
     if (!pTokenDB->FindTokenGroups(vTokenGroups, strError)) {
         return error(strError.c_str());
     }
+    if (fHavePruned) {
+        LogPrintf("The block database has been pruned: lowering token database validation level\n");
+    }
     for (auto tgCreation : vTokenGroups) {
         uint256 hash_block;
         CTransactionRef tx;
         uint256 txHash = tgCreation.creationTransaction->GetHash();
 
         LOCK(cs_main);
-        auto pindex = mapBlockIndex.at(tgCreation.creationBlockHash);
+        auto pindex = mapBlockIndex.find(tgCreation.creationBlockHash);
+        if (pindex == mapBlockIndex.end()) {
+            strError = "Cannot find token creation transaction's block";
+            return error(strError.c_str());
+        }
+        if (!chainActive.Contains(pindex->second)) {
+            strError = "Token creation not found in the current chain";
+            return error(strError.c_str());
+        }
+        if (fHavePruned && !(pindex->second->nStatus & BLOCK_HAVE_DATA) && pindex->second->nTx > 0) {
+            // Block is in the index, but it's data has been pruned
+            continue;
+        }
         CBlock block;
-        if (!ReadBlockFromDisk(block, pindex, Params().GetConsensus())) {
+        if (!ReadBlockFromDisk(block, pindex->second, Params().GetConsensus())) {
             strError = "Cannot locate token creation transaction's block";
             return error(strError.c_str());
         }
