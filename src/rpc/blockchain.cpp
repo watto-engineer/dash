@@ -2601,7 +2601,7 @@ UniValue scantokens(const JSONRPCRequest& request)
         }
 
         CTokenGroupID needle = GetTokenGroup(request.params[1].get_str());
-        if (!needle.isUserGroup())
+        if (!needle.isUserGroup() && !needle.isSubgroup())
         {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid group specified");
         }
