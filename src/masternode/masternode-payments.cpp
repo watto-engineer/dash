@@ -77,7 +77,16 @@ bool IsBlockValueValid(const CBlock& block, const int nBlockHeight, const CBlock
     if (coinstakeValueIn > 0) {
        blockReward.AddReward(CReward::RewardType::REWARD_COINSTAKE, coinstakeValueIn);
     }
-    // Add check for tokens
+    // Check for token authorities
+    if (IsAnyOutputGroupedAuthority(*block.vtx[0])) {
+        strErrorRet = strprintf("token authority in coinbase transaction at height %d", nBlockHeight);
+        return false;
+    }
+    if (block.IsProofOfStake() && IsAnyOutputGroupedAuthority(*block.vtx[1])) {
+        strErrorRet = strprintf("token authority in coinstake transaction at height %d", nBlockHeight);
+        return false;
+    }
+
     // Masternode rewards can default to coinstake, but not to coinbase
     if (!blockReward.fBurnUnpaidMasternodeReward && rewardsInBlock.GetMasternodeReward() == CReward(CReward::REWARD_MASTERNODE)) {
         blockReward.MoveMasternodeRewardToCoinbase();
