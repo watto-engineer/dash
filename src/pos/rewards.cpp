@@ -91,18 +91,6 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fHybridPowBlock, cons
             }
         }
     }
-/*
-    for (auto out : block.vtx[0]->vout) {
-        CReward reward(CReward::REWARD_COINBASE, out);
-        AddReward(reward);
-    }
-    if (block.IsProofOfStake()) {
-        for (auto out : block.vtx[1]->vout) {
-            CReward reward(CReward::REWARD_COINSTAKE, out);
-            AddReward(reward);
-        }
-    }
-*/
 }
 
 CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fPos, const Consensus::Params& consensusParams) {
