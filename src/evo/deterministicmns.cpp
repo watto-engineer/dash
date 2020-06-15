@@ -887,8 +887,8 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
         }
     }
 
-    // we skip the coinbase and coinstake
-    for (int i = block.IsProofOfStake() ? 2 : 1; i < (int)block.vtx.size(); i++) {
+    // we skip the coinbase
+    for (int i = 1; i < (int)block.vtx.size(); i++) {
         const CTransaction& tx = *block.vtx[i];
 
         // check if any existing MN collateral is spent by this transaction
