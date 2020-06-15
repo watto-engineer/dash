@@ -4021,32 +4021,32 @@ UniValue autocombinerewards(const JSONRPCRequest& request)
             "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
 
             "\nArguments:\n"
-            "1. enable          (boolean, required) Enable auto combine (true) or disable (false)\n"
-            "2. threshold       (numeric, optional) Threshold amount (default: 0)\n"
+            "1. enable                  (boolean, required) Enable auto combine (true) or disable (false)\n"
+            "2. threshold amount        (numeric, optional) Coins with an aggregated value of this amount will be combined (default: 0)\n"
 
             "\nExamples:\n" +
             HelpExampleCli("autocombinerewards", "true 500") + HelpExampleRpc("autocombinerewards", "true 500"));
 
     EnsureWalletIsUnlocked(pwallet);
 
-    CAmount nThreshold = 0;
+    CAmount nThresholdAmount = 0;
 
     if (fEnable) {
-        nThreshold = request.params[1].get_int64();
-        if (nThreshold < 0)
+        nThresholdAmount = request.params[1].get_int64();
+        if (nThresholdAmount < 0)
             throw std::runtime_error("Value out of range, minimum allowed is 0");
     }
 
     LOCK(pwallet->cs_wallet);
 
     UniValue result(UniValue::VOBJ);
-    if (!pwallet->SetAutoCombineSettings(fEnable, nThreshold)) {
+    if (!pwallet->SetAutoCombineSettings(fEnable, nThresholdAmount)) {
         throw std::runtime_error("Changed settings in wallet but failed to save to database\n");
     }
 
-    rewardManager->AutoCombineSettings(fEnable, nThreshold);
+    rewardManager->AutoCombineSettings(fEnable, nThresholdAmount);
 
-    result.push_back(Pair("threshold", int(rewardManager->GetAutoCombineThreshold())));
+    result.push_back(Pair("threshold", int(rewardManager->GetAutoCombineThresholdAmount())));
     result.push_back(Pair("enabled", rewardManager->IsAutoCombineEnabled()));
 
     return result;

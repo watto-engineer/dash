@@ -16,7 +16,7 @@
 std::shared_ptr<CRewardManager> rewardManager;
 
 CRewardManager::CRewardManager() :
-        fEnableRewardManager(false), fEnableAutoCombineRewards(false), nAutoCombineThreshold(0) {
+        fEnableRewardManager(false), fEnableAutoCombineRewards(false), nAutoCombineAmountThreshold(0), nAutoCombineNThreshold(10) {
 }
 
 bool CRewardManager::IsReady() {
@@ -41,10 +41,10 @@ bool CRewardManager::IsCombining()
     return IsReady() && IsAutoCombineEnabled();
 }
 
-void CRewardManager::AutoCombineSettings(bool fEnable, CAmount nAutoCombineThresholdIn) {
+void CRewardManager::AutoCombineSettings(bool fEnable, CAmount nAutoCombineAmountThresholdIn) {
     LOCK(cs);
     fEnableAutoCombineRewards = fEnable;
-    nAutoCombineThreshold = nAutoCombineThresholdIn;
+    nAutoCombineAmountThreshold = nAutoCombineAmountThresholdIn;
 }
 
 // TODO: replace with pwallet->FilterCoins()
@@ -68,15 +68,17 @@ std::map<CTxDestination, std::vector<COutput> > CRewardManager::AvailableCoinsBy
 }
 
 void CRewardManager::AutoCombineRewards() {
-    LOCK2(cs_main, pwallet->cs_wallet);
-
-    std::map<CTxDestination, std::vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineThreshold * COIN);
+    std::map<CTxDestination, std::vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineAmountThreshold * COIN);
 
     //coins are sectioned by address. This combination code only wants to combine inputs that belong to the same address
     for (std::map<CTxDestination, std::vector<COutput> >::iterator it = mapCoinsByAddress.begin(); it != mapCoinsByAddress.end(); it++) {
-        std::vector<COutput> vCoins, vRewardCoins;
         bool maxSize = false;
-        vCoins = it->second;
+        std::vector<COutput> vRewardCoins;
+        std::vector<COutput> vCoins(it->second);
+
+        std::sort(vCoins.begin(), vCoins.end(), [](const COutput& a, const COutput& b) {
+            return a.GetValue() < b.GetValue();
+        });
 
         // We don't want the tx to be refused for being too large
         // we use 50 bytes as a base tx size (2 output: 2*34 + overhead: 10 -> 90 to be certain)
@@ -95,7 +97,7 @@ void CRewardManager::AutoCombineRewards() {
             nTotalRewardsValue += out.GetValue();
 
             // Combine to the threshold and not way above
-            if (nTotalRewardsValue > nAutoCombineThreshold * COIN)
+            if (nTotalRewardsValue > nAutoCombineAmountThreshold * COIN)
                 break;
 
             // Around 180 bytes per input. We use 190 to be certain
@@ -112,6 +114,10 @@ void CRewardManager::AutoCombineRewards() {
 
         //we cannot combine one coin with itself
         if (vRewardCoins.size() <= 1)
+            continue;
+
+        //we want at least N inputs to combine
+        if (vRewardCoins.size() <= nAutoCombineNThreshold)
             continue;
 
         std::vector<CRecipient> vecSend;
@@ -141,7 +147,7 @@ void CRewardManager::AutoCombineRewards() {
         }
 
         //we don't combine below the threshold unless the fees are 0 to avoid paying fees over fees over fees
-        if (!maxSize && nTotalRewardsValue < nAutoCombineThreshold * COIN && nFeeRet > 0)
+        if (!maxSize && nTotalRewardsValue < nAutoCombineAmountThreshold * COIN && nFeeRet > 0)
             continue;
 
         CValidationState state;
@@ -151,6 +157,8 @@ void CRewardManager::AutoCombineRewards() {
         }
 
         LogPrintf("AutoCombineDust sent transaction\n");
+        // Max one transaction per cycle
+        break;
     }
 }
 
@@ -162,5 +170,7 @@ void CRewardManager::DoMaintenance(CConnman& connman) {
 
     if (IsAutoCombineEnabled()) {
         AutoCombineRewards();
+        int randsleep = 3 * 60 * 1000 + GetRandInt(5 * 60 * 1000);
+        MilliSleep(randsleep); // Sleep between 3 and 8 minutes
     }
 }
