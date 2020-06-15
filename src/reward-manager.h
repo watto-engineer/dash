@@ -35,14 +35,15 @@ public:
     bool fEnableRewardManager;
 
     bool fEnableAutoCombineRewards;
-    CAmount nAutoCombineThreshold;
+    CAmount nAutoCombineAmountThreshold;
+    uint32_t nAutoCombineNThreshold;
 
     bool IsReady();
     bool IsCombining();
 
     bool IsAutoCombineEnabled() { return fEnableAutoCombineRewards; };
-    CAmount GetAutoCombineThreshold() { return nAutoCombineThreshold; };
-    void AutoCombineSettings(bool fEnable, CAmount nAutoCombineThresholdIn = 0);
+    CAmount GetAutoCombineThresholdAmount() { return nAutoCombineAmountThreshold; };
+    void AutoCombineSettings(bool fEnable, CAmount nAutoCombineAmountThresholdIn = 0);
 
     std::map<CTxDestination, std::vector<COutput> > AvailableCoinsByAddress(bool fConfirmed, CAmount maxCoinValue);
     void AutoCombineRewards();

@@ -195,11 +195,11 @@ bool WalletBatch::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
     return WriteIC(DBKeys::STAKE_SPLIT_THRESHOLD, nStakeSplitThreshold);
 }
 
-bool WalletBatch::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
+bool WalletBatch::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThresholdAmount)
 {
     std::pair<bool, CAmount> pSettings;
     pSettings.first = fEnable;
-    pSettings.second = nCombineThreshold;
+    pSettings.second = nCombineThresholdAmount;
     return WriteIC(DBKeys::AUTOCOMBINE_SETTINGS, pSettings);
 }
 
