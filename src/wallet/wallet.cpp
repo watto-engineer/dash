@@ -3276,6 +3276,8 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
                     continue;
                 if (IsOutputGrouped(pcoin->tx->vout[i]))
                     continue;
+                if (pcoin->tx->vout[i].nValue == 10000000 * COIN)
+                    continue;
             }
 
             if (pcoin->tx->vout[i].nValue < nMinimumAmount || pcoin->tx->vout[i].nValue > nMaximumAmount)
