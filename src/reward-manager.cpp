@@ -170,7 +170,7 @@ void CRewardManager::DoMaintenance(CConnman& connman) {
 
     if (IsAutoCombineEnabled()) {
         AutoCombineRewards();
-        int randsleep = 3 * 60 * 1000 + GetRandInt(5 * 60 * 1000);
+        int randsleep = GetRandInt(5 * 60 * 1000);
         MilliSleep(randsleep); // Sleep between 3 and 8 minutes
     }
 }
