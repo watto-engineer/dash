@@ -373,6 +373,9 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 
 bool UpdateZBYTZSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
 {
+    // Only update zBYTZ supply when zerocoin mint amount can change
+    if (pindex->nVersion != BLOCKHEADER_LEGACY_VERSION) return true;
+
     std::list<CZerocoinMint> listMints;
     bool fFilterInvalid = false;//pindex->nHeight >= Params().Zerocoin_Block_RecalculateAccumulators();
     BlockToZerocoinMintList(block, listMints, fFilterInvalid);
@@ -381,7 +384,8 @@ bool UpdateZBYTZSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck
     // Initialize zerocoin supply to the supply from previous block
     if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion == BLOCKHEADER_LEGACY_VERSION) {
         for (auto& denom : libzerocoin::zerocoinDenomList) {
-            pindex->mapZerocoinSupply.at(denom) = pindex->pprev->GetZcMints(denom);
+            uint16_t nMints = pindex->pprev->GetZcMints(denom);
+            if (nMints != 0) pindex->mapZerocoinSupply[denom] = nMints;
         }
     }
 
@@ -393,7 +397,7 @@ bool UpdateZBYTZSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck
         for (auto& m : listMints) {
             libzerocoin::CoinDenomination denom = m.GetDenomination();
             pindex->vMintDenominationsInBlock.push_back(m.GetDenomination());
-            pindex->mapZerocoinSupply.at(denom)++;
+            pindex->mapZerocoinSupply[denom] = pindex->GetZcMints(denom) + 1;
 
 /*
             //Remove any of our own mints from the mintpool
@@ -420,17 +424,20 @@ bool UpdateZBYTZSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck
         }
 
         for (auto& denom : listSpends) {
-            pindex->mapZerocoinSupply.at(denom)--;
-            nAmountZerocoinSpent += libzerocoin::ZerocoinDenominationToAmount(denom);
+            uint16_t nMints = pindex->GetZcMints(denom);
 
             // zerocoin failsafe
-            if (pindex->GetZcMints(denom) < 0)
+            if (nMints == 0)
                 return error("Block contains zerocoins that spend more than are in the available supply to spend");
+
+            pindex->mapZerocoinSupply[denom] = nMints - 1;
+            nAmountZerocoinSpent += libzerocoin::ZerocoinDenominationToAmount(denom);
+
         }
     }
 
     for (auto& denom : libzerocoin::zerocoinDenomList)
-        LogPrint(BCLog::ZEROCOIN, "%s coins for denomination %d pubcoin %s\n", __func__, denom, pindex->mapZerocoinSupply.at(denom));
+        LogPrint(BCLog::ZEROCOIN, "%s coins for denomination %d pubcoin %s\n", __func__, denom, pindex->GetZcMints(denom));
 
     return true;
 }

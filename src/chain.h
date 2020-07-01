@@ -218,7 +218,7 @@ public:
     unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
 
     //! zerocoin specific fields
-    std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
+    std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
     //! ATP specific fields
@@ -266,10 +266,7 @@ public:
         nStakeModifierV2 = uint256();
         nStakeModifierChecksum = 0;
 
-        // Start supply of each denomination with 0s
-        for (auto& denom : libzerocoin::zerocoinDenomList) {
-            mapZerocoinSupply.insert(std::make_pair(denom, 0));
-        }
+        mapZerocoinSupply.clear();
         vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
 
@@ -415,7 +412,12 @@ public:
      */
     int64_t GetZcMints(libzerocoin::CoinDenomination denom) const
     {
-        return mapZerocoinSupply.at(denom);
+        auto it = mapZerocoinSupply.find(denom);
+        if (it != mapZerocoinSupply.end()) {
+            return it->second;
+        } else {
+            return 0;
+        }
     }
 
     /**
