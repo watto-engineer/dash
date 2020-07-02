@@ -189,10 +189,10 @@ public:
     //! ATP specific fields
     //! Number of XDM transactions in this block.
     //! Note: in a potential headers-first mode, this number cannot be relied upon until after full block validation
-    unsigned int nXDMTransactions;
+    uint16_t nXDMTransactions;
 
     //! (memory only) Number of XDM transactions in the chain up to and including this block.
-    unsigned int nChainXDMTransactions;
+    uint32_t nChainXDMTransactions;
     uint64_t nXDMSupply;
 
     //! block header
@@ -497,11 +497,10 @@ public:
         // v1/v2 modifier selection.
         if (obj.nVersion > 10) {
             READWRITE(obj.nStakeModifierV2);
+            READWRITE(VARINT(obj.nXDMTransactions));
+            READWRITE(VARINT(obj.nXDMSupply));
         } else {
             READWRITE(obj.nStakeModifier);
-        READWRITE(VARINT(obj.nXDMTransactions));
-        READWRITE(VARINT(obj.nXDMSupply));
-
         }
     }
 
