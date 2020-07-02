@@ -64,7 +64,8 @@ public:
 
     bool ManagementTokensCreated(int nHeight);
 
-    unsigned int GetTokenTxStats(const CTransaction &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, unsigned int &nTokenCount, CAmount &nTokenMint);
+    uint16_t GetXDMInBlock(const CBlock& block);
+    unsigned int GetTokenTxStats(const CTransactionRef &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, uint16_t &nTokenCount, CAmount &nTokenMint);
 
     bool TokenMoneyRange(CAmount nValueOut);
     CAmount AmountFromTokenValue(const UniValue& value, const CTokenGroupID& tgID);

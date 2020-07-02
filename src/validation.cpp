@@ -54,6 +54,7 @@
 
 #include <statsd_client.h>
 
+#include <tokens/groups.h>
 #include <tokens/tokendb.h>
 #include <tokens/tokengroupmanager.h>
 #include <tokens/tokengroupwallet.h>
@@ -2211,8 +2212,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
     //! ATP
     std::vector<CTokenGroupCreation> newTokenGroups;
-    unsigned int nXDMCountInBlock = 0;
-    unsigned int nMagicCountInBlock = 0;
     CAmount nXDMMint = 0;
     CAmount nMagicMint = 0;
 
@@ -2491,7 +2490,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
 
     // Track XDM money supply in the block index
-    pindex->nXDMTransactions = nXDMCountInBlock;
+    pindex->nXDMTransactions = tokenGroupManager->GetXDMInBlock(block);
+    pindex->nChainXDMTransactions = (pindex->pprev ? pindex->pprev->nChainXDMTransactions : 0) + pindex->nXDMTransactions;
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
@@ -3577,6 +3577,8 @@ void CChainState::ReceivedBlockTransactions(const CBlock& block, CBlockIndex* pi
     }
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
+    pindexNew->nXDMTransactions = 0;
+    pindexNew->nChainXDMTransactions = 0;
     pindexNew->nFile = pos.nFile;
     pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;
@@ -4468,12 +4470,15 @@ bool CChainState::LoadBlockIndex(const Consensus::Params& consensus_params, CBlo
             if (pindex->pprev) {
                 if (pindex->pprev->nChainTx) {
                     pindex->nChainTx = pindex->pprev->nChainTx + pindex->nTx;
+                    pindex->nChainXDMTransactions = pindex->pprev->nChainXDMTransactions + pindex->nXDMTransactions;
                 } else {
                     pindex->nChainTx = 0;
+                    pindex->nChainXDMTransactions = 0;
                     mapBlocksUnlinked.insert(std::make_pair(pindex->pprev, pindex));
                 }
             } else {
                 pindex->nChainTx = pindex->nTx;
+                pindex->nChainXDMTransactions = pindex->nXDMTransactions;
             }
         }
         if (!(pindex->nStatus & BLOCK_FAILED_MASK) && pindex->pprev && (pindex->pprev->nStatus & BLOCK_FAILED_MASK)) {

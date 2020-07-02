@@ -186,14 +186,35 @@ bool CTokenGroupManager::ManagementTokensCreated(int nHeight) {
     return MagicTokensCreated() && DarkMatterTokensCreated() && AtomTokensCreated();
 }
 
-unsigned int CTokenGroupManager::GetTokenTxStats(const CTransaction &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId,
-                unsigned int &nTokenCount, CAmount &nTokenMint) {
+uint16_t CTokenGroupManager::GetXDMInBlock(const CBlock& block) {
+    uint16_t nXDMCount = 0;
+    if (tokenGroupManager && tokenGroupManager->DarkMatterTokensCreated()) {
+        CTokenGroupID tgId = tokenGroupManager->GetDarkMatterID();
+        for (unsigned int i = 0; i < block.vtx.size(); i++)
+        {
+            for (const auto &outp : block.vtx[i]->vout)
+            {
+                const CScript &scriptPubKey = outp.scriptPubKey;
+                CTokenGroupInfo tokenGrp(scriptPubKey);
+                if (!tokenGrp.invalid && tokenGrp.associatedGroup == tgId)
+                {
+                    nXDMCount++;
+                    break;
+                }
+            }
+        }
+    }
+    return nXDMCount;
+}
+
+unsigned int CTokenGroupManager::GetTokenTxStats(const CTransactionRef &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId,
+                uint16_t &nTokenCount, CAmount &nTokenMint) {
 
     CAmount nTxValueOut = 0;
     CAmount nTxValueIn = 0;
 
-    if (!tx.IsCoinBase() && !tx.IsCoinStake() && !tx.HasZerocoinSpendInputs()) {
-        for (const auto &outp : tx.vout)
+    if (!tx->IsCoinBase() && !tx->IsCoinStake() && !tx->HasZerocoinSpendInputs()) {
+        for (const auto &outp : tx->vout)
         {
             const CScript &scriptPubKey = outp.scriptPubKey;
             CTokenGroupInfo tokenGrp(scriptPubKey);
@@ -202,7 +223,7 @@ unsigned int CTokenGroupManager::GetTokenTxStats(const CTransaction &tx, const C
                 nTxValueOut += tokenGrp.quantity;
             }
         }
-        for (const auto &inp : tx.vin)
+        for (const auto &inp : tx->vin)
         {
             const COutPoint &prevout = inp.prevout;
             const Coin &coin = view.AccessCoin(prevout);
