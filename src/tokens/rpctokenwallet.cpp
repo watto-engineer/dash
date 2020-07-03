@@ -556,7 +556,7 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
     unsigned int curparam = 0;
 
     std::string strAccount = "*";
-    bool fAllGroups;
+    bool fAllGroups = true;
     CTokenGroupID grpID;
 
     if (request.params.size() > curparam)
