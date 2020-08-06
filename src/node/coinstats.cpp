@@ -65,7 +65,10 @@ static void ApplyStats(CCoinsStats& stats, T& hash_obj, const uint256& hash, con
         ApplyHash(stats, hash_obj, hash, outputs, it);
 
         stats.nTransactionOutputs++;
-        stats.nTotalAmount += it->second.out.nValue;
+        const CScript& script = output.second.out.scriptPubKey;
+        if (script.size() > 0 && script.size() < MAX_SCRIPT_SIZE && *script.begin() != OP_RETURN && *script.begin() != OP_ZEROCOINMINT) {
+            stats.nTotalAmount += output.second.out.nValue;
+        }
         stats.nBogoSize += GetBogoSize(it->second.out.scriptPubKey);
     }
 }
