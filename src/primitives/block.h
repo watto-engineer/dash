@@ -10,6 +10,10 @@
 #include <primitives/transaction.h>
 #include <serialize.h>
 #include <uint256.h>
+
+#define BLOCKHEADER_INITIAL_VERSION 1
+#define BLOCKHEADER_LEGACY_VERSION 2
+
 #include <cstddef>
 #include <type_traits>
 
