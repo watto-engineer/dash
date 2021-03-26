@@ -234,12 +234,7 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
     // loop to find the stake modifier later by a selection interval
     do {
         if (!pindexNext) {
-            // Should never happen
-            if (chainActive.Height() >= 1126 && chainActive.Height() <= Params().GetConsensus().DGWStartHeight) {
-                return true;
-            } else {
-                return error("%s : Null pindexNext, current block %s ", __func__, pindex->phashBlock->GetHex());
-            }
+            return error("%s : Null pindexNext, current block %s ", __func__, pindex->phashBlock->GetHex());
         }
         pindex = pindexNext;
         if (pindex->GeneratedStakeModifier()) {
@@ -271,26 +266,10 @@ bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, const unsigned int nBit
     const arith_uint256 proof = UintToArith256(hashProofOfStake);
     const bool res = (UintToArith256(hashProofOfStake) < bnTarget);
 
-    bool fPreDGW = (pindexPrev->nHeight + 1) < Params().GetConsensus().DGWStartHeight || nTimeTx < (unsigned int)Params().GetConsensus().DGWStartTime;
-    return res || fPreDGW;
-}
-
-bool GetHashProofOfStakePreDGW(const CBlockIndex* pindexPrev, CStakeInput* stake, const unsigned int nTimeTx, const bool fVerify, uint256& hashProofOfStakeRet) {
-    // Grab the stake data
-    CBlockIndex* pindexfrom = stake->GetIndexFrom();
-    const unsigned int nTimeBlockFrom = pindexfrom->nTime;
-
-    CDataStream ss(SER_GETHASH, 0);
-    ss << nTimeBlockFrom << hashProofOfStakeRet << stake->GetValue() << nTimeTx;
-    hashProofOfStakeRet = Hash(ss.begin(), ss.end());
-
-    return true;
+    return res;
 }
 
 bool GetHashProofOfStake(const CBlockIndex* pindexPrev, CStakeInput* stake, const unsigned int nTimeTx, const bool fVerify, uint256& hashProofOfStakeRet) {
-    if (pindexPrev->nHeight < Params().GetConsensus().DGWStartHeight)
-        return GetHashProofOfStakePreDGW(pindexPrev, stake, nTimeTx, fVerify, hashProofOfStakeRet);
-
     // Grab the stake data
     CBlockIndex* pindexfrom = stake->GetIndexFrom();
     if (!pindexfrom) return error("%s : Failed to find the block index for stake origin", __func__);
@@ -505,65 +484,6 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
     if (Params().NetworkIDString() != CBaseChainParams::MAIN) return true; // Testnet has no checkpoints
     if (mapStakeModifierCheckpoints.count(nHeight)) {
         return nStakeModifierChecksum == mapStakeModifierCheckpoints[nHeight];
-    }
-    return true;
-}
-
-// The stake modifier used to hash for a stake kernel is chosen as the stake
-// modifier about a selection interval later than the coin generating the kernel
-bool GetKernelStakeModifierPreDGW(uint256 hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
-{
-    nStakeModifier = 0;
-    if (!mapBlockIndex.count(hashBlockFrom))
-        return error("GetKernelStakeModifier() : block not indexed");
-    const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
-    nStakeModifierHeight = pindexFrom->nHeight;
-    nStakeModifierTime = pindexFrom->GetBlockTime();
-    int64_t nStakeModifierSelectionInterval = GetStakeModifierSelectionIntervalPreDGW();
-    const CBlockIndex* pindex = pindexFrom;
-    CBlockIndex* pindexNext = chainActive[pindexFrom->nHeight + 1];
-
-    // loop to find the stake modifier later by a selection interval
-    int nDGWStartHeight = Params().GetConsensus().DGWStartHeight;
-    while (nStakeModifierTime < pindexFrom->GetBlockTime() + nStakeModifierSelectionInterval) {
-        if (!pindexNext) {
-            if (chainActive.Height() >= 1126 && chainActive.Height() <= nDGWStartHeight) {
-                return true;
-            } else {
-                LogPrint(BCLog::STAKING, "Null pindexNext\n");
-            }
-            return true;
-        }
-
-        pindex = pindexNext;
-        pindexNext = chainActive[pindexNext->nHeight + 1];
-        if (pindex->GeneratedStakeModifier()) {
-            nStakeModifierHeight = pindex->nHeight;
-            nStakeModifierTime = pindex->GetBlockTime();
-        }
-    }
-    nStakeModifier = pindex->nStakeModifier;
-    return true;
-}
-
-bool AcceptPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex* pindexNew) {
-    AssertLockHeld(cs_main);
-
-    if (!pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit()))
-        return state.Invalid(error("%s : SetStakeEntropyBit() failed", __func__));
-
-    if (pindexNew->nHeight < Params().GetConsensus().nBlockStakeModifierV2) {
-        uint64_t nStakeModifier = 0;
-        bool fGeneratedStakeModifier = false;
-        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            return state.Invalid(error("%s : ComputeNextStakeModifier() failed", __func__));
-        pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            return state.DoS(20, error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__));
-    } else {
-        // compute v2 stake modifier
-        ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);
     }
     return true;
 }

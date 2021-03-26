@@ -178,16 +178,32 @@ struct Params {
     BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
     /** Proof of work parameters */
     uint256 powLimit;
-    uint256 posLimit;
     bool fPowAllowMinDifficultyBlocks;
     bool fPowNoRetargeting;
     int64_t nPowTargetSpacing;
     int64_t nPowTargetTimespan;
-    int nPosStartHeight;
-    int nPivxProtocolV2;
     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
+
+    /** Proof of stake parameters */
+    int64_t nPosStartHeight;
+    int64_t nPivxProtocolV2StartHeight;
+    uint256 posLimit;
+    int64_t nPosTargetSpacing;
+    int32_t nStakeMinDepth;
+    int64_t nBlockStakeModifierV2;
+
+    /** Zerocoin - retired functionality */
+    int64_t nZerocoinStartHeight;
+    int64_t nZerocoinStartTime;
+    int64_t nBlockZerocoinV2;
+    int64_t nPublicZCSpends;
+    std::string zerocoinModulus;
+    int64_t nFakeSerialBlockheightEnd;
+    int32_t nZerocoinRequiredStakeDepth;
+    int nMintRequiredConfirmations;
+    int nRequiredAccumulation;
 
     /** these parameters are only used on devnet and can be configured from the outside */
     int nMinimumDifficultyBlocks{0};

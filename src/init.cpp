@@ -1970,7 +1970,7 @@ bool AppInitMain()
                 deterministicMNManager.reset();
                 deterministicMNManager.reset(new CDeterministicMNManager(*evoDb));
                 zerocoinDB.reset();
-                zerocoinDB = new CZerocoinDB(0, false, fReset || fReindexChainState);
+                zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
 
                 llmq::InitLLMQSystem(*evoDb, false, fReset || fReindexChainState);
 

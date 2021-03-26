@@ -48,7 +48,7 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion > 7)
+        if(nVersion == BLOCKHEADER_LEGACY_VERSION)
             READWRITE(nAccumulatorCheckpoint);
     }
 
