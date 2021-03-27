@@ -167,6 +167,7 @@ CTxMemPool mempool(&feeEstimator);
 
 /** Proof of Stake */
 std::map<uint256, uint256> mapProofOfStake;
+const std::string strMessageMagic = "DarkNet Signed Message:\n";
 
 // Internal stuff
 namespace {
