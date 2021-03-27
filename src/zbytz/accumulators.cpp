@@ -217,7 +217,7 @@ bool InitializeAccumulators(const int nHeight, int& nHeightCheckpoint, Accumulat
     if (nHeight >= Params().GetConsensus().nBlockZerocoinV2) {
         //after v2_start, accumulators need to use v2 params
         mapAccumulators.Reset(Params().Zerocoin_Params(false));
-
+/*
         // 20 after v2 start is when the new checkpoints will be in the block, so don't need to load hard checkpoints
         if (nHeight <= Params().GetConsensus().nBlockZerocoinV2 + 20 && Params().NetworkIDString() != CBaseChainParams::REGTEST) {
             //Load hard coded checkpointed value
@@ -229,6 +229,7 @@ bool InitializeAccumulators(const int nHeight, int& nHeightCheckpoint, Accumulat
             mapAccumulators.Load(checkpoint);
             return true;
         }
+*/
     }
 
     //Use the previous block's checkpoint to initialize the accumulator's state
@@ -318,6 +319,7 @@ bool InvalidCheckpointRange(int nHeight)
 
 bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, AccumulatorMap& mapAccumulators)
 {
+/*
     //V1 accumulators are completely phased out by the time this code hits the public and begins generating new checkpoints
     //It is VERY IMPORTANT that when this is being run and height < v2_start, then zBYTZ need to be disabled at the same time!!
     bool fVerifyingBlocks = false;
@@ -341,7 +343,7 @@ bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, Acc
     if (block.nAccumulatorCheckpoint != pindex->pprev->GetBlockHeader().nAccumulatorCheckpoint) {
             return error("%s : new accumulator checkpoint generated on a block that is not multiple of 10", __func__);
     }
-
+*/
     return true;
 }
 
