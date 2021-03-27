@@ -271,7 +271,7 @@ CScript COINBASE_FLAGS;
 /** Proof of Stake */
 std::map<uint256, uint256> mapProofOfStake;
 
-const std::string strMessageMagic = "DarkCoin Signed Message:\n";
+const std::string strMessageMagic = "DarkNet Signed Message:\n";
 
 // Internal stuff
 namespace {
