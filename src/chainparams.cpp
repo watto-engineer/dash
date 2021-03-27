@@ -382,6 +382,7 @@ public:
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nStakeMinDepth = 600;
+        consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;

@@ -192,6 +192,7 @@ struct Params {
     uint256 posLimit;
     int64_t nPosTargetSpacing;
     int32_t nStakeMinDepth;
+    int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
 
     /** Zerocoin - retired functionality */
