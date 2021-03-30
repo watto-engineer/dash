@@ -386,6 +386,7 @@ public:
         consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.BytzAddrPrefix = "bytz";
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -607,6 +608,7 @@ public:
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.BytzAddrPrefix = "bytztest";
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -791,6 +793,7 @@ public:
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.BytzAddrPrefix = "bytztest";
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -973,6 +976,7 @@ public:
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.BytzAddrPrefix = "bytzreg";
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

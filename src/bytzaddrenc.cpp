@@ -64,7 +64,7 @@ std::vector<uint8_t> PackAddrData(const T &id, uint8_t type)
     // hash, with version byte.  Add half a byte(4) so integer math provides
     // the next multiple-of-5 that would fit all the data.
     converted.reserve(((size + 1) * 8 + 4) / 5);
-    ConvertBits<8, 5, true>(converted, std::begin(data), std::end(data));
+    ConvertBits<8, 5, true>([&](uint8_t c) { converted.push_back(c); }, data.begin(), data.end());
 
     return converted;
 }
@@ -77,13 +77,13 @@ public:
     std::string operator()(const CKeyID &id) const
     {
         std::vector<uint8_t> data = PackAddrData(id, PUBKEY_TYPE);
-        return bech32::Encode(params.Bech32HRP(), data);
+        return bech32::Encode(params.GetConsensus().BytzAddrPrefix, data);
     }
 
     std::string operator()(const CScriptID &id) const
     {
         std::vector<uint8_t> data = PackAddrData(id, SCRIPT_TYPE);
-        return bech32::Encode(params.Bech32HRP(), data);
+        return bech32::Encode(params.GetConsensus().BytzAddrPrefix, data);
     }
 
     std::string operator()(const CNoDestination &) const { return ""; }
@@ -97,7 +97,7 @@ private:
 std::string EncodeBytzAddr(const std::vector<uint8_t> &id, const BytzAddrType addrtype, const CChainParams &params)
 {
     std::vector<uint8_t> data = PackAddrData(id, addrtype);
-    return bech32::Encode(params.Bech32HRP(), data);
+    return bech32::Encode(params.GetConsensus().BytzAddrPrefix, data);
 }
 
 
@@ -123,7 +123,7 @@ BytzAddrContent DecodeBytzAddrContent(const std::string &addr, const CChainParam
     std::vector<uint8_t> payload;
     std::tie(prefix, payload) = bech32::Decode(addr);
 
-    if (prefix != params.Bech32HRP())
+    if (prefix != params.GetConsensus().BytzAddrPrefix)
     {
         return {};
     }
@@ -151,7 +151,7 @@ BytzAddrContent DecodeBytzAddrContent(const std::string &addr, const CChainParam
 
     std::vector<uint8_t> data;
     data.reserve(payload.size() * 5 / 8);
-    ConvertBits<5, 8, false>(data, begin(payload), end(payload));
+    ConvertBits<5, 8, false>([&](uint8_t c) { data.push_back(c); }, payload.begin(), payload.end());
 
     // Decode type and size from the version.
     uint8_t version = data[0];
