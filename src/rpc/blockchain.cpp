@@ -2305,8 +2305,6 @@ static inline OutputScriptType GetOutputScriptTypeFromString(const std::string& 
 {
     if (outputtype == "P2PK") return OutputScriptType::P2PK;
     else if (outputtype == "P2PKH") return OutputScriptType::P2PKH;
-    else if (outputtype == "P2SH_P2WPKH") return OutputScriptType::P2SH_P2WPKH;
-    else if (outputtype == "P2WPKH") return OutputScriptType::P2WPKH;
     else return OutputScriptType::UNKNOWN;
 }
 
@@ -2314,17 +2312,6 @@ CTxDestination GetDestinationForKey(const CPubKey& key, OutputScriptType type)
 {
     switch (type) {
     case OutputScriptType::P2PKH: return key.GetID();
-    case OutputScriptType::P2SH_P2WPKH:
-    case OutputScriptType::P2WPKH: {
-        if (!key.IsCompressed()) return key.GetID();
-        CTxDestination witdest = WitnessV0KeyHash(key.GetID());
-        if (type == OutputScriptType::P2SH_P2WPKH) {
-            CScript witprog = GetScriptForDestination(witdest);
-            return CScriptID(witprog);
-        } else {
-            return witdest;
-        }
-    }
     default: assert(false);
     }
 }
