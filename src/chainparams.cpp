@@ -384,6 +384,8 @@ public:
         consensus.nStakeMinDepth = 600;
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
+        // ATP parameters
+        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -603,7 +605,8 @@ public:
         // Proof of Stake parameters
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
-
+        // ATP parameters
+        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -786,7 +789,8 @@ public:
         // Proof of Stake parameters
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
-
+        // ATP parameters
+        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -967,6 +971,8 @@ public:
         consensus.fPowNoRetargeting = true;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
+        // ATP parameters
+        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

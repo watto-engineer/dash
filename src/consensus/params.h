@@ -195,6 +195,9 @@ struct Params {
     int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
 
+    /** ATP parameters */
+    int64_t ATPStartHeight;
+
     /** Zerocoin - retired functionality */
     int64_t nZerocoinStartHeight;
     int64_t nZerocoinStartTime;
