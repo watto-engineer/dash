@@ -6,7 +6,7 @@
 #include <qt/bitcoinaddressvalidator.h>
 #include <qt/guiutil.h>
 
-#include <key_io.h>
+#include <dstencode.h>
 
 /* Base58 characters are:
      "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"

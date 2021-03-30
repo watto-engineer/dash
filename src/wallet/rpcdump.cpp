@@ -6,7 +6,7 @@
 #include <chain.h>
 #include <core_io.h>
 #include <interfaces/chain.h>
-#include <key_io.h>
+#include <dstencode.h>
 #include <merkleblock.h>
 #include <rpc/server.h>
 #include <rpc/util.h>

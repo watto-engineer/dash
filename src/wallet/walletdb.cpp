@@ -8,6 +8,7 @@
 
 #include <consensus/tx_check.h>
 #include <consensus/validation.h>
+#include <dstencode.h>
 #include <key_io.h>
 #include <fs.h>
 #include <governance/object.h>

@@ -8,7 +8,7 @@
 
 #include <qt/walletmodeltransaction.h>
 
-#include <key_io.h>
+#include <dstencode.h>
 
 WalletModelTransaction::WalletModelTransaction(const QList<SendCoinsRecipient> &_recipients) :
     recipients(_recipients),

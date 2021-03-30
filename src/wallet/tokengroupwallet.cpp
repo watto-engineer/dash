@@ -4,6 +4,7 @@
 #include <wallet/tokengroupwallet.h>
 #include <base58.h>
 #include <wagerraddrenc.h>
+#include <dstencode.h>
 #include <coins.h>
 #include <consensus/tokengroups.h>
 #include <consensus/validation.h>

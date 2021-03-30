@@ -10,7 +10,7 @@
 #include <qt/guiutil.h>
 #include <qt/walletmodel.h>
 
-#include <key_io.h>
+#include <dstencode.h>
 #include <util/strencodings.h>
 #include <util/validation.h> // For strMessageMagic
 #include <validation.h>

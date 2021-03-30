@@ -15,9 +15,9 @@
 
 #include <chainparams.h>
 #include <clientversion.h>
+#include <dstencode.h>
 #include <interfaces/node.h>
 #include <policy/policy.h>
-#include <key_io.h>
 #include <ui_interface.h>
 #include <util/system.h>
 

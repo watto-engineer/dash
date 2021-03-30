@@ -17,8 +17,8 @@
 #include <qt/walletmodel.h>
 
 #include <wallet/coincontrol.h>
+#include <dstencode.h>
 #include <interfaces/node.h>
-#include <key_io.h>
 #include <policy/policy.h>
 #include <wallet/wallet.h>
 
