@@ -5,7 +5,7 @@
 #include <spork.h>
 
 #include <chainparams.h>
-#include <key_io.h>
+#include <dstencode.h>
 #include <validation.h>
 #include <messagesigner.h>
 #include <net_processing.h>

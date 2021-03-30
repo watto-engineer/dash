@@ -9,6 +9,7 @@
 #include <consensus/validation.h>
 #include <primitives/transaction.h>
 
+#include <dstencode.h>
 #include <key_io.h>
 #include <netaddress.h>
 #include <pubkey.h>

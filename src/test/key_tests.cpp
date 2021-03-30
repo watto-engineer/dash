@@ -4,6 +4,7 @@
 
 #include <key.h>
 
+#include <dstencode.h>
 #include <key_io.h>
 #include <script/script.h>
 #include <uint256.h>

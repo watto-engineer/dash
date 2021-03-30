@@ -146,22 +146,12 @@ std::string EncodeExtKey(const CExtKey& key)
     return ret;
 }
 
-std::string EncodeDestination(const CTxDestination& dest)
+std::string EncodeLegacyAddr(const CTxDestination& dest, const CChainParams& params)
 {
-    return boost::apply_visitor(DestinationEncoder(Params()), dest);
+    return boost::apply_visitor(DestinationEncoder(params), dest);
 }
 
-CTxDestination DecodeDestination(const std::string& str)
+CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params)
 {
-    return DecodeDestination(str, Params());
-}
-
-bool IsValidDestinationString(const std::string& str, const CChainParams& params)
-{
-    return IsValidDestination(DecodeDestination(str, params));
-}
-
-bool IsValidDestinationString(const std::string& str)
-{
-    return IsValidDestinationString(str, Params());
+    return DecodeDestination(str, params);
 }

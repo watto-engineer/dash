@@ -15,9 +15,9 @@
 
 #include <base58.h>
 #include <chainparams.h>
+#include <dstencode.h>
 #include <primitives/transaction.h>
 #include <interfaces/node.h>
-#include <key_io.h>
 #include <policy/policy.h>
 #include <protocol.h>
 #include <script/script.h>

@@ -8,6 +8,7 @@
 #include <clientversion.h>
 #include <consensus/consensus.h>
 #include <core_io.h>
+#include <dstencode.h>
 #include <evo/mnauth.h>
 #include <init.h>
 #include <httpserver.h>

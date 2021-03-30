@@ -21,9 +21,7 @@ std::string EncodeExtKey(const CExtKey& extkey);
 CExtPubKey DecodeExtPubKey(const std::string& str);
 std::string EncodeExtPubKey(const CExtPubKey& extpubkey);
 
-std::string EncodeDestination(const CTxDestination& dest);
-CTxDestination DecodeDestination(const std::string& str);
-bool IsValidDestinationString(const std::string& str);
-bool IsValidDestinationString(const std::string& str, const CChainParams& params);
+std::string EncodeLegacyAddr(const CTxDestination& dest, const CChainParams& params);
+CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params);
 
 #endif // BITCOIN_KEY_IO_H

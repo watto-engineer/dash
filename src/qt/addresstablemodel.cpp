@@ -8,8 +8,8 @@
 #include <qt/guiutil.h>
 #include <qt/walletmodel.h>
 
+#include <dstencode.h>
 #include <interfaces/node.h>
-#include <key_io.h>
 
 #include <QFont>
 #include <QDebug>

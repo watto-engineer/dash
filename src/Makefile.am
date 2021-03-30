@@ -157,6 +157,7 @@ BITCOIN_CORE_H = \
   cuckoocache.h \
   ctpl.h \
   cxxtimer.hpp \
+  dstencode.h \
   evo/cbtx.h \
   evo/deterministicmns.h \
   evo/evodb.h \
@@ -631,6 +632,7 @@ libdash_common_a_SOURCES = \
   compressor.cpp \
   core_read.cpp \
   core_write.cpp \
+  dstencode.cpp \
   hdchain.cpp \
   key.cpp \
   key_io.cpp \

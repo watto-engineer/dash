@@ -14,8 +14,8 @@
 #include <qt/walletmodel.h>
 
 #include <wallet/coincontrol.h>
+#include <dstencode.h>
 #include <interfaces/node.h>
-#include <key_io.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <validation.h> // For mempool
