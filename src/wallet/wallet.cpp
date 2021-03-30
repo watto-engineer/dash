@@ -3054,7 +3054,7 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
             const uint256 &wtxid = it->first;
             const CWalletTx *pcoin = &(*it).second;
 
-            if (!CheckFinalTx(*pcoin))
+            if (!CheckFinalTx(*pcoin->tx))
                 continue;
 
             if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)

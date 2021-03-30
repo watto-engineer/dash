@@ -19,6 +19,10 @@
 #include <utilmoneystr.h>
 #include <wallet/coincontrol.h>
 #include <wallet/fees.h>
+#include <wallet/wallet.h>
+
+#include <algorithm>
+#include <boost/lexical_cast.hpp>
 
 #include <validation.h> // for BlockMap
 
@@ -367,7 +371,7 @@ uint64_t RenewAuthority(const COutput &authority, std::vector<CRecipient> &outpu
     return totalBchNeeded;
 }
 
-void ConstructTx(CWalletTx &wtxNew,
+void ConstructTx(CTransactionRef &txNew,
     const std::vector<COutput> &chosenCoins,
     const std::vector<CRecipient> &outputs,
     CAmount totalAvailable,
@@ -383,6 +387,8 @@ void ConstructTx(CWalletTx &wtxNew,
     CMutableTransaction tx;
     CReserveKey groupChangeKeyReservation(wallet);
     CReserveKey feeChangeKeyReservation(wallet);
+
+    txNew = MakeTransactionRef(tx);
 
     {
         if (GetRandInt(10) == 0)
@@ -428,7 +434,7 @@ void ConstructTx(CWalletTx &wtxNew,
         approxSize += inpSize;
 
         // Now add bitcoin fee
-        CAmount fee = wallet->GetRequiredFee(approxSize);
+        CAmount fee = GetRequiredFee(approxSize);
 
         if (totalAvailable < totalNeeded + fee) // need to find a fee input
         {
@@ -470,13 +476,10 @@ void ConstructTx(CWalletTx &wtxNew,
         }
     }
 
-    wtxNew.BindWallet(wallet);
-    wtxNew.fFromMe = true;
-    wtxNew.SetTx(std::make_shared<CTransaction>(tx));
     // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
     CReserveKey dummy(wallet);
     CValidationState state;
-    if (!wallet->CommitTransaction(wtxNew, dummy, g_connman.get(), state))
+    if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
         throw JSONRPCError(RPC_WALLET_ERROR, strprintf("Error: The transaction was rejected! Reason given: %s", state.GetRejectReason()));
 
     feeChangeKeyReservation.KeepKey();
@@ -484,7 +487,7 @@ void ConstructTx(CWalletTx &wtxNew,
 }
 
 
-void GroupMelt(CWalletTx &wtxNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet)
+void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet)
 {
     std::string strError;
     std::vector<CRecipient> outputs; // Melt has no outputs (except change)
@@ -561,12 +564,12 @@ void GroupMelt(CWalletTx &wtxNew, const CTokenGroupID &grpID, CAmount totalNeede
     totalBchNeeded += RenewAuthority(authority, outputs, childAuthorityKey);
     // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
     // This surplus will be melted.
-    ConstructTx(wtxNew, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, totalAvailable - totalNeeded, 0, grpID,
+    ConstructTx(txNew, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, totalAvailable - totalNeeded, 0, grpID,
         wallet);
     childAuthorityKey.KeepKey();
 }
 
-void GroupSend(CWalletTx &wtxNew,
+void GroupSend(CTransactionRef &txNew,
     const CTokenGroupID &grpID,
     const std::vector<CRecipient> &outputs,
     CAmount totalNeeded,
@@ -596,7 +599,7 @@ void GroupSend(CWalletTx &wtxNew,
     std::vector<COutput> chosenCoins;
     totalAvailable = GroupCoinSelection(coins, totalNeeded, chosenCoins);
 
-    ConstructTx(wtxNew, chosenCoins, outputs, 0, GROUPED_SATOSHI_AMT * outputs.size(), totalAvailable, totalNeeded,
+    ConstructTx(txNew, chosenCoins, outputs, 0, GROUPED_SATOSHI_AMT * outputs.size(), totalAvailable, totalNeeded,
         grpID, wallet);
 }
 
@@ -903,10 +906,10 @@ extern UniValue token(const JSONRPCRequest& request)
                 totalBchNeeded += GROUPED_SATOSHI_AMT;
             }
 
-            CWalletTx wtx;
-            ConstructTx(wtx, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, 0, 0, grpID, pwallet);
+            CTransactionRef tx;
+            ConstructTx(tx, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, 0, 0, grpID, pwallet);
             renewAuthorityKey.KeepKey();
-            return wtx.GetHash().GetHex();
+            return tx->GetHash().GetHex();
         }
     }
     else if (operation == "new")
@@ -977,12 +980,12 @@ extern UniValue token(const JSONRPCRequest& request)
         CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
         outputs.push_back(recipient);
 
-        CWalletTx wtx;
-        ConstructTx(wtx, chosenCoins, outputs, coin.GetValue(), 0, 0, 0, grpID, pwallet);
+        CTransactionRef tx;
+        ConstructTx(tx, chosenCoins, outputs, coin.GetValue(), 0, 0, 0, grpID, pwallet);
         authKeyReservation.KeepKey();
         UniValue ret(UniValue::VOBJ);
         ret.push_back(Pair("groupIdentifier", EncodeTokenGroup(grpID)));
-        ret.push_back(Pair("transaction", wtx.GetHash().GetHex()));
+        ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
         return ret;
     }
 
@@ -1062,12 +1065,12 @@ extern UniValue token(const JSONRPCRequest& request)
         CReserveKey childAuthorityKey(pwallet);
         totalBchNeeded += RenewAuthority(authority, outputs, childAuthorityKey);
 
-        CWalletTx wtx;
+        CTransactionRef tx;
         // I don't "need" tokens even though they are in the output because I'm minting, which is why
         // the token quantities are 0
-        ConstructTx(wtx, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, 0, 0, grpID, pwallet);
+        ConstructTx(tx, chosenCoins, outputs, totalBchAvailable, totalBchNeeded, 0, 0, grpID, pwallet);
         childAuthorityKey.KeepKey();
-        return wtx.GetHash().GetHex();
+        return tx->GetHash().GetHex();
     }
     else if (operation == "balance")
     {
@@ -1114,9 +1117,9 @@ extern UniValue token(const JSONRPCRequest& request)
         {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Improper number of parameters, did you forget the payment amount?");
         }
-        CWalletTx wtx;
-        GroupSend(wtx, grpID, outputs, totalTokensNeeded, pwallet);
-        return wtx.GetHash().GetHex();
+        CTransactionRef tx;
+        GroupSend(tx, grpID, outputs, totalTokensNeeded, pwallet);
+        return tx->GetHash().GetHex();
     }
     else if (operation == "melt")
     {
@@ -1131,9 +1134,9 @@ extern UniValue token(const JSONRPCRequest& request)
 
         CAmount totalNeeded = AmountFromIntegralValue(request.params[2]);
 
-        CWalletTx wtx;
-        GroupMelt(wtx, grpID, totalNeeded, pwallet);
-        return wtx.GetHash().GetHex();
+        CTransactionRef tx;
+        GroupMelt(tx, grpID, totalNeeded, pwallet);
+        return tx->GetHash().GetHex();
     }
     else
     {
