@@ -105,7 +105,6 @@ static bool SignStep(const SigningProvider& provider, const BaseSignatureCreator
     case TX_NULL_DATA:
         return false;
     case TX_PUBKEY:
-    case TX_GRP_PUBKEYHASH:
         if (!CreateSig(creator, sigdata, provider, sig, CPubKey(vSolutions[0]), scriptPubKey, sigversion)) return false;
         ret.push_back(std::move(sig));
         return true;
