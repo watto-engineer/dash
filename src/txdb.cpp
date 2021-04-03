@@ -443,18 +443,18 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
 
-                //Proof Of Stake
+                // POS
                 pindexNew->nFlags         = diskindex.nFlags;
                 if (pindexNew->nHeight < Params().GetConsensus().nBlockStakeModifierV2) {
                     pindexNew->nStakeModifier = diskindex.nStakeModifier;
                 } else {
                     pindexNew->nStakeModifierV2 = diskindex.nStakeModifierV2;
                 }
-                //Zerocoin
+                // Zerocoin
                 pindexNew->nAccumulatorCheckpoint = diskindex.nAccumulatorCheckpoint;
                 pindexNew->mapZerocoinSupply = diskindex.mapZerocoinSupply;
                 pindexNew->vMintDenominationsInBlock = diskindex.vMintDenominationsInBlock;
-                //Tokens
+                // ATP
                 pindexNew->nXDMSupply = diskindex.nXDMSupply;
                 pindexNew->nXDMTransactions = diskindex.nXDMTransactions;
 

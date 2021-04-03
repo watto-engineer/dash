@@ -76,10 +76,10 @@ static bool SignStep(const BaseSignatureCreator& creator, const CScript& scriptP
     case TX_NULL_DATA:
         return false;
     case TX_PUBKEY:
-    case TX_GRP_PUBKEYHASH:
         keyID = CPubKey(vSolutions[0]).GetID();
         return Sign1(keyID, creator, scriptPubKey, ret, sigversion);
     case TX_PUBKEYHASH:
+    case TX_GRP_PUBKEYHASH:
         keyID = CKeyID(uint160(vSolutions[0]));
         if (!Sign1(keyID, creator, scriptPubKey, ret, sigversion))
             return false;
