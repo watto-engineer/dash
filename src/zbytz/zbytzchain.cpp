@@ -379,7 +379,7 @@ bool UpdateZBYTZSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck
     std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
 
     // Initialize zerocoin supply to the supply from previous block
-    if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion > 3) {
+    if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion == BLOCKHEADER_LEGACY_VERSION) {
         for (auto& denom : libzerocoin::zerocoinDenomList) {
             pindex->mapZerocoinSupply.at(denom) = pindex->pprev->GetZcMints(denom);
         }
