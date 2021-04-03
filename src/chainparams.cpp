@@ -215,6 +215,8 @@ public:
         consensus.WagerrAddrPrefix = "wagerr";
         consensus.strTokenManagementKey = "WdFESJpjnXBjq4xahEsbHYeD8yoHfSHLCh"; // 04d449cc1ac45d327c34d8b116797ad9ed287980a9199ea48dc4c8beab90ae2ded738e826ba0b27b5571d63884d985e2a50afbe8eef2925fc280af51a2a2d5e0e0
         consensus.nOpGroupNewRequiredConfirmations = 1;
+        // Other
+        consensus.nCoinbaseMaturity = 100;
 
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
@@ -456,6 +458,8 @@ public:
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TNPPuVRwCbBtNtWG9dBtv1fYDC8PFEeQ6y";
         consensus.nOpGroupNewRequiredConfirmations = 1;
+        // Other
+        consensus.nCoinbaseMaturity = 15;
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -665,6 +669,8 @@ public:
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
+        // Other
+        consensus.nCoinbaseMaturity = 15;
         // Zerocoin
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
@@ -933,6 +939,8 @@ public:
         consensus.WagerrAddrPrefix = "wagerrreg";
         consensus.strTokenManagementKey = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk";
         consensus.nOpGroupNewRequiredConfirmations = 1;
+        // Other
+        consensus.nCoinbaseMaturity = 15;
 
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
