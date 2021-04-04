@@ -4,12 +4,8 @@
 
 #include "tokens/tokengroupconfiguration.h"
 #include "tokens/tokengroupmanager.h"
-#include "tokens/tokengroupwallet.h"
 
-#include <univalue.h>
-#include <iostream>
 #include <regex>
-#include <string.h>
 
 bool CTokenGroupCreation::ValidateDescription() {
     for (auto tgFilters : tokenGroupManager->vTokenGroupFilters) {

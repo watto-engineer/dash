@@ -248,6 +248,7 @@ BITCOIN_CORE_H = \
   script/sigcache.h \
   script/sign.h \
   script/standard.h \
+  script/tokengroup.h \
   spork.h \
   stacktraces.h \
   streams.h \
@@ -398,7 +399,6 @@ libdash_server_a_SOURCES = \
   spork.cpp \
   statsd_client.cpp \
   timedata.cpp \
-  tokens/tokendb.cpp \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
@@ -440,10 +440,7 @@ libdash_wallet_a_SOURCES = \
   keepass.cpp \
   pos/staker.cpp \
   pos/staking-manager.cpp \
-  tokens/rpctokens.cpp \
-  tokens/tokengroupconfiguration.cpp \
-  tokens/tokengroupdescription.cpp \
-  tokens/tokengroupmanager.cpp \
+  tokens/rpctokenwallet.cpp \
   tokens/tokengroupwallet.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
@@ -659,6 +656,12 @@ libdash_common_a_SOURCES = \
   script/ismine.cpp \
   script/sign.cpp \
   script/standard.cpp \
+  script/tokengroup.cpp \
+  tokens/tokendb.cpp \
+  tokens/rpctokens.cpp \
+  tokens/tokengroupconfiguration.cpp \
+  tokens/tokengroupdescription.cpp \
+  tokens/tokengroupmanager.cpp \
   warnings.cpp \
   $(BITCOIN_CORE_H)
 

@@ -5,13 +5,16 @@
 #ifndef TOKEN_GROUP_MANAGER_H
 #define TOKEN_GROUP_MANAGER_H
 
+#include "consensus/tokengroups.h"
 #include "tokens/tokengroupconfiguration.h"
 #include "wallet/wallet.h"
 
 #include <unordered_map>
-#include <univalue.h>
 
+class CBlockIndex;
 class CTokenGroupManager;
+class UniValue;
+
 extern std::shared_ptr<CTokenGroupManager> tokenGroupManager;
 
 // TokenGroup Class
@@ -69,8 +72,6 @@ public:
     bool GetXDMFee(const CBlockIndex* pindex, CAmount& fee);
 
     bool CheckXDMFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, CBlockIndex* pindex, CAmount& nXDMFees);
-    CAmount GetXDMFeesPaid(const std::vector<CRecipient> outputs);
-    bool EnsureXDMFee(std::vector<CRecipient> &outputs, CAmount XDMFee);
 };
 
 #endif

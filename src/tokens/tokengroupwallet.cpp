@@ -2,32 +2,19 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "tokens/tokengroupwallet.h"
-#include "base58.h"
-#include "bytzaddrenc.h"
-#include "wallet/coincontrol.h"
-#include "coins.h"
+
 #include "consensus/tokengroups.h"
 #include "consensus/validation.h"
-#include "core_io.h"
 #include "dstencode.h"
-#include "init.h"
 #include "net.h"
-#include "primitives/transaction.h"
-#include "pubkey.h"
-#include "random.h"
 #include "rpc/protocol.h"
-#include "rpc/server.h"
-#include "script/script.h"
-#include "script/standard.h"
+#include "script/tokengroup.h"
 #include "tokens/tokengroupmanager.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
-#include "validation.h" // for BlockMap
+#include "validation.h" // for cs_main
 #include "wallet/wallet.h"
 #include "wallet/fees.h"
-#include <algorithm>
-
-#include <boost/lexical_cast.hpp>
 
 // allow this many times fee overpayment, rather than make a change output
 #define FEE_FUDGE 2
@@ -65,78 +52,6 @@ OP_GROUP
 OP_DROP
 OP_HASH256 [32-byte-hash-value] OP_EQUAL
 */
-
-class CTxDestinationTokenGroupExtractor : public boost::static_visitor<CTokenGroupID>
-{
-public:
-    CTokenGroupID operator()(const CKeyID &id) const { return CTokenGroupID(id); }
-    CTokenGroupID operator()(const CScriptID &id) const { return CTokenGroupID(id); }
-    CTokenGroupID operator()(const CNoDestination &) const { return CTokenGroupID(); }
-};
-
-CTokenGroupID GetTokenGroup(const CTxDestination &id)
-{
-    return boost::apply_visitor(CTxDestinationTokenGroupExtractor(), id);
-}
-
-CTokenGroupID GetTokenGroup(const std::string &addr, const CChainParams &params)
-{
-    BytzAddrContent cac = DecodeBytzAddrContent(addr, params);
-    if (cac.type == BytzAddrType::GROUP_TYPE)
-        return CTokenGroupID(cac.hash);
-    // otherwise it becomes NoGroup (i.e. data is size 0)
-    return CTokenGroupID();
-}
-
-
-class CGroupScriptVisitor : public boost::static_visitor<bool>
-{
-private:
-    CScript *script;
-    CTokenGroupID group;
-    CAmount quantity;
-
-public:
-    CGroupScriptVisitor(CTokenGroupID grp, CAmount qty, CScript *scriptin) : group(grp), quantity(qty)
-    {
-        script = scriptin;
-    }
-    bool operator()(const CNoDestination &dest) const
-    {
-        script->clear();
-        return false;
-    }
-
-    bool operator()(const CKeyID &keyID) const
-    {
-        script->clear();
-        if (group.isUserGroup())
-        {
-            *script << group.bytes() << SerializeAmount(quantity) << OP_GROUP << OP_DROP << OP_DROP << OP_DUP
-                    << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
-        }
-        else
-        {
-            *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
-        }
-        return true;
-    }
-
-    bool operator()(const CScriptID &scriptID) const
-    {
-        script->clear();
-        if (group.isUserGroup())
-        {
-            *script << group.bytes() << SerializeAmount(quantity) << OP_GROUP << OP_DROP << OP_DROP << OP_HASH160
-                    << ToByteVector(scriptID) << OP_EQUAL;
-        }
-        else
-        {
-            *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
-        }
-        return true;
-    }
-};
 
 void GetAllGroupBalances(const CWallet *wallet, std::unordered_map<CTokenGroupID, CAmount> &balances)
 {
@@ -314,14 +229,6 @@ void GetGroupAuthority(const CWallet *wallet, std::vector<COutput>& coins, Group
         }
         return false;
     });
-}
-
-CScript GetScriptForDestination(const CTxDestination &dest, const CTokenGroupID &group, const CAmount &amount)
-{
-    CScript script;
-
-    boost::apply_visitor(CGroupScriptVisitor(group, amount, &script), dest);
-    return script;
 }
 
 bool NearestGreaterCoin(const std::vector<COutput> &coins, CAmount amt, COutput &chosenCoin)
@@ -706,4 +613,54 @@ CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGro
         ret = hasher.GetHash();
     } while (ret.bytes()[31] != (uint8_t)flags);
     return ret;
+}
+
+CAmount GetXDMFeesPaid(const std::vector<CRecipient> outputs) {
+    CAmount XDMFeesPaid = 0;
+    for (auto output : outputs) {
+        CTxDestination payeeDest;
+        if (ExtractDestination(output.scriptPubKey, payeeDest))
+        {
+            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
+                CTokenGroupInfo tgInfo(output.scriptPubKey);
+                if (tokenGroupManager->MatchesDarkMatter(tgInfo.associatedGroup)) {
+                    XDMFeesPaid += tgInfo.isAuthority() ? 0 : tgInfo.quantity;
+                }
+            }
+        }
+    }
+    return XDMFeesPaid;
+}
+
+// Ensure that one of the recipients is an XDM fee payment
+// If an output to the fee address already exists, it ensures that the output is at least XDMFee large
+// Returns true if a new output is added and false if a current output is either increased or kept as-is
+bool EnsureXDMFee(std::vector<CRecipient> &outputs, CAmount XDMFee) {
+    if (!tokenGroupManager->DarkMatterTokensCreated()) return false;
+    if (XDMFee <= 0) return false;
+    CTxDestination payeeDest;
+    for (auto &output : outputs) {
+        if (ExtractDestination(output.scriptPubKey, payeeDest))
+        {
+            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
+                CTokenGroupInfo tgInfo(output.scriptPubKey);
+                if (tokenGroupManager->MatchesDarkMatter(tgInfo.associatedGroup) && !tgInfo.isAuthority()) {
+                    if (tgInfo.quantity < XDMFee) {
+                        CScript script = GetScriptForDestination(payeeDest, tgInfo.associatedGroup, XDMFee);
+                        CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+
+                        output.scriptPubKey = script;
+                        return false;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    CScript script = GetScriptForDestination(DecodeDestination(Params().GetConsensus().strTokenManagementKey), tokenGroupManager->GetDarkMatterID(), XDMFee);
+    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+    outputs.push_back(recipient);
+
+    return true;
 }

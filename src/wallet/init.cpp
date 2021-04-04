@@ -7,6 +7,7 @@
 #include <keepass.h>
 #include <net.h>
 #include <scheduler.h>
+#include <tokens/rpctokenwallet.h>
 #include <util.h>
 #include <utilmoneystr.h>
 #include <validation.h>
@@ -341,6 +342,7 @@ void WalletInit::RegisterRPC(CRPCTable &t) const
     }
 
     RegisterWalletRPCCommands(t);
+    RegisterTokenWalletRPCCommands(t);
 }
 
 bool WalletInit::Verify() const

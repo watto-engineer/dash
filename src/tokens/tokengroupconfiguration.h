@@ -6,8 +6,8 @@
 #define TOKEN_GROUP_CONFIGURATION_H
 
 #include "blockencodings.h"
+#include "consensus/tokengroups.h"
 #include "tokens/tokengroupdescription.h"
-#include "wallet/wallet.h"
 
 #include <unordered_map>
 #include <univalue.h>

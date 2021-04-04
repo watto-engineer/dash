@@ -3,11 +3,13 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "tokens/tokengroupmanager.h"
-#include "tokens/tokengroupwallet.h"
 
+#include "chain.h"
+#include "coins.h"
 #include "dstencode.h"
 #include "bytzaddrenc.h"
 #include "rpc/protocol.h"
+#include "script/tokengroup.h"
 #include "utilstrencodings.h"
 #include "tokens/tokengroupconfiguration.h"
 
@@ -349,54 +351,4 @@ bool CTokenGroupManager::CheckXDMFees(const CTransaction &tx, const std::unorder
     nXDMFees += nXDMOutputs > nXDMFreeOutputs ?  1 * curXDMFee : 0;
 
     return XDMFeesPaid >= nXDMFees;
-}
-
-CAmount CTokenGroupManager::GetXDMFeesPaid(const std::vector<CRecipient> outputs) {
-    CAmount XDMFeesPaid = 0;
-    for (auto output : outputs) {
-        CTxDestination payeeDest;
-        if (ExtractDestination(output.scriptPubKey, payeeDest))
-        {
-            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
-                CTokenGroupInfo tgInfo(output.scriptPubKey);
-                if (MatchesDarkMatter(tgInfo.associatedGroup)) {
-                    XDMFeesPaid += tgInfo.isAuthority() ? 0 : tgInfo.quantity;
-                }
-            }
-        }
-    }
-    return XDMFeesPaid;
-}
-
-// Ensure that one of the recipients is an XDM fee payment
-// If an output to the fee address already exists, it ensures that the output is at least XDMFee large
-// Returns true if a new output is added and false if a current output is either increased or kept as-is
-bool CTokenGroupManager::EnsureXDMFee(std::vector<CRecipient> &outputs, CAmount XDMFee) {
-    if (!tgDarkMatterCreation) return false;
-    if (XDMFee <= 0) return false;
-    CTxDestination payeeDest;
-    for (auto &output : outputs) {
-        if (ExtractDestination(output.scriptPubKey, payeeDest))
-        {
-            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
-                CTokenGroupInfo tgInfo(output.scriptPubKey);
-                if (MatchesDarkMatter(tgInfo.associatedGroup) && !tgInfo.isAuthority()) {
-                    if (tgInfo.quantity < XDMFee) {
-                        CScript script = GetScriptForDestination(payeeDest, tgInfo.associatedGroup, XDMFee);
-                        CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
-
-                        output.scriptPubKey = script;
-                        return false;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-    CScript script = GetScriptForDestination(DecodeDestination(Params().GetConsensus().strTokenManagementKey), tgDarkMatterCreation->tokenGroupInfo.associatedGroup, XDMFee);
-    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
-    outputs.push_back(recipient);
-
-    return true;
 }

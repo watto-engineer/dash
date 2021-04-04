@@ -4,6 +4,7 @@
 
 #include "tokens/tokendb.h"
 #include "tokens/tokengroupmanager.h"
+#include "ui_interface.h"
 #include "validation.h"
 
 CTokenDB::CTokenDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "tokens", nCacheSize, fMemory, fWipe) {}

@@ -29,12 +29,6 @@ void GetGroupBalanceAndAuthorities(CAmount &balance, GroupAuthorityFlags &author
 void GetGroupCoins(const CWallet *wallet, std::vector<COutput>& coins, CAmount& balance, const CTokenGroupID &grpID, const CTxDestination &dest = CNoDestination());
 void GetGroupAuthority(const CWallet *wallet, std::vector<COutput>& coins, GroupAuthorityFlags flags, const CTokenGroupID &grpID, const CTxDestination &dest = CNoDestination());
 
-// Token group helper functions -- not members because they use objects not available in the consensus lib
-//* Initialize the group id from an address
-CTokenGroupID GetTokenGroup(const CTxDestination &id);
-//* Initialize a group ID from a string representation
-CTokenGroupID GetTokenGroup(const std::string &bytzAddrGrpId, const CChainParams &params = Params());
-
 //* Calculate a group ID based on the provided inputs.  Pass and empty script to opRetTokDesc if there is not
 // going to be an OP_RETURN output in the transaction.
 CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGroupIdFlags flags, uint64_t &nonce);
@@ -50,8 +44,7 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
 void GroupSend(CTransactionRef &txNew, const CTokenGroupID &grpID, const std::vector<CRecipient> &outputs,
     CAmount totalNeeded, CAmount totalXDMNeeded, CWallet *wallet);
 
-
-//* Group script helper function
-CScript GetScriptForDestination(const CTxDestination &dest, const CTokenGroupID &group, const CAmount &amount);
+CAmount GetXDMFeesPaid(const std::vector<CRecipient> outputs);
+bool EnsureXDMFee(std::vector<CRecipient> &outputs, CAmount XDMFee);
 
 #endif

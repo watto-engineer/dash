@@ -6,13 +6,12 @@
 #define TOKEN_GROUPS_H
 
 #include "chainparams.h"
-#include "coins.h"
 #include "consensus/validation.h"
 #include "pubkey.h"
 #include "util.h"
 #include <unordered_map>
 
-class CWallet;
+class CCoinsViewCache;
 
 /** Transaction cannot be committed on my fork */
 static const unsigned int REJECT_GROUP_IMBALANCE = 0x104;
