@@ -279,6 +279,7 @@ BITCOIN_CORE_H = \
   script/sign.h \
   script/signingprovider.h \
   script/standard.h \
+  script/tokengroup.h \
   shutdown.h \
   spork.h \
   stacktraces.h \
@@ -478,7 +479,6 @@ libbitcoin_server_a_SOURCES = \
   spork.cpp \
   statsd_client.cpp \
   timedata.cpp \
-  tokens/tokendb.cpp \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
@@ -559,10 +559,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/context.cpp \
   pos/staker.cpp \
   pos/staking-manager.cpp \
-  tokens/rpctokens.cpp \
-  tokens/tokengroupconfiguration.cpp \
-  tokens/tokengroupdescription.cpp \
-  tokens/tokengroupmanager.cpp \
+  tokens/rpctokenwallet.cpp \
   tokens/tokengroupwallet.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
@@ -782,6 +779,12 @@ libbitcoin_common_a_SOURCES = \
   script/sign.cpp \
   script/signingprovider.cpp \
   script/standard.cpp \
+  script/tokengroup.cpp \
+  tokens/tokendb.cpp \
+  tokens/rpctokens.cpp \
+  tokens/tokengroupconfiguration.cpp \
+  tokens/tokengroupdescription.cpp \
+  tokens/tokengroupmanager.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
   $(BITCOIN_CORE_H)

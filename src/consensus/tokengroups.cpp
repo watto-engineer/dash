@@ -1,30 +1,15 @@
 // Copyright (c) 2015-2017 The Bitcoin Unlimited developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include <algorithm>
+#include <clientversion.h>
 #include "coins.h"
 #include "consensus/tokengroups.h"
 #include "dstencode.h"
-#include "init.h"
-#include "primitives/transaction.h"
-#include "rpc/protocol.h"
 #include "rpc/server.h"
-#include "script/script.h"
-#include "script/standard.h"
-#include "pubkey.h"
 #include "wagerraddrenc.h"
-#include "random.h"
 #include "rpc/server.h"
+#include <streams.h>
 #include "tokens/tokengroupmanager.h"
-#include "util/system.h"
-#include "util/moneystr.h"
-#include "wallet/coincontrol.h"
-#include "wallet/wallet.h"
-#include <algorithm>
-#include "tokens/tokengroupwallet.h"
-
-#include <unordered_map>
-#include <univalue.h>
 
 CTokenGroupID NoGroup; // No group specified.
 

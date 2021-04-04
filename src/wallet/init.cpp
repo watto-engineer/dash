@@ -10,6 +10,8 @@
 #include <net.h>
 #include <node/context.h>
 #include <univalue.h>
+
+#include <tokens/rpctokenwallet.h>
 #include <util/check.h>
 #include <util/error.h>
 #include <util/system.h>
