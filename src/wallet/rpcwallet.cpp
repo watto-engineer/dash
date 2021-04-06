@@ -3947,6 +3947,53 @@ UniValue signrawtransactionwithwallet(const JSONRPCRequest& request)
     return SignTransaction(mtx, request.params[1], pwallet, false, request.params[2]);
 }
 
+UniValue setstakesplitthreshold(const JSONRPCRequest& request)
+{
+    CWallet * const pwallet = GetWalletForJSONRPCRequest(request);
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+            "setstakesplitthreshold value\n"
+            "\nThis will set the output size of your stakes to never be below this number\n" +
+            HelpRequiringPassphrase(pwallet) + "\n"
+
+            "\nArguments:\n"
+            "1. value   (numeric, required) Threshold value between 1 and 999999\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"threshold\": n,    (numeric) Threshold value set\n"
+            "  \"saved\": true|false    (boolean) 'true' if successfully saved to the wallet file\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("setstakesplitthreshold", "5000") + HelpExampleRpc("setstakesplitthreshold", "5000"));
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    const UniValue &stakeSplitThreshold = request.params[0];
+
+    uint64_t nStakeSplitThreshold = request.params[0].get_int64();
+
+    if (nStakeSplitThreshold > 999999)
+        throw std::runtime_error("Value out of range, max allowed is 999999");
+
+    LOCK(pwallet->cs_wallet);
+
+    UniValue result(UniValue::VOBJ);
+    if (!pwallet->SetStakeSplitThreshold(nStakeSplitThreshold)) {
+        throw std::runtime_error(std::string(__func__) + ": writing generated key failed");
+    }
+
+    result.push_back(Pair("threshold", int(pwallet->GetStakeSplitThreshold())));
+    result.push_back(Pair("saved", "true"));
+
+    return result;
+}
+
 #if ENABLE_MINER
 UniValue generate(const JSONRPCRequest& request)
 {

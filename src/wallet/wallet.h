@@ -869,6 +869,9 @@ private:
      */
     void InitCoinJoinSalt();
 
+    // Staking and POS
+    uint64_t nStakeSplitThreshold = 2000;
+
 public:
     /*
      * Main wallet lock.
@@ -1276,6 +1279,13 @@ public:
     bool AutoBackupWallet(const fs::path& wallet_path, std::string& strBackupWarningRet, std::string& strBackupErrorRet);
 
     bool BackupWallet(const std::string& strDest);
+
+    /**
+     * Staking and POS
+     */
+    bool SetStakeSplitThreshold(uint64_t newThreshold);
+    void LoadStakeSplitThreshold(uint64_t newThreshold);
+    uint64_t GetStakeSplitThreshold();
 
     /**
      * HD Wallet Functions

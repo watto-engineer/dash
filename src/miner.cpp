@@ -117,16 +117,23 @@ void BlockAssembler::resetBlock()
 }
 
 bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx) {
+#ifdef ENABLE_WALLET
     // Calculate if we need to split the output
     if (coinstakeTx->vout.size() != 2)
         return false;
-    CAmount nValue = coinstakeTx->vout[1].nValue;
-    if (nValue / 2 > (CAmount)(2000 * COIN)) {
-        coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
-        coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
-    } else {
+    if (!HasWallets()) {
         return false;
+    } else {
+        std::vector<CWallet*> wallets = GetWallets();
+        CAmount nValue = coinstakeTx->vout[1].nValue;
+        if (nValue / 2 > (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN)) {
+            coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
+            coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
+        } else {
+            return false;
+        }
     }
+#endif
     return true;
 }
 

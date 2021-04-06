@@ -1783,6 +1783,22 @@ CAmount CWallet::GetChange(const CTxOut& txout) const
     return (IsChange(txout) ? txout.nValue : 0);
 }
 
+bool CWallet::SetStakeSplitThreshold(uint64_t newThreshold)
+{
+    WalletBatch batch(*database);
+    return batch.WriteStakeSplitThreshold(newThreshold);
+}
+
+void CWallet::LoadStakeSplitThreshold(uint64_t newThreshold)
+{
+    nStakeSplitThreshold = newThreshold;
+}
+
+uint64_t CWallet::GetStakeSplitThreshold()
+{
+    return nStakeSplitThreshold;
+}
+
 void CWallet::GenerateNewHDChain(const SecureString& secureMnemonic, const SecureString& secureMnemonicPassphrase)
 {
     CHDChain newHdChain;

@@ -159,6 +159,11 @@ bool WalletBatch::WriteMinVersion(int nVersion)
     return WriteIC(std::string("minversion"), nVersion);
 }
 
+bool WalletBatch::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
+{
+    return WriteIC(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
+}
+
 bool WalletBatch::ReadAccount(const std::string& strAccount, CAccount& account)
 {
     account.SetNull();
@@ -583,6 +588,12 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         }
         else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
             wss.m_unknown_records++;
+        }
+        else if (strType == "stakeSplitThreshold")
+        {
+            uint64_t nStakeSplitThreshold;
+            ssValue >> nStakeSplitThreshold;
+            pwallet->LoadStakeSplitThreshold(nStakeSplitThreshold);
         }
     } catch (...)
     {
