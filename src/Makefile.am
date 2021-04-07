@@ -296,6 +296,7 @@ BITCOIN_CORE_H = \
   threadsafety.h \
   threadinterrupt.h \
   timedata.h \
+  tokens/groups.h \
   tokens/tokendb.h \
   tokens/tokengroupconfiguration.h \
   tokens/tokengroupdescription.h \
@@ -780,6 +781,7 @@ libbitcoin_common_a_SOURCES = \
   script/signingprovider.cpp \
   script/standard.cpp \
   script/tokengroup.cpp \
+  tokens/groups.cpp \
   tokens/tokendb.cpp \
   tokens/rpctokens.cpp \
   tokens/tokengroupconfiguration.cpp \

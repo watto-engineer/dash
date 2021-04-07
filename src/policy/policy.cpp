@@ -8,6 +8,7 @@
 #include <policy/policy.h>
 
 #include <coins.h>
+#include <tokens/groups.h>
 #include <policy/settings.h>
 
 
@@ -22,7 +23,7 @@ CAmount GetDustThreshold(const CTxOut& txout, const CFeeRate& dustRelayFeeIn)
     // so dust is a spendable txout less than
     // 182*dustRelayFee/1000 (in duffs).
     // 546 duffs at the default rate of 3000 duff/kB.
-    if (txout.scriptPubKey.IsUnspendable())
+    if (txout.scriptPubKey.IsUnspendable() || IsOutputGrouped(txout))
         return 0;
 
     size_t nSize = GetSerializeSize(txout)+148u;
