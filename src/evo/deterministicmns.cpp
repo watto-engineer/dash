@@ -9,6 +9,7 @@
 #include <chainparams.h>
 #include <core_io.h>
 #include <script/standard.h>
+#include <spork.h>
 #include <ui_interface.h>
 #include <validation.h>
 #include <validationinterface.h>
@@ -628,7 +629,7 @@ bool CDeterministicMNManager::ProcessBlock(const CBlock& block, const CBlockInde
         uiInterface.NotifyMasternodeListChanged(newList);
     }
 
-    if (nHeight == consensusParams.DIP0003EnforcementHeight) {
+    if (nHeight == sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         if (!consensusParams.DIP0003EnforcementHash.IsNull() && consensusParams.DIP0003EnforcementHash != pindex->GetBlockHash()) {
             LogPrintf("CDeterministicMNManager::%s -- DIP3 enforcement block has wrong hash: hash=%s, expected=%s, nHeight=%d\n", __func__,
                     pindex->GetBlockHash().ToString(), consensusParams.DIP0003EnforcementHash.ToString(), nHeight);
@@ -671,8 +672,8 @@ bool CDeterministicMNManager::UndoBlock(const CBlock& block, const CBlockIndex* 
         uiInterface.NotifyMasternodeListChanged(prevList);
     }
 
-    const auto& consensusParams = Params().GetConsensus();
-    if (nHeight == consensusParams.DIP0003EnforcementHeight) {
+//    const auto& consensusParams = Params().GetConsensus();
+    if (nHeight == sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         LogPrintf("CDeterministicMNManager::%s -- DIP3 is not enforced anymore. nHeight=%d\n", __func__, nHeight);
     }
 
@@ -1027,7 +1028,7 @@ CDeterministicMNList CDeterministicMNManager::GetListForBlock(const CBlockIndex*
 CDeterministicMNList CDeterministicMNManager::GetListAtChainTip()
 {
     LOCK(cs);
-    if (!tipIndex || tipIndex->nHeight < Params().GetConsensus().DIP0003EnforcementHeight) {
+    if (!tipIndex || tipIndex->nHeight < sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         return {};
     }
     return GetListForBlock(tipIndex);
@@ -1063,7 +1064,7 @@ bool CDeterministicMNManager::IsDIP3Enforced(int nHeight)
         nHeight = tipIndex->nHeight;
     }
 
-    return nHeight >= Params().GetConsensus().DIP0003EnforcementHeight;
+    return nHeight >= sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED);
 }
 
 void CDeterministicMNManager::CleanupCache(int nHeight)

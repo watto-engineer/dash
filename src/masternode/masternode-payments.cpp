@@ -281,11 +281,6 @@ bool CMasternodePayments::GetBlockTxOuts(int nBlockHeight, CBlockReward blockRew
     {
         LOCK(cs_main);
         pindex = chainActive[nBlockHeight - 1];
-
-        const Consensus::Params& consensusParams = Params().GetConsensus();
-        if (VersionBitsState(pindex, consensusParams, Consensus::DEPLOYMENT_REALLOC, versionbitscache) == ThresholdState::ACTIVE) {
-            nReallocActivationHeight = VersionBitsStateSinceHeight(pindex, consensusParams, Consensus::DEPLOYMENT_REALLOC, versionbitscache);
-        }
     }
 
     // TODO: add token amount

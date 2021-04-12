@@ -308,8 +308,9 @@ BOOST_FIXTURE_TEST_CASE(dip3_protx, TestChainDIP3Setup)
         nHeight++;
     }
 
-    int DIP0003EnforcementHeightBackup = Params().GetConsensus().DIP0003EnforcementHeight;
-    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = chainActive.Height() + 1;
+    int DIP0003EnforcementHeightBackup = sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED);
+    sporkManager.UpdateSpork(SPORK_4_DIP0003_ENFORCED, chainActive.Height() + 1, *g_connman);
+//    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = chainActive.Height() + 1;
     CreateAndProcessBlock({}, coinbaseKey);
     deterministicMNManager->UpdatedBlockTip(chainActive.Tip());
     nHeight++;
@@ -436,7 +437,8 @@ BOOST_FIXTURE_TEST_CASE(dip3_protx, TestChainDIP3Setup)
     }
     BOOST_ASSERT(foundRevived);
 
-    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = DIP0003EnforcementHeightBackup;
+    sporkManager.UpdateSpork(SPORK_4_DIP0003_ENFORCED, DIP0003EnforcementHeightBackup, *g_connman);
+//    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = DIP0003EnforcementHeightBackup;
 }
 
 BOOST_FIXTURE_TEST_CASE(dip3_test_mempool_reorg, TestChainDIP3Setup)
