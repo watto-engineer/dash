@@ -1546,7 +1546,7 @@ CAmount CWalletTx::GetUnlockedCredit(bool fUseCache, const isminefilter& filter)
         return 0;
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsGenerated() && GetBlocksToMaturity() > 0)
         return 0;
 
     CAmount nCredit = 0;
@@ -1571,7 +1571,7 @@ CAmount CWalletTx::GetLockedCredit(bool fUseCache, const isminefilter& filter) c
         return 0;
 
    // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsGenerated() && GetBlocksToMaturity() > 0)
         return 0;
 
     CAmount nCredit = 0;
@@ -2163,7 +2163,7 @@ void CWallet::ReacceptWalletTransactions()
 
         int nDepth = wtx.GetDepthInMainChain();
 
-        if (!wtx.IsCoinBase() && (nDepth == 0 && !wtx.IsLockedByInstantSend() && !wtx.isAbandoned())) {
+        if (!wtx.IsGenerated() && (nDepth == 0 && !wtx.IsLockedByInstantSend() && !wtx.isAbandoned())) {
             mapSorted.insert(std::make_pair(wtx.nOrderPos, &wtx));
         }
     }
@@ -2185,7 +2185,7 @@ bool CWalletTx::CanBeResent() const
         !isAbandoned() &&
         // Don't try to submit coinbase transactions. These would fail anyway but would
         // cause log spam.
-        !IsCoinBase() &&
+        !IsGenerated() &&
         // Don't try to submit conflicted or confirmed transactions.
         GetDepthInMainChain() == 0 &&
         // Don't try to submit transactions locked via InstantSend.
@@ -2329,7 +2329,7 @@ CAmount CWalletTx::GetAnonymizedCredit(const CCoinControl* coinControl) const
     AssertLockHeld(pwallet->cs_wallet);
 
     // Exclude coinbase and conflicted txes
-    if (IsCoinBase() || GetDepthInMainChain() < 0)
+    if (IsGenerated() || GetDepthInMainChain() < 0)
         return 0;
 
     if (coinControl == nullptr && m_amounts[ANON_CREDIT].m_cached[ISMINE_SPENDABLE])
@@ -2370,7 +2370,7 @@ CAmount CWalletTx::GetDenominatedCredit(bool unconfirmed, bool fUseCache) const
     AssertLockHeld(pwallet->cs_wallet);
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsGenerated() && GetBlocksToMaturity() > 0)
         return 0;
 
     int nDepth = GetDepthInMainChain();
@@ -2718,7 +2718,7 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
             if (!CheckFinalTx(*pcoin->tx))
                 continue;
 
-            if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
+            if ((pcoin->IsGenerated() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain();
@@ -3318,7 +3318,7 @@ std::vector<CompactTallyItem> CWallet::SelectCoinsGroupedByAddresses(bool fSkipD
 
         const CWalletTx& wtx = (*it).second;
 
-        if(wtx.IsCoinBase() && wtx.GetBlocksToMaturity() > 0) continue;
+        if(wtx.IsGenerated() && wtx.GetBlocksToMaturity() > 0) continue;
         if(fSkipUnconfirmed && !wtx.IsTrusted()) continue;
         if (wtx.GetDepthInMainChain() < 0) continue;
 
@@ -5212,7 +5212,7 @@ bool CWalletTx::IsChainLocked() const
 
 int CWalletTx::GetBlocksToMaturity() const
 {
-    if (!(IsCoinBase() || IsCoinStake() || IsAnyOutputGroupedAuthority(*tx)))
+    if (!(IsGenerated() || IsCoinStake() || IsAnyOutputGroupedAuthority(*tx)))
         return 0;
     int chain_depth = GetDepthInMainChain();
     assert(chain_depth >= 0); // coinbase tx should not be conflicted

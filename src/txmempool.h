@@ -126,7 +126,7 @@ public:
     uint64_t GetSizeWithDescendants() const { return nSizeWithDescendants; }
     CAmount GetModFeesWithDescendants() const { return nModFeesWithDescendants; }
 
-    bool GetSpendsCoinbase() const { return spendsCoinbase; }
+    bool GetSpendsGenerated() const { return spendsGenerated; }
 
     uint64_t GetCountWithAncestors() const { return nCountWithAncestors; }
     uint64_t GetSizeWithAncestors() const { return nSizeWithAncestors; }
