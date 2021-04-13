@@ -232,11 +232,12 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
 }
 
 bool CStakingManager::IsStaking() {
-    bool nStaking = false;
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
-        nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
+    if (mapHashedBlocks.count(chainActive.Tip()->nHeight)) {
+        return true;
+    } else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval) {
+        return true;
+    }
+    return false;
 }
 
 void CStakingManager::UpdatedBlockTip(const CBlockIndex* pindex)
