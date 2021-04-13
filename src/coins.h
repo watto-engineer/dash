@@ -62,6 +62,10 @@ public:
         return fCoinStake;
     }
 
+    bool IsGenerated() const {
+        return fCoinBase || fCoinStake;
+    }
+
     template<typename Stream>
     void Serialize(Stream &s) const {
         assert(!IsSpent());

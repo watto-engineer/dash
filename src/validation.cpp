@@ -583,7 +583,7 @@ void UpdateMempoolForReorg(DisconnectedBlockTransactions &disconnectpool, bool f
     while (it != disconnectpool.queuedTx.get<insertion_order>().rend()) {
         // ignore validation errors in resurrected transactions
         CValidationState stateDummy;
-        if (!fAddToMempool || (*it)->IsCoinBase() ||
+        if (!fAddToMempool || (*it)->IsGenerated() ||
             !AcceptToMemoryPool(mempool, stateDummy, *it, nullptr /* pfMissingInputs */,
                                 true /* bypass_limits */, 0 /* nAbsurdFee */)) {
             // If the transaction doesn't make it in to the mempool, remove any
@@ -671,6 +671,10 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
         return state.DoS(100, false, REJECT_INVALID, "coinbase");
+
+    // Coinstake is only valid in a block, not as a loose transaction
+    if (tx.IsCoinStake())
+        return state.DoS(100, false, REJECT_INVALID, "coinstake");
 
     // Disallow any OP_GROUP txs from entering the mempool until OP_GROUP is enabled.
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
@@ -803,17 +807,17 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
         // Keep track of transactions that spend a coinbase, which we re-scan
         // during reorgs to ensure COINBASE_MATURITY is still met.
-        bool fSpendsCoinbase = false;
+        bool fSpendsGenerated = false;
         for (const CTxIn &txin : tx.vin) {
             const Coin &coin = view.AccessCoin(txin.prevout);
-            if (coin.IsCoinBase()) {
-                fSpendsCoinbase = true;
+            if (coin.IsGenerated()) {
+                fSpendsGenerated = true;
                 break;
             }
         }
 
         CTxMemPoolEntry entry(ptx, nFees, nAcceptTime, chainActive.Height(),
-                              fSpendsCoinbase, nSigOps, lp);
+                              fSpendsGenerated, nSigOps, lp);
         unsigned int nSize = entry.GetTxSize();
 
         // Check that the transaction doesn't have an excessive number of

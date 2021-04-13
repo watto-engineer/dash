@@ -188,6 +188,11 @@ bool CTransaction::IsCoinStake() const
     return (vout.size() >= 2 && vout[0].IsEmpty());
 }
 
+bool CTransaction::IsGenerated() const
+{
+    return IsCoinBase() || IsCoinStake();
+}
+
 bool CTxIn::IsZerocoinSpend() const
 {
     return prevout.hash == uint256() && scriptSig.IsZerocoinSpend();

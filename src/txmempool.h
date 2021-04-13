@@ -75,7 +75,7 @@ private:
     size_t nUsageSize;         //!< ... and total memory usage
     int64_t nTime;             //!< Local time when entering the mempool
     unsigned int entryHeight;  //!< Chain height when entering the mempool
-    bool spendsCoinbase;       //!< keep track of transactions that spend a coinbase
+    bool spendsGenerated;       //!< keep track of transactions that spend a coinbase
     unsigned int sigOpCount;   //!< Legacy sig ops plus P2SH sig op count
     int64_t feeDelta;          //!< Used for determining the priority of the transaction for mining in a block
     LockPoints lockPoints;     //!< Track the height and time at which tx was final
@@ -96,7 +96,7 @@ private:
 public:
     CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                     int64_t _nTime, unsigned int _entryHeight,
-                    bool spendsCoinbase,
+                    bool spendsGenerated,
                     unsigned int nSigOps, LockPoints lp);
 
     const CTransaction& GetTx() const { return *this->tx; }
@@ -124,7 +124,7 @@ public:
     uint64_t GetSizeWithDescendants() const { return nSizeWithDescendants; }
     CAmount GetModFeesWithDescendants() const { return nModFeesWithDescendants; }
 
-    bool GetSpendsCoinbase() const { return spendsCoinbase; }
+    bool GetSpendsGenerated() const { return spendsGenerated; }
 
     uint64_t GetCountWithAncestors() const { return nCountWithAncestors; }
     uint64_t GetSizeWithAncestors() const { return nSizeWithAncestors; }
