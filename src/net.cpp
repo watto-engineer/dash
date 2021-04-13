@@ -19,6 +19,7 @@
 #include <primitives/transaction.h>
 #include <netbase.h>
 #include <scheduler.h>
+#include <spork.h>
 #include <ui_interface.h>
 #include <utilstrencodings.h>
 #include <validation.h>
@@ -3691,6 +3692,10 @@ void CConnman::RelayTransaction(const CTransaction& tx)
     RelayInv(inv);
 }
 
+void CConnman::RelayInv(CInv &inv) {
+    RelayInv(inv, GetMinPeerVersion());
+}
+
 void CConnman::RelayInv(CInv &inv, const int minProtoVersion) {
     LOCK(cs_vNodes);
     for (const auto& pnode : vNodes) {
@@ -3727,6 +3732,13 @@ void CConnman::RelayInvFiltered(CInv &inv, const uint256& relatedTxHash, const i
         }
         pnode->PushInventory(inv);
     }
+}
+
+int CConnman::GetMinPeerVersion() {
+    if (sporkManager.IsSporkActive(SPORK_8_NEW_PROTOCOL_ENFORCEMENT))
+            return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
+
+    return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
 }
 
 void CConnman::RecordBytesRecv(uint64_t bytes)
