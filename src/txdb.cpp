@@ -458,7 +458,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nXDMSupply = diskindex.nXDMSupply;
                 pindexNew->nXDMTransactions = diskindex.nXDMTransactions;
 
-                if (pindexNew->nHeight < consensusParams.nPosStartHeight && pindexNew->IsProofOfWork() && !CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams))
+                if (!IsProofOfStakeHeight(pindexNew->nHeight, consensusParams) && pindexNew->IsProofOfWork() && !CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams))
                     return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
 
                 //populate accumulator checksum map in memory
