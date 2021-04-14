@@ -183,37 +183,40 @@ void CMainSignals::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockInd
     // the chain actually updates. One way to ensure this is for the caller to invoke this signal
     // in the same critical section where the chain is updated
 
-    m_internals->m_schedulerClient.AddToProcessQueue([pindexNew, pindexFork, fInitialDownload, this] {
+    LogPrintf("%s - Adding UpdatedBlockTip() to process queue: %s(%d)\n", __func__, pindexNew->GetBlockHash().ToString(), pindexNew->nHeight);
+    //m_internals->m_schedulerClient.AddToProcessQueue([pindexNew, pindexFork, fInitialDownload, this] {
         m_internals->UpdatedBlockTip(pindexNew, pindexFork, fInitialDownload);
-    });
+    //});
 }
 
 void CMainSignals::SynchronousUpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
+    LogPrintf("%s - SynchronousUpdatedBlockTip: %s(%d)\n", __func__, pindexNew->GetBlockHash().ToString(), pindexNew->nHeight);
     m_internals->SynchronousUpdatedBlockTip(pindexNew, pindexFork, fInitialDownload);
 }
 
 void CMainSignals::TransactionAddedToMempool(const CTransactionRef &ptx, int64_t nAcceptTime) {
-    m_internals->m_schedulerClient.AddToProcessQueue([ptx, nAcceptTime, this] {
+    //m_internals->m_schedulerClient.AddToProcessQueue([ptx, nAcceptTime, this] {
         m_internals->TransactionAddedToMempool(ptx, nAcceptTime);
-    });
+    //});
 }
 
 void CMainSignals::BlockConnected(const std::shared_ptr<const CBlock> &pblock, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>>& pvtxConflicted) {
-    m_internals->m_schedulerClient.AddToProcessQueue([pblock, pindex, pvtxConflicted, this] {
+    LogPrintf("%s - Adding BlockConnected() to process queue: %s %s(%d)\n", __func__, pblock->GetHash().ToString(), pindex->GetBlockHash().ToString(), pindex->nHeight);
+    //m_internals->m_schedulerClient.AddToProcessQueue([pblock, pindex, pvtxConflicted, this] {
         m_internals->BlockConnected(pblock, pindex, *pvtxConflicted);
-    });
+    //});
 }
 
 void CMainSignals::BlockDisconnected(const std::shared_ptr<const CBlock> &pblock, const CBlockIndex* pindexDisconnected) {
-    m_internals->m_schedulerClient.AddToProcessQueue([pblock, pindexDisconnected, this] {
+    //m_internals->m_schedulerClient.AddToProcessQueue([pblock, pindexDisconnected, this] {
         m_internals->BlockDisconnected(pblock, pindexDisconnected);
-    });
+    //});
 }
 
 void CMainSignals::SetBestChain(const CBlockLocator &locator) {
-    m_internals->m_schedulerClient.AddToProcessQueue([locator, this] {
+    //m_internals->m_schedulerClient.AddToProcessQueue([locator, this] {
         m_internals->SetBestChain(locator);
-    });
+    //});
 }
 
 void CMainSignals::Broadcast(int64_t nBestBlockTime, CConnman* connman) {
