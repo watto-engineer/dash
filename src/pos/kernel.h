@@ -41,6 +41,8 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
 // Check Kernel Stake for pre DGW period
 bool GetKernelStakeModifierPreDGW(uint256 hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake);
 
+bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake);
+
 bool AcceptPOSParameters(const CBlock& block, CValidationState& state,CBlockIndex* pindexNew);
 
 #endif // BITCOIN_KERNEL_H

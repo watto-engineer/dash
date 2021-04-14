@@ -42,6 +42,7 @@ LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
 LIBBITCOIN_CLI=libbitcoin_cli.a
 LIBBITCOIN_UTIL=libbitcoin_util.a
 LIBBITCOIN_CRYPTO_BASE=crypto/libbitcoin_crypto_base.a
+LIBBITCOIN_ZEROCOIN=libzerocoin/libbitcoin_zerocoin.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 
@@ -83,6 +84,7 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
@@ -246,6 +248,7 @@ BITCOIN_CORE_H = \
   policy/policy.h \
   policy/settings.h \
   pos/blocksignature.h \
+  pos/checks.h \
   pos/kernel.h \
   pos/stakeinput.h \
   pow.h \
@@ -341,6 +344,16 @@ BITCOIN_CORE_H = \
   wallet/walletutil.h \
   wallet/coinselection.h \
   warnings.h \
+  zwgr/accumulators.h \
+  zwgr/accumulatorcheckpoints.h \
+  zwgr/accumulatorcheckpoints.json.h \
+  zwgr/accumulatormap.h \
+  zwgr/deterministicmint.h \
+  zwgr/zwgrchain.h \
+  zwgr/zwgrmodule.h \
+  zwgr/witness.h \
+  zwgr/zerocoin.h \
+  zwgr/zerocoindb.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqnotificationinterface.h \
   zmq/zmqpublishnotifier.h \
@@ -434,6 +447,7 @@ libbitcoin_server_a_SOURCES = \
   policy/policy.cpp \
   policy/settings.cpp \
   pos/blocksignature.cpp \
+  pos/checks.cpp \
   pos/kernel.cpp \
   pos/stakeinput.cpp \
   pow.cpp \
@@ -461,6 +475,15 @@ libbitcoin_server_a_SOURCES = \
   validation.cpp \
   validationinterface.cpp \
   versionbits.cpp \
+  zwgr/accumulators.cpp \
+  zwgr/accumulatorcheckpoints.cpp \
+  zwgr/accumulatormap.cpp \
+  zwgr/deterministicmint.cpp \
+  zwgr/witness.cpp \
+  zwgr/zwgrchain.cpp \
+  zwgr/zwgrmodule.cpp \
+  zwgr/zerocoin.cpp \
+  zwgr/zerocoindb.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_WALLET
@@ -605,6 +628,36 @@ crypto_libbitcoin_crypto_arm_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
 crypto_libbitcoin_crypto_arm_shani_a_CXXFLAGS += $(ARM_SHANI_CXXFLAGS)
 crypto_libbitcoin_crypto_arm_shani_a_CPPFLAGS += -DENABLE_ARM_SHANI
 crypto_libbitcoin_crypto_arm_shani_a_SOURCES = crypto/sha256_arm_shani.cpp
+
+# libzerocoin library
+libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
+libzerocoin_libbitcoin_zerocoin_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libzerocoin_libbitcoin_zerocoin_a_SOURCES = \
+  libzerocoin/Accumulator.h \
+  libzerocoin/AccumulatorProofOfKnowledge.h \
+  libzerocoin/bignum.h \
+  libzerocoin/Coin.h \
+  libzerocoin/CoinSpend.h \
+  libzerocoin/Commitment.h \
+  libzerocoin/Denominations.h \
+  libzerocoin/ParamGeneration.h \
+  libzerocoin/Params.h \
+  libzerocoin/SerialNumberSignatureOfKnowledge.h \
+  libzerocoin/SpendType.h \
+  libzerocoin/ZerocoinDefines.h \
+  libzerocoin/bignum.cpp \
+  libzerocoin/Accumulator.cpp \
+  libzerocoin/AccumulatorProofOfKnowledge.cpp \
+  libzerocoin/Coin.cpp \
+  libzerocoin/Denominations.cpp \
+  libzerocoin/CoinSpend.cpp \
+  libzerocoin/Commitment.cpp \
+  libzerocoin/ParamGeneration.cpp \
+  libzerocoin/Params.cpp \
+  libzerocoin/SerialNumberSignatureOfKnowledge.cpp
+if USE_NUM_GMP
+  libzerocoin_libbitcoin_zerocoin_a_SOURCES += libzerocoin/bignum_gmp.cpp
+endif
 
 # consensus: shared between all executables that validate any consensus rules.
 libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -762,6 +815,7 @@ dashd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_CONSENSUS) \
@@ -804,6 +858,7 @@ endif
 dash_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
@@ -877,6 +932,7 @@ CLEANFILES += index/*.gcda index/*.gcno
 CLEANFILES += interfaces/*.gcda interfaces/*.gcno
 CLEANFILES += node/*.gcda node/*.gcno
 CLEANFILES += policy/*.gcda policy/*.gcno
+CLEANFILES += libzerocoin/*.gcda libzerocoin/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
 CLEANFILES += rpc/*.gcda rpc/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno

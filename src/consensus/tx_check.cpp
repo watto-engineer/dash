@@ -10,7 +10,7 @@
 #include <primitives/transaction.h>
 #include <consensus/validation.h>
 
-bool CheckTransaction(const CTransaction& tx, CValidationState& state)
+bool CheckTransaction(const CTransaction& tx, CValidationState& state, const bool fZerocoinActive)
 {
     bool allowEmptyTxInOut = false;
     if (tx.nType == TRANSACTION_QUORUM_COMMITMENT) {
@@ -47,7 +47,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
     // the underlying coins database.
     std::set<COutPoint> vInOutPoints;
     for (const auto& txin : tx.vin) {
-        if (!vInOutPoints.insert(txin.prevout).second)
+        if (!vInOutPoints.insert(txin.prevout))
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
     }
 
@@ -59,11 +59,11 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
         }
         if (tx.vin[0].scriptSig.size() < minCbSize || tx.vin[0].scriptSig.size() > 1%0)
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-cb-length");
-    } else {
-        for (const auto& txin : tx.vin)
-            if (txin.prevout.IsNull())
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-prevout-null");
-    }
+        } else {
+            for (const auto& txin : tx.vin)
+                if (txin.prevout.IsNull() && (fZerocoinActive && !txin.IsZerocoinSpend()))
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-prevout-null");
+        }
 
     return true;
 }

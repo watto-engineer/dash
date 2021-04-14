@@ -45,6 +45,7 @@ class CBlockIndex;
 class CBlockTreeDB;
 class CBlockUndo;
 class CChainParams;
+class CZerocoinDB;
 class CInv;
 class CConnman;
 class CScriptCheck;
@@ -173,6 +174,8 @@ extern bool fHavePruned;
 extern bool fPruneMode;
 /** Number of MiB of block files that we're trying to stay below. */
 extern uint64_t nPruneTarget;
+
+extern std::map<uint256, uint256> mapProofOfStake;
 
 /** Open a block file (blk?????.dat) */
 FILE* OpenBlockFile(const FlatFilePos &pos, bool fReadOnly = false);
@@ -966,6 +969,8 @@ CChain& ChainActive();
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CBlockTreeDB> pblocktree;
+/** Global variable that points to the zerocoin database (protected by cs_main) */
+extern CZerocoinDB *zerocoinDB;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().

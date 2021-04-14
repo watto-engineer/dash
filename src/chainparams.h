@@ -8,6 +8,7 @@
 
 #include <chainparamsbase.h>
 #include <consensus/params.h>
+#include <libzerocoin/Params.h>
 #include <llmq/params.h>
 #include <primitives/block.h>
 #include <protocol.h>
@@ -110,6 +111,7 @@ public:
     const std::vector<std::string>& SporkAddresses() const { return vSporkAddresses; }
     int MinSporkKeys() const { return nMinSporkKeys; }
     bool BIP9CheckMasternodesUpgraded() const { return fBIP9CheckMasternodesUpgraded; }
+    libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;
     const Consensus::LLMQParams& GetLLMQ(Consensus::LLMQType llmqType) const;
     bool HasLLMQ(Consensus::LLMQType llmqType) const;
 

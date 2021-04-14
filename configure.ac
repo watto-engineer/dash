@@ -245,6 +245,12 @@ AC_ARG_ENABLE([zmq],
   [use_zmq=$enableval],
   [use_zmq=yes])
 
+AC_ARG_WITH([zerocoin-bignum],
+  [AS_HELP_STRING([--with-zerocoin-bignum=gmp|auto],
+  [Specify Bignum Implementation. Default is auto])],
+  [req_bignum=$withval],
+  [req_bignum=auto])
+
 AC_ARG_ENABLE(man,
     [AS_HELP_STRING([--disable-man],
                     [do not install man pages (default is to install)])],,
@@ -1563,6 +1569,29 @@ if test "x$use_ccache" != "xno"; then
   fi
 fi
 
+dnl bignum value
+set_bignum=$req_bignum
+case $req_bignum in
+auto)
+  GMP_CHECK
+  if test x"$has_gmp" != x"yes"; then
+    AC_MSG_ERROR([gmp bignum automatically selected but libgmp is not available. Use depends,
+    install libgmp or select an other bignum implementation (ONLY gmp is fully SUPPORTED)])
+  else
+    set_bignum=gmp
+  fi
+  ;;
+gmp)
+  GMP_CHECK
+  if test x"$has_gmp" != x"yes"; then
+    AC_MSG_ERROR([gmp bignum explicitly requested but libgmp is not available])
+  fi
+  ;;
+*)
+  AC_MSG_ERROR([invalid bignum implementation selection])
+  ;;
+esac
+
 dnl enable wallet
 AC_MSG_CHECKING([if wallet should be enabled])
 if test x$enable_wallet != xno; then
@@ -1669,6 +1698,17 @@ fi
 
 AM_CONDITIONAL([ENABLE_ZMQ], [test "x$use_zmq" = "xyes"])
 
+# select bignum implementation
+case $set_bignum in
+gmp)
+  AC_DEFINE(USE_NUM_GMP, 1, [Define this symbol to use the gmp implementation])
+  ;;
+*)
+  AC_MSG_ERROR([invalid bignum implementation])
+  ;;
+esac
+
+AM_CONDITIONAL([USE_NUM_GMP], [test "x$set_bignum" = "xgmp"])
 AC_MSG_CHECKING([whether to build test_dash])
 if test x$use_tests = xyes; then
   AC_MSG_RESULT([yes])
@@ -1783,6 +1823,7 @@ AC_SUBST(EVENT_PTHREADS_LIBS)
 AC_SUBST(ZMQ_LIBS)
 AC_SUBST(QR_LIBS)
 AC_SUBST(DSYMUTIL_FLAT)
+AC_SUBST(USE_NUM_GMP)
 AC_SUBST(HAVE_FDATASYNC)
 AC_SUBST(HAVE_FULLFSYNC)
 AC_SUBST(HAVE_O_CLOEXEC)
@@ -1843,6 +1884,7 @@ if test x$bitcoin_enable_qt != xno; then
     echo "    with qr           = $use_qr"
 fi
 echo "  with zmq            = $use_zmq"
+echo "  with bignum         = $set_bignum"
 echo "  with test           = $use_tests"
 echo "  with bench          = $use_bench"
 if test x$use_tests != xno; then

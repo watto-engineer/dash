@@ -16,6 +16,6 @@ class CTransaction;
 class CValidationState;
 
 /** Context-independent validity checks */
-bool CheckTransaction(const CTransaction& tx, CValidationState& state);
+bool CheckTransaction(const CTransaction& tx, CValidationState& state, const bool fZerocoinActive);
 
 #endif // BITCOIN_CONSENSUS_TX_CHECK_H

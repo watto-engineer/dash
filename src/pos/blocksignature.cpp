@@ -6,8 +6,7 @@
 #include "blocksignature.h"
 #include "util/system.h"
 #include "util/strencodings.h"
-//#include "main.h"
-//#include "zwgrchain.h"
+#include "zwgr/zwgrchain.h"
 
 typedef std::vector<unsigned char> valtype;
 
@@ -73,10 +72,8 @@ bool CheckBlockSignature(const CBlock& block)
     CPubKey pubkey;
     bool fZStake = block.vtx[1]->vin[0].IsZerocoinSpend();
     if (fZStake) {
-/*
-        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1].vin[0]);
+        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1]->vin[0]);
         pubkey = spend.getPubKey();
-*/
         return error ("%s: zerocoin functionality not implemented yet", __func__);
     } else {
         txnouttype whichType;

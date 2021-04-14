@@ -129,7 +129,8 @@ unsigned int GetLegacySigOpCount(const CTransaction& tx)
 
 unsigned int GetP2SHSigOpCount(const CTransaction& tx, const CCoinsViewCache& inputs)
 {
-    if (tx.IsCoinBase())
+    if (tx.IsCoinBase() || tx.HasZerocoinSpendInputs())
+        // a tx containing a zc spend can have only zc inputs
         return 0;
 
     unsigned int nSigOps = 0;
