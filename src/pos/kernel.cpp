@@ -14,6 +14,8 @@
 #include "timedata.h"
 #include "util.h"
 #include "stakeinput.h"
+#include "zbytz/zbytzchain.h"
+#include "zbytz/accumulators.h"
 
 // v1 modifier interval.
 static const int64_t OLD_MODIFIER_INTERVAL = 2087;
@@ -374,6 +376,32 @@ bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int 
     return fSuccess;
 }
 
+bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
+{
+    if (nPreviousBlockHeight < Params().GetConsensus().nBlockZerocoinV2)
+        return error("%s : zBYTZ stake block is less than allowed start height", __func__);
+
+    if (CZStake* zBYTZ = dynamic_cast<CZStake*>(stake)) {
+        CBlockIndex* pindexFrom = zBYTZ->GetIndexFrom();
+        if (!pindexFrom)
+            return error("%s: failed to get index associated with zBYTZ stake checksum", __func__);
+
+        int depth = (nPreviousBlockHeight + 1) - pindexFrom->nHeight;
+        if (depth < Params().GetConsensus().nZerocoinRequiredStakeDepth)
+            return error("%s : zBYTZ stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, nPreviousBlockHeight, pindexFrom->nHeight);
+
+        //The checksum needs to be the exact checksum from 200 blocks ago
+        uint256 nCheckpoint200 = chainActive[nPreviousBlockHeight - Params().GetConsensus().nZerocoinRequiredStakeDepth]->GetBlockHeader().nAccumulatorCheckpoint;
+        uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zBYTZ->GetValue()));
+        if (nChecksum200 != zBYTZ->GetChecksum())
+            return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zBYTZ->GetChecksum(), nChecksum200);
+    } else {
+        return error("%s: dynamic_cast of stake ptr failed", __func__);
+    }
+
+    return true;
+}
+
 // Check kernel hash target and coinstake signature
 bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight) {
     const CTransaction tx = *block.vtx[1];
@@ -383,7 +411,17 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx.vin[0];
 
-    {
+    //Construct the stakeinput object
+    if (txin.IsZerocoinSpend()) {
+        libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
+        if (spend.getSpendType() != libzerocoin::SpendType::STAKE)
+            return error("%s: spend is using the wrong SpendType (%d)", __func__, (int)spend.getSpendType());
+
+        stake = std::unique_ptr<CStakeInput>(new CZStake(spend));
+
+        if (!ContextualCheckZerocoinStake(nPreviousBlockHeight, stake.get()))
+            return error("%s: staked zBYTZ fails context checks", __func__);
+    } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;
         CTransactionRef txPrev;
@@ -424,6 +462,12 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     unsigned int nTxTime = block.nTime;
     const int nBlockFromHeight = pindexfrom->nHeight;
 
+    if (!txin.IsZerocoinSpend() && nPreviousBlockHeight >= Params().GetConsensus().nPublicZCSpends - 1) {
+        //check for maturity (min age/depth) requirements
+        if (!HasStakeMinAgeOrDepth(nPreviousBlockHeight+1, nTxTime, nBlockFromHeight, nBlockFromTime))
+            return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
+                             __func__, nPreviousBlockHeight, nTxTime, nBlockFromTime, nBlockFromHeight);
+    }
     if (!CheckStakeKernelHash(pindex->pprev, block.nBits, stake.get(), nTxTime, hashProofOfStake, true)) {
         return error("%s : INFO: check kernel failed on coinstake %s, hashProof=%s", __func__,
                      tx->GetHash().GetHex(), hashProofOfStake.GetHex());

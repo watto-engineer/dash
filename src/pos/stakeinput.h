@@ -38,6 +38,43 @@ public:
     }
 };
 
+
+// zStake can take two forms
+// 1) the stake candidate, which is a zcmint that is attempted to be staked
+// 2) a staked zbytz, which is a zcspend that has successfully staked
+class CZStake : public CStakeInput
+{
+private:
+    uint32_t nChecksum;
+    bool fMint;
+    libzerocoin::CoinDenomination denom;
+    uint256 hashSerial;
+
+public:
+    explicit CZStake(libzerocoin::CoinDenomination denom, const uint256& hashSerial)
+    {
+        this->denom = denom;
+        this->hashSerial = hashSerial;
+        fMint = true;
+    }
+
+    explicit CZStake(const libzerocoin::CoinSpend& spend);
+
+    CBlockIndex* GetIndexFrom() override;
+    bool GetTxFrom(CTransactionRef& tx) override;
+    CAmount GetValue() override;
+    bool GetModifier(uint64_t& nStakeModifier) override;
+    CDataStream GetUniqueness() override;
+    bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
+    bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
+//    bool MarkSpent(CWallet* pwallet, const uint256& txid);
+    bool IsZBYTZ() override { return true; }
+    uint256 GetSerialHash() const override { return hashSerial; }
+    int GetChecksumHeightFromMint();
+    int GetChecksumHeightFromSpend();
+    uint32_t GetChecksum();
+};
+
 class CStake : public CStakeInput
 {
 private:

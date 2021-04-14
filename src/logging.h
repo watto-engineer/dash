@@ -78,6 +78,7 @@ namespace BCLog {
         //End Dash
 
         //Start Bytz
+        ZEROCOIN    = ((uint64_t)1 << 61),
         STAKING     = ((uint64_t)1 << 62),
         //End Bytz
 

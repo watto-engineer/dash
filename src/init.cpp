@@ -61,6 +61,9 @@
 #include <warnings.h>
 #include <walletinitinterface.h>
 
+#include <zbytz/accumulatorcheckpoints.h>
+#include <zbytz/zerocoindb.h>
+
 #include <evo/deterministicmns.h>
 #include <llmq/quorums_init.h>
 #include <llmq/quorums_blockprocessor.h>
@@ -331,6 +334,7 @@ void PrepareShutdown()
         llmq::DestroyLLMQSystem();
         deterministicMNManager.reset();
         evoDb.reset();
+        zerocoinDB.reset();
     }
     g_wallet_init_interface.Stop();
 
@@ -1965,6 +1969,8 @@ bool AppInitMain()
                 evoDb.reset(new CEvoDB(nEvoDbCache, false, fReset || fReindexChainState));
                 deterministicMNManager.reset();
                 deterministicMNManager.reset(new CDeterministicMNManager(*evoDb));
+                zerocoinDB.reset();
+                zerocoinDB = new CZerocoinDB(0, false, fReset || fReindexChainState);
 
                 llmq::InitLLMQSystem(*evoDb, false, fReset || fReindexChainState);
 
@@ -2043,6 +2049,9 @@ bool AppInitMain()
 
                 // At this point we're either in reindex or we've loaded a useful
                 // block tree into mapBlockIndex!
+
+                // Load Accumulator Checkpoints according to network (main/test/regtest)
+                assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
 
                 pcoinsdbview.reset(new CCoinsViewDB(nCoinDBCache, false, fReset || fReindexChainState));
                 pcoinscatcher.reset(new CCoinsViewErrorCatcher(pcoinsdbview.get()));

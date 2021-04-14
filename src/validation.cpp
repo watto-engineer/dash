@@ -20,8 +20,9 @@
 #include <init.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
-#include <pos/kernel.h>
 #include <pos/blocksignature.h>
+#include <pos/checks.h>
+#include <pos/kernel.h>
 #include <pow.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
@@ -50,6 +51,11 @@
 #include <llmq/quorums_chainlocks.h>
 
 #include <statsd_client.h>
+
+#include <libzerocoin/bignum.h>
+#include <zbytz/accumulators.h>
+#include <zbytz/zbytzchain.h>
+#include <zbytz/zerocoindb.h>
 
 #include <future>
 #include <sstream>
@@ -311,6 +317,7 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 std::unique_ptr<CCoinsViewDB> pcoinsdbview;
 std::unique_ptr<CCoinsViewCache> pcoinsTip;
 std::unique_ptr<CBlockTreeDB> pblocktree;
+std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 enum class FlushStateMode {
     NONE,
@@ -643,7 +650,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         *pfMissingInputs = false;
     }
 
-    if (!CheckTransaction(tx, state))
+    if (!CheckTransaction(tx, state, true))
         return false; // state filled in by CheckTransaction
 
     if (!ContextualCheckTransaction(tx, state, chainparams.GetConsensus(), chainActive.Tip()))
@@ -1334,7 +1341,7 @@ void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CValidationState 
 void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, CTxUndo &txundo, int nHeight)
 {
     // mark inputs spent
-    if (!tx.IsCoinBase()) {
+    if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs()) {
         txundo.vprevout.reserve(tx.vin.size());
         for (const CTxIn &txin : tx.vin) {
             txundo.vprevout.emplace_back();
@@ -1395,7 +1402,7 @@ void InitScriptExecutionCache() {
 bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks)
 {
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
-    if (!tx.IsCoinBase())
+    if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs())
     {
         if (pvChecks)
             pvChecks->reserve(tx.vin.size());
@@ -2139,6 +2146,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
     std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
+    std::vector<uint256> vSpendsInBlock;
+    CAmount nValueIn = 0;
+    //! Zerocoin
+    std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpends;
+    std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
 
     std::vector<PrecomputedTransactionData> txdata;
     txdata.reserve(block.vtx.size()); // Required so that pointers to individual PrecomputedTransactionData don't get invalidated
@@ -2156,16 +2168,20 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     for (unsigned int i = 0; i < block.vtx.size(); i++)
     {
-        const CTransaction &tx = *(block.vtx[i]);
-        const uint256 txhash = tx.GetHash();
+        const CTransactionRef tx = block.vtx[i];
+        const uint256 txhash = tx->GetHash();
 
-        nInputs += tx.vin.size();
+        nInputs += tx->vin.size();
 
-        if (!tx.IsCoinBase())
+        if (tx->HasZerocoinSpendInputs())
+        {
+            if (!CheckZerocoinSpendTx(pindex, state, *tx, vSpendsInBlock, vSpends, vMints, nValueIn))
+                return false;
+        } else if (!tx->IsCoinBase())
         {
             CAmount txfee = 0;
-            if (!Consensus::CheckTxInputs(tx, state, view, pindex->nHeight, txfee)) {
-                return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
+            if (!Consensus::CheckTxInputs(*tx, state, view, pindex->nHeight, txfee)) {
+                return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx->GetHash().ToString(), FormatStateMessage(state));
             }
             nFees += txfee;
             if (!MoneyRange(nFees)) {
@@ -2176,21 +2192,21 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             // Check that transaction is BIP68 final
             // BIP68 lock checks (as opposed to nLockTime checks) must
             // be in ConnectBlock because they require the UTXO set
-            prevheights.resize(tx.vin.size());
-            for (size_t j = 0; j < tx.vin.size(); j++) {
-                prevheights[j] = view.AccessCoin(tx.vin[j].prevout).nHeight;
+            prevheights.resize(tx->vin.size());
+            for (size_t j = 0; j < tx->vin.size(); j++) {
+                prevheights[j] = view.AccessCoin(tx->vin[j].prevout).nHeight;
             }
 
-            if (!SequenceLocks(tx, nLockTimeFlags, &prevheights, *pindex)) {
+            if (!SequenceLocks(*tx, nLockTimeFlags, &prevheights, *pindex)) {
                 return state.DoS(100, error("%s: contains a non-BIP68-final transaction", __func__),
                                  REJECT_INVALID, "bad-txns-nonfinal");
             }
 
             if (fAddressIndex || fSpentIndex)
             {
-                for (size_t j = 0; j < tx.vin.size(); j++) {
-                    const CTxIn input = tx.vin[j];
-                    const Coin& coin = view.AccessCoin(tx.vin[j].prevout);
+                for (size_t j = 0; j < tx->vin.size(); j++) {
+                    const CTxIn input = tx->vin[j];
+                    const Coin& coin = view.AccessCoin(tx->vin[j].prevout);
                     const CTxOut &prevout = coin.out;
                     uint160 hashBytes;
                     int addressType;
@@ -2225,32 +2241,47 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 }
 
             }
+            // Check that zBYTZ mints are not already known
+            if (tx->HasZerocoinMintOutputs()) {
+                for (auto& out : tx->vout) {
+                    if (!out.IsZerocoinMint())
+                        continue;
 
+                    libzerocoin::PublicCoin coin(Params().Zerocoin_Params(false));
+                    if (!TxOutToPublicCoin(out, coin, state))
+                        return state.DoS(100, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx->GetHash().GetHex()));
+
+                    if (!ContextualCheckZerocoinMint(coin, pindex))
+                        return state.DoS(100, error("%s: zerocoin mint failed contextual check", __func__));
+
+                    vMints.emplace_back(std::make_pair(coin, tx->GetHash()));
+                }
+            }
         }
 
         // GetTransactionSigOpCount counts 2 types of sigops:
         // * legacy (always)
         // * p2sh (when P2SH enabled in flags and excludes coinbase)
-        nSigOps += GetTransactionSigOpCount(tx, view, flags);
+        nSigOps += GetTransactionSigOpCount(*tx, view, flags);
         if (nSigOps > MaxBlockSigOps(fDIP0001Active_context))
             return state.DoS(100, error("ConnectBlock(): too many sigops"),
                              REJECT_INVALID, "bad-blk-sigops");
 
-        txdata.emplace_back(tx);
-        if (!tx.IsCoinBase())
+        txdata.emplace_back(*tx);
+        if (!tx->IsCoinBase())
         {
 
             std::vector<CScriptCheck> vChecks;
             bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
-            if (!CheckInputs(tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr))
+            if (!CheckInputs(*tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txdata[i], nScriptCheckThreads ? &vChecks : nullptr))
                 return error("ConnectBlock(): CheckInputs on %s failed with %s",
-                    tx.GetHash().ToString(), FormatStateMessage(state));
+                    tx->GetHash().ToString(), FormatStateMessage(state));
             control.Add(vChecks);
         }
 
         if (fAddressIndex) {
-            for (unsigned int k = 0; k < tx.vout.size(); k++) {
-                const CTxOut &out = tx.vout[k];
+            for (unsigned int k = 0; k < tx->vout.size(); k++) {
+                const CTxOut &out = tx->vout[k];
 
                 if (out.scriptPubKey.IsPayToScriptHash()) {
                     std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
@@ -2362,6 +2393,17 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     // END DASH
 
+    // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
+    AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
+    if (!ValidateAccumulatorCheckpoint(block, pindex, mapAccumulators)) {
+        if (!ShutdownRequested()) {
+            return state.DoS(100, error("%s: Failed to validate accumulator checkpoint for block=%s height=%d", __func__,
+                                   block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID, "bad-acc-checkpoint");
+        }
+        return error("%s: Failed to validate accumulator checkpoint for block=%s height=%d because wallet is shutting down", __func__,
+                block.GetHash().GetHex(), pindex->nHeight);
+    }
+
     if (fJustCheck)
         return true;
 
@@ -2375,6 +2417,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     if (!WriteTxIndexDataForBlock(block, state, pindex))
         return false;
+
+    // Flush spend/mint info to disk
+    if (!zerocoinDB->WriteCoinSpendBatch(vSpends)) return AbortNode(state, ("Failed to record coin serials to database"));
+    if (!zerocoinDB->WriteCoinMintBatch(vMints)) return AbortNode(state, ("Failed to record new mints to database"));
+
+    //Record accumulator checksums
+    DatabaseChecksums(mapAccumulators);
 
     if (fAddressIndex) {
         if (!pblocktree->WriteAddressIndex(addressIndex)) {
@@ -3621,9 +3670,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             if (block.vtx[i]->IsCoinStake())
                 return state.DoS(100, error("CheckBlock() : more than one coinstake"));
     }
+
     // Check transactions
+    bool fZerocoinActive = block.GetBlockTime() > consensusParams.nZerocoinStartTime;
     for (const auto& tx : block.vtx)
-        if (!CheckTransaction(*tx, state))
+        if (!CheckTransaction(*tx, state, fZerocoinActive))
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                                  strprintf("Transaction check failed (tx hash %s) %s", tx->GetHash().ToString(), state.GetDebugMessage()));
 

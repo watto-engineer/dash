@@ -143,6 +143,7 @@ const CLogCategoryDesc LogCategories[] =
     //End Dash
 
     //Start Bytz
+    {BCLog::ZEROCOIN, "zerocoin"},
     {BCLog::STAKING, "staking"},
     //End Bytz
 };

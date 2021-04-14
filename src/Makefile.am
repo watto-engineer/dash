@@ -53,6 +53,7 @@ LIBBITCOIN_CONSENSUS=libdash_consensus.a
 LIBBITCOIN_CLI=libdash_cli.a
 LIBBITCOIN_UTIL=libdash_util.a
 LIBBITCOIN_CRYPTO_BASE=crypto/libdash_crypto_base.a
+LIBBITCOIN_ZEROCOIN=libzerocoin/libbitcoin_zerocoin.a
 LIBBITCOINQT=qt/libdashqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 
@@ -89,6 +90,7 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
@@ -219,6 +221,7 @@ BITCOIN_CORE_H = \
   policy/fees.h \
   policy/policy.h \
   pos/blocksignature.h \
+  pos/checks.h \
   pos/kernel.h \
   pos/stakeinput.h \
   pow.h \
@@ -279,6 +282,16 @@ BITCOIN_CORE_H = \
   wallet/walletutil.h \
   wallet/coinselection.h \
   warnings.h \
+  zbytz/accumulators.h \
+  zbytz/accumulatorcheckpoints.h \
+  zbytz/accumulatorcheckpoints.json.h \
+  zbytz/accumulatormap.h \
+  zbytz/deterministicmint.h \
+  zbytz/zbytzchain.h \
+  zbytz/zbytzmodule.h \
+  zbytz/witness.h \
+  zbytz/zerocoin.h \
+  zbytz/zerocoindb.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h\
   zmq/zmqnotificationinterface.h \
@@ -354,6 +367,7 @@ libdash_server_a_SOURCES = \
   policy/fees.cpp \
   policy/policy.cpp \
   pos/blocksignature.cpp \
+  pos/checks.cpp \
   pos/kernel.cpp \
   pos/stakeinput.cpp \
   pow.cpp \
@@ -381,6 +395,15 @@ libdash_server_a_SOURCES = \
   validation.cpp \
   validationinterface.cpp \
   versionbits.cpp \
+  zbytz/accumulators.cpp \
+  zbytz/accumulatorcheckpoints.cpp \
+  zbytz/accumulatormap.cpp \
+  zbytz/deterministicmint.cpp \
+  zbytz/witness.cpp \
+  zbytz/zbytzchain.cpp \
+  zbytz/zbytzmodule.cpp \
+  zbytz/zerocoin.cpp \
+  zbytz/zerocoindb.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
@@ -490,6 +513,36 @@ crypto_libdash_crypto_shani_a_CPPFLAGS = $(AM_CPPFLAGS)
 crypto_libdash_crypto_shani_a_CXXFLAGS += $(SHANI_CXXFLAGS)
 crypto_libdash_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
 crypto_libdash_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
+
+# libzerocoin library
+libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
+libzerocoin_libbitcoin_zerocoin_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libzerocoin_libbitcoin_zerocoin_a_SOURCES = \
+  libzerocoin/Accumulator.h \
+  libzerocoin/AccumulatorProofOfKnowledge.h \
+  libzerocoin/bignum.h \
+  libzerocoin/Coin.h \
+  libzerocoin/CoinSpend.h \
+  libzerocoin/Commitment.h \
+  libzerocoin/Denominations.h \
+  libzerocoin/ParamGeneration.h \
+  libzerocoin/Params.h \
+  libzerocoin/SerialNumberSignatureOfKnowledge.h \
+  libzerocoin/SpendType.h \
+  libzerocoin/ZerocoinDefines.h \
+  libzerocoin/bignum.cpp \
+  libzerocoin/Accumulator.cpp \
+  libzerocoin/AccumulatorProofOfKnowledge.cpp \
+  libzerocoin/Coin.cpp \
+  libzerocoin/Denominations.cpp \
+  libzerocoin/CoinSpend.cpp \
+  libzerocoin/Commitment.cpp \
+  libzerocoin/ParamGeneration.cpp \
+  libzerocoin/Params.cpp \
+  libzerocoin/SerialNumberSignatureOfKnowledge.cpp
+if USE_NUM_GMP
+  libzerocoin_libbitcoin_zerocoin_a_SOURCES += libzerocoin/bignum_gmp.cpp
+endif
 
 # consensus: shared between all executables that validate any consensus rules.
 libdash_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -621,6 +674,7 @@ dashd_LDADD = \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_CONSENSUS) \
@@ -663,6 +717,7 @@ endif
 dash_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_ZEROCOIN) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
@@ -701,6 +756,7 @@ CLEANFILES += compat/*.gcda compat/*.gcno
 CLEANFILES += consensus/*.gcda consensus/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
 CLEANFILES += policy/*.gcda policy/*.gcno
+CLEANFILES += libzerocoin/*.gcda libzerocoin/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno
 CLEANFILES += support/*.gcda support/*.gcno

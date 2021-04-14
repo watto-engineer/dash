@@ -359,6 +359,10 @@ public:
         return new CDBIterator(*this, pdb->NewIterator(iteroptions));
     }
 
+    leveldb::Iterator *NewRawIterator() {
+        return pdb->NewIterator(iteroptions);
+    }
+
     /**
      * Return true if the database managed by this class contains no entries.
      */
