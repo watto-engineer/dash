@@ -183,19 +183,21 @@ void CMainSignals::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockInd
     // the chain actually updates. One way to ensure this is for the caller to invoke this signal
     // in the same critical section where the chain is updated
 
-    m_internals->m_schedulerClient.AddToProcessQueue([pindexNew, pindexFork, fInitialDownload, this] {
+    LogPrintf("%s - Adding UpdatedBlockTip() to process queue: %s(%d)\n", __func__, pindexNew->GetBlockHash().ToString(), pindexNew->nHeight);
+    //m_internals->m_schedulerClient.AddToProcessQueue([pindexNew, pindexFork, fInitialDownload, this] {
         m_internals->UpdatedBlockTip(pindexNew, pindexFork, fInitialDownload);
-    });
+    //});
 }
 
 void CMainSignals::SynchronousUpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
+    LogPrintf("%s - SynchronousUpdatedBlockTip: %s(%d)\n", __func__, pindexNew->GetBlockHash().ToString(), pindexNew->nHeight);
     m_internals->SynchronousUpdatedBlockTip(pindexNew, pindexFork, fInitialDownload);
 }
 
 void CMainSignals::TransactionAddedToMempool(const CTransactionRef &ptx, int64_t nAcceptTime) {
-    m_internals->m_schedulerClient.AddToProcessQueue([ptx, nAcceptTime, this] {
+    //m_internals->m_schedulerClient.AddToProcessQueue([ptx, nAcceptTime, this] {
         m_internals->TransactionAddedToMempool(ptx, nAcceptTime);
-    });
+    //});
 }
 
 void CMainSignals::BlockConnected(const std::shared_ptr<const CBlock> &pblock, const CBlockIndex *pindex, const std::shared_ptr<const std::vector<CTransactionRef>>& pvtxConflicted) {
