@@ -17,7 +17,7 @@
 
 std::shared_ptr<CStakingManager> stakingManager;
 
-CStakingManager::CStakingManager(CWallet * const pwalletIn) :
+CStakingManager::CStakingManager(std::shared_ptr<CWallet> pwalletIn) :
         nMintableLastCheck(0), fMintableCoins(false), nExtraNonce(0), // Currently unused
         fEnableStaking(false), fEnableBYTZStaking(false), nReserveBalance(0), pwallet(pwalletIn) {}
 

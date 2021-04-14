@@ -110,7 +110,7 @@ CDataStream CZStake::GetUniqueness()
     return ss;
 }
 
-bool CZStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
+bool CZStake::CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
     return false;
 /*
@@ -133,7 +133,7 @@ bool CZStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 */
 }
 
-bool CZStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
+bool CZStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
 {
     return false;
 /*
@@ -217,7 +217,7 @@ bool CStake::GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const
     return true;
 }
 
-bool CStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
+bool CStake::CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
     txIn = CTxIn(txFrom->GetHash(), nPosition);
     return true;
@@ -228,7 +228,7 @@ CAmount CStake::GetValue() const
     return txFrom->vout[nPosition].nValue;
 }
 
-bool CStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
+bool CStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
 {
     std::vector<valtype> vSolutions;
     txnouttype whichType;

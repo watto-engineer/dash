@@ -124,7 +124,7 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
     if (!HasWallets()) {
         return false;
     } else {
-        std::vector<CWallet*> wallets = GetWallets();
+        std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
         CAmount nValue = coinstakeTx->vout[1].nValue;
         if (nValue / 2 > (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN)) {
             coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
@@ -142,7 +142,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 {
     CBasicKeyStore tempKeystore;
 #ifdef ENABLE_WALLET
-    std::vector<CWallet*> wallets = GetWallets();
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     const CKeyStore& keystore = wallets.size() < 1 ? tempKeystore : *wallets[0];
 #else
     const CKeyStore& keystore = tempKeystore;

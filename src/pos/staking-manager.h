@@ -27,14 +27,14 @@ public:
 
 private:
     const CBlockIndex* tipIndex{nullptr};
-    CWallet* pwallet = nullptr;
+    std::shared_ptr<CWallet> pwallet = nullptr;
 
     int64_t nMintableLastCheck;
     bool fMintableCoins;
     unsigned int nExtraNonce;
 
 public:
-    CStakingManager(CWallet * const pwalletIn = nullptr);
+    CStakingManager(std::shared_ptr<CWallet> pwalletIn = nullptr);
 
     bool fEnableStaking;
     bool fEnableBYTZStaking;

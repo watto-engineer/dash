@@ -24,11 +24,11 @@ protected:
 public:
     virtual ~CStakeInput(){};
     virtual CBlockIndex* GetIndexFrom() = 0;
-    virtual bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) = 0;
+    virtual bool CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) = 0;
     virtual bool GetTxFrom(CTransactionRef& tx) = 0;
     virtual bool GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const = 0;
     virtual CAmount GetValue() const = 0;
-    virtual bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal) = 0;
+    virtual bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) = 0;
     virtual bool GetModifier(uint64_t& nStakeModifier) = 0;
     virtual bool IsZBYTZ() = 0;
     virtual CDataStream GetUniqueness() = 0;
@@ -67,8 +67,8 @@ public:
     CAmount GetValue() const override;
     bool GetModifier(uint64_t& nStakeModifier) override;
     CDataStream GetUniqueness() override;
-    bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
-    bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
+    bool CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
+    bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
 //    bool MarkSpent(CWallet* pwallet, const uint256& txid);
     bool IsZBYTZ() override { return true; }
     uint256 GetSerialHash() const override { return hashSerial; }
@@ -98,8 +98,8 @@ public:
     CAmount GetValue() const override;
     bool GetModifier(uint64_t& nStakeModifier) override;
     CDataStream GetUniqueness() override;
-    bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
-    bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
+    bool CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
+    bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
     bool IsZBYTZ() override { return false; }
     uint256 GetSerialHash() const override { return uint256(); }
 

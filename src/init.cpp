@@ -2356,7 +2356,7 @@ bool AppInitMain()
 
 #ifdef ENABLE_WALLET
 
-    std::vector<CWallet*> wallets = GetWallets();
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     if (!HasWallets() || wallets.size() < 1) {
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
         stakingManager->fEnableStaking = false;
