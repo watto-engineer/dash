@@ -23,6 +23,14 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
     return 0 * COIN;
 }
 
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZBYTZStake, const Consensus::Params& consensusParams) {
+    if (nHeight >= consensusParams.V16DeploymentHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZBYTZStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    if (nHeight >= consensusParams.nBlockZerocoinV2 && isZBYTZStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
+    if (nHeight >= consensusParams.nPosStartHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    return 0 * COIN;
+}
+
 CReward::CReward(const RewardType typeIn, const CAmount amountIn, const CTokenGroupID group, const CAmount tokenAmount) : type(typeIn), amount(amountIn) {
     if (group != NoGroup && tokenAmount != 0) {
         tokenAmounts.insert(std::pair<CTokenGroupID, CAmount>(group, tokenAmount));
@@ -97,7 +105,8 @@ CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fP
     rewards.clear();
     fBurnUnpaidMasternodeReward = false;
     CAmount nBlockValue = GetBlockSubsidyBytz(nHeight - 1, fPos, consensusParams);
-    SetRewards(nBlockValue, nFees, false, fPos);
+    CAmount mnRewardAmount = GetMasternodePayment(nHeight, nBlockValue, false, consensusParams);
+    SetRewards(nBlockValue, mnRewardAmount, nFees, false, fPos);
 }
 
 int CBlockReward::CompareTo(const CBlockReward& rhs) const {
@@ -248,7 +257,7 @@ void CBlockReward::SetHybridRewards(const CAmount blockSubsidy, const CAmount nF
     AddHybridFees(nFees);
 }
 
-void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount nFees, const bool fHybrid, const bool fPOS) {
+void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount nFees, const bool fHybrid, const bool fPOS) {
     if (fHybrid) {
         if (fPOS) {
             SetHybridPOSRewards(blockSubsidy);
@@ -258,7 +267,7 @@ void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount nFees, c
         }
         AddHybridFees(nFees);
     } else {
-        SetMasternodeReward(blockSubsidy * 0.5);
+        SetMasternodeReward(mnRewardAmount);
         if (fPOS) {
             SetCoinstakeReward(blockSubsidy - GetMasternodeReward().amount);
             AddReward(CReward::RewardType::REWARD_COINSTAKE, nFees);

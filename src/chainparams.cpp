@@ -564,7 +564,7 @@ public:
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
         consensus.nPowTargetSpacing = 1 * 60; // Dash: 1 minute
-        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
 
         // Bytz specific parameters
@@ -585,9 +585,9 @@ public:
         consensus.nCoinbaseMaturity = 15;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
-        consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
-        consensus.nZerocoinStartTime = std::numeric_limits<int>::max();
-        consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
+        consensus.nZerocoinStartHeight = 25;
+        consensus.nZerocoinStartTime = 1524496462;
+        consensus.nBlockZerocoinV2 = 60;
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19

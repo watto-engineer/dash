@@ -87,11 +87,7 @@ bool IsBlockValueValid(const CBlock& block, const int nBlockHeight, const CBlock
         return false;
     }
 
-    // Masternode rewards can default to coinstake, but not to coinbase
-    if (!blockReward.fBurnUnpaidMasternodeReward && rewardsInBlock.GetMasternodeReward() == CReward(CReward::REWARD_MASTERNODE)) {
-        blockReward.MoveMasternodeRewardToCoinbase();
-    }
-    bool isBlockRewardValueMet = blockReward >= rewardsInBlock && blockReward.GetCoinbaseReward() >= rewardsInBlock.GetCoinbaseReward();
+    bool isBlockRewardValueMet = blockReward >= rewardsInBlock;
 
     strErrorRet = "";
 
