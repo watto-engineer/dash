@@ -97,7 +97,7 @@ public:
 
     void AddHybridFees(const CAmount nFees);
 
-    void SetRewards(const CAmount blockSubsidy, const CAmount nFees, const bool fHybrid, const bool fPOS);
+    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount nFees, const bool fHybrid, const bool fPOS);
 
     CReward GetTotalRewards();
 };
