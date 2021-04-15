@@ -570,8 +570,12 @@ public:
         // Bytz specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
+        consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max();
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
-        consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
+        consensus.nPosTargetSpacing = 1 * 60; // 1 minute
+        consensus.nStakeMinDepth = 100;
+        consensus.nBlockStakeModifierV1A = 51197;
+        consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytztest";
@@ -580,6 +584,20 @@ public:
         // Other
         consensus.nCoinbaseMaturity = 15;
         // Zerocoin
+        consensus.nZerocoinRequiredStakeDepth = 200;
+        consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
+        consensus.nZerocoinStartTime = std::numeric_limits<int>::max();
+        consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
+        consensus.nPublicZCSpends = std::numeric_limits<int>::max();
+        consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        consensus.nRequiredAccumulation = 1;
+        consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
+            "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+            "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+            "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+            "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+            "31438167899885040445364023527381951378636564391212010397122822120720357";
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
@@ -719,8 +737,12 @@ public:
         // Bytz specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
+        consensus.nPivxProtocolV2StartHeight = 2000;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
+        consensus.nPosTargetSpacing = 1 * 60; // 1 minute
+        consensus.nStakeMinDepth = 100;
+        consensus.nBlockStakeModifierV1A = 1000;
+        consensus.nBlockStakeModifierV2 = consensus.nPivxProtocolV2StartHeight;
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytztest";
@@ -729,6 +751,21 @@ public:
         // Other
         consensus.nCoinbaseMaturity = 15;
         // Zerocoin
+        consensus.nZerocoinRequiredStakeDepth = 200;
+        consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
+        consensus.nZerocoinStartTime = std::numeric_limits<int>::max();
+        consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
+        consensus.nPublicZCSpends = std::numeric_limits<int>::max();
+        consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        consensus.nRequiredAccumulation = 1;
+        consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
+            "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+            "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+            "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+            "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+            "31438167899885040445364023527381951378636564391212010397122822120720357";
+
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
@@ -865,9 +902,16 @@ public:
         consensus.nPowTargetSpacing = 2.5 * 60; // Dash: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
+
+        // Bytz specific parameters
+        // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
+        consensus.nPivxProtocolV2StartHeight = 2000;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max(); // 'no DGW'
+        consensus.nPosTargetSpacing = 1 * 60; // 1 minute
+        consensus.nStakeMinDepth = 100;
+        consensus.nBlockStakeModifierV1A = 1000;
+        consensus.nBlockStakeModifierV2 = consensus.nPivxProtocolV2StartHeight;
         // ATP parameters
         consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
         consensus.BytzAddrPrefix = "bytzreg";
@@ -875,6 +919,22 @@ public:
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 15;
+        // Zerocoin
+        consensus.nZerocoinRequiredStakeDepth = 200;
+        consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
+        consensus.nZerocoinStartTime = std::numeric_limits<int>::max();
+        consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
+        consensus.nPublicZCSpends = std::numeric_limits<int>::max();
+        consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
+        consensus.nRequiredAccumulation = 1;
+        consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
+            "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+            "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+            "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+            "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+            "31438167899885040445364023527381951378636564391212010397122822120720357";
+
 
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
