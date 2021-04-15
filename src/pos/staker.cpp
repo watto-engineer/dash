@@ -48,15 +48,12 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
     UniValue blockHashes(UniValue::VARR);
     while (nHeight < nHeightEnd)
     {
-        fPosPowPhase = false;//nHeight + 1 >= params.nPosPowStartHeight;
-        fPosPhase = true; // fRegtest && (nHeight + 1 >= params.nPosStartHeight && nHeight + 1 < params.nPosPowStartHeight);
+        fPosPhase = IsProofOfStakeHeight(nHeight + 1, params);
         // If nHeight > POS start, wallet should be enabled.
 
-        // Create coinstake if on regtest, in POS phase and not in POW phase, or if in POS phase and in POW phase during alternating (odd) blocks
-        fCreatePosBlock = fRegtest && (fPosPhase || (fPosPowPhase && nHeight % 2));
         std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
         unsigned int nCoinStakeTime;
-        if (fCreatePosBlock) {
+        if (fPosPhase) {
             std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
             if (stakingManager->CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
@@ -64,23 +61,11 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
                 pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
             };
         } else {
-            if (fPosPowPhase) {
-                if (!tokenGroupManager->ElectronTokensCreated()) {
-                    throw JSONRPCError(RPC_MISC_ERROR, "Error: Mining in hybrid mode, but the Electron token group is not yet created");
-                }
-                std::shared_ptr<CReserveScript> coinbase_script;
-                CBlockReward reward(nHeight + 1, 0, false, params);
-                if (!pwallet->GetScriptForHybridMining(coinbase_script, coinbaseKey, reward.GetCoinbaseReward())) {
-                    throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-                }
-                pblocktemplate = BlockAssembler(Params()).CreateNewBlock(coinbase_script->reserveScript);
-            } else {
-                std::shared_ptr<CReserveScript> coinbase_script;
-                if (!pwallet->GetScriptForPowMining(coinbase_script, coinbaseKey)) {
-                    throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-                }
-                pblocktemplate = BlockAssembler(Params()).CreateNewBlock(coinbase_script->reserveScript);
+            std::shared_ptr<CReserveScript> coinbase_script;
+            if (!pwallet->GetScriptForPowMining(coinbase_script, coinbaseKey)) {
+                throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
             }
+            pblocktemplate = BlockAssembler(Params()).CreateNewBlock(coinbase_script->reserveScript);
         }
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
@@ -89,7 +74,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
             LOCK(cs_main);
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
-        while (!fCreatePosBlock && nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
+        while (!fPosPhase && nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
             ++pblock->nNonce;
             --nMaxTries;
         }
@@ -100,7 +85,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
             continue;
         }
 
-        if (fCreatePosBlock) {
+        if (fPosPhase) {
             CKeyID keyID;
             if (!GetKeyIDFromUTXO(pblock->vtx[1]->vout[1], keyID)) {
                 LogPrint(BCLog::STAKING, "%s: failed to find key for PoS", __func__);

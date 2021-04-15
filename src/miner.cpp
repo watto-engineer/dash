@@ -300,6 +300,12 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
                 throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
         }
     } else {
+        // Unpaid masternode rewards default to the miner
+        CAmount nMasternodePaymentAmount = 0;
+        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
+            nMasternodePaymentAmount += txout.nValue;
+        }
+        coinbaseTx.vout[0].nValue += blockReward.GetMasternodeReward().amount - nMasternodePaymentAmount;
         FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
     }
 
