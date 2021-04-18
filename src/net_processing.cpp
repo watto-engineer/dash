@@ -3017,6 +3017,14 @@ bool ProcessMessage(CNode* pfrom, const std::string& msg_type, CDataStream& vRec
             if (inv.type == MSG_BLOCK) {
                 UpdateBlockAvailability(pfrom->GetId(), inv.hash);
 
+                if (IsInitialBlockDownload() && fAlreadyHave && pfrom->nVersion < GETHEADERS_VERSION) {
+                    CNodeState *state = State(pfrom->GetId());
+                    if (state && state->fSyncStarted && state->nStallingSince == 0) {
+                        state->nStallingSince = GetTimeMicros();
+                        LogPrint(BCLog::NET, "Stall update peer=%s\n", state->name);
+                    }
+                }
+
                 if (fAlreadyHave || fImporting || fReindex || mapBlocksInFlight.count(inv.hash)) {
                     continue;
                 }
