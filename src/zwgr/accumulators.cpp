@@ -137,26 +137,6 @@ bool EraseAccumulatorValues(const uint256& nCheckpointErase, const uint256& nChe
     return true;
 }
 
-
-bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
-{
-    for (auto& denomination : libzerocoin::zerocoinDenomList) {
-        uint32_t nChecksum = ParseChecksum(nCheckpoint, denomination);
-
-        //if read is not successful then we are not in a state to verify zerocoin transactions
-        CBigNum bnValue;
-        if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
-            if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(), nCheckpoint))
-                listAccCheckpointsNoDB.push_back(nCheckpoint);
-            LogPrint(BCLog::ZEROCOIN, "%s : Missing databased value for checksum %d\n", __func__, nChecksum);
-            return false;
-        }
-        mapAccumulatorValues.insert(std::make_pair(nChecksum, bnValue));
-    }
-    return true;
-}
-
-
 //Erase accumulator checkpoints for a certain block range
 bool EraseCheckpoints(int nStartHeight, int nEndHeight)
 {
