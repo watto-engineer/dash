@@ -353,7 +353,7 @@ public:
         consensus.nInstantSendKeepLock = 24;
         consensus.nBudgetPaymentsStartBlock = std::numeric_limits<int>::max();
         consensus.nBudgetPaymentsCycleBlocks = 43200; // (60*24*30)
-        consensus.nBudgetPaymentsWindowBlocks = 100;
+        consensus.nBudgetPaymentsWindowBlocks = 2880;
         consensus.nSuperblockStartBlock = std::numeric_limits<int>::max();
         consensus.nSuperblockStartHash = uint256(); // do not check this
         consensus.nSuperblockCycle = 43200; // (60*24*30)
@@ -542,10 +542,10 @@ public:
         consensus.nMasternodePaymentsIncreasePeriod = 10;
         consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = std::numeric_limits<int>::max();
-        consensus.nBudgetPaymentsCycleBlocks = 50;
-        consensus.nBudgetPaymentsWindowBlocks = 10;
-        consensus.nSuperblockStartBlock = 4200; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
+        consensus.nBudgetPaymentsStartBlock = 4200;
+        consensus.nBudgetPaymentsCycleBlocks = 144;
+        consensus.nBudgetPaymentsWindowBlocks = 64;
+        consensus.nSuperblockStartBlock = std::numeric_limits<int>::max(); // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
         consensus.nSuperblockStartHash = uint256(); // do not check this on testnet
         consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on testnet
         consensus.nGovernanceMinQuorum = 1;
