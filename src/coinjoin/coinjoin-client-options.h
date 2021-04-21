@@ -63,7 +63,7 @@ public:
     static void SetRounds(int nRounds);
     static void SetAmount(CAmount amount);
 
-    static bool IsEnabled() { return CCoinJoinClientOptions::Get().fEnableCoinJoin; }
+    static bool IsEnabled() { return false; }
     static bool IsMultiSessionEnabled() { return CCoinJoinClientOptions::Get().fCoinJoinMultiSession; }
 
     static void GetJsonInfo(UniValue& obj);
