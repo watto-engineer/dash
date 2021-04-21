@@ -324,6 +324,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
     pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
+    if (nHeight < chainparams.GetConsensus().ATPStartHeight)
+        pblock->nAccumulatorCheckpoint =  pindexPrev ? pindexPrev->nAccumulatorCheckpoint : uint256();
     pblocktemplate->nPrevBits = pindexPrev->nBits;
     pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(*pblock->vtx[0]);
     if (fPos)
