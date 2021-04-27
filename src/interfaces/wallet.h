@@ -346,6 +346,7 @@ struct WalletTx
     std::vector<CTxDestination> txout_address;
     std::vector<isminetype> txout_address_is_mine;
     CAmount credit;
+    CAmount immature_credit;
     CAmount debit;
     CAmount change;
     int64_t time;

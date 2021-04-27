@@ -49,7 +49,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
             // BYTZ stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
-            sub.credit = nNet;
+            sub.credit = nNet + wtx.immature_credit;
             sub.strAddress = EncodeDestination(wtx.txout_address[1]);
             sub.txDest = wtx.txout_address[1];
             sub.updateLabel(wallet);
@@ -98,7 +98,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                     sub.strAddress = mapValue["from"];
                     sub.txDest = DecodeDestination(sub.strAddress);
                 }
-                if (wtx.is_coinbase || wtx.is_coinstake)
+                if (wtx.is_coinbase)
                 {
                     // Generated
                     sub.type = TransactionRecord::Generated;
@@ -314,7 +314,7 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
         }
     }
     // For generated transactions, determine maturity
-    else if(type == TransactionRecord::Generated)
+    else if(type == TransactionRecord::Generated || type == TransactionRecord::StakeMint || type == TransactionRecord::MNReward)
     {
         if (wtx.blocks_to_maturity > 0)
         {

@@ -82,6 +82,7 @@ WalletTx MakeWalletTx(CWallet& wallet, const CWalletTx& wtx)
         }
     }
     result.credit = wtx.GetCredit(ISMINE_ALL);
+    result.immature_credit = wtx.GetImmatureCredit();
     result.debit = wtx.GetDebit(ISMINE_ALL);
     result.change = wtx.GetChange();
     result.time = wtx.GetTxTime();
