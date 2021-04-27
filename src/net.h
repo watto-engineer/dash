@@ -423,6 +423,8 @@ public:
     // not yet fully disconnected.
     int GetExtraOutboundCount();
 
+    void CheckOffsetDisconnectedPeers(const CNetAddr& ip);
+
     bool AddNode(const std::string& node);
     bool RemoveAddedNode(const std::string& node);
     std::vector<AddedNodeInfo> GetAddedNodeInfo();

@@ -87,9 +87,10 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
     return true;
 }
 
-bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake)
+bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, int64_t& nTimeTx, uint256& hashProofOfStake)
 {
-    int prevHeight = pindexPrev->nHeight;
+    const int prevHeight = pindexPrev->nHeight;
+    const int nHeight = pindexPrev->nHeight + 1;
 
     // get stake input pindex
     CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
@@ -98,36 +99,51 @@ bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInp
     const uint32_t nTimeBlockFrom = pindexFrom->nTime;
     const int nHeightBlockFrom = pindexFrom->nHeight;
 
-    // check for maturity (min age/depth) requirements
-    if (!HasStakeMinAgeOrDepth(prevHeight + 1, nTimeTx, nHeightBlockFrom, nTimeBlockFrom))
-        return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
-                         __func__, prevHeight + 1, nTimeTx, nTimeBlockFrom, nHeightBlockFrom);
-
-    // iterate the hashing
     bool fSuccess = false;
-    const unsigned int nHashDrift = 60;
-    const unsigned int nFutureTimeDriftPoS = 180;
-    unsigned int nTryTime = nTimeTx - 1;
-    // iterate from nTimeTx up to nTimeTx + nHashDrift
-    // but not after the max allowed future blocktime drift (3 minutes for PoS)
-    const unsigned int maxTime = std::min(nTimeTx + nHashDrift, (uint32_t)GetAdjustedTime() + nFutureTimeDriftPoS);
 
-    while (nTryTime < maxTime)
-    {
-        //new block came in, move on
-        if (chainActive.Height() != prevHeight)
+    const Consensus::Params& params = Params().GetConsensus();
+    if (params.IsTimeProtocolV2(nHeight)) {
+        if (nHeight < nHeightBlockFrom + params.nStakeMinDepth)
+            return error("%s : min depth violation, nHeight=%d, nHeightBlockFrom=%d", __func__, nHeight, nHeightBlockFrom);
+
+        nTimeTx = GetTimeSlot(GetAdjustedTime());
+        // double check that we are not on the same slot as prev block
+        if (nTimeTx <= pindexPrev->nTime && Params().NetworkIDString() != CBaseChainParams::REGTEST)
+            return false;
+
+        // check stake kernel
+        fSuccess = CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTimeTx, hashProofOfStake);
+    } else {
+        // iterate from maxTime down to pindexPrev->nTime (or min time due to maturity, 60 min after blockFrom)
+        const unsigned int prevBlockTime = pindexPrev->nTime;
+        const unsigned int maxTime = pindexPrev->MaxFutureBlockTime(GetAdjustedTime(), params);
+        unsigned int minTime = std::max(prevBlockTime, nTimeBlockFrom + 3600);
+        if (Params().NetworkIDString() == CBaseChainParams::REGTEST)
+            minTime = prevBlockTime;
+        unsigned int nTryTime = maxTime;
+
+        if (maxTime <= minTime) {
+            // too early to stake
+            return false;
+        }
+
+        while (nTryTime > minTime)
+        {
+            //new block came in, move on
+            if (chainActive.Height() != prevHeight)
+                break;
+
+            --nTryTime;
+
+            // if stake hash does not meet the target then continue to next iteration
+            if (!CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTryTime, hashProofOfStake))
+                continue;
+
+            // if we made it this far, then we have successfully found a valid kernel hash
+            fSuccess = true;
+            nTimeTx = nTryTime;
             break;
-
-        ++nTryTime;
-
-        // if stake hash does not meet the target then continue to next iteration
-        if (!CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTryTime, hashProofOfStake))
-            continue;
-
-        // if we made it this far, then we have successfully found a valid kernel hash
-        fSuccess = true;
-        nTimeTx = nTryTime;
-        break;
+        }
     }
 
     mapHashedBlocks.clear();
@@ -135,7 +151,7 @@ bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInp
     return fSuccess;
 }
 
-bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared_ptr<CMutableTransaction>& coinstakeTx, std::shared_ptr<CStakeInput>& coinstakeInput, unsigned int& nTxNewTime) {
+bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared_ptr<CMutableTransaction>& coinstakeTx, std::shared_ptr<CStakeInput>& coinstakeInput, int64_t& nTxNewTime) {
     if (pwallet == nullptr || pindexPrev == nullptr)
         return false;
 
@@ -160,22 +176,15 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
         return false;
     }
 
-    if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60) {
+    if (GetAdjustedTime() - pindexPrev->GetBlockTime() < 60) {
         if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
-//            MilliSleep(1000);
+            MilliSleep(100);
         }
     }
 
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
     int nAttempts = 0;
-
-    // Block time.
-    nTxNewTime = GetAdjustedTime();
-    // If the block time is in the future, then starts there.
-    if (pindexPrev->nTime > nTxNewTime) {
-        nTxNewTime = pindexPrev->nTime;
-    }
 
     for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
         // Make sure the wallet is unlocked and shutdown hasn't been requested
@@ -185,7 +194,6 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
         boost::this_thread::interruption_point();
 
         CBlockHeader dummyBlockHeader;
-        dummyBlockHeader.nTime = nTxNewTime;
         unsigned int stakeNBits = GetNextWorkRequired(pindexPrev, &dummyBlockHeader, Params().GetConsensus());
         uint256 hashProofOfStake = uint256();
         nAttempts++;
@@ -272,12 +280,17 @@ void CStakingManager::DoMaintenance(CConnman& connman)
         return;
     }
 
+    const bool fTimeV2 = Params().GetConsensus().IsTimeProtocolV2(chainActive.Height()+1);
     //search our map of hashed blocks, see if bestblock has been hashed yet
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight) && !fLastLoopOrphan) {
-        // wait max 5 seconds if recently hashed
-        int nTimePast = GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight];
-        if (nTimePast < nHashInterval && nTimePast >= 0) {
-            MilliSleep(std::min(nHashInterval - nTimePast, (unsigned int)5) * 1000);
+    const int chainHeight = chainActive.Height();
+    if (mapHashedBlocks.count(chainHeight) && !fLastLoopOrphan)
+    {
+        int64_t nTime = GetAdjustedTime();
+        int64_t tipHashTime = mapHashedBlocks[chainHeight];
+        if (    (!fTimeV2 && nTime < tipHashTime + 22) ||
+                (fTimeV2 && GetTimeSlot(nTime) <= tipHashTime) )
+        {
+            MilliSleep(std::min(nHashInterval - (nTime - tipHashTime), (int64_t)5) * 1000);
             return;
         }
     }
@@ -304,7 +317,7 @@ void CStakingManager::DoMaintenance(CConnman& connman)
     std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
     std::shared_ptr<CStakeInput> coinstakeInputPtr = nullptr;
     std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
-    unsigned int nCoinStakeTime;
+    int64_t nCoinStakeTime;
     if (CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
         // Coinstake found. Extract signing key from coinstake
         try {

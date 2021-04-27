@@ -1,5 +1,7 @@
-// Copyright (c) 2012-2013 The PPCoin developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2011-2013 The PPCoin developers
+// Copyright (c) 2013-2014 The NovaCoin Developers
+// Copyright (c) 2014-2018 The BlackCoin Developers
+// Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2018-2019 The Ion developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -229,7 +231,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
 // The stake modifier used to hash for a stake kernel is chosen as the stake
 // modifier about a selection interval later than the coin generating the kernel
-bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
+bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
 {
     nStakeModifier = 0;
     if (!mapBlockIndex.count(hashBlockFrom))
@@ -316,7 +318,7 @@ bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
 {
     // before stake modifier V2, the age required was 60 * 60 (1 hour) / not required on regtest
     if (contextHeight < Params().GetConsensus().nBlockStakeModifierV2)
-        return (Params().NetworkIDString() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
+        return (Params().NetworkIDString() == CBaseChainParams::REGTEST || (utxoFromBlockTime + Params().GetConsensus().nStakeMinAge <= contextTime));
 
     // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
     return (contextHeight - utxoFromBlockHeight >= Params().GetConsensus().nStakeMinDepth);
@@ -349,7 +351,7 @@ bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
 }
 
 // Check kernel hash target and coinstake signature
-bool initStakeInput(const CBlock block, std::unique_ptr<CStake>& ionStake, std::unique_ptr<CZStake>& zStake, int nPreviousBlockHeight) {
+bool initStakeInput(const CBlock& block, std::unique_ptr<CStake>& ionStake, std::unique_ptr<CZStake>& zStake, int nPreviousBlockHeight) {
     const CTransaction tx = *block.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s : called on non-coinstake %s", __func__, tx.GetHash().GetHex());
@@ -390,7 +392,7 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStake>& ionStake, std::
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, const CBlockIndex* pindex)
+bool CheckProofOfStake(const CBlock& block, uint256& hashProofOfStake, const CBlockIndex* pindex)
 {
     std::unique_ptr<CStake> ionStake;
     std::unique_ptr<CZStake> zStake;
@@ -432,13 +434,6 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, const CBlo
     return true;
 }
 
-// Check whether the coinstake timestamp meets protocol
-bool CheckCoinStakeTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
-{
-    // v0.3 protocol
-    return (nTimeBlock == nTimeTx);
-}
-
 // Get stake modifier checksum
 unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
 {
@@ -463,6 +458,13 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
         return nStakeModifierChecksum == mapStakeModifierCheckpoints[nHeight];
     }
     return true;
+}
+
+// Timestamp for time protocol V2: slot duration 15 seconds
+int64_t GetTimeSlot(const int64_t nTime)
+{
+    const int slotLen = Params().GetConsensus().nTimeSlotLength;
+    return (nTime / slotLen) * slotLen;
 }
 
 bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex* pindexNew) {

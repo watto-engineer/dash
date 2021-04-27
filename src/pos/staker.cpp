@@ -52,7 +52,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
         // If nHeight > POS start, wallet should be enabled.
 
         std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
-        unsigned int nCoinStakeTime;
+        int64_t nCoinStakeTime;
         if (fPosPhase) {
             std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
