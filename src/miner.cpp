@@ -1,5 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2011-2013 The PPCoin developers
+// Copyright (c) 2013-2014 The NovaCoin Developers
+// Copyright (c) 2014-2018 The BlackCoin Developers
+// Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -61,7 +65,12 @@ uint64_t nLastBlockSize = 0;
 int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev)
 {
     int64_t nOldTime = pblock->nTime;
-    int64_t nNewTime = std::max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
+    int64_t nNewTime;
+    if (consensusParams.IsTimeProtocolV2(pindexPrev->nHeight + 1)) {
+        nNewTime = GetTimeSlot(GetAdjustedTime());
+    } else {
+        nNewTime = std::max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
+    }
 
     if (nOldTime < nNewTime)
         pblock->nTime = nNewTime;
@@ -139,7 +148,7 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
 }
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn,
-                                    std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, unsigned int nTxNewTime)
+                                    std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, uint64_t nTxNewTime)
 {
     CBasicKeyStore tempKeystore;
 #ifdef ENABLE_WALLET

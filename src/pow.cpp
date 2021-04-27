@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -33,11 +34,12 @@ unsigned int static GetNextWorkRequiredOrig(const CBlockIndex* pindexLast, const
         return UintToArith256(params.powLimit).GetCompact();
     }
 
-    arith_uint256 bnTargetLimit = fProofOfStake ? UintToArith256(params.posLimit) : UintToArith256(params.powLimit);
     // Off-by-one
     if (pindexLast->nHeight >= params.nPosStartHeight) {
-        int64_t nTargetSpacing = 60;
-        int64_t nTargetTimespan = 60 * 40;
+        const bool fTimeV2 = params.IsTimeProtocolV2(pindexLast->nHeight+1);
+        const arith_uint256 bnTargetLimit = fTimeV2 ? UintToArith256(params.posLimit_V2) : UintToArith256(params.posLimit);
+        const int64_t nTargetSpacing = params.nPosTargetSpacing;
+        const int64_t nTargetTimespan = fTimeV2 ? params.nPosTargetTimespan_V2 : params.nPosTargetTimespan;
 
         int64_t nActualSpacing = 0;
         if (pindexLast->nHeight != 0)
@@ -45,11 +47,17 @@ unsigned int static GetNextWorkRequiredOrig(const CBlockIndex* pindexLast, const
 
         if (nActualSpacing < 0)
             nActualSpacing = 1;
+         if (fTimeV2 && nActualSpacing > nTargetSpacing*10)
+            nActualSpacing = nTargetSpacing*10;
 
         // ppcoin: target change every block
         // ppcoin: retarget with exponential moving toward target spacing
         arith_uint256 bnNew;
         bnNew.SetCompact(pindexLast->nBits);
+
+        // on first block with V2 time protocol, reduce the difficulty by a factor 16
+        if (pindexLast->nHeight+1 == params.nBlockTimeProtocolV2)
+            bnNew <<= 4;
 
         int64_t nInterval = nTargetTimespan / nTargetSpacing;
         bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
@@ -60,6 +68,9 @@ unsigned int static GetNextWorkRequiredOrig(const CBlockIndex* pindexLast, const
 
         return bnNew.GetCompact();
     }
+
+    // Proof of work
+    const arith_uint256 bnTargetLimit = UintToArith256(params.powLimit);
 
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
         if (PastBlocksMax > 0 && i > PastBlocksMax) {
@@ -135,9 +146,6 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     }
 
     bool fProofOfStake = IsProofOfStakeHeight(pindexLast->nHeight + 1, params);
-    if (pindexLast->nHeight + 1 < params.nPivxProtocolV2StartHeight) {
-        return GetNextWorkRequiredOrig(pindexLast, params, fProofOfStake);
-    }
 
     return GetNextWorkRequiredOrig(pindexLast, params, fProofOfStake);
 }

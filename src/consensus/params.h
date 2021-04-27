@@ -190,12 +190,20 @@ struct Params {
 
     /** Proof of stake parameters */
     int64_t nPosStartHeight;
-    int64_t nPivxProtocolV2StartHeight;
     uint256 posLimit;
+    uint256 posLimit_V2;
     int64_t nPosTargetSpacing;
+    int64_t nPosTargetTimespan;
+    int64_t nPosTargetTimespan_V2;
     int32_t nStakeMinDepth;
+    int32_t nStakeMinAge;
     int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
+
+    /** Time Protocol V2 **/
+    int nBlockTimeProtocolV2;
+    bool IsTimeProtocolV2(const int nHeight) const { return nHeight >= nBlockTimeProtocolV2; }
+    int nTimeSlotLength;
 
     /** ATP parameters */
     int64_t ATPStartHeight;

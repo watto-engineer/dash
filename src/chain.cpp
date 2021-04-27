@@ -124,6 +124,38 @@ unsigned int CBlockIndex::GetStakeEntropyBit() const
     return ((UintToArith256(GetBlockHash()).GetLow64()) & 1);
 }
 
+int CBlockIndex::FutureBlockTimeDrift(const int nHeight, const Consensus::Params& params) const
+{
+    if (params.IsTimeProtocolV2(nHeight))
+        // PoS (TimeV2): 14 seconds
+        return params.nTimeSlotLength - 1;
+
+    // PoS (TimeV1): 3 minutes
+    // PoW: 2 hours
+    return (nHeight >= params.nPosStartHeight) ? MAX_FUTURE_BLOCK_TIME_POS : MAX_FUTURE_BLOCK_TIME_POW;
+}
+
+int64_t CBlockIndex::MaxFutureBlockTime(int64_t nAdjustedTime, const Consensus::Params& params) const
+{
+    return nAdjustedTime + FutureBlockTimeDrift(nHeight+1, params);
+}
+
+int64_t CBlockIndex::MinPastBlockTime(const Consensus::Params& params) const
+{
+    // Time Protocol v1: pindexPrev->MedianTimePast + 1
+    if (!params.IsTimeProtocolV2(nHeight+1))
+        return GetMedianTimePast();
+
+    // on the transition from Time Protocol v1 to v2
+    // pindexPrev->nTime might be in the future (up to the allowed drift)
+    // so we allow the nBlockTimeProtocolV2 to be at most (180-14) seconds earlier than previous block
+    if (nHeight + 1 == params.nBlockTimeProtocolV2)
+        return GetBlockTime() - FutureBlockTimeDrift(nHeight, params) + FutureBlockTimeDrift(nHeight + 1, params);
+
+    // Time Protocol v2: pindexPrev->nTime
+    return GetBlockTime();
+}
+
 arith_uint256 GetBlockProof(const CBlockIndex& block)
 {
     arith_uint256 bnTarget;

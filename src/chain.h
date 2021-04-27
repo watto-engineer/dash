@@ -1,5 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2011-2013 The PPCoin developers
+// Copyright (c) 2013-2014 The NovaCoin Developers
+// Copyright (c) 2014-2018 The BlackCoin Developers
+// Copyright (c) 2015-2019 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,15 +22,16 @@
  * Maximum amount of time that a block timestamp is allowed to exceed the
  * current network-adjusted time before the block will be accepted.
  */
-static const int64_t MAX_FUTURE_BLOCK_TIME = 2 * 60 * 60;
+static const int64_t MAX_FUTURE_BLOCK_TIME_POW = 2 * 60 * 60;
+static const int64_t MAX_FUTURE_BLOCK_TIME_POS = 3 * 60;
 
 /**
  * Timestamp window used as a grace period by code that compares external
  * timestamps (such as timestamps passed to RPCs, or wallet key creation times)
  * to block timestamps. This should be set at least as high as
- * MAX_FUTURE_BLOCK_TIME.
+ * MAX_FUTURE_BLOCK_TIME_POW.
  */
-static const int64_t TIMESTAMP_WINDOW = MAX_FUTURE_BLOCK_TIME;
+static const int64_t TIMESTAMP_WINDOW = MAX_FUTURE_BLOCK_TIME_POW;
 
 class CBlockFileInfo
 {
@@ -361,6 +366,12 @@ public:
         std::sort(pbegin, pend);
         return pbegin[(pend - pbegin)/2];
     }
+
+    int FutureBlockTimeDrift(const int nHeight, const Consensus::Params& params) const;
+
+    int64_t MaxFutureBlockTime(int64_t nAdjustedTime, const Consensus::Params& params) const;
+
+    int64_t MinPastBlockTime(const Consensus::Params& params) const;
 
     bool IsProofOfWork() const
     {
