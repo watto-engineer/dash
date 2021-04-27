@@ -539,7 +539,7 @@ bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
         std::map<uint256, CWalletTx>::const_iterator mit = mapWallet.find(wtxid);
         if (mit != mapWallet.end()) {
             int depth = mit->second.GetDepthInMainChain();
-            if (depth > 0  || (depth == 0 && !mit->second.isAbandoned()))
+            if (depth > 0  || (depth == 0 && !mit->second.isAbandoned() && !mit->second.IsCoinStake()))
                 return true; // Spent
         }
     }
@@ -1546,7 +1546,7 @@ CAmount CWalletTx::GetUnlockedCredit(bool fUseCache, const isminefilter& filter)
         return 0;
 
     // Must wait until coinbase is safely deep enough in the chain before valuing it
-    if (IsCoinBase() && GetBlocksToMaturity() > 0)
+    if (IsGenerated() && GetBlocksToMaturity() > 0)
         return 0;
 
     CAmount nCredit = 0;
@@ -5216,8 +5216,6 @@ int CWalletTx::GetBlocksToMaturity() const
 {
     if (!(IsGenerated() || IsCoinStake() || IsAnyOutputGroupedAuthority(*tx)))
         return 0;
-    int chain_depth = GetDepthInMainChain();
-    assert(chain_depth >= 0); // coinbase tx should not be conflicted
     int depth = GetDepthInMainChain();
     int minBlocksToMaturity = 0;
     if (IsAnyOutputGroupedAuthority(*tx))
