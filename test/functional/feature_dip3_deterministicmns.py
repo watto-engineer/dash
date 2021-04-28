@@ -25,7 +25,7 @@ class DIP3Test(BitcoinTestFramework):
         self.supports_cli = False
 
         self.extra_args = ["-budgetparams=10:10:10"]
-        self.extra_args += ["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"]
+        self.extra_args += ["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"]
         self.extra_args += ["-dip3params=135:150"]
 
 

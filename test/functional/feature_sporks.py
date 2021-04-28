@@ -13,7 +13,7 @@ class SporkTest(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 3
         self.setup_clean_chain = True
-        self.extra_args = [["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"], [], []]
+        self.extra_args = [["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"], [], []]
 
     def setup_network(self):
         self.disable_mocktime()

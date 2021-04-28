@@ -63,7 +63,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1518696183
+GENESISTIME = 1524496461
 
 TMPDIR_PREFIX = "dash_func_test_"
 
@@ -690,7 +690,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
 
             os.rmdir(cache_path('wallets'))  # Remove empty wallets dir
             for entry in os.listdir(cache_path()):
-                if entry not in ['chainstate', 'blocks', 'indexes', 'evodb', 'llmq']:  # Keep some folders
+                if entry not in ['wallets', 'chainstate', 'blocks', 'evodb', 'llmq', 'backups', 'tokens', 'zerocoin']:
                     os.remove(cache_path(entry))
 
         for i in range(self.num_nodes):
@@ -751,7 +751,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         return self.config["components"].getboolean("ENABLE_ZMQ")
 
 
-MASTERNODE_COLLATERAL = 1000
+MASTERNODE_COLLATERAL = 10000000
 
 
 class MasternodeInfo:
@@ -788,7 +788,7 @@ class DashTestFramework(BitcoinTestFramework):
             extra_args = [[]] * num_nodes
         assert_equal(len(extra_args), num_nodes)
         self.extra_args = [copy.deepcopy(a) for a in extra_args]
-        self.extra_args[0] += ["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"]
+        self.extra_args[0] += ["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"]
         self.fast_dip3_enforcement = fast_dip3_enforcement
         if fast_dip3_enforcement:
             for i in range(0, num_nodes):
@@ -1004,9 +1004,13 @@ class DashTestFramework(BitcoinTestFramework):
             self.create_simple_node()
 
         self.log.info("Activating DIP3")
+        self.nodes[0].generate(90)
         if not self.fast_dip3_enforcement:
             while self.nodes[0].getblockcount() < 500:
                 self.nodes[0].generate(10)
+        else:
+            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 50)
+            self.wait_for_sporks_same()
         self.sync_all()
 
         # create masternodes
@@ -1028,6 +1032,8 @@ class DashTestFramework(BitcoinTestFramework):
             force_finish_mnsync(self.nodes[i + 1])
 
         # Enable InstantSend (including block filtering) and ChainLocks by default
+        if self.fast_dip3_enforcement:
+            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 50)
         self.nodes[0].sporkupdate("SPORK_2_INSTANTSEND_ENABLED", 0)
         self.nodes[0].sporkupdate("SPORK_3_INSTANTSEND_BLOCK_FILTERING", 0)
         self.nodes[0].sporkupdate("SPORK_19_CHAINLOCKS_ENABLED", 0)
