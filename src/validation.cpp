@@ -3855,7 +3855,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     // Check timestamp against prev
 //    if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast())
-    if (block.GetBlockTime() <= pindexPrev->MinPastBlockTime(consensusParams))
+    if (block.GetBlockTime() <= pindexPrev->MinPastBlockTime(consensusParams) && Params().NetworkIDString() != CBaseChainParams::REGTEST)
         return state.Invalid(false, REJECT_INVALID, "time-too-old", strprintf("block's timestamp is too early %d %d", block.GetBlockTime(), pindexPrev->GetMedianTimePast()));
 
     // Check timestamp
@@ -3864,7 +3864,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
         return state.Invalid(false, REJECT_INVALID, "time-too-new", strprintf("block timestamp too far in the future %d %d", block.GetBlockTime(), nAdjustedTime + 2 * 60 * 60));
 
     // Check blocktime mask
-    if (!IsValidBlockTimeStamp(block.GetBlockTime(), nHeight, consensusParams))
+    if (!IsValidBlockTimeStamp(block.GetBlockTime(), nHeight, consensusParams) && Params().NetworkIDString() != CBaseChainParams::REGTEST)
         return state.DoS(100, error("%s : block timestamp mask not valid", __func__), REJECT_INVALID, "invalid-time-mask");
 
     // check for version 2, 3 and 4 upgrades
