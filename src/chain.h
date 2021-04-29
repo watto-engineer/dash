@@ -508,7 +508,7 @@ public:
             READWRITE(obj.vMintDenominationsInBlock);
         }
         // v1/v2 modifier selection.
-        if (obj.nVersion > 10) {
+        if (obj.nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(obj.nStakeModifierV2);
             READWRITE(VARINT(obj.nXDMTransactions));
             READWRITE(VARINT(obj.nXDMSupply));
