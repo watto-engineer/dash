@@ -619,7 +619,7 @@ public:
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
         // ATP parameters
-        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -845,7 +845,7 @@ public:
         consensus.V16DeploymentHeight = 300;
         consensus.BIP34Height = 500; // BIP34 activated on regtest (Used in functional tests)
         consensus.BIP34Hash = uint256();
-        consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in functional tests)
+        consensus.BIP65Height = consensus.V16DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
         consensus.DIP0001Height = 2000;
         consensus.DIP0003Height = 432;
@@ -872,10 +872,10 @@ public:
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
-        consensus.nBlockStakeModifierV1A = 1000;
+        consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
         // ATP parameters
-        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrreg";
         consensus.strTokenManagementKey = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk";
         consensus.nOpGroupNewRequiredConfirmations = 1;
