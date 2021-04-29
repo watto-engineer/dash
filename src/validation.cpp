@@ -1923,7 +1923,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
 
-    if (pindexPrev->nHeight + 1 >= params.ATPStartHeight) {
+    if (pindexPrev->nHeight + 1 >= params.V16DeploymentHeight) {
         nVersion |= BlockTypeBits::BLOCKTYPE_STAKING;
     }
 
