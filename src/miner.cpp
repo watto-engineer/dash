@@ -126,22 +126,18 @@ void BlockAssembler::resetBlock()
     nFees = 0;
 }
 
-bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx) {
+bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx, CBlockReward& blockReward, const CAmount nSplitValue) {
 #ifdef ENABLE_WALLET
     // Calculate if we need to split the output
     if (coinstakeTx->vout.size() != 2)
         return false;
-    if (!HasWallets()) {
-        return false;
+    CAmount nValue = coinstakeTx->vout[1].nValue;
+    if (nValue / 2 > nSplitValue) {
+        blockReward.fSplitCoinstake = true;
+        coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
+        coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
     } else {
-        std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-        CAmount nValue = coinstakeTx->vout[1].nValue;
-        if (nValue / 2 > (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN)) {
-            coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
-            coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
-        } else {
-            return false;
-        }
+        return false;
     }
 #endif
     return true;
@@ -150,10 +146,14 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn,
                                     std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, uint64_t nTxNewTime)
 {
+    CAmount nSplitValue = MAX_MONEY;
     CBasicKeyStore tempKeystore;
 #ifdef ENABLE_WALLET
     std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
     const CKeyStore& keystore = wallets.size() < 1 ? tempKeystore : *wallets[0];
+    if (HasWallets()) {
+        nSplitValue = (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN);
+    }
 #else
     const CKeyStore& keystore = tempKeystore;
 #endif
@@ -184,8 +184,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
     nHeight = pindexPrev->nHeight + 1;
-
-    bool fHybridPow = false; //!fPos && nHeight >= chainparams.GetConsensus().nPosPowStartHeight;
 
     bool fDIP0003Active_context = nHeight >= chainparams.GetConsensus().DIP0003Height;
     bool fDIP0008Active_context = nHeight >= chainparams.GetConsensus().DIP0008Height;
@@ -241,20 +239,49 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
 
     CBlockReward blockReward(nHeight, nFees, fPos, Params().GetConsensus());
+    CCbTx cbTx;
 
-    // Compute regular coinbase transaction.
+    // Update coinbase transaction with additional info about masternode and governance payments,
+    // get some info back to pass to getblocktemplate
+    CAmount nMasternodePaymentAmount = 0;
     if (fPos) {
+        FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+        // Unpaid masternode rewards default to the staking node
+        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
+            nMasternodePaymentAmount += txout.nValue;
+        }
         coinbaseTx.vout[0].nValue = 0;
-        // TODO: Add token amounts
         pCoinstakeTx->vout[1].nValue += blockReward.GetCoinstakeReward().amount;
-    } else if (fHybridPow) {
-        // HybridPow miner is rewarded in ELEC
-        // TODO: Add token amounts
-        coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
+        bool fSplit = SplitCoinstakeVouts(pCoinstakeTx, blockReward, nSplitValue);
+        if (blockReward.GetCarbonReward().amount > 0) {
+            pCoinstakeTx->vout.emplace_back(CTxOut(blockReward.GetCarbonReward().amount, GetScriptForDestination(DecodeDestination(chainparams.GetConsensus().strCarbonOffsetAddress))));
+        }
+        pCoinstakeTx->vout.insert(pCoinstakeTx->vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
+
+        // Sign for Bytz
+        int nIn = 0;
+        for (CTxIn txIn : pCoinstakeTx->vin) {
+            CScript coinstakeInScript;
+            coinstakeInput->GetScriptPubKeyKernel(coinstakeInScript);
+            CTransactionRef coinstakeTxFrom;
+            coinstakeInput->GetTxFrom(coinstakeTxFrom);
+            if (!SignSignature(keystore, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
+                throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
+        }
     } else {
-        // TODO: Add token amounts
+        FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+        // Unpaid masternode rewards default to the miner
+        CAmount nMasternodePaymentAmount = 0;
+        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
+            nMasternodePaymentAmount += txout.nValue;
+        }
         coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
+        if (blockReward.GetCarbonReward().amount > 0) {
+            coinbaseTx.vout.emplace_back(CTxOut(blockReward.GetCarbonReward().amount, GetScriptForDestination(DecodeDestination(chainparams.GetConsensus().strCarbonOffsetAddress))));
+        }
+        coinbaseTx.vout.insert(coinbaseTx.vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
     }
+
 
     if (!fDIP0003Active_context) {
         coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
@@ -264,8 +291,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         coinbaseTx.nVersion = 3;
         coinbaseTx.nType = TRANSACTION_COINBASE;
 
-        CCbTx cbTx;
-
         if (fDIP0008Active_context) {
             cbTx.nVersion = 2;
         } else {
@@ -273,6 +298,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         }
 
         cbTx.nHeight = nHeight;
+        CalcCbTxCoinstakeFlags(cbTx.coinstakeFlags, blockReward);
 
         CValidationState state;
         if (!CalcCbTxMerkleRootMNList(*pblock, pindexPrev, cbTx.merkleRootMNList, state, *pcoinsTip.get())) {
@@ -285,37 +311,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         }
 
         SetTxPayload(coinbaseTx, cbTx);
-    }
-
-    // Update coinbase transaction with additional info about masternode and governance payments,
-    // get some info back to pass to getblocktemplate
-    if (fPos) {
-        SplitCoinstakeVouts(pCoinstakeTx);
-        FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
-        // Unpaid masternode rewards default to the staking node
-        CAmount nMasternodePaymentAmount = 0;
-        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
-            nMasternodePaymentAmount += txout.nValue;
-        }
-        pCoinstakeTx->vout[1].nValue += blockReward.GetMasternodeReward().amount - nMasternodePaymentAmount;
-        // Sign for Bytz
-        int nIn = 0;
-        for (CTxIn txIn : pCoinstakeTx->vin) {
-            CScript coinstakeInScript;
-            coinstakeInput->GetScriptPubKeyKernel(coinstakeInScript);
-            CTransactionRef coinstakeTxFrom;
-            coinstakeInput->GetTxFrom(coinstakeTxFrom);
-            if (!SignSignature(keystore, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
-                throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
-        }
-    } else {
-        // Unpaid masternode rewards default to the miner
-        CAmount nMasternodePaymentAmount = 0;
-        for (const auto& txout : pblocktemplate->voutMasternodePayments) {
-            nMasternodePaymentAmount += txout.nValue;
-        }
-        coinbaseTx.vout[0].nValue += blockReward.GetMasternodeReward().amount - nMasternodePaymentAmount;
-        FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
     }
 
     pblock->vtx[0] = MakeTransactionRef(std::move(coinbaseTx));

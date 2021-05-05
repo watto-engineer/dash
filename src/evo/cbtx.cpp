@@ -8,6 +8,7 @@
 #include <llmq/quorums_commitment.h>
 #include <evo/simplifiedmns.h>
 #include <evo/specialtx.h>
+#include <pos/rewards.h>
 
 #include <chain.h>
 #include <chainparams.h>
@@ -95,7 +96,71 @@ bool CheckCbTxMerkleRoots(const CBlock& block, const CBlockIndex* pindex, CValid
 
     }
 
+    return CheckCbTxCoinstakeFlags(cbTx, block, state);
+}
+
+bool CheckCbTxCoinstakeFlags(const CCbTx& cbTx, const CBlock& block, CValidationState& state) {
+    if (cbTx.coinstakeFlags >= CSTX_MAX) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-flags");
+    }
+
+    bool fPos;
+    bool fSplitCoinstake;
+    bool fCarbonOffset;
+    bool fMasternodeTx;
+    bool fOperatorTx;
+    GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
+    if (!CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx)) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-cs-outputs");
+    }
     return true;
+}
+
+bool CheckCoinstakeOutputs(const CBlock& block, const bool fPos, const bool fSplitCoinstake, const bool fCarbonOffset, const bool fMasternodeTx, const bool fOperatorTx) {
+    int nOutputs = 1; // Always at least 1
+    if (fPos) nOutputs++;
+    if (fSplitCoinstake) nOutputs++;
+    if (fCarbonOffset) nOutputs++;
+    if (fMasternodeTx) nOutputs++;
+    if (fOperatorTx) nOutputs++;
+
+    if (block.IsProofOfStake() != fPos) {
+        return false;
+    }
+
+    if (block.vtx[fPos ? 1 : 0]->vout.size() != nOutputs) {
+        return false;
+    }
+    return true;
+}
+
+void GetCbTxCoinstakeFlags(const uint8_t nCoinstakeFlags, bool& fPos, bool& fSplitCoinstake, bool& fCarbonOffset, bool& fMasternodeTx, bool& fOperatorTx)
+{
+    fPos = (nCoinstakeFlags & CSTX_POS) != 0;
+    fSplitCoinstake = (nCoinstakeFlags & CSTX_SPLIT_COINSTAKE) != 0;
+    fCarbonOffset = (nCoinstakeFlags & CSTX_CARBON_OUTPUT) != 0;
+    fMasternodeTx = (nCoinstakeFlags & CSTX_MASTERNODE_OUTPUT) != 0;
+    fOperatorTx = (nCoinstakeFlags & CSTX_OPERATOR_OUTPUT) != 0;
+}
+
+void CalcCbTxCoinstakeFlags(uint8_t& nCoinstakeFlags, const bool fPos, const bool fSplitCoinstake, const bool fCarbonOffset, const bool fMasternodeTx, const bool fOperatorTx)
+{
+    nCoinstakeFlags = fPos ? CSTX_POS : 0;
+    nCoinstakeFlags |= fSplitCoinstake ? CSTX_SPLIT_COINSTAKE : 0;
+    nCoinstakeFlags |= fCarbonOffset ? CSTX_CARBON_OUTPUT : 0;
+    nCoinstakeFlags |= fMasternodeTx ? CSTX_MASTERNODE_OUTPUT : 0;
+    nCoinstakeFlags |= fOperatorTx ? CSTX_OPERATOR_OUTPUT : 0;
+}
+
+void CalcCbTxCoinstakeFlags(uint8_t& nCoinstakeFlags, CBlockReward blockReward)
+{
+    CalcCbTxCoinstakeFlags(nCoinstakeFlags,
+        blockReward.fPos,
+        blockReward.fSplitCoinstake,
+        blockReward.GetCarbonReward().amount > 0,
+        blockReward.GetMasternodeReward().amount > 0,
+        blockReward.GetOperatorReward().amount > 0
+    );
 }
 
 bool CalcCbTxMerkleRootMNList(const CBlock& block, const CBlockIndex* pindexPrev, uint256& merkleRootRet, CValidationState& state, const CCoinsViewCache& view)

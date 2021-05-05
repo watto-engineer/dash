@@ -6,6 +6,8 @@
 #include "pos/rewards.h"
 
 #include "chainparams.h"
+#include <evo/cbtx.h>
+#include <evo/specialtx.h>
 #include "tokens/tokengroupmanager.h"
 
 CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams)
@@ -13,6 +15,11 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
     CAmount nSubsidy = 0;
     int nHeight = nPrevHeight + 1;
 
+    if (nHeight >= consensusParams.V16DeploymentHeight + 4 * 513000) return 260 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 3 * 513000) return 520 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 2 * 513000) return 770 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 513000) return 1000 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight) return 1210 * COIN;
     if (nHeight >= 107624) return 2710 * COIN;
     if (nHeight >= 67004) return 0 * COIN;
     if (nHeight >= 67001) return 2850000000 * COIN;
@@ -24,10 +31,15 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
 }
 
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZBYTZStake, const Consensus::Params& consensusParams) {
-    if (nHeight >= consensusParams.V16DeploymentHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 4 * 513000) return 156 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 3 * 513000) return 312 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 2 * 513000) return 462 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight + 513000) return 600 * COIN;
+    if (nHeight >= consensusParams.V16DeploymentHeight) return 726 * COIN;
     if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZBYTZStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
     if (nHeight >= consensusParams.nBlockZerocoinV2 && isZBYTZStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
     if (nHeight >= consensusParams.nPosStartHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) return 0.4 * blockValue;
     return 0 * COIN;
 }
 
@@ -73,40 +85,95 @@ void CReward::AddRewardAmounts(const CAmount amountIn, const CTokenGroupID group
     }
 }
 
-CBlockReward::CBlockReward(const CBlock& block, const bool fHybridPowBlock, const CAmount coinstakeValueIn) {
+CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmount coinstakeValueIn) {
     rewards.clear();
     fBurnUnpaidMasternodeReward = false;
-
-    const int coinbaseVoutSize = block.vtx[0]->vout.size();
-    if (coinbaseVoutSize > 0) {
-        AddReward(CReward(CReward::REWARD_COINBASE, block.vtx[0]->vout[0]));
-    }
+    fSplitCoinstake = false;
 
     if (block.IsProofOfStake()) {
+        fPos = true;
+        const int coinbaseVoutSize = block.vtx[0]->vout.size();
         const int coinstakeVoutSize = block.vtx[1]->vout.size();
-        if (coinstakeVoutSize > 1) {
-            AddReward(CReward(CReward::REWARD_COINSTAKE, block.vtx[1]->vout[1]));
-            for (int i = 2; i < coinstakeVoutSize; i++) {
-                AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[1]->vout[i]));
+
+        for (auto& out : block.vtx[0]->vout) {
+            AddReward(CReward(CReward::REWARD_COINBASE, out));
+        }
+        if (fLegacy) {
+            if (coinstakeVoutSize > 1) {
+                AddReward(CReward(CReward::REWARD_COINSTAKE, block.vtx[1]->vout[1]));
+                for (int i = 2; i < coinstakeVoutSize; i++) {
+                    AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[1]->vout[i]));
+                }
             }
+        } else {
+            CCbTx cbTx;
+            int nTx = 0;
+            GetTxPayload(*block.vtx[0], cbTx);
+
+            bool fCarbonOffset;
+            bool fMasternodeTx;
+            bool fOperatorTx;
+            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
+            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx));
+
+            nTx++;
+            int nOutput = 1;
+            AddReward(CReward(CReward::REWARD_COINSTAKE, block.vtx[nTx]->vout[nOutput]));
+            if (fSplitCoinstake) {
+                AddReward(CReward(CReward::REWARD_COINSTAKE, block.vtx[nTx]->vout[++nOutput]));
+                fSplitCoinstake = true;
+            }
+            if (fCarbonOffset) AddReward(CReward(CReward::REWARD_CARBON, block.vtx[nTx]->vout[++nOutput]));
+            if (fMasternodeTx) AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[nTx]->vout[++nOutput]));
+            if (fOperatorTx) AddReward(CReward(CReward::REWARD_OPERATOR, block.vtx[nTx]->vout[++nOutput]));
         }
     } else {
-        if (coinbaseVoutSize <= 1) {
-            fBurnUnpaidMasternodeReward = fHybridPowBlock;
-        } else {
-            for (int i = 1; i < coinbaseVoutSize; i++) {
-                AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[i]));
+        if (fLegacy) {
+            fPos = false;
+            const int coinbaseVoutSize = block.vtx[0]->vout.size();
+            AddReward(CReward(CReward::REWARD_COINBASE, block.vtx[0]->vout[0]));
+
+            if (coinbaseVoutSize == 2) {
+                AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[coinbaseVoutSize-1]));
+            } else if (coinbaseVoutSize == 3) {
+                AddReward(CReward(CReward::REWARD_CARBON, block.vtx[0]->vout[coinbaseVoutSize-2]));
+                AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[coinbaseVoutSize-1]));
+            } else if (coinbaseVoutSize > 3) {
+                AddReward(CReward(CReward::REWARD_CARBON, block.vtx[0]->vout[1]));
+                AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[2]));
+                for (int i = 3; i < coinbaseVoutSize; i++) {
+                    AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[i]));
+                }
             }
+        } else {
+            CCbTx cbTx;
+            int nTx = 0;
+            GetTxPayload(*block.vtx[nTx], cbTx);
+
+            bool fCarbonOffset;
+            bool fMasternodeTx;
+            bool fOperatorTx;
+            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
+            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx));
+
+            int nOutput = 0;
+            AddReward(CReward(CReward::REWARD_COINBASE, block.vtx[nTx]->vout[nOutput]));
+            if (fCarbonOffset) AddReward(CReward(CReward::REWARD_CARBON, block.vtx[nTx]->vout[++nOutput]));
+            if (fMasternodeTx) AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[nTx]->vout[++nOutput]));
+            if (fOperatorTx) AddReward(CReward(CReward::REWARD_OPERATOR, block.vtx[nTx]->vout[++nOutput]));
         }
     }
 }
 
-CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fPos, const Consensus::Params& consensusParams) {
+// fSplitCoinstake is not set after calling this constructor
+CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fPosIn, const Consensus::Params& consensusParams) {
     rewards.clear();
     fBurnUnpaidMasternodeReward = false;
+    fPos = fPosIn;
+    fSplitCoinstake = false;
     CAmount nBlockValue = GetBlockSubsidyBytz(nHeight - 1, fPos, consensusParams);
     CAmount mnRewardAmount = GetMasternodePayment(nHeight, nBlockValue, false, consensusParams);
-    SetRewards(nBlockValue, mnRewardAmount, nFees, false, fPos);
+    SetRewards(nBlockValue, mnRewardAmount, 0, nFees, nHeight < consensusParams.DIP0003Height, fPos);
 }
 
 int CBlockReward::CompareTo(const CBlockReward& rhs) const {
@@ -136,7 +203,9 @@ CReward CBlockReward::GetTotalRewards() {
     CReward totalRewards(CReward::REWARD_TOTAL);
     totalRewards += GetCoinbaseReward();
     totalRewards += GetCoinstakeReward();
+    totalRewards += GetCarbonReward();
     totalRewards += GetMasternodeReward();
+    totalRewards += GetOperatorReward();
     return totalRewards;
 }
 
@@ -181,8 +250,14 @@ CReward CBlockReward::GetCoinbaseReward() {
 CReward CBlockReward::GetCoinstakeReward() {
     return GetReward(CReward::REWARD_COINSTAKE);
 }
+CReward CBlockReward::GetCarbonReward() {
+    return GetReward(CReward::REWARD_CARBON);
+}
 CReward CBlockReward::GetMasternodeReward() {
     return GetReward(CReward::REWARD_MASTERNODE);
+}
+CReward CBlockReward::GetOperatorReward() {
+    return GetReward(CReward::REWARD_OPERATOR);
 }
 
 void CBlockReward::SetCoinbaseReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
@@ -195,10 +270,20 @@ void CBlockReward::SetCoinstakeReward(const CAmount amount, const CTokenGroupID 
     SetReward(coinstakeReward, amount, tokenID, tokenAmount);
     rewards[CReward::REWARD_COINSTAKE] = coinstakeReward;
 }
+void CBlockReward::SetCarbonReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
+    CReward carbonReward(CReward::REWARD_COINSTAKE);
+    SetReward(carbonReward, amount, tokenID, tokenAmount);
+    rewards[CReward::REWARD_CARBON] = carbonReward;
+}
 void CBlockReward::SetMasternodeReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
     CReward masternodeReward(CReward::REWARD_MASTERNODE);
     SetReward(masternodeReward, amount, tokenID, tokenAmount);
     rewards[CReward::REWARD_MASTERNODE] = masternodeReward;
+}
+void CBlockReward::SetOperatorReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
+    CReward operatorReward(CReward::REWARD_OPERATOR);
+    SetReward(operatorReward, amount, tokenID, tokenAmount);
+    rewards[CReward::REWARD_OPERATOR] = operatorReward;
 }
 
 void CBlockReward::MoveMasternodeRewardToCoinbase() {
@@ -207,6 +292,13 @@ void CBlockReward::MoveMasternodeRewardToCoinbase() {
         CReward masternodeReward(r_it->second);
         masternodeReward.type = CReward::RewardType::REWARD_COINBASE;
         AddReward(masternodeReward);
+        rewards.erase(r_it);
+    }
+    r_it = rewards.find(CReward::RewardType::REWARD_OPERATOR);
+    if (r_it != rewards.end()) {
+        CReward operatorReward(r_it->second);
+        operatorReward.type = CReward::RewardType::REWARD_COINBASE;
+        AddReward(operatorReward);
         rewards.erase(r_it);
     }
 }
@@ -219,61 +311,46 @@ void CBlockReward::MoveMasternodeRewardToCoinstake() {
         AddReward(masternodeReward);
         rewards.erase(r_it);
     }
-}
-
-void CBlockReward::SetHybridPOSRewards(const CAmount blockSubsidy) {
-    SetMasternodeReward(blockSubsidy * 0.7);
-    SetCoinstakeReward(blockSubsidy * 0.6);
-}
-
-void CBlockReward::SetHybridPOWRewards(const CAmount blockSubsidy) {
-    if (tokenGroupManager->ElectronTokensCreated()) {
-        SetCoinbaseReward(1, tokenGroupManager->GetElectronID(), blockSubsidy);
-    } else {
-        SetCoinbaseReward(0);
-    }
-    SetMasternodeReward(blockSubsidy * 0.7);
-}
-
-void CBlockReward::AddHybridFees(const CAmount nFees) {
-    CAmount nMasternodeFees = nFees * 0.5;
-    CAmount nCoinstakeFees = 0;
-    AddReward(CReward::RewardType::REWARD_MASTERNODE, nMasternodeFees);
-
-    auto r_it = rewards.find(CReward::RewardType::REWARD_COINSTAKE);
+    r_it = rewards.find(CReward::RewardType::REWARD_OPERATOR);
     if (r_it != rewards.end()) {
-        nCoinstakeFees = nFees * 0.3;
-        AddReward(CReward::RewardType::REWARD_COINSTAKE, nCoinstakeFees);
+        CReward operatorReward(r_it->second);
+        operatorReward.type = CReward::RewardType::REWARD_COINSTAKE;
+        AddReward(operatorReward);
+        rewards.erase(r_it);
     }
-    AddReward(CReward::RewardType::REWARD_BURN, nFees - nMasternodeFees - nCoinstakeFees);
 }
 
-void CBlockReward::SetHybridRewards(const CAmount blockSubsidy, const CAmount nFees, const bool fHybridPOS) {
-    if (fHybridPOS) {
-        SetHybridPOSRewards(blockSubsidy);
-    } else {
-        SetHybridPOWRewards(blockSubsidy);
+void CBlockReward::RemoveMasternodeReward() {
+    auto r_it = rewards.find(CReward::RewardType::REWARD_MASTERNODE);
+    if (r_it != rewards.end()) {
+        rewards.erase(r_it);
     }
-    AddHybridFees(nFees);
 }
 
-void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount nFees, const bool fHybrid, const bool fPOS) {
-    if (fHybrid) {
+void CBlockReward::AddFees(const CAmount nFees) {
+    CAmount nCarbonFees = nFees * 0.5;
+    AddReward(CReward::RewardType::REWARD_CARBON, nCarbonFees);
+    AddReward(CReward::RewardType::REWARD_BURN, nFees - nCarbonFees);
+}
+
+void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS) {
+    if (!fLegacy) {
+        SetMasternodeReward(mnRewardAmount);
+        SetOperatorReward(opRewardAmount);
         if (fPOS) {
-            SetHybridPOSRewards(blockSubsidy);
+            SetCoinstakeReward(blockSubsidy - mnRewardAmount - opRewardAmount);
         } else {
-            SetHybridPOWRewards(blockSubsidy);
-            fBurnUnpaidMasternodeReward = true;
+            SetCoinbaseReward(blockSubsidy - mnRewardAmount - opRewardAmount);
         }
-        AddHybridFees(nFees);
+        AddFees(nFees);
     } else {
         SetMasternodeReward(mnRewardAmount);
         if (fPOS) {
             SetCoinstakeReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_COINSTAKE, nFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
         } else {
             SetCoinbaseReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_COINBASE, nFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
         }
     }
 }

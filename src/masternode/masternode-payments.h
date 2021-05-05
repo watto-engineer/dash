@@ -19,7 +19,7 @@ class CMasternodePayments;
 /// TODO: all 4 functions do not belong here really, they should be refactored/moved somewhere (main.cpp ?)
 bool IsBlockValueValid(const CBlock& block, const int nBlockHeight, const CBlockReward& blockRewardIn, const CAmount coinstakeValueIn, std::string& strErrorRet);
 bool IsBlockPayeeValid(const CTransactionRef txNewMiner, const CTransactionRef txNewStaker, int nBlockHeight, CBlockReward blockReward);
-void FillBlockPayments(CMutableTransaction& txNew, int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet);
+void FillBlockPayments(CMutableTransaction& txNew, int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet);
 
 extern CMasternodePayments mnpayments;
 
@@ -31,10 +31,10 @@ extern CMasternodePayments mnpayments;
 class CMasternodePayments
 {
 public:
-    static bool GetBlockTxOuts(int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet);
+    static bool GetBlockTxOuts(int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet);
     static bool IsTransactionValid(const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward);
 
-    static bool GetMasternodeTxOuts(int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet);
+    static bool GetMasternodeTxOuts(int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet);
 };
 
 #endif // BITCOIN_MASTERNODE_MASTERNODE_PAYMENTS_H

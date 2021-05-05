@@ -17,6 +17,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 class CBlockIndex;
+class CBlockReward;
 class CChainParams;
 class CConnman;
 class CScript;
@@ -172,7 +173,7 @@ private:
     void AddToBlock(CTxMemPool::txiter iter);
 
     /** If the coinstake output is above a threshold, split the stake reward in two outputs */
-    bool SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx);
+    bool SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> coinstakeTx, CBlockReward& blockReward, const CAmount nSplitValue);
 
     // Methods for how to add transactions to a block.
     /** Add transactions based on feerate including unconfirmed ancestors

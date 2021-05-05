@@ -199,6 +199,7 @@ struct Params {
     int32_t nStakeMinAge;
     int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
+    std::string strCarbonOffsetAddress;
 
     /** Time Protocol V2 **/
     int nBlockTimeProtocolV2;

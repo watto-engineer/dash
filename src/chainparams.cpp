@@ -390,6 +390,7 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.strCarbonOffsetAddress = "sYG1qGUtbTdNRYtFsKvnY3GvuauF3eVwhT";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.BytzAddrPrefix = "bytz";
@@ -586,6 +587,7 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 51197;
         consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
+        consensus.strCarbonOffsetAddress = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.BytzAddrPrefix = "bytztest";
@@ -759,6 +761,7 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.strCarbonOffsetAddress = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.BytzAddrPrefix = "bytztest";
@@ -933,6 +936,7 @@ public:
         consensus.nStakeMinAge = 0;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.strCarbonOffsetAddress = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V16DeploymentHeight;
         consensus.BytzAddrPrefix = "bytzreg";

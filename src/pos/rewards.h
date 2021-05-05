@@ -16,7 +16,9 @@ public:
     typedef enum RewardType_t {
         REWARD_COINBASE,
         REWARD_COINSTAKE,
+        REWARD_CARBON,
         REWARD_MASTERNODE,
+        REWARD_OPERATOR,
 
         REWARD_BURN,
         REWARD_TOTAL,
@@ -53,22 +55,17 @@ private:
 
     bool SetReward(CReward &reward, const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
 
-    void SetHybridPOSRewards(const CAmount blockSubsidy);
-    void SetHybridPOWRewards(const CAmount blockSubsidy);
-    void SetHybridRewards(const CAmount blockSubsidy, const CAmount nFees, const bool fHybridPOS);
-
-    void SetClassicPOSRewards(const CAmount blockSubsidy);
-    void SetClassicPOWRewards(const CAmount blockSubsidy);
-    void SetClassicRewards(const CAmount blockSubsidy, const CAmount nFees, const bool fClassicPOS);
-
 public:
     bool fBurnUnpaidMasternodeReward;
+    bool fPos; // PoS, not PoW
+    bool fSplitCoinstake; // True if two staker rewards, false if one staker reward.
 
     CBlockReward() {
         fBurnUnpaidMasternodeReward = false;
+        fSplitCoinstake = false;
     };
 
-    CBlockReward(const CBlock& block, const bool fHybridPowBlock, const CAmount coinstakeValueIn);
+    CBlockReward(const CBlock& block, const bool fLegacy, const CAmount coinstakeValueIn);
     CBlockReward(const int nHeight, const CAmount nFees, const bool fPos, const Consensus::Params& consensusParams);
 
     bool operator<(const CBlockReward& rhs) const { return CompareTo(rhs) < 0; }
@@ -86,18 +83,23 @@ public:
     CReward GetReward(CReward::RewardType rewardType);
     CReward GetCoinbaseReward();
     CReward GetCoinstakeReward();
+    CReward GetCarbonReward();
     CReward GetMasternodeReward();
+    CReward GetOperatorReward();
 
     void SetCoinbaseReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
     void SetCoinstakeReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
+    void SetCarbonReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
     void SetMasternodeReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
+    void SetOperatorReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
 
     void MoveMasternodeRewardToCoinbase();
     void MoveMasternodeRewardToCoinstake();
+    void RemoveMasternodeReward();
 
-    void AddHybridFees(const CAmount nFees);
+    void AddFees(const CAmount nFees);
 
-    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount nFees, const bool fHybrid, const bool fPOS);
+    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS);
 
     CReward GetTotalRewards();
 };
