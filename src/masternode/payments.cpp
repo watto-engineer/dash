@@ -27,8 +27,9 @@ CMasternodePayments mnpayments;
 
 bool IsOldBudgetBlockValueValid(const CBlock& block, int nBlockHeight, CBlockReward blockReward, const CAmount coinstakeValueIn, std::string& strErrorRet) {
     const Consensus::Params& consensusParams = Params().GetConsensus();
-    CBlockReward rewardInBlock(block, false, coinstakeValueIn);
-    bool isBlockRewardValueMet = rewardInBlock <= blockReward;
+    bool fDIP0003Active_context = nBlockHeight >= consensusParams.DIP0003Height;
+    CBlockReward rewardsInBlock(block, !fDIP0003Active_context, coinstakeValueIn);
+    bool isBlockRewardValueMet = rewardsInBlock <= blockReward;
 
     if (nBlockHeight < consensusParams.nBudgetPaymentsStartBlock) {
         strErrorRet = strprintf("Incorrect block %d, old budgets are not activated yet", nBlockHeight);
@@ -82,7 +83,8 @@ bool IsOldBudgetBlockValueValid(const CBlock& block, int nBlockHeight, CBlockRew
 bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CBlock& block, const int nBlockHeight, const CBlockReward& blockRewardIn, const CAmount coinstakeValueIn, std::string& strErrorRet)
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
-    CBlockReward rewardsInBlock(block, false, coinstakeValueIn);
+    bool fDIP0003Active_context = nBlockHeight >= consensusParams.DIP0003Height;
+    CBlockReward rewardsInBlock(block, !fDIP0003Active_context, coinstakeValueIn);
     CBlockReward blockReward = blockRewardIn;
     if (coinstakeValueIn > 0) {
        blockReward.AddReward(CReward::RewardType::REWARD_COINSTAKE, coinstakeValueIn);
@@ -233,7 +235,7 @@ bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& go
     return false;
 }
 
-void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, CMutableTransaction& txNew, int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet)
+void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, CMutableTransaction& txNew, int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet)
 {
     // only create superblocks if spork is enabled AND if superblock is actually triggered
     // (height should be validated inside)
@@ -246,8 +248,8 @@ void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& go
         LogPrint(BCLog::MNPAYMENTS, "%s -- no masternode to pay (MN list probably empty)\n", __func__);
     }
 
-    txNew.vout.insert(txNew.vout.end(), voutMasternodePaymentsRet.begin(), voutMasternodePaymentsRet.end());
-    txNew.vout.insert(txNew.vout.end(), voutSuperblockPaymentsRet.begin(), voutSuperblockPaymentsRet.end());
+//    txNew.vout.insert(txNew.vout.end(), voutMasternodePaymentsRet.begin(), voutMasternodePaymentsRet.end());
+//    txNew.vout.insert(txNew.vout.end(), voutSuperblockPaymentsRet.begin(), voutSuperblockPaymentsRet.end());
 
     std::string voutMasternodeStr;
     for (const auto& txout : voutMasternodePaymentsRet) {
@@ -266,7 +268,7 @@ void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& go
 *   Get masternode payment tx outputs
 */
 
-bool CMasternodePayments::GetMasternodeTxOuts(int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet)
+bool CMasternodePayments::GetMasternodeTxOuts(int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet)
 {
     // make sure it's not filled yet
     voutMasternodePaymentsRet.clear();
@@ -286,13 +288,18 @@ bool CMasternodePayments::GetMasternodeTxOuts(int nBlockHeight, CBlockReward blo
     return true;
 }
 
-bool CMasternodePayments::GetBlockTxOuts(int nBlockHeight, CBlockReward blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet)
+bool CMasternodePayments::GetBlockTxOuts(int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet)
 {
     voutMasternodePaymentsRet.clear();
 
     const CBlockIndex* pindex = WITH_LOCK(cs_main, return ::ChainActive()[nBlockHeight - 1]);
     auto dmnPayee = deterministicMNManager->GetListForBlock(pindex).GetMNPayee();
     if (!dmnPayee) {
+        if (blockReward.fPos) {
+            blockReward.MoveMasternodeRewardToCoinstake();
+        } else {
+            blockReward.MoveMasternodeRewardToCoinbase();
+        }
         return false;
     }
 
@@ -308,11 +315,15 @@ bool CMasternodePayments::GetBlockTxOuts(int nBlockHeight, CBlockReward blockRew
         masternodeReward -= operatorReward;
     }
 
+    blockReward.RemoveMasternodeReward();
+
     if (masternodeReward > 0) {
         voutMasternodePaymentsRet.emplace_back(masternodeReward, dmnPayee->pdmnState->scriptPayout);
+        blockReward.SetMasternodeReward(masternodeReward);
     }
     if (operatorReward > 0) {
         voutMasternodePaymentsRet.emplace_back(operatorReward, dmnPayee->pdmnState->scriptOperatorPayout);
+        blockReward.SetOperatorReward(operatorReward);
     }
 
     return true;
