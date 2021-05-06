@@ -26,8 +26,8 @@ from test_framework.util import hex_str_to_bytes, bytes_to_hex_str
 
 import dash_hash
 
-MIN_VERSION_SUPPORTED = 60001
-MY_VERSION = 70219  # LLMQ_DATA_MESSAGES_VERSION
+MIN_VERSION_SUPPORTED = 70915
+MY_VERSION = 70918  # LLMQ_DATA_MESSAGES_VERSION
 MY_SUBVERSION = b"/python-mininode-tester:0.0.3%s/"
 MY_RELAY = 1 # from version 70001 onwards, fRelay should be appended to version messages (BIP37)
 
