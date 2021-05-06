@@ -342,6 +342,7 @@ void PrepareShutdown()
         zerocoinDB.reset();
         pTokenDB.reset();
         rewardManager.reset();
+        tokenGroupManager.reset();
     }
     g_wallet_init_interface.Stop();
 
@@ -1997,6 +1998,8 @@ bool AppInitMain()
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
                 pTokenDB.reset();
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
+                tokenGroupManager.reset();
+                tokenGroupManager.reset(new CTokenGroupManager());
                 rewardManager.reset();
                 rewardManager.reset(new CRewardManager());
 
@@ -2080,8 +2083,6 @@ bool AppInitMain()
 
                 // Load Accumulator Checkpoints according to network (main/test/regtest)
                 assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
-
-                tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
 
                 // Drop all information from the tokenDB and repopulate
                 bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);

@@ -13,7 +13,10 @@
 #include "utilstrencodings.h"
 #include "tokens/tokengroupconfiguration.h"
 
+std::shared_ptr<CTokenGroupManager> tokenGroupManager;
+
 CTokenGroupManager::CTokenGroupManager() {
+    mapTokenGroups.clear();
     vTokenGroupFilters.emplace_back(TGFilterCharacters);
     vTokenGroupFilters.emplace_back(TGFilterUniqueness);
     vTokenGroupFilters.emplace_back(TGFilterUpperCaseTicker);

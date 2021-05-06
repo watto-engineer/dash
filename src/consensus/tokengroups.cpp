@@ -10,8 +10,6 @@
 #include <streams.h>
 #include "tokens/tokengroupmanager.h"
 
-std::shared_ptr<CTokenGroupManager> tokenGroupManager;
-
 bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const CCoinsViewCache& view, const CTokenGroupID tgID) {
     bool anyInputsGrouped = false;
     if (!transaction.IsGenerated() && !transaction.HasZerocoinSpendInputs()) {
