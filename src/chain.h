@@ -239,10 +239,6 @@ public:
         vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
 
-        nXDMSupply = 0;
-        nXDMTransactions = 0;
-        nChainXDMTransactions = 0;
-
         nVersion       = 0;
         hashMerkleRoot = uint256();
         nTime          = 0;
@@ -510,8 +506,6 @@ public:
         // v1/v2 modifier selection.
         if (obj.nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(obj.nStakeModifierV2);
-            READWRITE(VARINT(obj.nXDMTransactions));
-            READWRITE(VARINT(obj.nXDMSupply));
         } else {
             READWRITE(obj.nStakeModifier);
         }

@@ -1614,7 +1614,7 @@ int ApplyTxInUndo(Coin&& undo, CCoinsViewCache& view, const COutPoint& out)
 
 /** Undo the effects of this block (with given index) on the UTXO set represented by coins.
  *  When FAILED is returned, view is left in an indeterminate state. */
-DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view)
+DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view, bool fDisconnectTokens)
 {
     std::vector<CTokenGroupID> toRemoveTokenGroupIDs;
 
@@ -1769,7 +1769,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 }
 
             }
-            if (IsAnyOutputGroupedCreation(tx)) {
+            if (IsAnyOutputGroupedCreation(tx) && fDisconnectTokens) {
                 CTokenGroupID toRemoveTokenGroupID;
                 if (tokenGroupManager->RemoveTokenGroup(tx, toRemoveTokenGroupID))
                     toRemoveTokenGroupIDs.push_back(toRemoveTokenGroupID);
@@ -4838,7 +4838,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
         if (nCheckLevel >= 3 && (coins.DynamicMemoryUsage() + ::ChainstateActive().CoinsTip().DynamicMemoryUsage()) <= ::ChainstateActive().m_coinstip_cache_size_bytes) {
             assert(coins.GetBestBlock() == pindex->GetBlockHash());
-            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins);
+            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins, nCheckLevel > 3);
             if (res == DISCONNECT_FAILED) {
                 return error("VerifyDB(): *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
@@ -4902,6 +4902,8 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
             pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
 
+    std::vector<CTokenGroupCreation> newTokenGroups;
+
     for (const CTransactionRef& tx : block.vtx) {
         if (!tx->IsCoinBase()) {
             for (const CTxIn &txin : tx->vin) {
@@ -4910,6 +4912,22 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
         }
         // Pass check = true as every addition may be an overwrite.
         AddCoins(inputs, *tx, pindex->nHeight, true);
+
+        if (IsAnyOutputGroupedCreation(*tx)) {
+            if (pindex->nHeight >= params.GetConsensus().ATPStartHeight) {
+                CTokenGroupCreation newTokenGroupCreation;
+                if (CreateTokenGroup(tx, block.GetHash(), newTokenGroupCreation)) {
+                    newTokenGroups.push_back(newTokenGroupCreation);
+                } else {
+                    return state.Invalid(false, REJECT_INVALID, "bad OP_GROUP");
+                }
+            }
+        }
+    }
+    if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
+        return AbortNode(state, "Failed to write token creation data");
+    if (!tokenGroupManager->AddTokenGroups(newTokenGroups)) {
+        return AbortNode(state, "Failed to add token creation data");
     }
 
     return true;

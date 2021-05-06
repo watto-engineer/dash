@@ -360,6 +360,7 @@ void PrepareShutdown(NodeContext& node)
         zerocoinDB.reset();
         pTokenDB.reset();
         rewardManager.reset();
+        tokenGroupManager.reset();
     }
     for (const auto& client : node.chain_clients) {
         client->stop();
@@ -2069,6 +2070,8 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 zerocoinDB.reset(new CZerocoinDB(0, false, fReset || fReindexChainState));
                 pTokenDB.reset();
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
+                tokenGroupManager.reset();
+                tokenGroupManager.reset(new CTokenGroupManager());
                 rewardManager.reset();
                 rewardManager.reset(new CRewardManager());
                 llmq::quorumSnapshotManager.reset();
@@ -2078,8 +2081,6 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
                 // Load Accumulator Checkpoints according to network (main/test/regtest)
                 assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
-
-                tokenGroupManager = std::shared_ptr<CTokenGroupManager>(new CTokenGroupManager());
 
                 // Drop all information from the tokenDB and repopulate
                 bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
