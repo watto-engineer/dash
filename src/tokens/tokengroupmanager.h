@@ -23,9 +23,8 @@ class CTokenGroupManager
 {
 private:
     std::map<CTokenGroupID, CTokenGroupCreation> mapTokenGroups;
-    std::unique_ptr<CTokenGroupCreation> tgMagicCreation;
-    std::unique_ptr<CTokenGroupCreation> tgAtomCreation;
-    std::unique_ptr<CTokenGroupCreation> tgElectronCreation;
+    std::unique_ptr<CTokenGroupCreation> tgMGTCreation;
+    std::unique_ptr<CTokenGroupCreation> tgGVTCreation;
 
 public:
     CTokenGroupManager();
@@ -46,17 +45,14 @@ public:
     bool StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation);
     void ClearManagementTokenGroups();
 
-    bool MatchesMagic(CTokenGroupID tgID);
-    bool MatchesAtom(CTokenGroupID tgID);
-    bool MatchesElectron(CTokenGroupID tgID);
+    bool MatchesMGT(CTokenGroupID tgID);
+    bool MatchesGVT(CTokenGroupID tgID);
 
-    CTokenGroupID GetMagicID() { return tgMagicCreation->tokenGroupInfo.associatedGroup; };
-    CTokenGroupID GetAtomID() { return tgAtomCreation->tokenGroupInfo.associatedGroup; };
-    CTokenGroupID GetElectronID() { return tgElectronCreation->tokenGroupInfo.associatedGroup; };
+    CTokenGroupID GetMGTID() { return tgMGTCreation->tokenGroupInfo.associatedGroup; };
+    CTokenGroupID GetGVTID() { return tgGVTCreation->tokenGroupInfo.associatedGroup; };
 
-    bool MagicTokensCreated() { return tgMagicCreation ? true : false; };
-    bool AtomTokensCreated() { return tgAtomCreation ? true : false; };
-    bool ElectronTokensCreated() { return tgElectronCreation ? true : false; };
+    bool MGTTokensCreated() { return tgMGTCreation ? true : false; };
+    bool GVTTokensCreated() { return tgGVTCreation ? true : false; };
 
     bool ManagementTokensCreated(int nHeight);
 
