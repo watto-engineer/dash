@@ -191,15 +191,6 @@ public:
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
-    //! ATP specific fields
-    //! Number of XDM transactions in this block.
-    //! Note: in a potential headers-first mode, this number cannot be relied upon until after full block validation
-    uint16_t nXDMTransactions;
-
-    //! (memory only) Number of XDM transactions in the chain up to and including this block.
-    uint32_t nChainXDMTransactions;
-    uint64_t nXDMSupply;
-
     //! block header
     int32_t nVersion{0};
     uint256 hashMerkleRoot{};

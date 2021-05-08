@@ -304,19 +304,12 @@ bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, 
 }
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalGroupedNeeded, CAmount totalXDMNeeded, CTokenGroupID grpID, CWallet *wallet)
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet)
 {
     CAmount totalGroupedAvailable = 0;
-    CAmount totalXDMAvailable = 0;
-    CTokenGroupID XDMGrpID;
 
     CMutableTransaction tx;
     CReserveKey groupChangeKeyReservation(wallet);
-
-    const bool XDMCreated = tokenGroupManager->DarkMatterTokensCreated();
-    if (XDMCreated) {
-        XDMGrpID = tokenGroupManager->GetDarkMatterID();
-    }
 
     {
         // Add group outputs based on the passed recipient data to the tx.
@@ -337,8 +330,6 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
             {
                 if (tg.associatedGroup == grpID){
                     totalGroupedAvailable += tg.quantity;
-                } else if (XDMCreated && tg.associatedGroup == XDMGrpID) {
-                    totalXDMAvailable += tg.quantity;
                 }
             }
         }
@@ -352,19 +343,6 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 
             CTxOut txout(GROUPED_SATOSHI_AMT,
                 GetScriptForDestination(newKey.GetID(), grpID, totalGroupedAvailable - totalGroupedNeeded));
-            tx.vout.push_back(txout);
-        }
-
-        if (totalXDMAvailable > totalXDMNeeded) // need to make a group change output
-        {
-            CPubKey newKey;
-
-            if (!groupChangeKeyReservation.GetReservedKey(newKey, true))
-                throw JSONRPCError(
-                    RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-
-            CTxOut txout(GROUPED_SATOSHI_AMT,
-                GetScriptForDestination(newKey.GetID(), tokenGroupManager->GetDarkMatterID(), totalXDMAvailable - totalXDMNeeded));
             tx.vout.push_back(txout);
         }
 
@@ -484,7 +462,7 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
     RenewAuthority(authority, outputs, childAuthorityKey);
     // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
     // This surplus will be melted.
-    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, 0, grpID, wallet);
+    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
     childAuthorityKey.KeepKey();
 }
 
@@ -492,43 +470,12 @@ void GroupSend(CTransactionRef &txNew,
     const CTokenGroupID &grpID,
     const std::vector<CRecipient> &outputs,
     CAmount totalNeeded,
-    CAmount totalXDMNeeded,
     CWallet *wallet)
 {
     LOCK2(cs_main, wallet->cs_wallet);
     std::string strError;
     std::vector<COutput> coins;
     std::vector<COutput> chosenCoins;
-
-    // Add XDM inputs
-    // Increase tokens needed when sending XDM and select XDM coins otherwise
-    CAmount totalXDMAvailable = 0;
-    if (tokenGroupManager->MatchesDarkMatter(grpID)) {
-        totalNeeded += totalXDMNeeded;
-        totalXDMNeeded = 0;
-    } else {
-        if (totalXDMNeeded > 0) {
-            CTokenGroupID XDMGrpID = tokenGroupManager->GetDarkMatterID();
-            wallet->FilterCoins(coins, [XDMGrpID, &totalXDMAvailable](const CWalletTx *tx, const CTxOut *out) {
-                CTokenGroupInfo tg(out->scriptPubKey);
-                if ((XDMGrpID == tg.associatedGroup) && !tg.isAuthority())
-                {
-                    totalXDMAvailable += tg.quantity;
-                    return true;
-                }
-                return false;
-            });
-
-            if (totalXDMAvailable < totalXDMNeeded)
-            {
-                strError = strprintf("Not enough XDM in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalXDMNeeded - totalXDMAvailable, grpID));
-                throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-            }
-
-            // Get a near but greater quantity
-            totalXDMAvailable = GroupCoinSelection(coins, totalXDMNeeded, chosenCoins);
-        }
-    }
 
     CAmount totalAvailable = 0;
     wallet->FilterCoins(coins, [grpID, &totalAvailable](const CWalletTx *tx, const CTxOut *out) {
@@ -560,7 +507,7 @@ void GroupSend(CTransactionRef &txNew,
         }
     }
 
-    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, totalXDMNeeded, grpID, wallet);
+    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
 }
 
 CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGroupIdFlags flags, uint64_t &nonce)
@@ -583,54 +530,4 @@ CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGro
         ret = hasher.GetHash();
     } while (ret.bytes()[31] != (uint8_t)flags);
     return ret;
-}
-
-CAmount GetXDMFeesPaid(const std::vector<CRecipient> outputs) {
-    CAmount XDMFeesPaid = 0;
-    for (auto output : outputs) {
-        CTxDestination payeeDest;
-        if (ExtractDestination(output.scriptPubKey, payeeDest))
-        {
-            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
-                CTokenGroupInfo tgInfo(output.scriptPubKey);
-                if (tokenGroupManager->MatchesDarkMatter(tgInfo.associatedGroup)) {
-                    XDMFeesPaid += tgInfo.isAuthority() ? 0 : tgInfo.quantity;
-                }
-            }
-        }
-    }
-    return XDMFeesPaid;
-}
-
-// Ensure that one of the recipients is an XDM fee payment
-// If an output to the fee address already exists, it ensures that the output is at least XDMFee large
-// Returns true if a new output is added and false if a current output is either increased or kept as-is
-bool EnsureXDMFee(std::vector<CRecipient> &outputs, CAmount XDMFee) {
-    if (!tokenGroupManager->DarkMatterTokensCreated()) return false;
-    if (XDMFee <= 0) return false;
-    CTxDestination payeeDest;
-    for (auto &output : outputs) {
-        if (ExtractDestination(output.scriptPubKey, payeeDest))
-        {
-            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
-                CTokenGroupInfo tgInfo(output.scriptPubKey);
-                if (tokenGroupManager->MatchesDarkMatter(tgInfo.associatedGroup) && !tgInfo.isAuthority()) {
-                    if (tgInfo.quantity < XDMFee) {
-                        CScript script = GetScriptForDestination(payeeDest, tgInfo.associatedGroup, XDMFee);
-                        CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
-
-                        output.scriptPubKey = script;
-                        return false;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-    CScript script = GetScriptForDestination(DecodeDestination(Params().GetConsensus().strTokenManagementKey), tokenGroupManager->GetDarkMatterID(), XDMFee);
-    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
-    outputs.push_back(recipient);
-
-    return true;
 }
