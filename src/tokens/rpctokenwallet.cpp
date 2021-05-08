@@ -1044,7 +1044,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"GVN\" \"Guardian\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MAGIC.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
+            HelpExampleCli("configuremanagementtoken", "\"GVT\" \"GuardianValidatorToken\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
             "\n"
         );
 
@@ -1070,10 +1070,10 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     authDest = authKey.GetID();
 
     COutput coin(nullptr, 0, 0, false, false, false);
-    // If the MagicToken exists: spend a magic token output
+    // If the MGTToken exists: spend a magic token output
     // Otherwise: spend a Bytz output from the token management address
-    if (tokenGroupManager->MagicTokensCreated()){
-        CTokenGroupID magicID = tokenGroupManager->GetMagicID();
+    if (tokenGroupManager->MGTTokensCreated()){
+        CTokenGroupID magicID = tokenGroupManager->GetMGTID();
 
         std::vector<COutput> coins;
         CAmount lowest = MAX_MONEY;

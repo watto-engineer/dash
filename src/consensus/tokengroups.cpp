@@ -50,8 +50,8 @@ bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const 
 
 bool IsTokenManagementKey(CScript script) {
     // Initially, the TokenManagementKey enables management token operations
-    // When the MagicToken is created, the MagicToken enables management token operations
-    if (!tokenGroupManager->MagicTokensCreated()) {
+    // When the MGTToken is created, the MGTToken enables management token operations
+    if (!tokenGroupManager->MGTTokensCreated()) {
         CTxDestination payeeDest;
         ExtractDestination(script, payeeDest);
         return EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey;
@@ -59,12 +59,12 @@ bool IsTokenManagementKey(CScript script) {
     return false;
 }
 
-bool IsMagicInput(CScript script) {
+bool IsMGTInput(CScript script) {
     // Initially, the TokenManagementKey enables management token operations
-    // When the MagicToken is created, the MagicToken enables management token operations
-    if (tokenGroupManager->MagicTokensCreated()) {
+    // When the MGTToken is created, the MGTToken enables management token operations
+    if (tokenGroupManager->MGTTokensCreated()) {
         CTokenGroupInfo grp(script);
-        return grp.associatedGroup == tokenGroupManager->GetMagicID();
+        return grp.associatedGroup == tokenGroupManager->GetMGTID();
     }
     return false;
 }
@@ -129,7 +129,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         if (coin.nHeight < Params().GetConsensus().ATPStartHeight)
             continue;
 
-        anyInputsGroupManagement = anyInputsGroupManagement || IsMagicInput(script);
+        anyInputsGroupManagement = anyInputsGroupManagement || IsMGTInput(script);
 
         CTokenGroupInfo tokenGrp(script);
         // The prevout should never be invalid because that would mean that this node accepted a block with an

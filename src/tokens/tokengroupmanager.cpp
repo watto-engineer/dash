@@ -24,37 +24,29 @@ CTokenGroupManager::CTokenGroupManager() {
 }
 
 bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation) {
-    if (!tgMagicCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "MAGIC") {
-        this->tgMagicCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
+    if (!tgMGTCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "MGT") {
+        this->tgMGTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
-    } else if (!tgAtomCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ATOM") {
-        this->tgAtomCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
-        return true;
-    } else if (!tgElectronCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ELEC") {
-        this->tgElectronCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
+    } else if (!tgGVTCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "GVT") {
+        this->tgGVTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
     }
     return false;
 }
 
 void CTokenGroupManager::ClearManagementTokenGroups() {
-    tgMagicCreation.reset();
-    tgAtomCreation.reset();
+    tgMGTCreation.reset();
+    tgGVTCreation.reset();
 }
 
-bool CTokenGroupManager::MatchesMagic(CTokenGroupID tgID) {
-    if (!tgMagicCreation) return false;
-    return tgID == tgMagicCreation->tokenGroupInfo.associatedGroup;
+bool CTokenGroupManager::MatchesMGT(CTokenGroupID tgID) {
+    if (!tgMGTCreation) return false;
+    return tgID == tgMGTCreation->tokenGroupInfo.associatedGroup;
 }
 
-bool CTokenGroupManager::MatchesAtom(CTokenGroupID tgID) {
-    if (!tgAtomCreation) return false;
-    return tgID == tgAtomCreation->tokenGroupInfo.associatedGroup;
-}
-
-bool CTokenGroupManager::MatchesElectron(CTokenGroupID tgID) {
-    if (!tgElectronCreation) return false;
-    return tgID == tgElectronCreation->tokenGroupInfo.associatedGroup;
+bool CTokenGroupManager::MatchesGVT(CTokenGroupID tgID) {
+    if (!tgGVTCreation) return false;
+    return tgID == tgGVTCreation->tokenGroupInfo.associatedGroup;
 }
 
 bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups) {
@@ -96,12 +88,10 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
     bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, firstOpReturn);
 
     if (hasNewTokenGroup) {
-        if (MatchesMagic(tokenGroupInfo.associatedGroup)) {
-            tgMagicCreation.reset();
-        } else if (MatchesAtom(tokenGroupInfo.associatedGroup)) {
-            tgAtomCreation.reset();
-        } else if (MatchesElectron(tokenGroupInfo.associatedGroup)) {
-            tgElectronCreation.reset();
+        if (MatchesMGT(tokenGroupInfo.associatedGroup)) {
+            tgMGTCreation.reset();
+        } else if (MatchesGVT(tokenGroupInfo.associatedGroup)) {
+            tgGVTCreation.reset();
         }
 
         std::map<CTokenGroupID, CTokenGroupCreation>::iterator iter = mapTokenGroups.find(tokenGroupInfo.associatedGroup);
@@ -176,7 +166,7 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
 bool CTokenGroupManager::ManagementTokensCreated(int nHeight) {
     // if (!ElectronTokensCreated() && nHeight >= Params().GetConsensus().POSPOWStartHeight)
     //    return false;
-    return MagicTokensCreated() && AtomTokensCreated();
+    return MGTTokensCreated() && GVTTokensCreated();
 }
 
 uint16_t CTokenGroupManager::GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId) {
@@ -273,7 +263,7 @@ std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, cons
 }
 
 bool CTokenGroupManager::CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex) {
-    if (!tgMagicCreation) return true;
+    if (!tgMGTCreation) return true;
     // A token group creation costs 5x the standard TX fee
     // A token mint transaction costs 2x the standard TX fee
     // Sending tokens costs the standard fee
