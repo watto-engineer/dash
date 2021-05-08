@@ -226,15 +226,6 @@ public:
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
-    //! ATP specific fields
-    //! Number of XDM transactions in this block.
-    //! Note: in a potential headers-first mode, this number cannot be relied upon until after full block validation
-    uint16_t nXDMTransactions;
-
-    //! (memory only) Number of XDM transactions in the chain up to and including this block.
-    uint32_t nChainXDMTransactions;
-    uint64_t nXDMSupply;
-
     //! block header
     int32_t nVersion;
     uint256 hashMerkleRoot;
@@ -274,10 +265,6 @@ public:
         mapZerocoinSupply.clear();
         vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
-
-        nXDMSupply = 0;
-        nXDMTransactions = 0;
-        nChainXDMTransactions = 0;
 
         nVersion       = 0;
         hashMerkleRoot = uint256();
@@ -546,8 +533,6 @@ public:
         // v1/v2 modifier selection.
         if (this->nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(nStakeModifierV2);
-            READWRITE(VARINT(nXDMTransactions));
-            READWRITE(VARINT(nXDMSupply));
         } else {
             READWRITE(nStakeModifier);
         }

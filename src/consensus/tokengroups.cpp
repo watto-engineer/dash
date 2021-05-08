@@ -18,7 +18,7 @@ bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const 
             return false;
 
         if (nHeight >= Params().GetConsensus().ATPStartHeight) {
-            // Now iterate through the inputs to match to DarkMatter inputs
+            // Now iterate through the inputs to match to token inputs
             for (const auto &inp : transaction.vin)
             {
                 const COutPoint &prevout = inp.prevout;

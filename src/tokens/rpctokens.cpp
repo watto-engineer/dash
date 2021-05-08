@@ -70,7 +70,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             "'name' shows information on the token configuration with the specified name'\n"
             "'extended_info' (optional) show extended information'\n"
             "\n" +
-            HelpExampleCli("tokeninfo", "ticker \"XDM\"") +
+            HelpExampleCli("tokeninfo", "ticker \"BYTZ\"") +
             "\n"
         );
 
@@ -130,19 +130,12 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         }
 
         uint256 hash = pindex ? pindex->GetBlockHash() : uint256();
-        uint64_t nXDMTransactions = pindex ? pindex->nChainXDMTransactions : 0;
-        uint64_t nXDMSupply = pindex ? pindex->nXDMSupply : 0;
         uint64_t nHeight = pindex ? pindex->nHeight : -1;
 
         UniValue entry(UniValue::VOBJ);
         entry.push_back(Pair("height", nHeight));
         entry.push_back(Pair("blockhash", hash.GetHex()));
 
-
-        if (tokenGroupManager->DarkMatterTokensCreated()) {
-            entry.push_back(Pair("XDM_supply", tokenGroupManager->TokenValueFromAmount(nXDMSupply, tokenGroupManager->GetDarkMatterID())));
-            entry.push_back(Pair("XDM_transactions", (uint64_t)nXDMTransactions));
-        }
         ret.push_back(entry);
 
     } else if (operation == "groupid") {

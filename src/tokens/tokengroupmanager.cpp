@@ -8,6 +8,7 @@
 #include "coins.h"
 #include "dstencode.h"
 #include "bytzaddrenc.h"
+#include "policy/policy.h"
 #include "rpc/protocol.h"
 #include "script/tokengroup.h"
 #include "utilstrencodings.h"
@@ -26,9 +27,6 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
     if (!tgMagicCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "MAGIC") {
         this->tgMagicCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
-    } else if (!tgDarkMatterCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "XDM") {
-        this->tgDarkMatterCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
-        return true;
     } else if (!tgAtomCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "ATOM") {
         this->tgAtomCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
@@ -41,18 +39,12 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
 
 void CTokenGroupManager::ClearManagementTokenGroups() {
     tgMagicCreation.reset();
-    tgDarkMatterCreation.reset();
     tgAtomCreation.reset();
 }
 
 bool CTokenGroupManager::MatchesMagic(CTokenGroupID tgID) {
     if (!tgMagicCreation) return false;
     return tgID == tgMagicCreation->tokenGroupInfo.associatedGroup;
-}
-
-bool CTokenGroupManager::MatchesDarkMatter(CTokenGroupID tgID) {
-    if (!tgDarkMatterCreation) return false;
-    return tgID == tgDarkMatterCreation->tokenGroupInfo.associatedGroup;
 }
 
 bool CTokenGroupManager::MatchesAtom(CTokenGroupID tgID) {
@@ -106,8 +98,6 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
     if (hasNewTokenGroup) {
         if (MatchesMagic(tokenGroupInfo.associatedGroup)) {
             tgMagicCreation.reset();
-        } else if (MatchesDarkMatter(tokenGroupInfo.associatedGroup)) {
-            tgDarkMatterCreation.reset();
         } else if (MatchesAtom(tokenGroupInfo.associatedGroup)) {
             tgAtomCreation.reset();
         } else if (MatchesElectron(tokenGroupInfo.associatedGroup)) {
@@ -186,13 +176,12 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
 bool CTokenGroupManager::ManagementTokensCreated(int nHeight) {
     // if (!ElectronTokensCreated() && nHeight >= Params().GetConsensus().POSPOWStartHeight)
     //    return false;
-    return MagicTokensCreated() && DarkMatterTokensCreated() && AtomTokensCreated();
+    return MagicTokensCreated() && AtomTokensCreated();
 }
 
-uint16_t CTokenGroupManager::GetXDMInBlock(const CBlock& block) {
-    uint16_t nXDMCount = 0;
-    if (tokenGroupManager && tokenGroupManager->DarkMatterTokensCreated()) {
-        CTokenGroupID tgId = tokenGroupManager->GetDarkMatterID();
+uint16_t CTokenGroupManager::GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId) {
+    uint16_t nTokenCount = 0;
+    if (tokenGroupManager) {
         for (unsigned int i = 0; i < block.vtx.size(); i++)
         {
             for (const auto &outp : block.vtx[i]->vout)
@@ -201,13 +190,13 @@ uint16_t CTokenGroupManager::GetXDMInBlock(const CBlock& block) {
                 CTokenGroupInfo tokenGrp(scriptPubKey);
                 if (!tokenGrp.invalid && tokenGrp.associatedGroup == tgId)
                 {
-                    nXDMCount++;
+                    nTokenCount++;
                     break;
                 }
             }
         }
     }
-    return nXDMCount;
+    return nTokenCount;
 }
 
 unsigned int CTokenGroupManager::GetTokenTxStats(const CTransactionRef &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId,
@@ -283,63 +272,18 @@ std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, cons
     }
 }
 
-bool CTokenGroupManager::GetXDMFee(const uint32_t& nXDMTransactions, CAmount& fee) {
-    if (!tgDarkMatterCreation) {
-        fee = 0;
-        return false;
-    }
-    CAmount XDMCoin = tgDarkMatterCreation->tokenGroupDescription.GetCoin();
-    if (nXDMTransactions < 100000) {
-        fee = 0.10 * XDMCoin;
-    } else if (nXDMTransactions < 200000) {
-        fee = 0.09 * XDMCoin;
-    } else if (nXDMTransactions < 300000) {
-        fee = 0.08 * XDMCoin;
-    } else if (nXDMTransactions < 400000) {
-        fee = 0.07 * XDMCoin;
-    } else if (nXDMTransactions < 500000) {
-        fee = 0.06 * XDMCoin;
-    } else if (nXDMTransactions < 600000) {
-        fee = 0.05 * XDMCoin;
-    } else if (nXDMTransactions < 700000) {
-        fee = 0.04 * XDMCoin;
-    } else if (nXDMTransactions < 800000) {
-        fee = 0.03 * XDMCoin;
-    } else if (nXDMTransactions < 900000) {
-        fee = 0.02 * XDMCoin;
-    } else {
-        fee = 0.01 * XDMCoin;
-    }
-    return true;
-}
+bool CTokenGroupManager::CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex) {
+    if (!tgMagicCreation) return true;
+    // A token group creation costs 5x the standard TX fee
+    // A token mint transaction costs 2x the standard TX fee
+    // Sending tokens costs the standard fee
 
-bool CTokenGroupManager::GetXDMFee(const CBlockIndex* pindex, CAmount& fee) {
-    return GetXDMFee(pindex->nChainXDMTransactions, fee);
-}
+    uint32_t tokenMelts = 0;
+    uint32_t tokenMints = 0;
+    uint32_t tokensCreated = 0;
+    uint32_t tokenOutputs = 0;
 
-bool CTokenGroupManager::CheckXDMFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, CBlockIndex* pindex, CAmount& nXDMFees) {
-    if (!tgDarkMatterCreation) return true;
-    // Creating a token costs a fee in XDM.
-    // Fees are paid to an XDM management address.
-    // 80% of the fees are burned weekly
-    // 10% of the fees are distributed over masternode owners weekly
-    // 10% of the fees are distributed over atom token holders weekly
-
-    // A token group creation costs 5x the standard XDM fee
-    // A token mint transaction costs 5x the standard XDM fee
-    // Sending XDM costs 1x the standard XDM fee
-    // When paying fees, there are 2 'free' XDM outputs (fee and change)
-
-    CAmount XDMMelted = 0;
-    CAmount XDMMinted = 0;
-    CAmount XDMFeesPaid = 0;
-    uint32_t nXDMOutputs = 0;
-    uint32_t nXDMFreeOutputs = 0;
-
-    CAmount curXDMFee;
-    GetXDMFee(pindex, curXDMFee);
-
-    nXDMFees = 0;
+    CFeeRate feeRate = CFeeRate(DEFAULT_BLOCK_MIN_TX_FEE);
 
     for (auto txout : tx.vout) {
         CTokenGroupInfo grp(txout.scriptPubKey);
@@ -347,20 +291,11 @@ bool CTokenGroupManager::CheckXDMFees(const CTransaction &tx, const std::unorder
             return false;
         if (grp.isGroupCreation() && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
             // Creation tx of regular token
-            nXDMFees = 5 * curXDMFee;
-            nXDMFreeOutputs = nXDMFreeOutputs < 2 ? 2 : nXDMFreeOutputs; // Free outputs for fee and change
+            tokensCreated++;
         }
-        if (MatchesDarkMatter(grp.associatedGroup) && !grp.isAuthority()) {
-            // XDM output (send or mint)
-            nXDMOutputs++;
-
-            // Currenlty, fees are paid to the address belonging to the Token Management Key
-            // TODO: change this to paying fees to the latest address that received an XDM Melt Authority
-            CTxDestination payeeDest;
-            ExtractDestination(txout.scriptPubKey, payeeDest);
-            if (EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey) {
-                XDMFeesPaid += grp.quantity;
-            }
+        if (grp.getAmount() > 0) {
+            // Token output (send or mint)
+            tokenOutputs++;
         }
     }
     for (auto bal : tgMintMeltBalance) {
@@ -371,24 +306,15 @@ bool CTokenGroupManager::CheckXDMFees(const CTransaction &tx, const std::unorder
             // Mint
             if (!tgID.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
                 // Regular token mint tx
-                nXDMFees += 5 * curXDMFee;
-                nXDMFreeOutputs = nXDMFreeOutputs < 2 ? 2 : nXDMFreeOutputs; // Fee free outputs for fee and change
-            }
-            if (tgID == tgDarkMatterCreation->tokenGroupInfo.associatedGroup) {
-                // XDM mint
-                XDMMinted += tgBalance.output - tgBalance.input;
-                nXDMFreeOutputs = nXDMFreeOutputs < 1 ? 1 : nXDMFreeOutputs; // Fee free output for XDM mint
+                tokenMints++;
+            } else {
+                // Management token mint tx
+                tokenMints++;
             }
         } else if (tgBalance.output - tgBalance.input < 0) {
             // Melt
-            if (tgID == tgDarkMatterCreation->tokenGroupInfo.associatedGroup) {
-                // XDM melt
-                XDMMelted += tgBalance.output - tgBalance.input;
-                nXDMFreeOutputs = nXDMFreeOutputs < 1 ? 1 : nXDMFreeOutputs; // Fee free output for XDM melt
-            }
+            tokenMelts--;
         }
     }
-    nXDMFees += nXDMOutputs > nXDMFreeOutputs ?  1 * curXDMFee : 0;
-
-    return XDMFeesPaid >= nXDMFees;
+    return true;
 }

@@ -1433,11 +1433,10 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
             if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
                 return state.DoS(0, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
 
-            //Check that all token transactions paid their XDM fees
-            CAmount nXDMFees = 0;
+            //Check that all token transactions paid their fees
             if (IsAnyOutputGrouped(tx)) {
-                if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
-                    return state.DoS(0, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
+                if (!tokenGroupManager->CheckFees(tx, tgMintMeltBalance, state, pindexPrev)) {
+                    return state.DoS(0, error("Token transaction does not pay enough fees"), REJECT_MALFORMED, "token-group-imbalance");
                 }
                 if (!tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
                     for (const CTxOut &txout : tx.vout)
@@ -2217,8 +2216,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
     //! ATP
     std::vector<CTokenGroupCreation> newTokenGroups;
-    CAmount nXDMMint = 0;
-    CAmount nMagicMint = 0;
 
     std::vector<PrecomputedTransactionData> txdata;
     txdata.reserve(block.vtx.size()); // Required so that pointers to individual PrecomputedTransactionData don't get invalidated
@@ -2493,10 +2490,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (!UpdateZBYTZSupply(block, pindex, fJustCheck))
         return state.DoS(100, error("%s: Failed to calculate new zBYTZ supply for block=%s height=%d", __func__,
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
-
-    // Track XDM money supply in the block index
-    pindex->nXDMTransactions = tokenGroupManager->GetXDMInBlock(block);
-    pindex->nChainXDMTransactions = (pindex->pprev ? pindex->pprev->nChainXDMTransactions : 0) + pindex->nXDMTransactions;
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
@@ -3583,8 +3576,6 @@ void CChainState::ReceivedBlockTransactions(const CBlock& block, CBlockIndex* pi
     }
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
-    pindexNew->nXDMTransactions = 0;
-    pindexNew->nChainXDMTransactions = 0;
     pindexNew->nFile = pos.nFile;
     pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;
@@ -4493,15 +4484,12 @@ bool CChainState::LoadBlockIndex(const Consensus::Params& consensus_params, CBlo
             if (pindex->pprev) {
                 if (pindex->pprev->nChainTx) {
                     pindex->nChainTx = pindex->pprev->nChainTx + pindex->nTx;
-                    pindex->nChainXDMTransactions = pindex->pprev->nChainXDMTransactions + pindex->nXDMTransactions;
                 } else {
                     pindex->nChainTx = 0;
-                    pindex->nChainXDMTransactions = 0;
                     mapBlocksUnlinked.insert(std::make_pair(pindex->pprev, pindex));
                 }
             } else {
                 pindex->nChainTx = pindex->nTx;
-                pindex->nChainXDMTransactions = pindex->nXDMTransactions;
             }
         }
         if (!(pindex->nStatus & BLOCK_FAILED_MASK) && pindex->pprev && (pindex->pprev->nStatus & BLOCK_FAILED_MASK)) {

@@ -815,17 +815,8 @@ extern UniValue sendtoken(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_PARAMS, "Improper number of parameters, did you forget the payment amount?");
     }
 
-    // Optionally, add XDM fee
-    CAmount XDMFeeNeeded = 0;
-    if (tokenGroupManager->MatchesDarkMatter(grpID)) {
-        tokenGroupManager->GetXDMFee(chainActive.Tip(), XDMFeeNeeded);
-    }
-
-    // Ensure enough XDM fees are paid
-    EnsureXDMFee(outputs, XDMFeeNeeded);
-
     CTransactionRef tx;
-    GroupSend(tx, grpID, outputs, totalTokensNeeded, XDMFeeNeeded, pwallet);
+    GroupSend(tx, grpID, outputs, totalTokensNeeded, pwallet);
     return tx->GetHash().GetHex();
 }
 
@@ -907,65 +898,8 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
     outputs.push_back(recipient);
 
-    std::string strError;
-    std::vector<COutput> coins;
-
-    // When minting a regular (non-management) token, an XDM fee is needed
-    // Note that XDM itself is also a management token
-    // Add XDM output to fee address and to change address
-    CAmount XDMFeeNeeded = 0;
-    CAmount totalXDMAvailable = 0;
-    if (!grpID.hasFlag(TokenGroupIdFlags::MGT_TOKEN))
-    {
-        tokenGroupManager->GetXDMFee(chainActive.Tip(), XDMFeeNeeded);
-        XDMFeeNeeded *= 5;
-
-        // Ensure enough XDM fees are paid
-        EnsureXDMFee(outputs, XDMFeeNeeded);
-
-        // Add XDM inputs
-        if (XDMFeeNeeded > 0) {
-            CTokenGroupID XDMGrpID = tokenGroupManager->GetDarkMatterID();
-            pwallet->FilterCoins(coins, [XDMGrpID, &totalXDMAvailable](const CWalletTx *tx, const CTxOut *out) {
-                CTokenGroupInfo tg(out->scriptPubKey);
-                if ((XDMGrpID == tg.associatedGroup) && !tg.isAuthority())
-                {
-                    totalXDMAvailable += tg.quantity;
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        if (totalXDMAvailable < XDMFeeNeeded)
-        {
-            strError = strprintf("Not enough XDM in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(XDMFeeNeeded - totalXDMAvailable, grpID));
-            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-        }
-
-        // Get a near but greater quantity
-        totalXDMAvailable = GroupCoinSelection(coins, XDMFeeNeeded, chosenCoins);
-    }
-
     UniValue ret(UniValue::VOBJ);
 
-/*
-    UniValue retChosenCoins(UniValue::VARR);
-    for (auto coin : chosenCoins) {
-        retChosenCoins.push_back(coin.ToString());
-    }
-    ret.push_back(Pair("chosen_coins", retChosenCoins));
-    UniValue retOutputs(UniValue::VOBJ);
-    for (auto output : outputs) {
-        retOutputs.push_back(Pair(output.scriptPubKey.ToString(), output.nAmount));
-    }
-    ret.push_back(Pair("outputs", retOutputs));
-*/
-
-    if (tokenGroupManager->ManagementTokensCreated(chainActive.Height())) {
-        ret.push_back(Pair("xdm_available", tokenGroupManager->TokenValueFromAmount(totalXDMAvailable, tokenGroupManager->GetDarkMatterID())));
-        ret.push_back(Pair("xdm_needed", tokenGroupManager->TokenValueFromAmount(XDMFeeNeeded, tokenGroupManager->GetDarkMatterID())));
-    }
     ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
 
     CTokenGroupInfo tokenGroupInfo(opretScript);
@@ -1078,48 +1012,8 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
     outputs.push_back(recipient);
 
-    std::string strError;
-    std::vector<COutput> coins;
-
-    // When minting a regular (non-management) token, an XDM fee is needed
-    // Note that XDM itself is also a management token
-    // Add XDM output to fee address and to change address
-    CAmount XDMFeeNeeded = 0;
-    CAmount totalXDMAvailable = 0;
-    if (!grpID.hasFlag(TokenGroupIdFlags::MGT_TOKEN))
-    {
-        tokenGroupManager->GetXDMFee(chainActive.Tip(), XDMFeeNeeded);
-        XDMFeeNeeded *= 5;
-
-        // Ensure enough XDM fees are paid
-        EnsureXDMFee(outputs, XDMFeeNeeded);
-
-        // Add XDM inputs
-        if (XDMFeeNeeded > 0) {
-            CTokenGroupID XDMGrpID = tokenGroupManager->GetDarkMatterID();
-            pwallet->FilterCoins(coins, [XDMGrpID, &totalXDMAvailable](const CWalletTx *tx, const CTxOut *out) {
-                CTokenGroupInfo tg(out->scriptPubKey);
-                if ((XDMGrpID == tg.associatedGroup) && !tg.isAuthority())
-                {
-                    totalXDMAvailable += tg.quantity;
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        if (totalXDMAvailable < XDMFeeNeeded)
-        {
-            strError = strprintf("Not enough XDM in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(XDMFeeNeeded - totalXDMAvailable, grpID));
-            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-        }
-
-        // Get a near but greater quantity
-        totalXDMAvailable = GroupCoinSelection(coins, XDMFeeNeeded, chosenCoins);
-    }
-
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, XDMFeeNeeded, grpID, pwallet);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
     authKeyReservation.KeepKey();
     UniValue ret(UniValue::VOBJ);
     ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
@@ -1140,7 +1034,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
         throw std::runtime_error(
             "configuremanagementtoken \"ticker\" \"name\" decimalpos \"description_url\" description_hash ( confirm_send ) \n"
             "\n"
-            "Configures a new management token type. Currelty the only management tokens are MAGIC, XDM and ATOM.\n"
+            "Configures a new management token type. Currelty the only management tokens are MGT and GVN.\n"
             "\nArguments:\n"
             "1. \"ticker\"              (string, required) the token ticker\n"
             "2. \"name\"                (string, required) the token name\n"
@@ -1150,7 +1044,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"MAGIC\" \"MagicToken\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MAGIC.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
+            HelpExampleCli("configuremanagementtoken", "\"GVN\" \"Guardian\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MAGIC.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
             "\n"
         );
 
@@ -1267,7 +1161,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     UniValue ret(UniValue::VOBJ);
     if (confirmed) {
         CTransactionRef tx;
-        ConstructTx(tx, chosenCoins, outputs, 0, 0, grpID, pwallet);
+        ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
         authKeyReservation.KeepKey();
         ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
         ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
@@ -1395,7 +1289,7 @@ extern UniValue createtokenauthorities(const JSONRPCRequest& request)
     }
 
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, 0, grpID, pwallet);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
     renewAuthorityKey.KeepKey();
     return tx->GetHash().GetHex();
 }
@@ -1604,7 +1498,7 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
         outputs.push_back(recipient);
     }
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, 0, grpID, pwallet);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
     return ret;
 }
 
@@ -1703,47 +1597,10 @@ extern UniValue minttoken(const JSONRPCRequest& request)
     CReserveKey childAuthorityKey(pwallet);
     RenewAuthority(authority, outputs, childAuthorityKey);
 
-    // When minting a regular (non-management) token, an XDM fee is needed
-    // Note that XDM itself is also a management token
-    // Add XDM output to fee address and to change address
-    CAmount XDMFeeNeeded = 0;
-    CAmount totalXDMAvailable = 0;
-    if (!grpID.hasFlag(TokenGroupIdFlags::MGT_TOKEN))
-    {
-        tokenGroupManager->GetXDMFee(chainActive.Tip(), XDMFeeNeeded);
-        XDMFeeNeeded *= 5;
-
-        // Ensure enough XDM fees are paid
-        EnsureXDMFee(outputs, XDMFeeNeeded);
-
-        // Add XDM inputs
-        if (XDMFeeNeeded > 0) {
-            CTokenGroupID XDMGrpID = tokenGroupManager->GetDarkMatterID();
-            pwallet->FilterCoins(coins, [XDMGrpID, &totalXDMAvailable](const CWalletTx *tx, const CTxOut *out) {
-                CTokenGroupInfo tg(out->scriptPubKey);
-                if ((XDMGrpID == tg.associatedGroup) && !tg.isAuthority())
-                {
-                    totalXDMAvailable += tg.quantity;
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        if (totalXDMAvailable < XDMFeeNeeded)
-        {
-            strError = strprintf("Not enough XDM in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(XDMFeeNeeded - totalXDMAvailable, grpID));
-            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-        }
-
-        // Get a near but greater quantity
-        totalXDMAvailable = GroupCoinSelection(coins, XDMFeeNeeded, chosenCoins);
-    }
-
     // I don't "need" tokens even though they are in the output because I'm minting, which is why
     // the token quantities are 0
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, XDMFeeNeeded, grpID, pwallet);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
     childAuthorityKey.KeepKey();
     return tx->GetHash().GetHex();
 }

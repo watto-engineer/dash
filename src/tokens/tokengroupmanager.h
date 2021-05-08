@@ -24,7 +24,6 @@ class CTokenGroupManager
 private:
     std::map<CTokenGroupID, CTokenGroupCreation> mapTokenGroups;
     std::unique_ptr<CTokenGroupCreation> tgMagicCreation;
-    std::unique_ptr<CTokenGroupCreation> tgDarkMatterCreation;
     std::unique_ptr<CTokenGroupCreation> tgAtomCreation;
     std::unique_ptr<CTokenGroupCreation> tgElectronCreation;
 
@@ -48,33 +47,27 @@ public:
     void ClearManagementTokenGroups();
 
     bool MatchesMagic(CTokenGroupID tgID);
-    bool MatchesDarkMatter(CTokenGroupID tgID);
     bool MatchesAtom(CTokenGroupID tgID);
     bool MatchesElectron(CTokenGroupID tgID);
 
     CTokenGroupID GetMagicID() { return tgMagicCreation->tokenGroupInfo.associatedGroup; };
-    CTokenGroupID GetDarkMatterID() { return tgDarkMatterCreation->tokenGroupInfo.associatedGroup; };
     CTokenGroupID GetAtomID() { return tgAtomCreation->tokenGroupInfo.associatedGroup; };
     CTokenGroupID GetElectronID() { return tgElectronCreation->tokenGroupInfo.associatedGroup; };
 
     bool MagicTokensCreated() { return tgMagicCreation ? true : false; };
-    bool DarkMatterTokensCreated() { return tgDarkMatterCreation ? true : false; };
     bool AtomTokensCreated() { return tgAtomCreation ? true : false; };
     bool ElectronTokensCreated() { return tgElectronCreation ? true : false; };
 
     bool ManagementTokensCreated(int nHeight);
 
-    uint16_t GetXDMInBlock(const CBlock& block);
+    uint16_t GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId);
     unsigned int GetTokenTxStats(const CTransactionRef &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, uint16_t &nTokenCount, CAmount &nTokenMint);
 
     bool TokenMoneyRange(CAmount nValueOut);
     CAmount AmountFromTokenValue(const UniValue& value, const CTokenGroupID& tgID);
     std::string TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID);
 
-    bool GetXDMFee(const uint32_t& nXDMTransactions, CAmount& fee);
-    bool GetXDMFee(const CBlockIndex* pindex, CAmount& fee);
-
-    bool CheckXDMFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, CBlockIndex* pindex, CAmount& nXDMFees);
+    bool CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex);
 };
 
 #endif
