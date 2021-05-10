@@ -102,6 +102,7 @@ public:
     }
 
     bool hasFlag(TokenGroupIdFlags flag) const;
+    std::string encodeFlags() const;
 };
 
 namespace std

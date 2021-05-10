@@ -395,75 +395,104 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
     CAmount totalAvailable = 0;
     LOCK2(cs_main, wallet->cs_wallet);
 
-    // Find melt authority
     std::vector<COutput> coins;
 
-    int nOptions = wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
-        CTokenGroupInfo tg(out->scriptPubKey);
-        if ((tg.associatedGroup == grpID) && tg.allowsMelt())
-        {
-            return true;
-        }
-        return false;
-    });
-
-    // if its a subgroup look for a parent authority that will work
-    // As an idiot-proofing step, we only allow parent authorities that can be renewed, but that is a
-    // preference coded in this wallet, not a group token requirement.
-    if ((nOptions == 0) && (grpID.isSubgroup()))
-    {
-        // if its a subgroup look for a parent authority that will work
-        nOptions = wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+    if (grpID.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
+        // Find meltable coins
+        coins.clear();
+        wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
             CTokenGroupInfo tg(out->scriptPubKey);
-            if (tg.isAuthority() && tg.allowsRenew() && tg.allowsSubgroup() && tg.allowsMelt() &&
-                (tg.associatedGroup == grpID.parentGroup()))
+            // must be a grouped output sitting in group address
+            return ((grpID == tg.associatedGroup) && !tg.isAuthority());
+        });
+
+        // Get a near but greater quantity
+        std::vector<COutput> chosenCoins;
+        totalAvailable = GroupCoinSelection(coins, totalNeeded, chosenCoins);
+
+        if (totalAvailable < totalNeeded)
+        {
+            std::string strError;
+            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
+            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
+        } else if (totalAvailable == totalNeeded) {
+            CRecipient recipient = {CScript() << OP_RETURN, GROUPED_SATOSHI_AMT, false};
+
+            outputs.emplace_back(recipient);
+        }
+
+        // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
+        // This surplus will be melted.
+        ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
+    } else {
+        // Find melt authority
+        int nOptions = wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+            CTokenGroupInfo tg(out->scriptPubKey);
+            if ((tg.associatedGroup == grpID) && tg.allowsMelt())
             {
                 return true;
             }
             return false;
         });
+
+        // if its a subgroup look for a parent authority that will work
+        // As an idiot-proofing step, we only allow parent authorities that can be renewed, but that is a
+        // preference coded in this wallet, not a group token requirement.
+        if ((nOptions == 0) && (grpID.isSubgroup()))
+        {
+            // if its a subgroup look for a parent authority that will work
+            nOptions = wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+                CTokenGroupInfo tg(out->scriptPubKey);
+                if (tg.isAuthority() && tg.allowsRenew() && tg.allowsSubgroup() && tg.allowsMelt() &&
+                    (tg.associatedGroup == grpID.parentGroup()))
+                {
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        if (nOptions == 0)
+        {
+            strError = _("To melt coins, an authority output with melt capability is needed.");
+            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
+        }
+        COutput authority(nullptr, 0, 0, false, false, false);
+        // Just pick the first one for now.
+        for (auto coin : coins)
+        {
+            authority = coin;
+            break;
+        }
+
+        // Find meltable coins
+        coins.clear();
+        wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+            CTokenGroupInfo tg(out->scriptPubKey);
+            // must be a grouped output sitting in group address
+            return ((grpID == tg.associatedGroup) && !tg.isAuthority());
+        });
+
+        // Get a near but greater quantity
+        std::vector<COutput> chosenCoins;
+        totalAvailable = GroupCoinSelection(coins, totalNeeded, chosenCoins);
+
+        if (totalAvailable < totalNeeded)
+        {
+            std::string strError;
+            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
+            throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
+        }
+
+        chosenCoins.push_back(authority);
+
+        CReserveKey childAuthorityKey(wallet);
+        RenewAuthority(authority, outputs, childAuthorityKey);
+        // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
+        // This surplus will be melted.
+        ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
+        childAuthorityKey.KeepKey();
     }
-
-    if (nOptions == 0)
-    {
-        strError = _("To melt coins, an authority output with melt capability is needed.");
-        throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-    }
-    COutput authority(nullptr, 0, 0, false, false, false);
-    // Just pick the first one for now.
-    for (auto coin : coins)
-    {
-        authority = coin;
-        break;
-    }
-
-    // Find meltable coins
-    coins.clear();
-    wallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
-        CTokenGroupInfo tg(out->scriptPubKey);
-        // must be a grouped output sitting in group address
-        return ((grpID == tg.associatedGroup) && !tg.isAuthority());
-    });
-
-    // Get a near but greater quantity
-    std::vector<COutput> chosenCoins;
-    totalAvailable = GroupCoinSelection(coins, totalNeeded, chosenCoins);
-
-    if (totalAvailable < totalNeeded)
-    {
-        std::string strError;
-        strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
-        throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
-    }
-
-    chosenCoins.push_back(authority);
-
-    CReserveKey childAuthorityKey(wallet);
-    RenewAuthority(authority, outputs, childAuthorityKey);
-    // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
-    // This surplus will be melted.
-    ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
-    childAuthorityKey.KeepKey();
 }
 
 void GroupSend(CTransactionRef &txNew,

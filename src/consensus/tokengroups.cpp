@@ -151,6 +151,9 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             // Track what permissions this transaction has
             gBalance[tokenGrp.associatedGroup].ctrlPerms |= temp;
         }
+        if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
+            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
+        }
         if ((tokenGrp.associatedGroup != NoGroup) && !tokenGrp.isAuthority())
         {
             if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
@@ -215,7 +218,16 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                         LogPrint(BCLog::TOKEN, "%s - Group management creation transaction. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
                     } else {
                         return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
-                            "No group management capability at any input address");
+                            "No group management capability at any input address - unable to create management token");
+                    }
+                }
+                if (newGrpId.hasFlag(TokenGroupIdFlags::STICKY_MELT))
+                {
+                    if (anyInputsGroupManagement) {
+                        LogPrint(BCLog::TOKEN, "%s - Group with sticky melt created. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
+                    } else {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
+                            "No group management capability at any input address - unable to set stick_melt");
                     }
                 }
 

@@ -107,11 +107,12 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
     return curparam;
 }
 
-std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCRequest& request, unsigned int &curparam, bool &confirmed)
+std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCRequest& request, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
 {
     std::vector<std::vector<unsigned char> > ret;
     std::string strCurparamValue;
 
+    stickyMelt = false;
     confirmed = false;
 
     std::string tickerStr = request.params[curparam].get_str();
@@ -134,21 +135,12 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCReque
     ret.push_back(std::vector<unsigned char>(name.begin(), name.end()));
 
     curparam++;
-    // we will accept just ticker and name
     if (curparam >= request.params.size())
     {
-        ret.push_back(std::vector<unsigned char>());
-        ret.push_back(std::vector<unsigned char>());
-        ret.push_back(std::vector<unsigned char>());
-        return ret;
+        std::string strError = strprintf("Not enough paramaters", name);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
     strCurparamValue = request.params[curparam].get_str();
-    if (strCurparamValue == "true") {
-        confirmed = true;
-        return ret;
-    } else if (strCurparamValue == "false") {
-        return ret;
-    }
 
     int32_t decimalPosition;
     if (!ParseInt32(strCurparamValue, &decimalPosition) || decimalPosition > 16 || decimalPosition < 0) {
@@ -158,22 +150,12 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCReque
     ret.push_back(SerializeAmount(decimalPosition));
 
     curparam++;
-    // we will accept just ticker, name and decimal position
     if (curparam >= request.params.size())
     {
-        ret.push_back(std::vector<unsigned char>());
-        ret.push_back(std::vector<unsigned char>());
-        return ret;
+        std::string strError = strprintf("Not enough paramaters", name);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    strCurparamValue = request.params[curparam].get_str();
-    if (strCurparamValue == "true") {
-        confirmed = true;
-        return ret;
-    } else if (strCurparamValue == "false") {
-        return ret;
-    }
-
-    std::string url = strCurparamValue;
+    std::string url = request.params[curparam].get_str();
     if (name.size() > 98) {
         std::string strError = strprintf("URL %s has too many characters (98 max)", name);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
@@ -192,6 +174,18 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCReque
     uint256 docHash;
     docHash.SetHex(hexDocHash);
     ret.push_back(std::vector<unsigned char>(docHash.begin(), docHash.end()));
+
+    if (fManagementToken) {
+        curparam++;
+        if (curparam >= request.params.size())
+        {
+            return ret;
+        }
+        strCurparamValue = request.params[curparam].get_str();
+        if (strCurparamValue == "true") {
+            stickyMelt = true;
+        }
+    }
 
     curparam++;
     if (curparam >= request.params.size())
@@ -832,6 +826,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     unsigned int curparam = 0;
+    bool fStickyBit = false;
     bool confirmed = false;
 
     COutput coin(nullptr, 0, 0, false, false, false);
@@ -879,7 +874,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
         authDest = DecodeDestination(request.params[curparam].get_str(), Params());
         if (authDest == CTxDestination(CNoDestination()))
         {
-            auto desc = ParseGroupDescParams(request, curparam, confirmed);
+            auto desc = ParseGroupDescParams(request, curparam, fStickyBit, confirmed);
             if (desc.size()) // Add an op_return if there's a token desc doc
             {
                 opretScript = BuildTokenDescScript(desc);
@@ -892,7 +887,8 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     }
     curparam++;
 
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, TokenGroupIdFlags::NONE, grpNonce);
+    TokenGroupIdFlags tgFlags = fStickyBit ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
@@ -955,6 +951,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     unsigned int curparam = 0;
+    bool fStickyMelt = false;
     bool confirmed = false;
 
     COutput coin(nullptr, 0, 0, false, false, false);
@@ -995,7 +992,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     authDest = DecodeDestination(request.params[curparam].get_str(), Params());
     if (authDest == CTxDestination(CNoDestination()))
     {
-        auto desc = ParseGroupDescParams(request, curparam, confirmed);
+        auto desc = ParseGroupDescParams(request, curparam, fStickyMelt, confirmed);
         if (desc.size()) // Add an op_return if there's a token desc doc
         {
             opretScript = BuildTokenDescScript(desc);
@@ -1006,7 +1003,8 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
         authDest = authKey.GetID();
     }
 
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, TokenGroupIdFlags::NONE, grpNonce);
+    TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
@@ -1032,7 +1030,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configuremanagementtoken \"ticker\" \"name\" decimalpos \"description_url\" description_hash ( confirm_send ) \n"
+            "configuremanagementtoken \"ticker\" \"name\" decimalpos \"description_url\" description_hash sticky_melt ( confirm_send ) \n"
             "\n"
             "Configures a new management token type. Currelty the only management tokens are MGT and GVN.\n"
             "\nArguments:\n"
@@ -1041,7 +1039,8 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "3. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
             "4. \"description_url\"     (string, required) the URL of the token's description document\n"
             "5. \"description_hash\"    (hex) the hash of the token description document\n"
-            "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
+            "6. \"sticky_melt\"         (boolean, optional, default=false) the token can be melted, also without a token melt authority\n"
+            "7. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
             HelpExampleCli("configuremanagementtoken", "\"GVT\" \"GuardianValidatorToken\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
@@ -1052,6 +1051,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwallet->cs_wallet);
     unsigned int curparam = 0;
+    bool fStickyMelt = false;
     bool confirmed = false;
 
     CReserveKey authKeyReservation(pwallet);
@@ -1059,7 +1059,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     CScript opretScript;
     std::vector<CRecipient> outputs;
 
-    auto desc = ParseGroupDescParams(request, curparam, confirmed);
+    auto desc = ParseGroupDescParams(request, curparam, fStickyMelt, confirmed, true);
     if (desc.size()) // Add an op_return if there's a token desc doc
     {
         opretScript = BuildTokenDescScript(desc);
@@ -1149,7 +1149,9 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_PARAMS, "Management Group Token key is not available");
 
     uint64_t grpNonce = 0;
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, TokenGroupIdFlags::MGT_TOKEN, grpNonce);
+    TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    tgFlags |= TokenGroupIdFlags::MGT_TOKEN;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
 
     std::vector<COutput> chosenCoins;
     chosenCoins.push_back(coin);
