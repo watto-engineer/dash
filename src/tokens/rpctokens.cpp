@@ -39,6 +39,9 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
     entry.push_back(Pair("decimalPos", tgCreation.tokenGroupDescription.nDecimalPos));
     entry.push_back(Pair("URL", tgCreation.tokenGroupDescription.strDocumentUrl));
     entry.push_back(Pair("documentHash", tgCreation.tokenGroupDescription.documentHash.ToString()));
+    std::string flags = tgID.encodeFlags();
+    if (flags != "none")
+        entry.push_back(Pair("flags", flags));
     if (extended) {
         UniValue extendedEntry(UniValue::VOBJ);
         extendedEntry.push_back(Pair("txid", tgCreation.creationTransaction->GetHash().GetHex()));

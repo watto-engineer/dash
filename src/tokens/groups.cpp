@@ -304,3 +304,17 @@ const std::vector<unsigned char> CTokenGroupID::GetSubGroupData() const {
 bool CTokenGroupID::hasFlag(TokenGroupIdFlags flag) const {
     return data.size() >= PARENT_GROUP_ID_SIZE ? hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], flag) : false;
 }
+
+std::string CTokenGroupID::encodeFlags() const {
+    std::string sflags = "none";
+    if (data.size() < CTokenGroupID::PARENT_GROUP_ID_SIZE) return sflags;
+
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::MGT_TOKEN)) {
+        sflags = "management";
+    }
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::STICKY_MELT)) {
+        if (sflags != "") sflags += " ";
+        sflags += "sticky_melt";
+    }
+    return sflags;
+}
