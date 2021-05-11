@@ -75,6 +75,8 @@ public:
     CTokenGroupID(const uint256 &id) : data(ToByteVector(id)) {}
     //* Assign the groupID from a vector
     CTokenGroupID(const std::vector<unsigned char> &id);
+    //* Assign the groupID from a parent group and a string that identifies the subgroup
+    CTokenGroupID(const CTokenGroupID& tgID, const std::string strSubgroup);
 
     void NoGroup(void) { data.resize(0); }
     bool operator==(const CTokenGroupID &id) const { return data == id.data; }

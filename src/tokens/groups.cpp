@@ -283,6 +283,21 @@ CTokenGroupID::CTokenGroupID(const std::vector<unsigned char> &id)
     data = id;
 }
 
+CTokenGroupID::CTokenGroupID(const CTokenGroupID& tgID, const std::string strSubgroup)
+{
+    data = std::vector<unsigned char>(tgID.bytes().size() + strSubgroup.size());
+
+    unsigned int i;
+    for (i = 0; i < tgID.bytes().size(); i++)
+    {
+        data[i] = tgID.bytes()[i];
+    }
+    for (unsigned int j = 0; j < strSubgroup.size(); j++, i++)
+    {
+        data[i] = strSubgroup[j];
+    }
+}
+
 bool CTokenGroupID::isUserGroup(void) const { return (!data.empty()); }
 bool CTokenGroupID::isSubgroup(void) const { return (data.size() > PARENT_GROUP_ID_SIZE); }
 
