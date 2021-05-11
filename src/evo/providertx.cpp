@@ -8,6 +8,7 @@
 #include <consensus/validation.h>
 #include <hash.h>
 #include <script/standard.h>
+#include <tokens/tokengroupmanager.h>
 
 maybe_error CProRegTx::IsTriviallyValid() const
 {

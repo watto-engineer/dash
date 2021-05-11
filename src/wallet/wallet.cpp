@@ -2738,8 +2738,10 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
                 {
                     // The UTXO is available
                     COutput outpoint(pcoin, i, nDepth, (mine & ISMINE_SPENDABLE) != ISMINE_NO, false, false);
-                  vCoins.push_back(outpoint);
-                    ret++;
+                    if (outpoint.nInputBytes > 0) {
+                        vCoins.push_back(outpoint);
+                        ret++;
+                    }
                 }
             }
         }
