@@ -16,6 +16,7 @@
 #include <wallet/coincontrol.h>
 #include <wallet/wallet.h>
 #include <wallet/rpcwallet.h>
+#include <tokens/tokengroupmanager.h>
 #endif//ENABLE_WALLET
 
 #include <netbase.h>
@@ -152,6 +153,26 @@ static CBLSSecretKey ParseBLSSecretKey(const std::string& hexKey, const std::str
 
 #ifdef ENABLE_WALLET
 
+bool GetGVTCredits(CWallet* pwallet, std::vector<COutput>& credits) {
+
+    // Get grpID for GVT.credit
+    CTokenGroupID grpID(tokenGroupManager->GetGVTID(), "credit");
+
+    // Find GVT.credit coins
+    credits.clear();
+
+    pwallet->FilterCoins(credits, [grpID](const CWalletTx *tx, const CTxOut *out) {
+        CTokenGroupInfo tg(out->scriptPubKey);
+        // must be a grouped output sitting in group address
+        return ((grpID == tg.associatedGroup) && !tg.isAuthority() && tg.getAmount() == 1);
+    });
+
+    if (credits.size() == 0) {
+        return false;
+    }
+    return true;
+}
+
 template<typename SpecialTxPayload>
 static void FundSpecialTx(CWallet* pwallet, CMutableTransaction& tx, const SpecialTxPayload& payload, const CTxDestination& fundDest)
 {
@@ -212,12 +233,30 @@ static void FundSpecialTx(CWallet* pwallet, CMutableTransaction& tx, const Speci
     int nChangePos = -1;
     std::string strFailReason;
 
-    if (!pwallet->CreateTransaction(vecSend, newTx, reservekey, nFee, nChangePos, strFailReason, coinControl, false, tx.vExtraPayload.size())) {
+    std::vector<COutput> credits;
+    CTxIn gvtCreditTxIn;
+    int creditSize = 0;
+    bool fSpendCredit = tx.nType == TRANSACTION_PROVIDER_REGISTER;
+    if (fSpendCredit) {
+        if (!GetGVTCredits(pwallet, credits)) {
+            throw JSONRPCError(RPC_INTERNAL_ERROR, "No Governance Validator Node credit (GVT.credit) found");
+        }
+
+        gvtCreditTxIn = CTxIn(credits[0].GetOutPoint(), CScript(), CTxIn::SEQUENCE_FINAL - 1);
+        creditSize = credits[0].nInputBytes;
+    }
+
+    if (!pwallet->CreateTransaction(vecSend, newTx, reservekey, nFee, nChangePos, strFailReason, coinControl, false, tx.vExtraPayload.size() + creditSize)) {
         throw JSONRPCError(RPC_INTERNAL_ERROR, strFailReason);
     }
 
     tx.vin = newTx->vin;
     tx.vout = newTx->vout;
+
+    if (fSpendCredit) {
+        // add creditIn to tx.vin
+        tx.vin.push_back(gvtCreditTxIn);
+    }
 
     if (dummyTxOutAdded && tx.vout.size() > 1) {
         // CreateTransaction added a change output, so we don't need the dummy txout anymore.
