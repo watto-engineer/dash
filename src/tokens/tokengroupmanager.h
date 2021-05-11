@@ -7,7 +7,6 @@
 
 #include "consensus/tokengroups.h"
 #include "tokens/tokengroupconfiguration.h"
-#include "wallet/wallet.h"
 
 #include <unordered_map>
 

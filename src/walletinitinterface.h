@@ -22,6 +22,7 @@ public:
 
     // Dash Specific WalletInitInterface
     virtual void AutoLockMasternodeCollaterals() const = 0;
+    void InitStaking() const override {}
     virtual void InitCoinJoinSettings() const = 0;
     virtual bool InitAutoBackup() const = 0;
 

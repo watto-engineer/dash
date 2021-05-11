@@ -11,6 +11,9 @@
 #include <node/context.h>
 #include <univalue.h>
 
+#include <pos/staking-manager.h>
+#include <reward-manager.h>
+#include <scheduler.h>
 #include <tokens/rpctokenwallet.h>
 #include <util/check.h>
 #include <util/error.h>
@@ -42,6 +45,7 @@ public:
     // Dash Specific Wallet Init
     void AutoLockMasternodeCollaterals() const override;
     void InitCoinJoinSettings() const override;
+    void InitStaking() const override;
     bool InitAutoBackup() const override;
 };
 
@@ -109,12 +113,20 @@ bool WalletInit::ParameterInteraction() const
         for (const std::string& wallet : gArgs.GetArgs("-wallet")) {
             LogPrintf("%s: parameter interaction: -disablewallet -> ignoring -wallet=%s\n", __func__, wallet);
         }
+        if (gArgs.SoftSetBoolArg("-staking", false))
+            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
 
         return true;
     } else if (gArgs.IsArgSet("-masternodeblsprivkey")) {
         return InitError(_("You can not start a masternode with wallet enabled."));
     }
 
+    CAmount nReserveBalance;
+    if (gArgs.IsArgSet("-reservebalance")) {
+        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance)) {
+            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
+        }
+    }
     const bool is_multiwallet = gArgs.GetArgs("-wallet").size() > 1;
 
     if (gArgs.GetBoolArg("-blocksonly", DEFAULT_BLOCKSONLY) && gArgs.SoftSetBoolArg("-walletbroadcast", false)) {
@@ -211,6 +223,33 @@ void WalletInit::InitCoinJoinSettings() const
               CCoinJoinClientOptions::GetSessions(), CCoinJoinClientOptions::GetRounds(),
               CCoinJoinClientOptions::GetAmount(), CCoinJoinClientOptions::GetDenomsGoal(),
               CCoinJoinClientOptions::GetDenomsHardCap());
+}
+
+void WalletInit::InitStaking() const
+{
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    if (!HasWallets() || wallets.size() < 1) {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
+        stakingManager->fEnableStaking = false;
+        stakingManager->fEnableWAGERRStaking = false;
+    } else {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
+        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
+        stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
+
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
+    }
+    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
+        stakingManager->fEnableStaking = false;
+    }
+
+    CAmount nReserveBalance = 0;
+    if (gArgs.IsArgSet("-reservebalance")) {
+        bool res = ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance);
+    }
+
+    stakingManager->nReserveBalance = nReserveBalance;
 }
 
 bool WalletInit::InitAutoBackup() const

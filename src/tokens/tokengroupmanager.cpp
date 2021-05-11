@@ -8,6 +8,7 @@
 #include "coins.h"
 #include "dstencode.h"
 #include "wagerraddrenc.h"
+#include "logging.h"
 #include "policy/policy.h"
 #include "rpc/protocol.h"
 #include "script/tokengroup.h"

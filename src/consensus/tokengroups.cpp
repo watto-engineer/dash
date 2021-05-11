@@ -7,6 +7,7 @@
 #include "dstencode.h"
 #include "rpc/server.h"
 #include "wagerraddrenc.h"
+#include "logging.h"
 #include "rpc/server.h"
 #include <streams.h>
 #include "tokens/tokengroupmanager.h"

@@ -1165,16 +1165,6 @@ void InitParameterInteraction(ArgsManager& args)
         }
     }
 
-#ifdef ENABLE_WALLET
-    bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
-    if (fDisableWallet) {
-#endif
-        if (gArgs.SoftSetBoolArg("-staking", false))
-            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
-#ifdef ENABLE_WALLET
-    }
-#endif
-
     // Make sure additional indexes are recalculated correctly in VerifyDB
     // (we must reconnect blocks whenever we disconnect them for these indexes to work)
     bool fAdditionalIndexes =
@@ -2389,7 +2379,11 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
     g_wallet_init_interface.InitCoinJoinSettings();
 
-    // ********************************************************* Step 10b: Load cache data
+    // ********************************************************* Step 10b: setup Staking
+
+    g_wallet_init_interface.InitStaking();
+
+    // ********************************************************* Step 10c: Load cache data
 
     // LOAD SERIALIZED DAT FILES INTO DATA CACHES FOR INTERNAL USE
 
@@ -2457,6 +2451,13 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 #ifdef ENABLE_WALLET
     } else if(CCoinJoinClientOptions::IsEnabled()) {
         node.scheduler->scheduleEvery(std::bind(&DoCoinJoinMaintenance, std::ref(*node.connman)), 1 * 1000);
+
+    if (stakingManager->fEnableStaking) {
+        node.scheduler->scheduleEvery(std::bind(&CStakingManager::DoMaintenance, std::ref(stakingManager), std::ref(*node.connman)), 5 * 1000);
+    }
+    if (rewardManager->fEnableRewardManager) {
+        scheduler.scheduleEvery(std::bind(&CRewardManager::DoMaintenance, std::ref(rewardManager), std::ref(*node.connman)), 3 * 60 * 1000);
+    }
 #endif // ENABLE_WALLET
     }
 
@@ -2466,43 +2467,6 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
     }
 
     llmq::StartLLMQSystem();
-
-    // ********************************************************* Step 10d: setup and schedule Wagerr-specific functionality
-
-#ifdef ENABLE_WALLET
-
-    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    if (!HasWallets() || wallets.size() < 1) {
-        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
-        stakingManager->fEnableStaking = false;
-        stakingManager->fEnableWAGERRStaking = false;
-    } else {
-        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
-        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
-        stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
-
-        rewardManager->BindWallet(wallets[0].get());
-        rewardManager->fEnableRewardManager = true;
-    }
-    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
-        stakingManager->fEnableStaking = false;
-    }
-
-    if (gArgs.IsArgSet("-reservebalance")) {
-        CAmount n = 0;
-        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), n)) {
-            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
-        }
-        stakingManager->nReserveBalance = n;
-    }
-
-    if (stakingManager->fEnableStaking) {
-        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
-    }
-    if (rewardManager->fEnableRewardManager) {
-        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 3 * 60 * 1000);
-    }
-#endif // ENABLE_WALLET
 
     // ********************************************************* Step 11: import blocks
 
