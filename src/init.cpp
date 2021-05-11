@@ -124,6 +124,7 @@ public:
 
     // Dash Specific WalletInitInterface InitCoinJoinSettings
     void AutoLockMasternodeCollaterals() const override {}
+    void InitStaking() const override {}
     void InitCoinJoinSettings() const override {}
     void InitKeePass() const override {}
     bool InitAutoBackup() const override {return true;}
@@ -1061,16 +1062,6 @@ void InitParameterInteraction()
             LogPrintf("%s: parameter interaction: -prune=%d -> setting -txindex=false\n", __func__, nPruneArg);
         }
     }
-
-#ifdef ENABLE_WALLET
-    bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
-    if (fDisableWallet) {
-#endif
-        if (gArgs.SoftSetBoolArg("-staking", false))
-            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
-#ifdef ENABLE_WALLET
-    }
-#endif
 
     // Make sure additional indexes are recalculated correctly in VerifyDB
     // (we must reconnect blocks whenever we disconnect them for these indexes to work)
@@ -2288,6 +2279,10 @@ bool AppInitMain()
     g_wallet_init_interface.InitCoinJoinSettings();
     CCoinJoin::InitStandardDenominations();
 
+    // ********************************************************* Step 10b: setup Staking
+
+    g_wallet_init_interface.InitStaking();
+
     // ********************************************************* Step 10b: Load cache data
 
     // LOAD SERIALIZED DAT FILES INTO DATA CACHES FOR INTERNAL USE
@@ -2366,43 +2361,6 @@ bool AppInitMain()
     }
 
     llmq::StartLLMQSystem();
-
-    // ********************************************************* Step 10d: setup and schedule Bytz-specific functionality
-
-#ifdef ENABLE_WALLET
-
-    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    if (!HasWallets() || wallets.size() < 1) {
-        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
-        stakingManager->fEnableStaking = false;
-        stakingManager->fEnableBYTZStaking = false;
-    } else {
-        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
-        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
-        stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
-
-        rewardManager->BindWallet(wallets[0].get());
-        rewardManager->fEnableRewardManager = true;
-    }
-    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
-        stakingManager->fEnableStaking = false;
-    }
-
-    if (gArgs.IsArgSet("-reservebalance")) {
-        CAmount n = 0;
-        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), n)) {
-            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
-        }
-        stakingManager->nReserveBalance = n;
-    }
-
-    if (stakingManager->fEnableStaking) {
-        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
-    }
-    if (rewardManager->fEnableRewardManager) {
-        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 3 * 60 * 1000);
-    }
-#endif // ENABLE_WALLET
 
     // ********************************************************* Step 11: import blocks
 

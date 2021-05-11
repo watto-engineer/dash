@@ -6,6 +6,8 @@
 #include <init.h>
 #include <keepass.h>
 #include <net.h>
+#include <pos/staking-manager.h>
+#include <reward-manager.h>
 #include <scheduler.h>
 #include <tokens/rpctokenwallet.h>
 #include <util.h>
@@ -56,6 +58,7 @@ public:
     // Dash Specific Wallet Init
     void AutoLockMasternodeCollaterals() const override;
     void InitCoinJoinSettings() const override;
+    void InitStaking() const override;
     void InitKeePass() const override;
     bool InitAutoBackup() const override;
 };
@@ -124,6 +127,8 @@ bool WalletInit::ParameterInteraction() const
         for (const std::string& wallet : gArgs.GetArgs("-wallet")) {
             LogPrintf("%s: parameter interaction: -disablewallet -> ignoring -wallet=%s\n", __func__, wallet);
         }
+        if (gArgs.SoftSetBoolArg("-staking", false))
+            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
 
         return true;
     } else if (gArgs.IsArgSet("-masternodeblsprivkey")) {
@@ -243,6 +248,12 @@ bool WalletInit::ParameterInteraction() const
         {
             return InitError(strprintf(_("Invalid amount for -maxtxfee=<amount>: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)"),
                                        gArgs.GetArg("-maxtxfee", ""), ::minRelayTxFee.ToString()));
+        }
+    }
+    CAmount nReserveBalance;
+    if (gArgs.IsArgSet("-reservebalance")) {
+        if (!ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance)) {
+            return InitError(AmountErrMsg("reservebalance", gArgs.GetArg("-reservebalance", "")));
         }
     }
     nTxConfirmTarget = gArgs.GetArg("-txconfirmtarget", DEFAULT_TX_CONFIRM_TARGET);
@@ -423,6 +434,13 @@ void WalletInit::Start(CScheduler& scheduler) const
     if (!fMasternodeMode && CCoinJoinClientOptions::IsEnabled()) {
         scheduler.scheduleEvery(std::bind(&DoCoinJoinMaintenance, std::ref(*g_connman)), 1 * 1000);
     }
+
+    if (stakingManager->fEnableStaking) {
+        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
+    }
+    if (rewardManager->fEnableRewardManager) {
+        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 3 * 60 * 1000);
+    }
 }
 
 void WalletInit::Flush() const
@@ -480,6 +498,33 @@ void WalletInit::InitCoinJoinSettings() const
               CCoinJoinClientOptions::GetSessions(), CCoinJoinClientOptions::GetRounds(),
               CCoinJoinClientOptions::GetAmount(), CCoinJoinClientOptions::GetDenomsGoal(),
               CCoinJoinClientOptions::GetDenomsHardCap());
+}
+
+void WalletInit::InitStaking() const
+{
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    if (!HasWallets() || wallets.size() < 1) {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
+        stakingManager->fEnableStaking = false;
+        stakingManager->fEnableBYTZStaking = false;
+    } else {
+        stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
+        stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
+        stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
+
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
+    }
+    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
+        stakingManager->fEnableStaking = false;
+    }
+
+    CAmount nReserveBalance = 0;
+    if (gArgs.IsArgSet("-reservebalance")) {
+        bool res = ParseMoney(gArgs.GetArg("-reservebalance", ""), nReserveBalance);
+    }
+
+    stakingManager->nReserveBalance = nReserveBalance;
 }
 
 void WalletInit::InitKeePass() const
