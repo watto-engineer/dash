@@ -197,7 +197,8 @@ public:
         REASON_TERMINATION_OF_SERVICE = 1,
         REASON_COMPROMISED_KEYS = 2,
         REASON_CHANGE_OF_KEYS = 3,
-        REASON_LAST = REASON_CHANGE_OF_KEYS
+        REASON_EXPIRED = 4,
+        REASON_LAST = REASON_EXPIRED
     };
 
 public:
@@ -240,6 +241,6 @@ public:
 bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state);
 bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
-bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state);
+bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 
 #endif // BITCOIN_EVO_PROVIDERTX_H

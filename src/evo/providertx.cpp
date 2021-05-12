@@ -364,7 +364,7 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
     return true;
 }
 
-bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state)
+bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
     if (tx.nType != TRANSACTION_PROVIDER_UPDATE_REVOKE) {
         return state.DoS(100, false, REJECT_INVALID, "bad-protx-type");
@@ -395,9 +395,24 @@ bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             // pass the state returned by the function above
             return false;
         }
-        if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
-            // pass the state returned by the function above
-            return false;
+
+        if (ptx.nReason == CProUpRevTx::REASON_EXPIRED) {
+            CAmount nCredit;
+            CAmount nDebit;
+            CTokenGroupID gvtRevokeID(tokenGroupManager->GetGVTID(), "revoke");
+            if (!GetTokenBalance(tx, gvtRevokeID, state, view, nCredit, nDebit)) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-protx-revoke-token");
+            }
+            if (nCredit - nDebit != 1) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-protx-revoke-token");
+            }
+            if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
+                // pass the state returned by the function above
+                return false;
+            }
+        } else if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
+                // pass the state returned by the function above
+                return false;
         }
     }
 
