@@ -5,6 +5,7 @@
 #include <evo/providertx.h>
 
 #include <chainparams.h>
+#include <consensus/tokengroups.h>
 #include <consensus/validation.h>
 #include <hash.h>
 #include <script/standard.h>
