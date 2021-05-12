@@ -155,11 +155,15 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
             gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
         }
-        if ((tokenGrp.associatedGroup != NoGroup) && !tokenGrp.isAuthority())
+        if (tokenGrp.associatedGroup != NoGroup)
         {
-            if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
-                return state.Invalid(false, REJECT_INVALID, "token overflow");
-            gBalance[tokenGrp.associatedGroup].input += amount;
+            gBalance[tokenGrp.associatedGroup].numInputs += 1;
+            if (!tokenGrp.isAuthority())
+            {
+                if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
+                    return state.Invalid(false, REJECT_INVALID, "token overflow");
+                gBalance[tokenGrp.associatedGroup].input += amount;
+            }
         }
     }
 
@@ -263,5 +267,62 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         }
     }
 
+    return true;
+}
+
+bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidationState& state, const CCoinsViewCache& view, CAmount& nCredit, CAmount& nDebit)
+{
+    nCredit = 0;
+    nDebit = 0;
+    for (const auto &inp : tx.vin) {
+        const COutPoint &prevout = inp.prevout;
+        LogPrintf("%s - COutpoint prevout[%s]\n", __func__, prevout.ToString());
+        const Coin &coin = view.AccessCoin(prevout);
+        if (coin.IsSpent()) {
+            return state.DoS(100, false, REJECT_INVALID, "bad-protx-inputs-spent");
+        }
+
+        const CScript &script = coin.out.scriptPubKey;
+        if (coin.nHeight < Params().GetConsensus().ATPStartHeight)
+            continue;
+
+        CTokenGroupInfo tokenGrp(script);
+        if (tokenGrp.invalid || tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
+            continue;
+
+        CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
+        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
+            continue;
+
+        std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
+        std::string subgroup = std::string(subgroupData.begin(), subgroupData.end());
+
+        if (subgroup != "credit")
+            continue;
+
+        nCredit += tokenGrp.quantity;
+    }
+    for (const auto &outp : tx.vout) {
+        const CScript &scriptPubKey = outp.scriptPubKey;
+        CTokenGroupInfo tokenGrp(scriptPubKey);
+
+        if (tokenGrp.invalid)
+            return state.DoS(100, false, REJECT_INVALID, "bad-protx-grouped-outputs");
+
+        if (tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
+            continue;
+
+        CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
+        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
+            continue;
+
+        std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
+        std::string subgroup = std::string(subgroupData.begin(), subgroupData.end());
+
+        if (subgroup != "credit")
+            continue;
+
+        nDebit += tokenGrp.quantity;
+    }
     return true;
 }

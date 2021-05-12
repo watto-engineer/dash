@@ -32,6 +32,7 @@ public:
     GroupAuthorityFlags ctrlOutputPerms; // What permissions are enabled in outputs
     CAmount input;
     CAmount output;
+    uint64_t numInputs;
     uint64_t numOutputs;
 };
 
@@ -39,5 +40,6 @@ public:
 bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance);
 
 bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const CCoinsViewCache& view, const CTokenGroupID tgID);
+bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidationState& state, const CCoinsViewCache& view, CAmount& nCredit, CAmount& nDebit);
 
 #endif
