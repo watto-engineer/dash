@@ -8,7 +8,7 @@
 #include <regex>
 
 bool CTokenGroupCreation::ValidateDescription() {
-    for (auto tgFilters : tokenGroupManager->vTokenGroupFilters) {
+    for (std::function<void (CTokenGroupCreation&)> tgFilters : tokenGroupManager.get()->vTokenGroupFilters) {
         tgFilters(*this);
     }
     return true;
@@ -57,7 +57,7 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
 
     CTokenGroupID tgID = tokenGroupCreation.tokenGroupInfo.associatedGroup;
 
-    std::map<CTokenGroupID, CTokenGroupCreation> mapTGs = tokenGroupManager->GetMapTokenGroups();
+    std::map<CTokenGroupID, CTokenGroupCreation> mapTGs = tokenGroupManager.get()->GetMapTokenGroups();
 
     if (strLowerTicker != "") {
         std::find_if(

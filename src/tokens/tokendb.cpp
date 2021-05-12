@@ -73,12 +73,12 @@ bool CTokenDB::FindTokenGroups(std::vector<CTokenGroupCreation>& vTokenGroups, s
 }
 
 bool CTokenDB::LoadTokensFromDB(std::string& strError) {
-    tokenGroupManager->ResetTokenGroups();
+    tokenGroupManager.get()->ResetTokenGroups();
 
     std::vector<CTokenGroupCreation> vTokenGroups;
     FindTokenGroups(vTokenGroups, strError);
 
-    tokenGroupManager->AddTokenGroups(vTokenGroups);
+    tokenGroupManager.get()->AddTokenGroups(vTokenGroups);
     return true;
 }
 
@@ -138,7 +138,7 @@ bool ReindexTokenDB(std::string &strError) {
         strError = "Failed to reset token database";
         return false;
     }
-    tokenGroupManager->ResetTokenGroups();
+    tokenGroupManager.get()->ResetTokenGroups();
 
     uiInterface.ShowProgress(_("Reindexing token database..."), 0, false);
 
@@ -169,7 +169,7 @@ bool ReindexTokenDB(std::string &strError) {
             strError = "Error writing token database to disk";
             return false;
         }
-        tokenGroupManager->AddTokenGroups(vTokenGroups);
+        tokenGroupManager.get()->AddTokenGroups(vTokenGroups);
         vTokenGroups.clear();
 
         pindex = chainActive.Next(pindex);
