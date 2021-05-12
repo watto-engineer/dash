@@ -103,7 +103,7 @@ static bool CheckGVTCredit(const CTransaction& tx, const ProTx& proTx, CValidati
             continue;
 
         CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager->MatchesGVT(parentgrp))
+        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
             continue;
 
         std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
@@ -125,7 +125,7 @@ static bool CheckGVTCredit(const CTransaction& tx, const ProTx& proTx, CValidati
             continue;
 
         CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager->MatchesGVT(parentgrp))
+        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
             continue;
 
         std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();

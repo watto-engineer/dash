@@ -70,7 +70,7 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
         throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
     }
     CTokenGroupCreation tgCreation;
-    if (!tokenGroupManager->GetTokenGroupCreation(grpID, tgCreation)) {
+    if (!tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation)) {
         throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: Token group configuration transaction not found. Has it confirmed?");
     }
 
@@ -84,7 +84,7 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
         {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: destination address");
         }
-        CAmount amount = tokenGroupManager->AmountFromTokenValue(request.params[curparam + 1], grpID);
+        CAmount amount = tokenGroupManager.get()->AmountFromTokenValue(request.params[curparam + 1], grpID);
         if (amount <= 0)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid parameter: amount");
         CScript script;
@@ -270,8 +270,8 @@ void GetGroupedTransactions(CWallet * const pwallet,
                 entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
             } else {
                 entry.push_back(Pair("tokenType", "amount"));
-                entry.push_back(Pair("tokenValue", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
-                entry.push_back(Pair("tokenValueSat", tokenGroupManager->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                entry.push_back(Pair("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                entry.push_back(Pair("tokenValueSat", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
             }
             if (pwallet->mapAddressBook.count(s.destination))
                 entry.push_back(Pair("label", pwallet->mapAddressBook[s.destination].name));
@@ -318,7 +318,7 @@ void GetGroupedTransactions(CWallet * const pwallet,
                     entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
                 } else {
                     entry.push_back(Pair("tokenType", "amount"));
-                    entry.push_back(Pair("tokenValue", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                    entry.push_back(Pair("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
                     entry.push_back(Pair("tokenValueSat", tokenGroupInfo.getAmount()));
                 }
                 if (pwallet->mapAddressBook.count(r.destination))
@@ -418,16 +418,16 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
             if (grpID.isSubgroup()) {
                 CTokenGroupID parentgrp = grpID.parentGroup();
                 std::vector<unsigned char> subgroupData = grpID.GetSubGroupData();
-                tokenGroupManager->GetTokenGroupCreation(parentgrp, tgCreation);
+                tokenGroupManager.get()->GetTokenGroupCreation(parentgrp, tgCreation);
                 retobj.push_back(Pair("parentGroupID", EncodeTokenGroup(parentgrp)));
                 retobj.push_back(Pair("subgroupData", std::string(subgroupData.begin(), subgroupData.end())));
             } else {
-                tokenGroupManager->GetTokenGroupCreation(grpID, tgCreation);
+                tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
             }
             retobj.push_back(Pair("ticker", tgCreation.tokenGroupDescription.strTicker));
             retobj.push_back(Pair("name", tgCreation.tokenGroupDescription.strName));
 
-            retobj.push_back(Pair("balance", tokenGroupManager->TokenValueFromAmount(item.second, item.first)));
+            retobj.push_back(Pair("balance", tokenGroupManager.get()->TokenValueFromAmount(item.second, item.first)));
             if (hasCapability(authorities[item.first], GroupAuthorityFlags::CTRL))
                 retobj.push_back(Pair("authorities", EncodeGroupAuthority(authorities[item.first])));
 
@@ -458,7 +458,7 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
         GetGroupBalanceAndAuthorities(balance, authorities, grpID, dst, pwallet, nMinDepth);
         UniValue retobj(UniValue::VOBJ);
         retobj.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-        retobj.push_back(Pair("balance", tokenGroupManager->TokenValueFromAmount(balance, grpID)));
+        retobj.push_back(Pair("balance", tokenGroupManager.get()->TokenValueFromAmount(balance, grpID)));
         if (hasCapability(authorities, GroupAuthorityFlags::CTRL))
             retobj.push_back(Pair("authorities", EncodeGroupAuthority(authorities)));
         return retobj;
@@ -1072,8 +1072,8 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     COutput coin(nullptr, 0, 0, false, false, false);
     // If the MGTToken exists: spend a magic token output
     // Otherwise: spend a Bytz output from the token management address
-    if (tokenGroupManager->MGTTokensCreated()){
-        CTokenGroupID magicID = tokenGroupManager->GetMGTID();
+    if (tokenGroupManager.get()->MGTTokensCreated()){
+        CTokenGroupID magicID = tokenGroupManager.get()->GetMGTID();
 
         std::vector<COutput> coins;
         CAmount lowest = MAX_MONEY;
@@ -1338,7 +1338,7 @@ extern UniValue listtokenauthorities(const JSONRPCRequest& request)
         ExtractDestination(coin.GetScriptPubKey(), dest);
 
         CTokenGroupCreation tgCreation;
-        tokenGroupManager->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
+        tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
 
         UniValue retobj(UniValue::VOBJ);
         retobj.push_back(Pair("groupID", EncodeTokenGroup(tgInfo.associatedGroup)));
@@ -1643,7 +1643,7 @@ extern UniValue melttoken(const JSONRPCRequest& request)
     }
 
     curparam++;
-    CAmount totalNeeded = tokenGroupManager->AmountFromTokenValue(request.params[curparam], grpID);
+    CAmount totalNeeded = tokenGroupManager.get()->AmountFromTokenValue(request.params[curparam], grpID);
 
     CTransactionRef tx;
     GroupMelt(tx, grpID, totalNeeded, pwallet);
@@ -1834,7 +1834,7 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
 
         CTokenGroupInfo grp(scriptPubKey);
         CTokenGroupCreation tgCreation;
-        bool fValidGroup = !grp.invalid && grp.associatedGroup != NoGroup && !grp.isAuthority() && tokenGroupManager->GetTokenGroupCreation(grp.associatedGroup, tgCreation);
+        bool fValidGroup = !grp.invalid && grp.associatedGroup != NoGroup && !grp.isAuthority() && tokenGroupManager.get()->GetTokenGroupCreation(grp.associatedGroup, tgCreation);
 
         if (fFilterGrouped && (!fValidGroup || grp.associatedGroup != filterGroupID))
             continue;
@@ -1851,7 +1851,7 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
         if (fValidGroup) {
             entry.pushKV("groupID", EncodeTokenGroup(grp.associatedGroup));
             entry.pushKV("ticker", tgCreation.tokenGroupDescription.strTicker);
-            entry.pushKV("tokenAmount", tokenGroupManager->TokenValueFromAmount(grp.getAmount(), tgCreation.tokenGroupInfo.associatedGroup));
+            entry.pushKV("tokenAmount", tokenGroupManager.get()->TokenValueFromAmount(grp.getAmount(), tgCreation.tokenGroupInfo.associatedGroup));
         }
 
         if (fValidAddress) {

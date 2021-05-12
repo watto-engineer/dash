@@ -689,7 +689,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         if ((unsigned int)chainActive.Tip()->nHeight < chainparams.GetConsensus().ATPStartHeight)
         {
             return state.DoS(0, false, REJECT_NONSTANDARD, "premature-op_group-tx");
-        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
+        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager.get()->ManagementTokensCreated(chainActive.Height())){
             for (const CTxOut &txout : tx.vout)
             {
                 CTokenGroupInfo grp(txout.scriptPubKey);
@@ -1435,10 +1435,10 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
 
             //Check that all token transactions paid their fees
             if (IsAnyOutputGrouped(tx)) {
-                if (!tokenGroupManager->CheckFees(tx, tgMintMeltBalance, state, pindexPrev)) {
+                if (!tokenGroupManager.get()->CheckFees(tx, tgMintMeltBalance, state, pindexPrev)) {
                     return state.DoS(0, error("Token transaction does not pay enough fees"), REJECT_MALFORMED, "token-group-imbalance");
                 }
-                if (!tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
+                if (!tokenGroupManager.get()->ManagementTokensCreated(chainActive.Height())){
                     for (const CTxOut &txout : tx.vout)
                     {
                         CTokenGroupInfo grp(txout.scriptPubKey);
@@ -1797,7 +1797,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
             }
             if (IsAnyOutputGroupedCreation(tx) && fDisconnectTokens) {
                 CTokenGroupID toRemoveTokenGroupID;
-                if (tokenGroupManager->RemoveTokenGroup(tx, toRemoveTokenGroupID))
+                if (tokenGroupManager.get()->RemoveTokenGroup(tx, toRemoveTokenGroupID))
                     toRemoveTokenGroupIDs.push_back(toRemoveTokenGroupID);
             }
             // At this point, all of txundo.vprevout should have been moved out.
@@ -2543,7 +2543,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
         return AbortNode(state, "Failed to write token creation data");
-    if (!tokenGroupManager->AddTokenGroups(newTokenGroups)) {
+    if (!tokenGroupManager.get()->AddTokenGroups(newTokenGroups)) {
         return AbortNode(state, "Failed to add token creation data");
     }
 
@@ -4758,7 +4758,7 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
     }
     if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
         return AbortNode(state, "Failed to write token creation data");
-    if (!tokenGroupManager->AddTokenGroups(newTokenGroups)) {
+    if (!tokenGroupManager.get()->AddTokenGroups(newTokenGroups)) {
         return AbortNode(state, "Failed to add token creation data");
     }
 

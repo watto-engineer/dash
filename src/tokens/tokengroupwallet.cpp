@@ -370,7 +370,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         CTokenGroupInfo tgInfo(vout.scriptPubKey);
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
-            tokenGroupManager->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
+            tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
             LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.tokenGroupDescription.strName, tgInfo.quantity);
         }
     }
@@ -413,7 +413,7 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
         if (totalAvailable < totalNeeded)
         {
             std::string strError;
-            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
+            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager.get()->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
         } else if (totalAvailable == totalNeeded) {
             CRecipient recipient = {CScript() << OP_RETURN, GROUPED_SATOSHI_AMT, false};
@@ -480,7 +480,7 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
         if (totalAvailable < totalNeeded)
         {
             std::string strError;
-            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
+            strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager.get()->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
         }
 
@@ -519,7 +519,7 @@ void GroupSend(CTransactionRef &txNew,
 
     if (totalAvailable < totalNeeded)
     {
-        strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
+        strError = strprintf("Not enough tokens in the wallet.  Need %d more.", tokenGroupManager.get()->TokenValueFromAmount(totalNeeded - totalAvailable, grpID));
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
     }
 
@@ -531,7 +531,7 @@ void GroupSend(CTransactionRef &txNew,
         CTokenGroupInfo tgInfo(output.scriptPubKey);
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
-            tokenGroupManager->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
+            tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
             LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.tokenGroupDescription.strName, tgInfo.quantity);
         }
     }

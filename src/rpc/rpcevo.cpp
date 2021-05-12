@@ -156,7 +156,7 @@ static CBLSSecretKey ParseBLSSecretKey(const std::string& hexKey, const std::str
 bool GetGVTCredits(CWallet* pwallet, std::vector<COutput>& credits) {
 
     // Get grpID for GVT.credit
-    CTokenGroupID grpID(tokenGroupManager->GetGVTID(), "credit");
+    CTokenGroupID grpID(tokenGroupManager.get()->GetGVTID(), "credit");
 
     // Find GVT.credit coins
     credits.clear();

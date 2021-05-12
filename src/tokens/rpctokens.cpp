@@ -92,7 +92,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         }
 
         UniValue entry(UniValue::VOBJ);
-        for (auto tokenGroupMapping : tokenGroupManager->GetMapTokenGroups()) {
+        for (auto tokenGroupMapping : tokenGroupManager.get()->GetMapTokenGroups()) {
             entry.push_back(Pair(tokenGroupMapping.second.tokenGroupDescription.strTicker, EncodeTokenGroup(tokenGroupMapping.second.tokenGroupInfo.associatedGroup)));
         }
         ret.push_back(entry);
@@ -108,7 +108,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             extended = (sExtended == "true");
         }
 
-        for (auto tokenGroupMapping : tokenGroupManager->GetMapTokenGroups()) {
+        for (auto tokenGroupMapping : tokenGroupManager.get()->GetMapTokenGroups()) {
             UniValue entry(UniValue::VOBJ);
             TokenGroupCreationToJSON(tokenGroupMapping.first, tokenGroupMapping.second, entry, extended);
             ret.push_back(entry);
@@ -162,7 +162,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         }
         UniValue entry(UniValue::VOBJ);
         CTokenGroupCreation tgCreation;
-        tokenGroupManager->GetTokenGroupCreation(grpID, tgCreation);
+        tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
         TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
         ret.push_back(entry);
     } else if (operation == "ticker") {
@@ -172,7 +172,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         std::string ticker;
         CTokenGroupID grpID;
-        tokenGroupManager->GetTokenGroupIdByTicker(request.params[curparam].get_str(), grpID);
+        tokenGroupManager.get()->GetTokenGroupIdByTicker(request.params[curparam].get_str(), grpID);
         if (!grpID.isUserGroup())
         {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: could not find token group");
@@ -187,7 +187,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         }
 
         CTokenGroupCreation tgCreation;
-        tokenGroupManager->GetTokenGroupCreation(grpID, tgCreation);
+        tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
 
         LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.tokenGroupDescription.strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
@@ -200,7 +200,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         std::string name;
         CTokenGroupID grpID;
-        tokenGroupManager->GetTokenGroupIdByName(request.params[curparam].get_str(), grpID);
+        tokenGroupManager.get()->GetTokenGroupIdByName(request.params[curparam].get_str(), grpID);
         if (!grpID.isUserGroup())
         {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: Could not find token group");
@@ -215,7 +215,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         }
 
         CTokenGroupCreation tgCreation;
-        tokenGroupManager->GetTokenGroupCreation(grpID, tgCreation);
+        tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
 
         LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.tokenGroupDescription.strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
@@ -249,11 +249,11 @@ void RpcTokenTxnoutToUniv(const CTxOut& txout,
         if (tokenGroupInfo.associatedGroup.isSubgroup()) {
             CTokenGroupID parentgrp = tokenGroupInfo.associatedGroup.parentGroup();
             std::vector<unsigned char> subgroupData = tokenGroupInfo.associatedGroup.GetSubGroupData();
-            tgTicker = tokenGroupManager->GetTokenGroupTickerByID(parentgrp);
+            tgTicker = tokenGroupManager.get()->GetTokenGroupTickerByID(parentgrp);
             out.pushKV("parentGroupID", EncodeTokenGroup(parentgrp));
             out.pushKV("subgroupData", std::string(subgroupData.begin(), subgroupData.end()));
         } else {
-            tgTicker = tokenGroupManager->GetTokenGroupTickerByID(tokenGroupInfo.associatedGroup);
+            tgTicker = tokenGroupManager.get()->GetTokenGroupTickerByID(tokenGroupInfo.associatedGroup);
         }
         out.pushKV("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup));
         if (tokenGroupInfo.isAuthority()){
@@ -263,7 +263,7 @@ void RpcTokenTxnoutToUniv(const CTxOut& txout,
         } else {
             out.pushKV("type", "amount");
             out.pushKV("ticker", tgTicker);
-            out.pushKV("value", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
+            out.pushKV("value", tokenGroupManager.get()->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
             out.pushKV("valueSat", tokenGroupInfo.getAmount());
         }
     }
@@ -626,13 +626,13 @@ UniValue createrawtokentransaction(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
         }
         CTokenGroupCreation tgCreation;
-        if (!tokenGroupManager->GetTokenGroupCreation(tgID, tgCreation)) {
+        if (!tokenGroupManager.get()->GetTokenGroupCreation(tgID, tgCreation)) {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: Token group configuration transaction not found. Has it confirmed?");
         }
 
         CAmount nAmount = AmountFromValue(recipientObj["amount"]);
 
-        CAmount nTokenAmount = tokenGroupManager->AmountFromTokenValue(recipientObj["token_amount"], tgID);
+        CAmount nTokenAmount = tokenGroupManager.get()->AmountFromTokenValue(recipientObj["token_amount"], tgID);
         if (nTokenAmount <= 0)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid parameter: token_amount");
         CScript script;

@@ -52,7 +52,7 @@ bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const 
 bool IsTokenManagementKey(CScript script) {
     // Initially, the TokenManagementKey enables management token operations
     // When the MGTToken is created, the MGTToken enables management token operations
-    if (!tokenGroupManager->MGTTokensCreated()) {
+    if (!tokenGroupManager.get()->MGTTokensCreated()) {
         CTxDestination payeeDest;
         ExtractDestination(script, payeeDest);
         return EncodeDestination(payeeDest) == Params().GetConsensus().strTokenManagementKey;
@@ -63,9 +63,9 @@ bool IsTokenManagementKey(CScript script) {
 bool IsMGTInput(CScript script) {
     // Initially, the TokenManagementKey enables management token operations
     // When the MGTToken is created, the MGTToken enables management token operations
-    if (tokenGroupManager->MGTTokensCreated()) {
+    if (tokenGroupManager.get()->MGTTokensCreated()) {
         CTokenGroupInfo grp(script);
-        return grp.associatedGroup == tokenGroupManager->GetMGTID();
+        return grp.associatedGroup == tokenGroupManager.get()->GetMGTID();
     }
     return false;
 }

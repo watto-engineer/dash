@@ -2650,7 +2650,7 @@ UniValue scantokens(const JSONRPCRequest& request)
                 unspent.pushKV("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags()));
             } else {
                 unspent.pushKV("tokenType", "amount");
-                unspent.pushKV("tokenAmount", tokenGroupManager->TokenValueFromAmount(tokenGroupInfo.quantity, needle));
+                unspent.pushKV("tokenAmount", tokenGroupManager.get()->TokenValueFromAmount(tokenGroupInfo.quantity, needle));
                 unspent.pushKV("tokenAmountSat", tokenGroupInfo.quantity);
             }
 
@@ -2659,7 +2659,7 @@ UniValue scantokens(const JSONRPCRequest& request)
             unspents.push_back(unspent);
         }
         result.pushKV("unspents", unspents);
-        result.pushKV("total_tokenValue", tokenGroupManager->TokenValueFromAmount(total_in, needle));
+        result.pushKV("total_tokenValue", tokenGroupManager.get()->TokenValueFromAmount(total_in, needle));
         result.pushKV("total_tokenValueSat", ValueFromAmount(total_in));
         result.pushKV("total_tokenAuthorities", EncodeGroupAuthority(total_authorities));
     } else {
