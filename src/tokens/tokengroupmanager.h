@@ -8,6 +8,7 @@
 #include "consensus/tokengroups.h"
 #include "tokens/tokengroupconfiguration.h"
 
+#include <functional>
 #include <unordered_map>
 
 class CBlockIndex;
