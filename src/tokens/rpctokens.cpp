@@ -6,6 +6,7 @@
 #include "base58.h"
 #include "core_io.h"
 #include "dstencode.h"
+#include <evo/specialtx.h>
 #include "init.h"
 #include "bytzaddrenc.h"
 #include "rpc/protocol.h"
@@ -228,22 +229,11 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 }
 
 void RpcTokenTxnoutToUniv(const CTxOut& txout,
-    UniValue& out, bool& fExpectFirstOpReturn)
+    UniValue& out)
 {
     CTokenGroupInfo tokenGroupInfo(txout.scriptPubKey);
 
-    if (fExpectFirstOpReturn && (txout.nValue == 0) && (txout.scriptPubKey[0] == OP_RETURN)) {
-        fExpectFirstOpReturn = false;
-
-        CTokenGroupDescription tokenGroupDescription = CTokenGroupDescription(txout.scriptPubKey);
-
-        out.pushKV("type", "description");
-        out.pushKV("ticker", tokenGroupDescription.strTicker);
-        out.pushKV("name", tokenGroupDescription.strName);
-        out.pushKV("decimalPos", tokenGroupDescription.nDecimalPos);
-        out.pushKV("URL", tokenGroupDescription.strDocumentUrl);
-        out.pushKV("documentHash", tokenGroupDescription.documentHash.ToString());
-    } else if (!tokenGroupInfo.invalid && tokenGroupInfo.associatedGroup != NoGroup) {
+    if (!tokenGroupInfo.invalid && tokenGroupInfo.associatedGroup != NoGroup) {
         CTokenGroupCreation tgCreation;
         std::string tgTicker;
         if (tokenGroupInfo.associatedGroup.isSubgroup()) {
@@ -295,8 +285,6 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
     entry.pushKV("vin", vin);
 
     UniValue vout(UniValue::VARR);
-    CScript firstOpReturn;
-    bool fIsGroupConfigurationTX = IsAnyOutputGroupedCreation(*tx);
     for (unsigned int i = 0; i < tx->vout.size(); i++) {
         const CTxOut& txout = tx->vout[i];
 
@@ -311,13 +299,22 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
         out.pushKV("scriptPubKey", o);
 
         UniValue t(UniValue::VOBJ);
-        RpcTokenTxnoutToUniv(txout, t, fIsGroupConfigurationTX);
+        RpcTokenTxnoutToUniv(txout, t);
         if (t.size() > 0)
             out.pushKV("token", t);
 
         vout.push_back(out);
     }
     entry.pushKV("vout", vout);
+
+    if (tx->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+        CTokenGroupDescription tgDesc;
+        if (GetTxPayload(*tx, tgDesc)) {
+            UniValue creation(UniValue::VOBJ);
+            tgDesc.ToJson(creation);
+            entry.pushKV("token_creation", creation);
+        }
+    }
 
     if (hashBlock != uint256())
         entry.pushKV("blockhash", hashBlock.GetHex());

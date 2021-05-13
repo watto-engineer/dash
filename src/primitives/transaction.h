@@ -20,6 +20,9 @@ enum {
     TRANSACTION_PROVIDER_UPDATE_REVOKE = 4,
     TRANSACTION_COINBASE = 5,
     TRANSACTION_QUORUM_COMMITMENT = 6,
+    TRANSACTION_GROUP_CREATION_REGULAR = 7,
+    TRANSACTION_GROUP_CREATION_MGT = 8,
+    TRANSACTION_GROUP_CREATION_NFT = 9,
 };
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */

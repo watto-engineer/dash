@@ -27,6 +27,9 @@ CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter* filter, const std:
             TRANSACTION_PROVIDER_UPDATE_REGISTRAR,
             TRANSACTION_PROVIDER_UPDATE_REVOKE,
             TRANSACTION_COINBASE,
+            TRANSACTION_GROUP_CREATION_REGULAR,
+            TRANSACTION_GROUP_CREATION_MGT,
+            TRANSACTION_GROUP_CREATION_NFT,
     };
 
     for (unsigned int i = 0; i < block.vtx.size(); i++)

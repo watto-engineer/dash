@@ -6,6 +6,7 @@
 #include "tokens/tokengroupwallet.h"
 #include "core_io.h"
 #include "dstencode.h"
+#include <evo/specialtx.h>
 #include "init.h"
 #include "bytzaddrenc.h"
 #include "rpc/protocol.h"
@@ -107,60 +108,61 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
     return curparam;
 }
 
-std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCRequest& request, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
+bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescription& tgDesc, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
 {
-    std::vector<std::vector<unsigned char> > ret;
     std::string strCurparamValue;
+
+    std::string strTicker;
+    std::string strName;
+    uint8_t nDecimalPos;
+    std::string strDocumentUrl;
+    uint256 documentHash;
 
     stickyMelt = false;
     confirmed = false;
 
-    std::string tickerStr = request.params[curparam].get_str();
-    if (tickerStr.size() > 10) {
-        std::string strError = strprintf("Ticker %s has too many characters (10 max)", tickerStr);
+    strTicker = request.params[curparam].get_str();
+    if (strName.size() > 10) {
+        std::string strError = strprintf("Ticker %s has too many characters (10 max)", strName);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    ret.push_back(std::vector<unsigned char>(tickerStr.begin(), tickerStr.end()));
 
     curparam++;
     if (curparam >= request.params.size())
     {
         throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
     }
-    std::string name = request.params[curparam].get_str();
-    if (name.size() > 30) {
-        std::string strError = strprintf("Name %s has too many characters (30 max)", name);
+    strName = request.params[curparam].get_str();
+    if (strName.size() > 30) {
+        std::string strError = strprintf("Name %s has too many characters (30 max)", strName);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    ret.push_back(std::vector<unsigned char>(name.begin(), name.end()));
 
     curparam++;
     if (curparam >= request.params.size())
     {
-        std::string strError = strprintf("Not enough paramaters", name);
+        std::string strError = strprintf("Not enough paramaters");
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
     strCurparamValue = request.params[curparam].get_str();
-
-    int32_t decimalPosition;
-    if (!ParseInt32(strCurparamValue, &decimalPosition) || decimalPosition > 16 || decimalPosition < 0) {
-        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", decimalPosition);
+    int32_t nDecimalPos32;
+    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
+        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    ret.push_back(SerializeAmount(decimalPosition));
+    nDecimalPos = nDecimalPos32;
 
     curparam++;
     if (curparam >= request.params.size())
     {
-        std::string strError = strprintf("Not enough paramaters", name);
+        std::string strError = strprintf("Not enough paramaters");
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    std::string url = request.params[curparam].get_str();
-    if (name.size() > 98) {
-        std::string strError = strprintf("URL %s has too many characters (98 max)", name);
+    strDocumentUrl = request.params[curparam].get_str();
+    if (strDocumentUrl.size() > 98) {
+        std::string strError = strprintf("URL %s has too many characters (98 max)", strDocumentUrl);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    ret.push_back(std::vector<unsigned char>(url.begin(), url.end()));
 
     curparam++;
     if (curparam >= request.params.size())
@@ -169,17 +171,17 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCReque
         // could change the document without holders knowing about it.
         throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
     }
+    strCurparamValue = request.params[curparam].get_str();
+    documentHash.SetHex(strCurparamValue);
 
-    std::string hexDocHash = request.params[curparam].get_str();
-    uint256 docHash;
-    docHash.SetHex(hexDocHash);
-    ret.push_back(std::vector<unsigned char>(docHash.begin(), docHash.end()));
+    tgDesc = CTokenGroupDescription(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
     if (fManagementToken) {
         curparam++;
         if (curparam >= request.params.size())
         {
-            return ret;
+            std::string strError = strprintf("Not enough paramaters");
+            throw JSONRPCError(RPC_INVALID_PARAMS, strError);
         }
         strCurparamValue = request.params[curparam].get_str();
         if (strCurparamValue == "true") {
@@ -190,26 +192,13 @@ std::vector<std::vector<unsigned char> > ParseGroupDescParams(const JSONRPCReque
     curparam++;
     if (curparam >= request.params.size())
     {
-        return ret;
+        return true;
     }
     if (request.params[curparam].get_str() == "true") {
         confirmed = true;
-        return ret;
+        return true;
     }
-    return ret;
-}
-
-CScript BuildTokenDescScript(const std::vector<std::vector<unsigned char> > &desc)
-{
-    CScript ret;
-    std::vector<unsigned char> data;
-    uint32_t OpRetGroupId = 88888888;
-    ret << OP_RETURN << OpRetGroupId;
-    for (auto &d : desc)
-    {
-        ret << d;
-    }
-    return ret;
+    return true;
 }
 
 static void MaybePushAddress(UniValue &entry, const CTxDestination &dest)
@@ -826,7 +815,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     unsigned int curparam = 0;
-    bool fStickyBit = false;
+    bool fStickyMelt = false;
     bool confirmed = false;
 
     COutput coin(nullptr, 0, 0, false, false, false);
@@ -862,33 +851,19 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
 
     CReserveKey authKeyReservation(pwallet);
     CTxDestination authDest;
-    CScript opretScript;
-    if (curparam >= request.params.size())
-    {
-        CPubKey authKey;
-        authKeyReservation.GetReservedKey(authKey, true);
-        authDest = authKey.GetID();
+    CTokenGroupDescription tgDesc;
+
+    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
+        return false;
     }
-    else
-    {
-        authDest = DecodeDestination(request.params[curparam].get_str(), Params());
-        if (authDest == CTxDestination(CNoDestination()))
-        {
-            auto desc = ParseGroupDescParams(request, curparam, fStickyBit, confirmed);
-            if (desc.size()) // Add an op_return if there's a token desc doc
-            {
-                opretScript = BuildTokenDescScript(desc);
-                outputs.push_back(CRecipient{opretScript, 0, false});
-            }
-            CPubKey authKey;
-            authKeyReservation.GetReservedKey(authKey, true);
-            authDest = authKey.GetID();
-        }
-    }
+
+    CPubKey authKey;
+    authKeyReservation.GetReservedKey(authKey, true);
+    authDest = authKey.GetID();
     curparam++;
 
-    TokenGroupIdFlags tgFlags = fStickyBit ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
+    TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
@@ -898,11 +873,10 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
 
     ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
 
-    CTokenGroupInfo tokenGroupInfo(opretScript);
-    CTokenGroupDescription tokenGroupDescription(opretScript);
+    CTokenGroupInfo tokenGroupInfo(script);
     CTokenGroupStatus tokenGroupStatus;
     CTransaction dummyTransaction;
-    CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), uint256(), tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
+    CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), uint256(), tokenGroupInfo, tgDesc, tokenGroupStatus);
     tokenGroupCreation.ValidateDescription();
 
     ret.push_back(Pair("ticker", tokenGroupCreation.tokenGroupDescription.strTicker));
@@ -989,29 +963,24 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CTxDestination authDest;
     CScript opretScript;
 
-    authDest = DecodeDestination(request.params[curparam].get_str(), Params());
-    if (authDest == CTxDestination(CNoDestination()))
-    {
-        auto desc = ParseGroupDescParams(request, curparam, fStickyMelt, confirmed);
-        if (desc.size()) // Add an op_return if there's a token desc doc
-        {
-            opretScript = BuildTokenDescScript(desc);
-            outputs.push_back(CRecipient{opretScript, 0, false});
-        }
-        CPubKey authKey;
-        authKeyReservation.GetReservedKey(authKey, true);
-        authDest = authKey.GetID();
+    CTokenGroupDescription tgDesc;
+    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
+        return false;
     }
+    CPubKey authKey;
+    authKeyReservation.GetReservedKey(authKey, true);
+    authDest = authKey.GetID();
 
     TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
     outputs.push_back(recipient);
 
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, &tgDesc);
+
     authKeyReservation.KeepKey();
     UniValue ret(UniValue::VOBJ);
     ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
@@ -1059,11 +1028,9 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     CScript opretScript;
     std::vector<CRecipient> outputs;
 
-    auto desc = ParseGroupDescParams(request, curparam, fStickyMelt, confirmed, true);
-    if (desc.size()) // Add an op_return if there's a token desc doc
-    {
-        opretScript = BuildTokenDescScript(desc);
-        outputs.push_back(CRecipient{opretScript, 0, false});
+    CTokenGroupDescription tgDesc;
+    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed, true)) {
+        return false;
     }
     CPubKey authKey;
     authKeyReservation.GetReservedKey(authKey, true);
@@ -1151,7 +1118,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     uint64_t grpNonce = 0;
     TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
     tgFlags |= TokenGroupIdFlags::MGT_TOKEN;
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), opretScript, tgFlags, grpNonce);
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
 
     std::vector<COutput> chosenCoins;
     chosenCoins.push_back(coin);
@@ -1163,7 +1130,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     UniValue ret(UniValue::VOBJ);
     if (confirmed) {
         CTransactionRef tx;
-        ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
+        ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, &tgDesc);
         authKeyReservation.KeepKey();
         ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
         ret.push_back(Pair("transaction", tx->GetHash().GetHex()));

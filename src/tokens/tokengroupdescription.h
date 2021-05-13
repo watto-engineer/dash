@@ -9,6 +9,8 @@
 #include "script/script.h"
 #include "uint256.h"
 
+class UniValue;
+
 static CAmount COINFromDecimalPos(const uint8_t& nDecimalPos) {
     uint8_t n = nDecimalPos <= 16 ? nDecimalPos : 0;
     static CAmount pow10[17] = {
@@ -22,6 +24,11 @@ static CAmount COINFromDecimalPos(const uint8_t& nDecimalPos) {
 class CTokenGroupDescription
 {
 public:
+    static const uint16_t CURRENT_VERSION = 1;
+
+public:
+    uint16_t nVersion{CURRENT_VERSION};
+
     // Token ticker name
     std::string strTicker;
 
@@ -75,12 +82,15 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
+        READWRITE(nVersion);
         READWRITE(strTicker);
         READWRITE(strName);
         READWRITE(nDecimalPos);
         READWRITE(strDocumentUrl);
         READWRITE(documentHash);
     }
+    void ToJson(UniValue& obj) const;
+
     bool operator==(const CTokenGroupDescription &c)
     {
         return (strTicker == c.strTicker && strName == c.strName && nDecimalPos == c.nDecimalPos && strDocumentUrl == c.strDocumentUrl && documentHash == c.documentHash);

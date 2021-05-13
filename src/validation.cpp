@@ -509,10 +509,17 @@ bool ContextualCheckTransaction(const CTransaction& tx, CValidationState &state,
                 tx.nType != TRANSACTION_PROVIDER_UPDATE_REGISTRAR &&
                 tx.nType != TRANSACTION_PROVIDER_UPDATE_REVOKE &&
                 tx.nType != TRANSACTION_COINBASE &&
-                tx.nType != TRANSACTION_QUORUM_COMMITMENT) {
+                tx.nType != TRANSACTION_QUORUM_COMMITMENT &&
+                tx.nType != TRANSACTION_GROUP_CREATION_REGULAR &&
+                tx.nType != TRANSACTION_GROUP_CREATION_MGT &&
+                tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-type");
             }
             if (tx.IsCoinBase() && tx.nType != TRANSACTION_COINBASE)
+                return state.DoS(100, false, REJECT_INVALID, "bad-txns-cb-type");
+
+            if (IsAnyOutputGroupedCreation(tx) &&
+                    (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR && tx.nType != TRANSACTION_GROUP_CREATION_MGT && tx.nType != TRANSACTION_GROUP_CREATION_NFT))
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-cb-type");
         } else if (tx.nType != TRANSACTION_NORMAL) {
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-type");

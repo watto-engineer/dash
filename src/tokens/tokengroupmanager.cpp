@@ -83,10 +83,10 @@ void CTokenGroupManager::ResetTokenGroups() {
 }
 
 bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID) {
-    CScript firstOpReturn;
     CTokenGroupInfo tokenGroupInfo;
+    CTokenGroupDescription tgDesc;
 
-    bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, firstOpReturn);
+    bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
 
     if (hasNewTokenGroup) {
         if (MatchesMGT(tokenGroupInfo.associatedGroup)) {

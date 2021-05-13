@@ -5,6 +5,8 @@
 #include "tokens/tokengroupconfiguration.h"
 #include "tokens/tokengroupmanager.h"
 
+#include <chain.h>
+#include <evo/specialtx.h>
 #include <regex>
 
 bool CTokenGroupCreation::ValidateDescription() {
@@ -120,14 +122,11 @@ void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation) {
     tokenGroupCreation.tokenGroupDescription.strTicker = strUpperTicker;
 }
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CScript &firstOpReturn) {
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescription& tgDesc) {
     bool hasNewTokenGroup = false;
     for (const auto &txout : tx.vout) {
         const CScript &scriptPubKey = txout.scriptPubKey;
         CTokenGroupInfo tokenGrp(scriptPubKey);
-        if ((txout.nValue == 0) && (firstOpReturn.size() == 0) && (txout.scriptPubKey[0] == OP_RETURN)) {
-            firstOpReturn = txout.scriptPubKey;
-        }
         if (tokenGrp.invalid)
             return false;
         if (tokenGrp.associatedGroup != NoGroup && tokenGrp.isGroupCreation() && !hasNewTokenGroup) {
@@ -135,19 +134,42 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
             tokenGroupInfo = tokenGrp;
         }
     }
-    return hasNewTokenGroup;
-
+    if (hasNewTokenGroup) {
+        return GetTxPayload(tx, tgDesc);
+    }
+    return false;
 }
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
-    CScript firstOpReturn;
     CTokenGroupInfo tokenGroupInfo;
+    CTokenGroupDescription tokenGroupDescription;
 
-    if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, firstOpReturn)) return false;
+    if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
 
-    CTokenGroupDescription tokenGroupDescription = CTokenGroupDescription(firstOpReturn);
     CTokenGroupStatus tokenGroupStatus;
     newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
+
+    return true;
+}
+
+bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+{
+    if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-type");
+    }
+
+    if (!IsAnyOutputGroupedCreation(tx)) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-invalid");
+    }
+
+    CTokenGroupDescription tgDesc;
+    if (!GetTxPayload(tx, tgDesc)) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-payload");
+    }
+
+    if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescription::CURRENT_VERSION) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-version");
+    }
 
     return true;
 }
