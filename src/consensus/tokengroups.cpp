@@ -5,6 +5,7 @@
 #include "coins.h"
 #include "consensus/tokengroups.h"
 #include "dstencode.h"
+#include <evo/specialtx.h>
 #include "rpc/server.h"
 #include "wagerraddrenc.h"
 #include "logging.h"
@@ -78,17 +79,11 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
     // Tokens minted from the tokenGroupManagement address can create management tokens
     bool anyInputsGroupManagement = false;
 
-    CScript firstOpReturn;
-
     // Iterate through all the outputs constructing the final balances of every group.
     for (const auto &outp : tx.vout)
     {
         const CScript &scriptPubKey = outp.scriptPubKey;
         CTokenGroupInfo tokenGrp(scriptPubKey);
-        if ((outp.nValue == 0) && (firstOpReturn.size() == 0) && (outp.scriptPubKey[0] == OP_RETURN))
-        {
-            firstOpReturn = outp.scriptPubKey; // Used later if this is a group creation transaction
-        }
         if (tokenGrp.invalid)
             return state.Invalid(false, REJECT_INVALID, "bad OP_GROUP");
         if (tokenGrp.associatedGroup != NoGroup)
@@ -205,10 +200,12 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         {
             CHashWriter mintGrp(SER_GETHASH, PROTOCOL_VERSION);
             mintGrp << tx.vin[0].prevout;
-            if (firstOpReturn.size())
-            {
-                std::vector<unsigned char> data(firstOpReturn.begin(), firstOpReturn.end());
-                mintGrp << data;
+            if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+                CTokenGroupDescription tgDesc;
+                if (!GetTxPayload(tx, tgDesc)) {
+                    return state.DoS(100, false, REJECT_INVALID, "bad-protx-token-payload");
+                }
+                mintGrp << tgDesc;
             }
             mintGrp << (((uint64_t)bal.ctrlOutputPerms) & ~((uint64_t)GroupAuthorityFlags::ALL_BITS));
             CTokenGroupID newGrpId(mintGrp.GetHash());

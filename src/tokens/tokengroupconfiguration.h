@@ -11,6 +11,8 @@
 
 #include <unordered_map>
 
+class CBlockIndex;
+
 class CTokenGroupStatus
 {
 public:
@@ -63,7 +65,9 @@ void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation);
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CScript &firstOpReturn);
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescription& tgDesc);
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation);
+
+bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 
 #endif

@@ -6,6 +6,7 @@
 #include "consensus/tokengroups.h"
 #include "consensus/validation.h"
 #include "dstencode.h"
+#include <evo/specialtx.h>
 #include "net.h"
 #include "rpc/protocol.h"
 #include "script/tokengroup.h"
@@ -304,7 +305,7 @@ bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, 
 }
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet)
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescription* ptgDesc)
 {
     CAmount totalGroupedAvailable = 0;
 
@@ -353,6 +354,12 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         bool lockUnspents;
         std::set<int> setSubtractFeeFromOutputs;
         CCoinControl coinControl;
+
+        if (ptgDesc != nullptr) {
+            tx.nVersion = 3;
+            tx.nType = TRANSACTION_GROUP_CREATION_REGULAR;
+            SetTxPayload(tx, *ptgDesc);
+        };
 
         if (!wallet->FundTransaction(tx, fee, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
             throw JSONRPCError(RPC_WALLET_ERROR, strError);
@@ -539,7 +546,7 @@ void GroupSend(CTransactionRef &txNew,
     ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
 }
 
-CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGroupIdFlags flags, uint64_t &nonce)
+CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescription& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce)
 {
     CTokenGroupID ret;
     do
@@ -549,12 +556,7 @@ CTokenGroupID findGroupId(const COutPoint &input, CScript opRetTokDesc, TokenGro
         // mask off any flags in the nonce
         nonce &= ~((uint64_t)GroupAuthorityFlags::ALL_BITS);
         hasher << input;
-
-        if (opRetTokDesc.size())
-        {
-            std::vector<unsigned char> data(opRetTokDesc.begin(), opRetTokDesc.end());
-            hasher << data;
-        }
+        hasher << tgDesc;
         hasher << nonce;
         ret = hasher.GetHash();
     } while (ret.bytes()[31] != (uint8_t)flags);

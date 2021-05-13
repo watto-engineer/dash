@@ -12,6 +12,8 @@
 #include <evo/providertx.h>
 #include <hash.h>
 #include <llmq/blockprocessor.h>
+#include <tokens/tokengroupconfiguration.h>
+
 #include <llmq/commitment.h>
 #include <primitives/block.h>
 #include <validation.h>
@@ -41,6 +43,8 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
             return CheckCbTx(tx, pindexPrev, state);
         case TRANSACTION_QUORUM_COMMITMENT:
             return llmq::CheckLLMQCommitment(tx, pindexPrev, state);
+        case TRANSACTION_GROUP_CREATION_REGULAR:
+            return CheckTokenCreationTx(tx, pindexPrev, state, view);
         case TRANSACTION_MNHF_SIGNAL:
             return VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE && CheckMNHFTx(tx, pindexPrev, state);
         }
@@ -68,6 +72,9 @@ bool ProcessSpecialTx(const CTransaction& tx, const CBlockIndex* pindex, CValida
         return true; // nothing to do
     case TRANSACTION_QUORUM_COMMITMENT:
         return true; // handled per block
+    case TRANSACTION_GROUP_CREATION_REGULAR:
+    case TRANSACTION_GROUP_CREATION_MGT:
+    case TRANSACTION_GROUP_CREATION_NFT:
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
     }
@@ -91,6 +98,10 @@ bool UndoSpecialTx(const CTransaction& tx, const CBlockIndex* pindex)
         return true; // nothing to do
     case TRANSACTION_QUORUM_COMMITMENT:
         return true; // handled per block
+    case TRANSACTION_GROUP_CREATION_REGULAR:
+    case TRANSACTION_GROUP_CREATION_MGT:
+    case TRANSACTION_GROUP_CREATION_NFT:
+        return true; // handled per tx
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
     }
