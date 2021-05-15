@@ -75,7 +75,7 @@ void CTokenGroupManager::ResetTokenGroups() {
 
     CTokenGroupInfo tgInfoWAGERR(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
     CTransaction tgTxWagerr;
-    CTokenGroupDescription tgDescriptionWAGERR("WAGERR", "Wagerr", 8, "https://wagerr.gg", uint256());
+    CTokenGroupDescriptionRegular tgDescriptionWAGERR("WAGERR", "Wagerr", 8, "https://wagerr.com", uint256());
     CTokenGroupStatus tokenGroupStatus;
     CTokenGroupCreation tgCreationWAGERR(MakeTransactionRef(tgTxWagerr), uint256(), tgInfoWAGERR, tgDescriptionWAGERR, tokenGroupStatus);
     mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationWAGERR));
@@ -84,7 +84,7 @@ void CTokenGroupManager::ResetTokenGroups() {
 
 bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID) {
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
 
     bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
 
@@ -251,7 +251,7 @@ CAmount CTokenGroupManager::AmountFromTokenValue(const UniValue& value, const CT
 std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID) {
     CTokenGroupCreation tgCreation;
     GetTokenGroupCreation(tgID, tgCreation);
-    CAmount tokenCOIN = tgCreation.tokenGroupDescription.GetCoin();
+    CAmount tokenCOIN = GetCoin(tgCreation.tokenGroupDescription);
     bool sign = amount < 0;
     int64_t n_abs = (sign ? -amount : amount);
     int64_t quotient = n_abs / tokenCOIN;

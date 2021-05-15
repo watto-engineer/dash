@@ -6,14 +6,18 @@
 #include "util.h"
 #include <univalue.h>
 
-
-void CTokenGroupDescription::ToJson(UniValue& obj) const
+void CTokenGroupDescriptionBase::ToJson(UniValue& obj) const
 {
     obj.clear();
     obj.setObject();
     obj.pushKV("ticker", strTicker);
     obj.pushKV("name", strName);
-    obj.pushKV("decimal_pos", (int)nDecimalPos);
     obj.pushKV("document_URL", strDocumentUrl);
     obj.pushKV("documentHash", documentHash.ToString());
+}
+
+void CTokenGroupDescriptionRegular::ToJson(UniValue& obj) const
+{
+    CTokenGroupDescriptionBase::ToJson(obj);
+    obj.pushKV("decimal_pos", (int)nDecimalPos);
 }

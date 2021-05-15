@@ -10,7 +10,7 @@
 #include "wallet/wallet.h"
 #include <unordered_map>
 
-class CTokenGroupDescription;
+class CTokenGroupDescriptionRegular;
 
 // Number of satoshis we will put into a grouped output
 static const CAmount GROUPED_SATOSHI_AMT = 1;
@@ -33,13 +33,13 @@ void GetGroupAuthority(const CWallet *wallet, std::vector<COutput>& coins, Group
 
 //* Calculate a group ID based on the provided inputs.  Pass and empty object to tgDesc if there is not
 // going to be a special tx in the transaction.
-CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescription& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
+CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescriptionRegular& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
 
 CAmount GroupCoinSelection(const std::vector<COutput> &coins, CAmount amt, std::vector<COutput> &chosenCoins);
 bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey);
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescription* ptgDesc = nullptr);
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescriptionRegular* ptgDesc = nullptr);
 
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet);
 void GroupSend(CTransactionRef &txNew, const CTokenGroupID &grpID, const std::vector<CRecipient> &outputs,
