@@ -283,7 +283,7 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
             entry.pushKV("qcTx", obj);
         }
     } else if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-        CTokenGroupDescription tgDesc;
+        CTokenGroupDescriptionRegular tgDesc;
         if (GetTxPayload(tx, tgDesc)) {
             UniValue obj;
             tgDesc.ToJson(obj);

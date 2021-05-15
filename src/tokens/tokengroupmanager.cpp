@@ -75,7 +75,7 @@ void CTokenGroupManager::ResetTokenGroups() {
 
     CTokenGroupInfo tgInfoBYTZ(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
     CTransaction tgTxBytz;
-    CTokenGroupDescription tgDescriptionBYTZ("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
+    CTokenGroupDescriptionRegular tgDescriptionBYTZ("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
     CTokenGroupStatus tokenGroupStatus;
     CTokenGroupCreation tgCreationBYTZ(MakeTransactionRef(tgTxBytz), uint256(), tgInfoBYTZ, tgDescriptionBYTZ, tokenGroupStatus);
     mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationBYTZ));
@@ -84,7 +84,7 @@ void CTokenGroupManager::ResetTokenGroups() {
 
 bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID) {
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
 
     bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
 
@@ -251,7 +251,7 @@ CAmount CTokenGroupManager::AmountFromTokenValue(const UniValue& value, const CT
 std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID) {
     CTokenGroupCreation tgCreation;
     GetTokenGroupCreation(tgID, tgCreation);
-    CAmount tokenCOIN = tgCreation.tokenGroupDescription.GetCoin();
+    CAmount tokenCOIN = GetCoin(tgCreation.tokenGroupDescription);
     bool sign = amount < 0;
     int64_t n_abs = (sign ? -amount : amount);
     int64_t quotient = n_abs / tokenCOIN;

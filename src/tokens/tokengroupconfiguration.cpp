@@ -122,7 +122,7 @@ void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation) {
     tokenGroupCreation.tokenGroupDescription.strTicker = strUpperTicker;
 }
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescription& tgDesc) {
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc) {
     bool hasNewTokenGroup = false;
     for (const auto &txout : tx.vout) {
         const CScript &scriptPubKey = txout.scriptPubKey;
@@ -142,7 +142,7 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescription tokenGroupDescription;
+    CTokenGroupDescriptionRegular tokenGroupDescription;
 
     if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
 
@@ -162,12 +162,15 @@ bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev,
         return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-invalid");
     }
 
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
         return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-payload");
     }
+    if (tgDesc.nDecimalPos > 16) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-group-param");
+    }
 
-    if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescription::CURRENT_VERSION) {
+    if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionRegular::CURRENT_VERSION) {
         return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-version");
     }
 

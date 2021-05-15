@@ -33,12 +33,12 @@ public:
     CTransactionRef creationTransaction;
     uint256 creationBlockHash;
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescription tokenGroupDescription;
+    CTokenGroupDescriptionRegular tokenGroupDescription;
     CTokenGroupStatus status;
 
     CTokenGroupCreation() : creationTransaction(MakeTransactionRef()){};
 
-    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, CTokenGroupDescription tokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
+    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, CTokenGroupDescriptionRegular tokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
         : creationTransaction(creationTransaction), creationBlockHash(creationBlockHash), tokenGroupInfo(tokenGroupInfo), tokenGroupDescription(tokenGroupDescription), status(tokenGroupStatus) {}
 
     bool ValidateDescription();
@@ -65,7 +65,7 @@ void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation);
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescription& tgDesc);
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc);
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation);
 
 bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);

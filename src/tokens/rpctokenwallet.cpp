@@ -108,7 +108,7 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
     return curparam;
 }
 
-bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescription& tgDesc, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
+bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescriptionRegular& tgDesc, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
 {
     std::string strCurparamValue;
 
@@ -174,7 +174,7 @@ bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescription&
     strCurparamValue = request.params[curparam].get_str();
     documentHash.SetHex(strCurparamValue);
 
-    tgDesc = CTokenGroupDescription(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
+    tgDesc = CTokenGroupDescriptionRegular(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
     if (fManagementToken) {
         curparam++;
@@ -851,7 +851,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
 
     CReserveKey authKeyReservation(pwallet);
     CTxDestination authDest;
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
 
     if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
         return false;
@@ -963,7 +963,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CTxDestination authDest;
     CScript opretScript;
 
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
     if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
         return false;
     }
@@ -1028,7 +1028,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     CScript opretScript;
     std::vector<CRecipient> outputs;
 
-    CTokenGroupDescription tgDesc;
+    CTokenGroupDescriptionRegular tgDesc;
     if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed, true)) {
         return false;
     }

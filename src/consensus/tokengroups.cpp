@@ -199,7 +199,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             CHashWriter mintGrp(SER_GETHASH, PROTOCOL_VERSION);
             mintGrp << tx.vin[0].prevout;
             if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-                CTokenGroupDescription tgDesc;
+                CTokenGroupDescriptionRegular tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
                     return state.DoS(100, false, REJECT_INVALID, "bad-protx-token-payload");
                 }

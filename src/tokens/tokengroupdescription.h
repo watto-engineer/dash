@@ -21,7 +21,7 @@ static CAmount COINFromDecimalPos(const uint8_t& nDecimalPos) {
     return pow10[n];
 }
 
-class CTokenGroupDescription
+class CTokenGroupDescriptionBase
 {
 public:
     static const uint16_t CURRENT_VERSION = 1;
@@ -35,48 +35,30 @@ public:
     // Token name
     std::string strName;
 
-    // Decimal position to translate between token value and amount
-    uint8_t nDecimalPos;
-
     // Extended token description document URL
     std::string strDocumentUrl;
 
     uint256 documentHash;
 
-    CTokenGroupDescription() { };
-    CTokenGroupDescription(std::string strTicker, std::string strName, uint8_t nDecimalPosIn, std::string strDocumentUrl, uint256 documentHash) :
-        strTicker(strTicker), strName(strName), strDocumentUrl(strDocumentUrl), documentHash(documentHash)
-    {
-        SetDecimalPos(nDecimalPosIn);
+    CTokenGroupDescriptionBase() {
+        SetNull();
     };
-    CTokenGroupDescription(CScript script) {
-        std::vector<std::vector<unsigned char> > desc;
-        if (BuildGroupDescData(script, desc)) {
-            SetGroupDescData(desc);
-        }
+    CTokenGroupDescriptionBase(std::string strTicker, std::string strName, std::string strDocumentUrl, uint256 documentHash) :
+        strTicker(strTicker), strName(strName), strDocumentUrl(strDocumentUrl), documentHash(documentHash) {};
+
+    void SetNull() {
+        strTicker = "";
+        strName = "";
+        strDocumentUrl = "";
+        documentHash = uint256();
     }
 
 private:
-    void SetDecimalPos(uint8_t nDecimalPosIn) {
-        nDecimalPos = nDecimalPosIn > 16 ? 8 : nDecimalPosIn;
-    }
-
     inline std::string GetStringFromChars(const std::vector<unsigned char> chars, const uint32_t maxChars) const {
         return std::string(chars.begin(), chars.size() < maxChars ? chars.end() : std::next(chars.begin(), maxChars));
     }
 
 public:
-    bool SetGroupDescData(const std::vector<std::vector<unsigned char> > descriptionData);
-    bool BuildGroupDescData(const CScript& script, std::vector<std::vector<unsigned char> > &descriptionData);
-
-
-    // Tokens with no fractional quantities have nDecimalPos=0
-    // Bytz has has decimalpos=8 (1 BYTZ is 100000000 satoshi)
-    // Maximum value is 10^16
-    CAmount GetCoin() {
-        return COINFromDecimalPos(nDecimalPos);
-    }
-
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -85,16 +67,60 @@ public:
         READWRITE(nVersion);
         READWRITE(strTicker);
         READWRITE(strName);
-        READWRITE(nDecimalPos);
         READWRITE(strDocumentUrl);
         READWRITE(documentHash);
     }
     void ToJson(UniValue& obj) const;
 
-    bool operator==(const CTokenGroupDescription &c)
+    bool operator==(const CTokenGroupDescriptionBase &c)
+    {
+        return (strTicker == c.strTicker && strName == c.strName && strDocumentUrl == c.strDocumentUrl && documentHash == c.documentHash);
+    }
+};
+
+class CTokenGroupDescriptionRegular : public CTokenGroupDescriptionBase
+{
+public:
+    static const uint16_t CURRENT_VERSION = 1;
+
+public:
+    // Decimal position to translate between token value and amount
+    uint8_t nDecimalPos;
+
+    CTokenGroupDescriptionRegular() {
+        SetNull();
+    };
+    CTokenGroupDescriptionRegular(std::string strTicker, std::string strName, uint8_t nDecimalPos, std::string strDocumentUrl, uint256 documentHash) :
+        nDecimalPos(nDecimalPos) {
+            CTokenGroupDescriptionBase(strTicker, strName, strDocumentUrl, documentHash);
+        };
+
+    void SetNull() {
+        CTokenGroupDescriptionBase::SetNull();
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITEAS(CTokenGroupDescriptionBase, *this);
+        READWRITE(nDecimalPos);
+    }
+    void ToJson(UniValue& obj) const;
+
+    bool operator==(const CTokenGroupDescriptionRegular &c)
     {
         return (strTicker == c.strTicker && strName == c.strName && nDecimalPos == c.nDecimalPos && strDocumentUrl == c.strDocumentUrl && documentHash == c.documentHash);
     }
 };
+
+// Tokens with no fractional quantities have nDecimalPos=0
+// Bytz has has decimalpos=8 (1 BYTZ is 100000000 satoshi)
+// Maximum value is 10^16
+template <typename TokenGroupDescription>
+CAmount GetCoin(TokenGroupDescription tgDesc) {
+    return COINFromDecimalPos(tgDesc.nDecimalPos);
+}
 
 #endif

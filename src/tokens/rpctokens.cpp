@@ -308,7 +308,7 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
     entry.pushKV("vout", vout);
 
     if (tx->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-        CTokenGroupDescription tgDesc;
+        CTokenGroupDescriptionRegular tgDesc;
         if (GetTxPayload(*tx, tgDesc)) {
             UniValue creation(UniValue::VOBJ);
             tgDesc.ToJson(creation);

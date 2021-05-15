@@ -305,7 +305,7 @@ bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, 
 }
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescription* ptgDesc)
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescriptionRegular* ptgDesc)
 {
     CAmount totalGroupedAvailable = 0;
 
@@ -546,7 +546,7 @@ void GroupSend(CTransactionRef &txNew,
     ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
 }
 
-CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescription& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce)
+CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescriptionRegular& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce)
 {
     CTokenGroupID ret;
     do
