@@ -35,11 +35,14 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
         entry.push_back(Pair("parentGroupID", EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup)));
         entry.push_back(Pair("subgroupData", std::string(subgroupData.begin(), subgroupData.end())));
     }
-    entry.push_back(Pair("ticker", tgCreation.tokenGroupDescription.strTicker));
-    entry.push_back(Pair("name", tgCreation.tokenGroupDescription.strName));
-    entry.push_back(Pair("decimalPos", tgCreation.tokenGroupDescription.nDecimalPos));
-    entry.push_back(Pair("URL", tgCreation.tokenGroupDescription.strDocumentUrl));
-    entry.push_back(Pair("documentHash", tgCreation.tokenGroupDescription.documentHash.ToString()));
+    entry.push_back(Pair("ticker", tgCreation.pTokenGroupDescription->strTicker));
+    entry.push_back(Pair("name", tgCreation.pTokenGroupDescription->strName));
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR)
+        entry.push_back(Pair("decimalPos", ((CTokenGroupDescriptionRegular *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos));
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT)
+        entry.push_back(Pair("decimalPos", ((CTokenGroupDescriptionMGT *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos));
+    entry.push_back(Pair("URL", tgCreation.pTokenGroupDescription->strDocumentUrl));
+    entry.push_back(Pair("documentHash", tgCreation.pTokenGroupDescription->documentHash.ToString()));
     std::string flags = tgID.encodeFlags();
     if (flags != "none")
         entry.push_back(Pair("flags", flags));
@@ -94,7 +97,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         UniValue entry(UniValue::VOBJ);
         for (auto tokenGroupMapping : tokenGroupManager.get()->GetMapTokenGroups()) {
-            entry.push_back(Pair(tokenGroupMapping.second.tokenGroupDescription.strTicker, EncodeTokenGroup(tokenGroupMapping.second.tokenGroupInfo.associatedGroup)));
+            entry.push_back(Pair(tokenGroupMapping.second.pTokenGroupDescription->strTicker, EncodeTokenGroup(tokenGroupMapping.second.tokenGroupInfo.associatedGroup)));
         }
         ret.push_back(entry);
     } else if (operation == "all") {
@@ -190,7 +193,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         CTokenGroupCreation tgCreation;
         tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
 
-        LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.tokenGroupDescription.strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
+        LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.pTokenGroupDescription->strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
         TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
         ret.push_back(entry);
@@ -218,7 +221,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         CTokenGroupCreation tgCreation;
         tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
 
-        LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.tokenGroupDescription.strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
+        LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgCreation.pTokenGroupDescription->strTicker, EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
         TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
         ret.push_back(entry);
@@ -309,6 +312,14 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
 
     if (tx->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
         CTokenGroupDescriptionRegular tgDesc;
+        if (GetTxPayload(*tx, tgDesc)) {
+            UniValue creation(UniValue::VOBJ);
+            tgDesc.ToJson(creation);
+            entry.pushKV("token_creation", creation);
+        }
+    }
+    if (tx->nType == TRANSACTION_GROUP_CREATION_MGT) {
+        CTokenGroupDescriptionMGT tgDesc;
         if (GetTxPayload(*tx, tgDesc)) {
             UniValue creation(UniValue::VOBJ);
             tgDesc.ToJson(creation);

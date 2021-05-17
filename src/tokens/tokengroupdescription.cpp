@@ -21,3 +21,10 @@ void CTokenGroupDescriptionRegular::ToJson(UniValue& obj) const
     CTokenGroupDescriptionBase::ToJson(obj);
     obj.pushKV("decimal_pos", (int)nDecimalPos);
 }
+
+void CTokenGroupDescriptionMGT::ToJson(UniValue& obj) const
+{
+    CTokenGroupDescriptionBase::ToJson(obj);
+    obj.pushKV("decimal_pos", (int)nDecimalPos);
+    obj.pushKV("bls_pubkey", blsPubKey.ToString());
+}
