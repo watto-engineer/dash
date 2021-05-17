@@ -33,13 +33,13 @@ public:
     CTransactionRef creationTransaction;
     uint256 creationBlockHash;
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescriptionRegular tokenGroupDescription;
+    std::shared_ptr<CTokenGroupDescriptionBase> pTokenGroupDescription;
     CTokenGroupStatus status;
 
-    CTokenGroupCreation() : creationTransaction(MakeTransactionRef()){};
+    CTokenGroupCreation() : creationTransaction(MakeTransactionRef()), pTokenGroupDescription(std::make_shared<CTokenGroupDescriptionBase>()) {};
 
-    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, CTokenGroupDescriptionRegular tokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
-        : creationTransaction(creationTransaction), creationBlockHash(creationBlockHash), tokenGroupInfo(tokenGroupInfo), tokenGroupDescription(tokenGroupDescription), status(tokenGroupStatus) {}
+    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionBase> pTokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
+        : creationTransaction(creationTransaction), creationBlockHash(creationBlockHash), tokenGroupInfo(tokenGroupInfo), pTokenGroupDescription(pTokenGroupDescription), status(tokenGroupStatus) {}
 
     bool ValidateDescription();
 
@@ -51,13 +51,31 @@ public:
         READWRITE(REF(TransactionCompressor(creationTransaction)));
         READWRITE(creationBlockHash);
         READWRITE(tokenGroupInfo);
-        READWRITE(tokenGroupDescription);
+        if (ser_action.ForRead()) {
+            if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+                CTokenGroupDescriptionRegular tgDesc;
+                READWRITE(tgDesc);
+                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionRegular>(tgDesc);
+            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
+                CTokenGroupDescriptionMGT tgDesc;
+                READWRITE(tgDesc);
+                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionMGT>(tgDesc);
+            }
+        } else {
+            if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+                CTokenGroupDescriptionRegular* tgDesc = static_cast<CTokenGroupDescriptionRegular*>(pTokenGroupDescription.get());
+                READWRITE(*tgDesc);
+            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
+                CTokenGroupDescriptionMGT* tgDesc = static_cast<CTokenGroupDescriptionMGT*>(pTokenGroupDescription.get());
+                READWRITE(*tgDesc);
+            }
+        }
     }
     bool operator==(const CTokenGroupCreation &c)
     {
         if (c.tokenGroupInfo.invalid || tokenGroupInfo.invalid)
             return false;
-        return (*creationTransaction == *c.creationTransaction && creationBlockHash == c.creationBlockHash && tokenGroupInfo == c.tokenGroupInfo && tokenGroupDescription == c.tokenGroupDescription);
+        return (*creationTransaction == *c.creationTransaction && creationBlockHash == c.creationBlockHash && tokenGroupInfo == c.tokenGroupInfo);
     }
 };
 
@@ -65,9 +83,12 @@ void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation);
 void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation);
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc);
+template <typename TokenGroupDescription>
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<TokenGroupDescription>& tgDesc);
+
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation);
 
-bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
+bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
+bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 
 #endif

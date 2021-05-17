@@ -108,18 +108,15 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
     return curparam;
 }
 
-bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescriptionRegular& tgDesc, unsigned int &curparam, bool &stickyMelt, bool &confirmed, const bool fManagementToken = false)
+template <typename TokenGroupDescription>
+bool ParseGroupDescParamsBase(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<TokenGroupDescription>& tgDesc)
 {
     std::string strCurparamValue;
 
     std::string strTicker;
     std::string strName;
-    uint8_t nDecimalPos;
     std::string strDocumentUrl;
     uint256 documentHash;
-
-    stickyMelt = false;
-    confirmed = false;
 
     strTicker = request.params[curparam].get_str();
     if (strName.size() > 10) {
@@ -144,20 +141,6 @@ bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescriptionR
         std::string strError = strprintf("Not enough paramaters");
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
-    strCurparamValue = request.params[curparam].get_str();
-    int32_t nDecimalPos32;
-    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
-        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    nDecimalPos = nDecimalPos32;
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
     strDocumentUrl = request.params[curparam].get_str();
     if (strDocumentUrl.size() > 98) {
         std::string strError = strprintf("URL %s has too many characters (98 max)", strDocumentUrl);
@@ -174,19 +157,94 @@ bool ParseGroupDescParams(const JSONRPCRequest& request, CTokenGroupDescriptionR
     strCurparamValue = request.params[curparam].get_str();
     documentHash.SetHex(strCurparamValue);
 
-    tgDesc = CTokenGroupDescriptionRegular(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
+    CTokenGroupDescriptionBase tgDescBase = CTokenGroupDescriptionBase(strTicker, strName, strDocumentUrl, documentHash);
+    tgDesc = std::make_shared<TokenGroupDescription>(tgDescBase);
 
-    if (fManagementToken) {
-        curparam++;
-        if (curparam >= request.params.size())
-        {
-            std::string strError = strprintf("Not enough paramaters");
-            throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-        }
-        strCurparamValue = request.params[curparam].get_str();
-        if (strCurparamValue == "true") {
-            stickyMelt = true;
-        }
+    return true;
+}
+
+bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed)
+{
+    if (!ParseGroupDescParamsBase(request, curparam, tgDesc)) {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "unable to parse parameters");
+    }
+    std::string strCurparamValue;
+    uint8_t nDecimalPos;
+
+    confirmed = false;
+
+    curparam++;
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    strCurparamValue = request.params[curparam].get_str();
+    int32_t nDecimalPos32;
+    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
+        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    tgDesc->nDecimalPos = nDecimalPos32;
+
+    curparam++;
+    if (curparam >= request.params.size())
+    {
+        return true;
+    }
+    if (request.params[curparam].get_str() == "true") {
+        confirmed = true;
+        return true;
+    }
+    return true;
+}
+
+bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, bool &stickyMelt, bool &confirmed)
+{
+    if (!ParseGroupDescParamsBase(request, curparam, tgDesc)) {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "unable to parse parameters");
+    }
+
+    std::string strCurparamValue;
+
+    confirmed = false;
+    stickyMelt = false;
+
+    curparam++;
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    strCurparamValue = request.params[curparam].get_str();
+    int32_t nDecimalPos32;
+    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
+        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    tgDesc->nDecimalPos = nDecimalPos32;
+
+    curparam++;
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    strCurparamValue = request.params[curparam].get_str();
+    tgDesc->blsPubKey.Reset();
+    if (!tgDesc->blsPubKey.SetHexStr(strCurparamValue)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("bls_pubkey must be a valid BLS public key, not %s", strCurparamValue));
+    }
+
+    curparam++;
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    strCurparamValue = request.params[curparam].get_str();
+    if (strCurparamValue == "true") {
+        stickyMelt = true;
     }
 
     curparam++;
@@ -413,8 +471,8 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
             } else {
                 tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
             }
-            retobj.push_back(Pair("ticker", tgCreation.tokenGroupDescription.strTicker));
-            retobj.push_back(Pair("name", tgCreation.tokenGroupDescription.strName));
+            retobj.push_back(Pair("ticker", tgCreation.pTokenGroupDescription->strTicker));
+            retobj.push_back(Pair("name", tgCreation.pTokenGroupDescription->strName));
 
             retobj.push_back(Pair("balance", tokenGroupManager.get()->TokenValueFromAmount(item.second, item.first)));
             if (hasCapability(authorities[item.first], GroupAuthorityFlags::CTRL))
@@ -815,7 +873,6 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     unsigned int curparam = 0;
-    bool fStickyMelt = false;
     bool confirmed = false;
 
     COutput coin(nullptr, 0, 0, false, false, false);
@@ -851,9 +908,9 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
 
     CReserveKey authKeyReservation(pwallet);
     CTxDestination authDest;
-    CTokenGroupDescriptionRegular tgDesc;
+    std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc;
 
-    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
+    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed)) {
         return false;
     }
 
@@ -862,7 +919,7 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     authDest = authKey.GetID();
     curparam++;
 
-    TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    TokenGroupIdFlags tgFlags = TokenGroupIdFlags::NONE;
     CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
@@ -879,11 +936,10 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
     CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), uint256(), tokenGroupInfo, tgDesc, tokenGroupStatus);
     tokenGroupCreation.ValidateDescription();
 
-    ret.push_back(Pair("ticker", tokenGroupCreation.tokenGroupDescription.strTicker));
-    ret.push_back(Pair("name", tokenGroupCreation.tokenGroupDescription.strName));
-    ret.push_back(Pair("decimalpos", tokenGroupCreation.tokenGroupDescription.nDecimalPos));
-    ret.push_back(Pair("documenturl", tokenGroupCreation.tokenGroupDescription.strDocumentUrl));
-    ret.push_back(Pair("documenthash", tokenGroupCreation.tokenGroupDescription.documentHash.ToString()));
+    ret.push_back(Pair("ticker", tokenGroupCreation.pTokenGroupDescription->strTicker));
+    ret.push_back(Pair("name", tokenGroupCreation.pTokenGroupDescription->strName));
+    ret.push_back(Pair("documenturl", tokenGroupCreation.pTokenGroupDescription->strDocumentUrl));
+    ret.push_back(Pair("documenthash", tokenGroupCreation.pTokenGroupDescription->documentHash.ToString()));
     ret.push_back(Pair("status", tokenGroupCreation.status.messages));
 
     return ret;
@@ -925,7 +981,6 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     unsigned int curparam = 0;
-    bool fStickyMelt = false;
     bool confirmed = false;
 
     COutput coin(nullptr, 0, 0, false, false, false);
@@ -963,15 +1018,15 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CTxDestination authDest;
     CScript opretScript;
 
-    CTokenGroupDescriptionRegular tgDesc;
-    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed)) {
+    std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc;
+    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed)) {
         return false;
     }
     CPubKey authKey;
     authKeyReservation.GetReservedKey(authKey, true);
     authDest = authKey.GetID();
 
-    TokenGroupIdFlags tgFlags = fStickyMelt ? TokenGroupIdFlags::STICKY_MELT : TokenGroupIdFlags::NONE;
+    TokenGroupIdFlags tgFlags = TokenGroupIdFlags::NONE;
     CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
@@ -979,7 +1034,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     outputs.push_back(recipient);
 
     CTransactionRef tx;
-    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, &tgDesc);
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
 
     authKeyReservation.KeepKey();
     UniValue ret(UniValue::VOBJ);
@@ -1028,8 +1083,8 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     CScript opretScript;
     std::vector<CRecipient> outputs;
 
-    CTokenGroupDescriptionRegular tgDesc;
-    if (!ParseGroupDescParams(request, tgDesc, curparam, fStickyMelt, confirmed, true)) {
+    std::shared_ptr<CTokenGroupDescriptionMGT> tgDesc;
+    if (!ParseGroupDescParamsMGT(request, curparam, tgDesc, fStickyMelt, confirmed)) {
         return false;
     }
     CPubKey authKey;
@@ -1130,7 +1185,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     UniValue ret(UniValue::VOBJ);
     if (confirmed) {
         CTransactionRef tx;
-        ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, &tgDesc);
+        ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
         authKeyReservation.KeepKey();
         ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
         ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
@@ -1311,7 +1366,7 @@ extern UniValue listtokenauthorities(const JSONRPCRequest& request)
         retobj.push_back(Pair("groupID", EncodeTokenGroup(tgInfo.associatedGroup)));
         retobj.push_back(Pair("txid", coin.tx->GetHash().ToString()));
         retobj.push_back(Pair("vout", coin.i));
-        retobj.push_back(Pair("ticker", tgCreation.tokenGroupDescription.strTicker));
+        retobj.push_back(Pair("ticker", tgCreation.pTokenGroupDescription->strTicker));
         retobj.push_back(Pair("address", EncodeDestination(dest)));
         retobj.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tgInfo.controllingGroupFlags())));
         ret.push_back(retobj);
@@ -1817,7 +1872,7 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
 
         if (fValidGroup) {
             entry.pushKV("groupID", EncodeTokenGroup(grp.associatedGroup));
-            entry.pushKV("ticker", tgCreation.tokenGroupDescription.strTicker);
+            entry.pushKV("ticker", tgCreation.pTokenGroupDescription->strTicker);
             entry.pushKV("tokenAmount", tokenGroupManager.get()->TokenValueFromAmount(grp.getAmount(), tgCreation.tokenGroupInfo.associatedGroup));
         }
 

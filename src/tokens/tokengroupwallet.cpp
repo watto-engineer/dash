@@ -304,8 +304,9 @@ bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, 
     return true;
 }
 
+template <typename TokenGroupDescription>
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
-    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, CTokenGroupDescriptionRegular* ptgDesc)
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const TokenGroupDescription& ptgDesc)
 {
     CAmount totalGroupedAvailable = 0;
 
@@ -357,7 +358,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 
         if (ptgDesc != nullptr) {
             tx.nVersion = 3;
-            tx.nType = TRANSACTION_GROUP_CREATION_REGULAR;
+            tx.nType = ptgDesc->SPECIALTX_TYPE;
             SetTxPayload(tx, *ptgDesc);
         };
 
@@ -378,7 +379,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
             tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
-            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.tokenGroupDescription.strName, tgInfo.quantity);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
         }
     }
 
@@ -393,7 +394,94 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 
     groupChangeKeyReservation.KeepKey();
 }
+template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionRegular>& ptgDesc);
+template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionMGT>& ptgDesc);
 
+void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet)
+{
+    CAmount totalGroupedAvailable = 0;
+
+    CMutableTransaction tx;
+    CReserveKey groupChangeKeyReservation(wallet);
+
+    {
+        // Add group outputs based on the passed recipient data to the tx.
+        for (const CRecipient &recipient : outputs)
+        {
+            CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
+            tx.vout.push_back(txout);
+        }
+
+        for (const auto &coin : chosenCoins)
+        {
+            CTxIn txin(coin.GetOutPoint());
+            tx.vin.push_back(txin);
+
+            // Gather data on the provided inputs, and add them to the tx.
+            CTokenGroupInfo tg(coin.GetScriptPubKey());
+            if (!tg.isInvalid() && tg.associatedGroup != NoGroup && !tg.isAuthority())
+            {
+                if (tg.associatedGroup == grpID){
+                    totalGroupedAvailable += tg.quantity;
+                }
+            }
+        }
+
+        if (totalGroupedAvailable > totalGroupedNeeded) // need to make a group change output
+        {
+            CPubKey newKey;
+            if (!groupChangeKeyReservation.GetReservedKey(newKey, true))
+                throw JSONRPCError(
+                    RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+
+            CTxOut txout(GROUPED_SATOSHI_AMT,
+                GetScriptForDestination(newKey.GetID(), grpID, totalGroupedAvailable - totalGroupedNeeded));
+            tx.vout.push_back(txout);
+        }
+
+        // Now add fee
+        CAmount fee;
+        int nChangePosRet = -1;
+        std::string strError;
+        bool lockUnspents;
+        std::set<int> setSubtractFeeFromOutputs;
+        CCoinControl coinControl;
+
+        if (!wallet->FundTransaction(tx, fee, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
+            throw JSONRPCError(RPC_WALLET_ERROR, strError);
+        }
+
+        if (!wallet->SignTransaction(tx))
+        {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Signing transaction failed");
+        }
+    }
+
+    txNew = MakeTransactionRef(std::move(tx));
+
+    for (auto vout : txNew->vout) {
+        CTokenGroupInfo tgInfo(vout.scriptPubKey);
+        if (!tgInfo.isInvalid()) {
+            CTokenGroupCreation tgCreation;
+            tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
+        }
+    }
+
+    // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
+    CReserveKey dummy(wallet);
+    CValidationState state;
+    if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the "
+                                             "coins in your wallet were already spent, such as if you used a copy of "
+                                             "wallet.dat and coins were spent in the copy but not marked as spent "
+                                             "here.");
+
+    groupChangeKeyReservation.KeepKey();
+}
 
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet)
 {
@@ -539,14 +627,15 @@ void GroupSend(CTransactionRef &txNew,
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
             tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
-            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.tokenGroupDescription.strName, tgInfo.quantity);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
         }
     }
 
     ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
 }
 
-CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescriptionRegular& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce)
+template <typename TokenGroupDescription>
+CTokenGroupID findGroupId(const COutPoint &input, const TokenGroupDescription& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce)
 {
     CTokenGroupID ret;
     do
@@ -556,9 +645,11 @@ CTokenGroupID findGroupId(const COutPoint &input, CTokenGroupDescriptionRegular&
         // mask off any flags in the nonce
         nonce &= ~((uint64_t)GroupAuthorityFlags::ALL_BITS);
         hasher << input;
-        hasher << tgDesc;
+        tgDesc->WriteHashable(hasher);
         hasher << nonce;
         ret = hasher.GetHash();
     } while (ret.bytes()[31] != (uint8_t)flags);
     return ret;
 }
+template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
+template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);

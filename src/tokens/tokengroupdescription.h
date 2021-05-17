@@ -6,7 +6,9 @@
 #define TOKEN_GROUP_DESCRIPTION_H
 
 #include "amount.h"
+#include <bls/bls.h>
 #include "script/script.h"
+#include <primitives/transaction.h>
 #include "uint256.h"
 
 class UniValue;
@@ -71,6 +73,13 @@ public:
         READWRITE(documentHash);
     }
     void ToJson(UniValue& obj) const;
+    void WriteHashable(CHashWriter& ss) const {
+        ss << nVersion;
+        ss << strTicker;
+        ss << strName;
+        ss << strDocumentUrl;
+        ss << documentHash;
+    }
 
     bool operator==(const CTokenGroupDescriptionBase &c)
     {
@@ -81,9 +90,8 @@ public:
 class CTokenGroupDescriptionRegular : public CTokenGroupDescriptionBase
 {
 public:
-    static const uint16_t CURRENT_VERSION = 1;
+    static const int SPECIALTX_TYPE = TRANSACTION_GROUP_CREATION_REGULAR;
 
-public:
     // Decimal position to translate between token value and amount
     uint8_t nDecimalPos;
 
@@ -91,12 +99,14 @@ public:
         SetNull();
     };
     CTokenGroupDescriptionRegular(std::string strTicker, std::string strName, uint8_t nDecimalPos, std::string strDocumentUrl, uint256 documentHash) :
-        nDecimalPos(nDecimalPos) {
-            CTokenGroupDescriptionBase(strTicker, strName, strDocumentUrl, documentHash);
-        };
+        CTokenGroupDescriptionBase(strTicker, strName, strDocumentUrl, documentHash), nDecimalPos(nDecimalPos) { };
+
+    CTokenGroupDescriptionRegular(CTokenGroupDescriptionBase tgDescBase) :
+        CTokenGroupDescriptionBase(tgDescBase), nDecimalPos(0) { };
 
     void SetNull() {
         CTokenGroupDescriptionBase::SetNull();
+        nDecimalPos = 0;
     }
 
     ADD_SERIALIZE_METHODS;
@@ -108,6 +118,10 @@ public:
         READWRITE(nDecimalPos);
     }
     void ToJson(UniValue& obj) const;
+    void WriteHashable(CHashWriter& ss) const {
+        CTokenGroupDescriptionBase::WriteHashable(ss);
+        ss << nDecimalPos;
+    }
 
     bool operator==(const CTokenGroupDescriptionRegular &c)
     {
@@ -115,12 +129,66 @@ public:
     }
 };
 
+class CTokenGroupDescriptionMGT : public CTokenGroupDescriptionBase
+{
+public:
+    static const int SPECIALTX_TYPE = TRANSACTION_GROUP_CREATION_MGT;
+
+    // Decimal position to translate between token value and amount
+    uint8_t nDecimalPos;
+
+    // BLS Public Key that enables signing
+    CBLSPublicKey blsPubKey;
+
+    CTokenGroupDescriptionMGT() {
+        SetNull();
+    };
+    CTokenGroupDescriptionMGT(std::string strTicker, std::string strName, uint8_t nDecimalPos, std::string strDocumentUrl, uint256 documentHash, CBLSPublicKey blsPubKey) :
+        CTokenGroupDescriptionBase(strTicker, strName, strDocumentUrl, documentHash), nDecimalPos(nDecimalPos), blsPubKey(blsPubKey) { };
+
+    CTokenGroupDescriptionMGT(CTokenGroupDescriptionBase tgDescBase) :
+        CTokenGroupDescriptionBase(tgDescBase), nDecimalPos(0) {
+        blsPubKey = CBLSPublicKey();
+    };
+
+    void SetNull() {
+        CTokenGroupDescriptionBase::SetNull();
+        nDecimalPos = 0;
+        blsPubKey = CBLSPublicKey();
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITEAS(CTokenGroupDescriptionBase, *this);
+        READWRITE(nDecimalPos);
+        READWRITE(blsPubKey);
+    }
+    void ToJson(UniValue& obj) const;
+
+    // BLS public key is excluded from hash
+    void WriteHashable(CHashWriter& ss) const {
+        CTokenGroupDescriptionBase::WriteHashable(ss);
+        ss << nDecimalPos;
+    }
+
+    bool operator==(const CTokenGroupDescriptionMGT &c)
+    {
+        return (strTicker == c.strTicker && strName == c.strName && strDocumentUrl == c.strDocumentUrl &&
+            documentHash == c.documentHash && nDecimalPos == c.nDecimalPos && blsPubKey == c.blsPubKey);
+    }
+};
+
 // Tokens with no fractional quantities have nDecimalPos=0
 // Bytz has has decimalpos=8 (1 BYTZ is 100000000 satoshi)
 // Maximum value is 10^16
 template <typename TokenGroupDescription>
-CAmount GetCoin(TokenGroupDescription tgDesc) {
-    return COINFromDecimalPos(tgDesc.nDecimalPos);
+CAmount GetCoinAmount(const TokenGroupDescription* tgDesc) {
+    return COINFromDecimalPos(tgDesc->nDecimalPos);
 }
+template CAmount GetCoinAmount(const CTokenGroupDescriptionRegular* tgDesc);
+template CAmount GetCoinAmount(const CTokenGroupDescriptionMGT* tgDesc);
 
 #endif

@@ -41,7 +41,9 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
         case TRANSACTION_QUORUM_COMMITMENT:
             return llmq::CheckLLMQCommitment(tx, pindexPrev, state);
         case TRANSACTION_GROUP_CREATION_REGULAR:
-            return CheckTokenCreationTx(tx, pindexPrev, state, view);
+            return CheckGroupConfigurationTxRegular(tx, pindexPrev, state, view);
+        case TRANSACTION_GROUP_CREATION_MGT:
+            return CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
         }
     } catch (const std::exception& e) {
         LogPrintf("%s -- failed: %s\n", __func__, e.what());

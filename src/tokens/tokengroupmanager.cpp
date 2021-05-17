@@ -25,10 +25,10 @@ CTokenGroupManager::CTokenGroupManager() {
 }
 
 bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation) {
-    if (!tgMGTCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "MGT") {
+    if (!tgMGTCreation && tokenGroupCreation.pTokenGroupDescription->strTicker == "MGT") {
         this->tgMGTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
-    } else if (!tgGVTCreation && tokenGroupCreation.tokenGroupDescription.strTicker == "GVT") {
+    } else if (!tgGVTCreation && tokenGroupCreation.pTokenGroupDescription->strTicker == "GVT") {
         this->tgGVTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
     }
@@ -75,7 +75,7 @@ void CTokenGroupManager::ResetTokenGroups() {
 
     CTokenGroupInfo tgInfoBYTZ(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
     CTransaction tgTxBytz;
-    CTokenGroupDescriptionRegular tgDescriptionBYTZ("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
+    std::shared_ptr<CTokenGroupDescriptionRegular> tgDescriptionBYTZ = std::make_shared<CTokenGroupDescriptionRegular>("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
     CTokenGroupStatus tokenGroupStatus;
     CTokenGroupCreation tgCreationBYTZ(MakeTransactionRef(tgTxBytz), uint256(), tgInfoBYTZ, tgDescriptionBYTZ, tokenGroupStatus);
     mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationBYTZ));
@@ -84,9 +84,16 @@ void CTokenGroupManager::ResetTokenGroups() {
 
 bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID) {
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescriptionRegular tgDesc;
 
-    bool hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+    bool hasNewTokenGroup = false;
+
+    if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+        std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc = std::make_shared<CTokenGroupDescriptionRegular>();
+        hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+    } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
+        std::shared_ptr<CTokenGroupDescriptionMGT> tgDesc = std::make_shared<CTokenGroupDescriptionMGT>();
+        hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+    }
 
     if (hasNewTokenGroup) {
         if (MatchesMGT(tokenGroupInfo.associatedGroup)) {
@@ -118,12 +125,12 @@ bool CTokenGroupManager::GetTokenGroupCreation(const CTokenGroupID& tgID, CToken
 }
 std::string CTokenGroupManager::GetTokenGroupNameByID(CTokenGroupID tokenGroupId) {
     CTokenGroupCreation tokenGroupCreation;
-    return GetTokenGroupCreation(tokenGroupId, tokenGroupCreation) ? tokenGroupCreation.tokenGroupDescription.strName : "";
+    return GetTokenGroupCreation(tokenGroupId, tokenGroupCreation) ? tokenGroupCreation.pTokenGroupDescription->strName : "";
 }
 
 std::string CTokenGroupManager::GetTokenGroupTickerByID(CTokenGroupID tokenGroupId) {
     CTokenGroupCreation tokenGroupCreation;
-    return GetTokenGroupCreation(tokenGroupId, tokenGroupCreation) ? tokenGroupCreation.tokenGroupDescription.strTicker : "";
+    return GetTokenGroupCreation(tokenGroupId, tokenGroupCreation) ? tokenGroupCreation.pTokenGroupDescription->strTicker : "";
 }
 
 bool CTokenGroupManager::GetTokenGroupIdByTicker(std::string strTicker, CTokenGroupID &tokenGroupID) {
@@ -133,8 +140,8 @@ bool CTokenGroupManager::GetTokenGroupIdByTicker(std::string strTicker, CTokenGr
         mapTokenGroups.begin(), mapTokenGroups.end(),
         [strNeedleTicker](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
             std::string strHeapTicker;
-            std::transform(tokenGroup.second.tokenGroupDescription.strTicker.begin(),
-                tokenGroup.second.tokenGroupDescription.strTicker.end(),
+            std::transform(tokenGroup.second.pTokenGroupDescription->strTicker.begin(),
+                tokenGroup.second.pTokenGroupDescription->strTicker.end(),
                 std::back_inserter(strHeapTicker), ::tolower);
             return strHeapTicker == strNeedleTicker;
         });
@@ -152,8 +159,8 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
         mapTokenGroups.begin(), mapTokenGroups.end(),
         [strNeedleName](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
             std::string strHeapName;
-            std::transform(tokenGroup.second.tokenGroupDescription.strName.begin(),
-                tokenGroup.second.tokenGroupDescription.strName.end(),
+            std::transform(tokenGroup.second.pTokenGroupDescription->strName.begin(),
+                tokenGroup.second.pTokenGroupDescription->strName.end(),
                 std::back_inserter(strHeapName), ::tolower);
             return strHeapName == strNeedleName;
         });
@@ -241,7 +248,12 @@ CAmount CTokenGroupManager::AmountFromTokenValue(const UniValue& value, const CT
     CAmount amount;
     CTokenGroupCreation tgCreation;
     GetTokenGroupCreation(tgID, tgCreation);
-    if (!ParseFixedPoint(value.getValStr(), tgCreation.tokenGroupDescription.nDecimalPos, &amount))
+    uint8_t nDecimalPos = 0;
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR)
+        nDecimalPos = ((CTokenGroupDescriptionRegular *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos;
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT)
+        nDecimalPos = ((CTokenGroupDescriptionMGT *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos;
+    if (!ParseFixedPoint(value.getValStr(), nDecimalPos, &amount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid token amount");
     if (!TokenMoneyRange(amount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Token amount out of range");
@@ -251,15 +263,29 @@ CAmount CTokenGroupManager::AmountFromTokenValue(const UniValue& value, const CT
 std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID) {
     CTokenGroupCreation tgCreation;
     GetTokenGroupCreation(tgID, tgCreation);
-    CAmount tokenCOIN = GetCoin(tgCreation.tokenGroupDescription);
+    CAmount tokenCOIN = 1;
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+        CTokenGroupDescriptionRegular* tgDescRegular = static_cast<CTokenGroupDescriptionRegular*>(tgCreation.pTokenGroupDescription.get());
+        tokenCOIN = GetCoinAmount(tgDescRegular);
+    } else if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
+        CTokenGroupDescriptionMGT* tgDescMGT = static_cast<CTokenGroupDescriptionMGT*>(tgCreation.pTokenGroupDescription.get());
+        tokenCOIN = GetCoinAmount(tgDescMGT);
+    }
     bool sign = amount < 0;
     int64_t n_abs = (sign ? -amount : amount);
     int64_t quotient = n_abs / tokenCOIN;
     int64_t remainder = n_abs % tokenCOIN;
-    if (tgCreation.tokenGroupDescription.nDecimalPos == 0) {
+
+    uint8_t nDecimalPos = 0;
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR)
+        nDecimalPos = ((CTokenGroupDescriptionRegular *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos;
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT)
+        nDecimalPos = ((CTokenGroupDescriptionMGT *)(tgCreation.pTokenGroupDescription.get()))->nDecimalPos;
+
+    if (nDecimalPos == 0) {
         return strprintf("%s%d", sign ? "-" : "", quotient);
     } else {
-        return strprintf("%s%d.%0*d", sign ? "-" : "", quotient, tgCreation.tokenGroupDescription.nDecimalPos, remainder);
+        return strprintf("%s%d.%0*d", sign ? "-" : "", quotient, nDecimalPos, remainder);
     }
 }
 

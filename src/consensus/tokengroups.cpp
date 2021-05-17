@@ -201,9 +201,15 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
                 CTokenGroupDescriptionRegular tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
-                    return state.DoS(100, false, REJECT_INVALID, "bad-protx-token-payload");
+                    return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
-                mintGrp << tgDesc;
+                tgDesc.WriteHashable(mintGrp);
+            } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
+                CTokenGroupDescriptionMGT tgDesc;
+                if (!GetTxPayload(tx, tgDesc)) {
+                    return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                }
+                tgDesc.WriteHashable(mintGrp);
             }
             mintGrp << (((uint64_t)bal.ctrlOutputPerms) & ~((uint64_t)GroupAuthorityFlags::ALL_BITS));
             CTokenGroupID newGrpId(mintGrp.GetHash());

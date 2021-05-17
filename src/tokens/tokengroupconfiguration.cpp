@@ -26,24 +26,20 @@ void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation) {
 
     std::smatch matchResult;
 
-    if (tokenGroupCreation.tokenGroupDescription.strTicker != "" &&
-            !std::regex_match(tokenGroupCreation.tokenGroupDescription.strTicker, matchResult, regexAlpha)) {
+    if (tokenGroupCreation.pTokenGroupDescription->strTicker != "" &&
+            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strTicker, matchResult, regexAlpha)) {
         tokenGroupCreation.status.AddMessage("Token ticker can only contain letters.");
-        tokenGroupCreation.tokenGroupDescription.strTicker = "";
+        tokenGroupCreation.pTokenGroupDescription->strTicker = "";
     }
-    if (tokenGroupCreation.tokenGroupDescription.strName != "" &&
-            !std::regex_match(tokenGroupCreation.tokenGroupDescription.strName, matchResult, regexAlpha)) {
+    if (tokenGroupCreation.pTokenGroupDescription->strName != "" &&
+            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strName, matchResult, regexAlpha)) {
         tokenGroupCreation.status.AddMessage("Token name can only contain letters.");
-        tokenGroupCreation.tokenGroupDescription.strName = "";
+        tokenGroupCreation.pTokenGroupDescription->strName = "";
     }
-    if (tokenGroupCreation.tokenGroupDescription.strDocumentUrl != "" &&
-            !std::regex_match(tokenGroupCreation.tokenGroupDescription.strDocumentUrl, matchResult, regexUrl)) {
+    if (tokenGroupCreation.pTokenGroupDescription->strDocumentUrl != "" &&
+            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strDocumentUrl, matchResult, regexUrl)) {
         tokenGroupCreation.status.AddMessage("Token description document URL cannot be parsed.");
-        tokenGroupCreation.tokenGroupDescription.strDocumentUrl = "";
-    }
-    if (tokenGroupCreation.tokenGroupDescription.nDecimalPos > 16) {
-        tokenGroupCreation.status.AddMessage("Token decimal separation position is too large.");
-        tokenGroupCreation.tokenGroupDescription.nDecimalPos = 8;
+        tokenGroupCreation.pTokenGroupDescription->strDocumentUrl = "";
     }
 }
 
@@ -54,8 +50,8 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
     // Iterate existing token groups and verify that the new group has an unique ticker and name
     std::string strLowerTicker;
     std::string strLowerName;
-    std::transform(tokenGroupCreation.tokenGroupDescription.strTicker.begin(), tokenGroupCreation.tokenGroupDescription.strTicker.end(), std::back_inserter(strLowerTicker), ::tolower);
-    std::transform(tokenGroupCreation.tokenGroupDescription.strName.begin(), tokenGroupCreation.tokenGroupDescription.strName.end(), std::back_inserter(strLowerName), ::tolower);
+    std::transform(tokenGroupCreation.pTokenGroupDescription->strTicker.begin(), tokenGroupCreation.pTokenGroupDescription->strTicker.end(), std::back_inserter(strLowerTicker), ::tolower);
+    std::transform(tokenGroupCreation.pTokenGroupDescription->strName.begin(), tokenGroupCreation.pTokenGroupDescription->strName.end(), std::back_inserter(strLowerName), ::tolower);
 
     CTokenGroupID tgID = tokenGroupCreation.tokenGroupInfo.associatedGroup;
 
@@ -74,12 +70,12 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
 
                     // Compare lower case
                     std::string strHeapTicker;
-                    std::transform(tokenGroup.second.tokenGroupDescription.strTicker.begin(),
-                        tokenGroup.second.tokenGroupDescription.strTicker.end(),
+                    std::transform(tokenGroup.second.pTokenGroupDescription->strTicker.begin(),
+                        tokenGroup.second.pTokenGroupDescription->strTicker.end(),
                         std::back_inserter(strHeapTicker), ::tolower);
                     if (strLowerTicker == strHeapTicker){
                         tokenGroupCreation.status.AddMessage("Token ticker already exists.");
-                        tokenGroupCreation.tokenGroupDescription.strTicker = "";
+                        tokenGroupCreation.pTokenGroupDescription->strTicker = "";
                         return true;
                     }
 
@@ -99,12 +95,12 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
                     if (tokenGroup.second.tokenGroupInfo.associatedGroup == tgID) return false;
 
                     std::string strHeapName;
-                    std::transform(tokenGroup.second.tokenGroupDescription.strName.begin(),
-                        tokenGroup.second.tokenGroupDescription.strName.end(),
+                    std::transform(tokenGroup.second.pTokenGroupDescription->strName.begin(),
+                        tokenGroup.second.pTokenGroupDescription->strName.end(),
                         std::back_inserter(strHeapName), ::tolower);
                     if (strLowerName == strHeapName){
                         tokenGroupCreation.status.AddMessage("Token name already exists.");
-                        tokenGroupCreation.tokenGroupDescription.strName = "";
+                        tokenGroupCreation.pTokenGroupDescription->strName = "";
                         return true;
                     }
 
@@ -117,12 +113,13 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
 // Returns true
 void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation) {
     std::string strUpperTicker;
-    std::transform(tokenGroupCreation.tokenGroupDescription.strTicker.begin(), tokenGroupCreation.tokenGroupDescription.strTicker.end(), std::back_inserter(strUpperTicker), ::toupper);
+    std::transform(tokenGroupCreation.pTokenGroupDescription->strTicker.begin(), tokenGroupCreation.pTokenGroupDescription->strTicker.end(), std::back_inserter(strUpperTicker), ::toupper);
 
-    tokenGroupCreation.tokenGroupDescription.strTicker = strUpperTicker;
+    tokenGroupCreation.pTokenGroupDescription->strTicker = strUpperTicker;
 }
 
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc) {
+template <typename TokenGroupDescription>
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<TokenGroupDescription>& tgDesc) {
     bool hasNewTokenGroup = false;
     for (const auto &txout : tx.vout) {
         const CScript &scriptPubKey = txout.scriptPubKey;
@@ -135,43 +132,77 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
         }
     }
     if (hasNewTokenGroup) {
-        return GetTxPayload(tx, tgDesc);
+        return GetTxPayload(tx, *tgDesc);
     }
     return false;
 }
+template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc);
+template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc);
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
     CTokenGroupInfo tokenGroupInfo;
-    CTokenGroupDescriptionRegular tokenGroupDescription;
-
-    if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
-
     CTokenGroupStatus tokenGroupStatus;
-    newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, tokenGroupDescription, tokenGroupStatus);
 
+    if (tx->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+        std::shared_ptr<CTokenGroupDescriptionRegular> pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionRegular>();
+        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, pTokenGroupDescription)) return false;
+        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, pTokenGroupDescription, tokenGroupStatus);
+    } else if (tx->nType == TRANSACTION_GROUP_CREATION_MGT) {
+        std::shared_ptr<CTokenGroupDescriptionMGT> pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionMGT>();
+        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, pTokenGroupDescription)) return false;
+        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, pTokenGroupDescription, tokenGroupStatus);
+    }
     return true;
 }
 
-bool CheckTokenCreationTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
     if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-type");
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-invalid");
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-tx");
     }
 
     CTokenGroupDescriptionRegular tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-payload");
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-payload");
     }
     if (tgDesc.nDecimalPos > 16) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-group-param");
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-param");
     }
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionRegular::CURRENT_VERSION) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-version");
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-version");
+    }
+
+    return true;
+}
+
+bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+{
+    if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-type");
+    }
+
+    if (!IsAnyOutputGroupedCreation(tx)) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-tx");
+    }
+
+    CTokenGroupDescriptionMGT tgDesc;
+    if (!GetTxPayload(tx, tgDesc)) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-payload");
+    }
+    if (tgDesc.nDecimalPos > 16) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-param");
+    }
+    if (!tgDesc.blsPubKey.IsValid()) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-key");
+    }
+
+    if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionMGT::CURRENT_VERSION) {
+        return state.DoS(100, false, REJECT_INVALID, "grp-bad-version");
     }
 
     return true;
