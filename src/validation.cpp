@@ -586,7 +586,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         if ((unsigned int)chainActive.Tip()->nHeight < chainparams.GetConsensus().ATPStartHeight)
         {
             return state.Invalid(ValidationInvalid::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "premature-op_group-tx");
-        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager.get()->ManagementTokensCreated(chainActive.Height())){
+        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager.get()->ManagementTokensCreated()){
             for (const CTxOut &txout : tx.vout)
             {
                 CTokenGroupInfo grp(txout.scriptPubKey);
@@ -1398,7 +1398,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                 if (!tokenGroupManager.get()->CheckFees(tx, tgMintMeltBalance, state, pindexPrev)) {
                     return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
                 }
-                if (!tokenGroupManager.get()->ManagementTokensCreated(chainActive.Height())){
+                if (!tokenGroupManager.get()->ManagementTokensCreated()){
                     for (const CTxOut &txout : tx.vout)
                     {
                         CTokenGroupInfo grp(txout.scriptPubKey);

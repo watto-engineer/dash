@@ -171,9 +171,7 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
     return false;
 }
 
-bool CTokenGroupManager::ManagementTokensCreated(int nHeight) {
-    // if (!ElectronTokensCreated() && nHeight >= Params().GetConsensus().POSPOWStartHeight)
-    //    return false;
+bool CTokenGroupManager::ManagementTokensCreated() {
     return MGTTokensCreated() && GVTTokensCreated();
 }
 

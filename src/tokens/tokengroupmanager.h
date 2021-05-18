@@ -48,6 +48,8 @@ public:
     bool MatchesMGT(CTokenGroupID tgID);
     bool MatchesGVT(CTokenGroupID tgID);
 
+    bool ManagementTokensCreated();
+
     CTokenGroupID GetMGTID() { return tgMGTCreation->tokenGroupInfo.associatedGroup; };
     CTokenGroupID GetGVTID() { return tgGVTCreation->tokenGroupInfo.associatedGroup; };
 
