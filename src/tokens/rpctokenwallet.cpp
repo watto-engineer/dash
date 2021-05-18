@@ -956,19 +956,19 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configuretoken \"ticker\" \"name\" decimalpos \"description_url\" description_hash ( confirm_send ) \n"
+            "configuretoken \"ticker\" \"name\" \"description_url\" description_hash decimalpos ( confirm_send ) \n"
             "\n"
             "Configures a new token type.\n"
             "\nArguments:\n"
             "1. \"ticker\"              (string, required) the token ticker\n"
             "2. \"name\"                (string, required) the token name\n"
-            "3. \"decimalpos\"          (numeric, required, default=8) the number of decimals after the decimal separator\n"
-            "4. \"description_url\"     (string, required) the URL of the token's description document\n"
-            "5. \"description_hash\"    (hex, required) the hash of the token description document\n"
+            "3. \"description_url\"     (string, required) the URL of the token's description document\n"
+            "4. \"description_hash\"    (hex, required) the hash of the token description document\n"
+            "5. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
             "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuretoken", "\"MGT\" \"ManagementToken\" 6 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-mainnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
+            HelpExampleCli("configuretoken", "\"FUN\" \"FunToken\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-mainnet-FUN.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 6 true") +
             "\n"
         );
 
@@ -1054,20 +1054,21 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configuremanagementtoken \"ticker\" \"name\" decimalpos \"description_url\" description_hash sticky_melt ( confirm_send ) \n"
+            "configuremanagementtoken \"ticker\" \"name\" \"description_url\" description_hash decimalpos \"blsPubKey\" sticky_melt ( confirm_send ) \n"
             "\n"
             "Configures a new management token type. Currelty the only management tokens are MGT and GVN.\n"
             "\nArguments:\n"
             "1. \"ticker\"              (string, required) the token ticker\n"
             "2. \"name\"                (string, required) the token name\n"
-            "3. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
-            "4. \"description_url\"     (string, required) the URL of the token's description document\n"
-            "5. \"description_hash\"    (hex) the hash of the token description document\n"
-            "6. \"sticky_melt\"         (boolean, optional, default=false) the token can be melted, also without a token melt authority\n"
-            "7. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
+            "3. \"description_url\"     (string, required) the URL of the token's description document\n"
+            "4. \"description_hash\"    (hex) the hash of the token description document\n"
+            "5. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
+            "6. \"blsPubKey\"           (string, required) the BLS public key. The BLS private key does not have to be known.\n"
+            "7. \"sticky_melt\"         (boolean, required) the token can be melted, also without a token melt authority\n"
+            "8. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"GVT\" \"GuardianValidatorToken\" 4 \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 true") +
+            HelpExampleCli("configuremanagementtoken", "\"GVT\" \"GuardianValidatorToken\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
             "\n"
         );
 
