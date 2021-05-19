@@ -128,6 +128,7 @@ BITCOIN_CORE_H = \
   bip39_english.h \
   blockencodings.h \
   bloom.h \
+  bytzaddrenc.h \
   cachemap.h \
   cachemultimap.h \
   blockfilter.h \
@@ -272,6 +273,7 @@ BITCOIN_CORE_H = \
   tokens/tokengroupdescription.h \
   tokens/tokengroupmanager.h \
   tokens/tokengroupwallet.h \
+  tokens/rpctokenwallet.h \
   torcontrol.h \
   txdb.h \
   txmempool.h \
