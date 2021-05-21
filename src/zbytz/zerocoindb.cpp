@@ -8,6 +8,8 @@
 #include "zbytz/zerocoindb.h"
 #include "validation.h"
 
+#include <boost/thread.hpp>
+
 CZerocoinDB::CZerocoinDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "zerocoin", nCacheSize, fMemory, fWipe)
 {
 }
