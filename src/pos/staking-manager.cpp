@@ -18,6 +18,8 @@
 #include "validation.h"
 #include "wallet/wallet.h"
 
+#include <boost/thread.hpp>
+
 std::shared_ptr<CStakingManager> stakingManager;
 
 CStakingManager::CStakingManager(std::shared_ptr<CWallet> pwalletIn) :
