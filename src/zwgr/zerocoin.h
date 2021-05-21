@@ -152,7 +152,7 @@ public:
         }
     }
 
-    ADD_SERIALIZE_METHODS;
+    // ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
@@ -224,7 +224,7 @@ public:
     void SetMintCount(int nMintsAdded) { this->nMintCount = nMintsAdded; }
     int GetMintCount() const { return nMintCount; }
 
-    ADD_SERIALIZE_METHODS;
+    // ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
