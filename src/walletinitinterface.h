@@ -31,7 +31,7 @@ public:
     /** Close wallets */
     virtual void Close() const = 0;
 
-    // Dash Specific WalletInitInterface
+    // Bytz Specific WalletInitInterface
     virtual void AutoLockMasternodeCollaterals() const = 0;
     virtual void InitCoinJoinSettings() const = 0;
     virtual void InitStaking() const = 0;

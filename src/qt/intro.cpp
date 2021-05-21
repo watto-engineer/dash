@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/dash-config.h>
+#include <config/bytz-config.h>
 #endif
 
 #include <fs.h>
@@ -129,7 +129,7 @@ Intro::Intro(QWidget *parent) :
         .arg(tr(PACKAGE_NAME))
         .arg(BLOCK_CHAIN_SIZE)
         .arg(2014)
-        .arg("Dash")
+        .arg("Bytz")
     );
     ui->lblExplanation2->setText(ui->lblExplanation2->text().arg(tr(PACKAGE_NAME)));
 
@@ -148,7 +148,7 @@ Intro::Intro(QWidget *parent) :
     }
     requiredSpace += CHAIN_STATE_SIZE;
     ui->sizeWarningLabel->setText(
-        tr("%1 will download and store a copy of the Dash block chain.").arg(tr(PACKAGE_NAME)) + " " +
+        tr("%1 will download and store a copy of the Bytz block chain.").arg(tr(PACKAGE_NAME)) + " " +
         storageRequiresMsg.arg(requiredSpace) + " " +
         tr("The wallet will also be stored in this directory.")
     );
@@ -209,7 +209,7 @@ bool Intro::pickDataDirectory(interfaces::Node& node)
         GUIUtil::disableMacFocusRect(&intro);
         GUIUtil::loadStyleSheet(true);
         intro.setDataDirectory(dataDirDefaultCurrent);
-        intro.setWindowIcon(QIcon(":icons/dash"));
+        intro.setWindowIcon(QIcon(":icons/bytz"));
 
         while(true)
         {
@@ -236,8 +236,8 @@ bool Intro::pickDataDirectory(interfaces::Node& node)
         settings.setValue("strDataDirDefault", dataDirDefaultCurrent);
     }
     /* Only override -datadir if different from the default, to make it possible to
-     * override -datadir in the dash.conf file in the default data directory
-     * (to be consistent with dashd behavior)
+     * override -datadir in the bytz.conf file in the default data directory
+     * (to be consistent with bytzd behavior)
      */
     if(dataDir != dataDirDefaultCurrent) {
         node.softSetArg("-datadir", GUIUtil::qstringToBoostPath(dataDir).string()); // use OS locale for path setting

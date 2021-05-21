@@ -371,8 +371,8 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V16DeploymentHeight;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 1 * 60; // Dash: 1 minute
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
+        consensus.nPowTargetSpacing = 1 * 60; // Bytz: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
 
@@ -469,18 +469,18 @@ public:
         vSeeds.emplace_back("204.92.235.52"); //Backup Seeder 3
         vSeeds.emplace_back("204.92.235.53"); //Backup Seeder 4
 
-        // Dash addresses start with 'X'
+        // Bytz addresses start with 'X'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,125);
-        // Dash script addresses start with '7'
+        // Bytz script addresses start with '7'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,18);
-        // Dash private keys start with '7' or 'X'
+        // Bytz private keys start with '7' or 'X'
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,140);
-        // Dash BIP32 pubkeys start with 'xpub' (Bitcoin defaults)
+        // Bytz BIP32 pubkeys start with 'xpub' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x02, 0x2D, 0x25, 0x33};
-        // Dash BIP32 prvkeys start with 'xprv' (Bitcoin defaults)
+        // Bytz BIP32 prvkeys start with 'xprv' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x02, 0x21, 0x31, 0x2B};
 
-        // Dash BIP44 coin type is '416'
+        // Bytz BIP44 coin type is '416'
         nExtCoinType = 416;
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
@@ -568,8 +568,8 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V16DeploymentHeight;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 1 * 60; // Dash: 1 minute
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
+        consensus.nPowTargetSpacing = 1 * 60; // Bytz: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
 
@@ -654,18 +654,18 @@ public:
         vSeeds.emplace_back("204.92.235.7");   // Bytz seeder located in Montreal
         vSeeds.emplace_back("198.96.117.222"); // Bytz seeder located in Montreal
 
-        // Testnet Dash addresses start with 'T'
+        // Testnet Bytz addresses start with 'T'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Dash script addresses start with '4' or '5'
+        // Testnet Bytz script addresses start with '4' or '5'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
         // Testnet private keys start with 'z' or '2'
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Dash BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Dash BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Testnet Dash BIP44 coin type is '1' (All coin's testnet default)
+        // Testnet Bytz BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params
@@ -742,8 +742,8 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 2; // DIP0008 activated immediately on devnet
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Dash: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Bytz: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
 
@@ -826,20 +826,20 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        //vSeeds.push_back(CDNSSeedData("dashevo.org",  "devnet-seed.dashevo.org"));
+        //vSeeds.push_back(CDNSSeedData("bytzevo.org",  "devnet-seed.bytzevo.org"));
 
-        // Testnet Dash addresses start with 'T'
+        // Testnet Bytz addresses start with 'T'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Dash script addresses start with '4' or '5'
+        // Testnet Bytz script addresses start with '4' or '5'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
         // Testnet private keys start with 'z' or '2'
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Dash BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Dash BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Testnet Dash BIP44 coin type is '1' (All coin's testnet default)
+        // Testnet Bytz BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params
@@ -917,8 +917,8 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 432;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Dash: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Bytz: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
 
@@ -1025,18 +1025,18 @@ public:
             0
         };
 
-        // Testnet Dash addresses start with 'T'
+        // Testnet Bytz addresses start with 'T'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Dash script addresses start with '4' or '5'
+        // Testnet Bytz script addresses start with '4' or '5'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
         // Testnet private keys start with 'z' or '2'
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Dash BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Dash BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Regtest Dash BIP44 coin type is '1' (All coin's testnet default)
+        // Regtest Bytz BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params

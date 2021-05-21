@@ -12,7 +12,7 @@
 #define BITCOIN_UTIL_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/dash-config.h>
+#include <config/bytz-config.h>
 #endif
 
 #include <attributes.h>
@@ -42,14 +42,14 @@
 
 // Uncomment the following line to enable debugging messages
 // or enable on a per file basis prior to inclusion of util.h
-//#define ENABLE_DASH_DEBUG
-#ifdef ENABLE_DASH_DEBUG
+//#define ENABLE_BYTZ_DEBUG
+#ifdef ENABLE_BYTZ_DEBUG
 #define DBG( x ) x
 #else
 #define DBG( x )
 #endif
 
-//Dash only features
+//Bytz only features
 
 extern bool fMasternodeMode;
 extern bool fDisableGovernance;
@@ -342,7 +342,7 @@ void RenameThreadPool(ctpl::thread_pool& tp, const char* baseName);
  */
 template <typename Callable> void TraceThread(const std::string name,  Callable func)
 {
-    std::string s = "dash-" + name;
+    std::string s = "bytz-" + name;
     RenameThread(s.c_str());
     try
     {

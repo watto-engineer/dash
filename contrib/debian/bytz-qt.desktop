@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Bytz Core
+Comment=Bytz P2P Cryptocurrency
+Comment[de]=Verbinde mit dem Bytz peer-to-peer Netzwerk
+Comment[fr]=Bytz, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Bytz, eşten eşe kriptografik sanal para birimi
+Exec=bytz-qt %u
+Terminal=false
+Type=Application
+Icon=bytz128
+MimeType=x-scheme-handler/bytz;
+Categories=Office;Finance;
+StartupWMClass=Bytz-qt

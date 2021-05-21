@@ -1,0 +1,6 @@
+usr/local/bin/bytz-qt usr/bin
+share/pixmaps/bytz32.xpm usr/share/pixmaps
+share/pixmaps/bytz16.xpm usr/share/pixmaps
+share/pixmaps/bytz128.png usr/share/pixmaps
+debian/bytz-qt.desktop usr/share/applications
+debian/bytz-qt.protocol usr/share/kde4/services/

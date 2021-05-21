@@ -25,7 +25,7 @@ class Error(BaseException):
 def init(libbytzcorefile=None):
     global bytzlib
     if libbytzcorefile is None:
-        libbytzcorefile = "libdashcore.so"
+        libbytzcorefile = "libbytzcore.so"
         try:
             bytzlib = CDLL(libbytzcorefile)
         except OSError:
