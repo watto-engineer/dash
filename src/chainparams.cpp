@@ -932,7 +932,7 @@ public:
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
-        consensus.nStakeMinDepth = 100;
+        consensus.nStakeMinDepth = 1;
         consensus.nStakeMinAge = 0;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
