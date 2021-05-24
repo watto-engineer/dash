@@ -181,6 +181,10 @@ UniValue generatetoaddress(const JSONRPCRequest& request)
             + HelpExampleCli("generatetoaddress", "11 \"myaddress\"")
         );
 
+    if (chainActive.Tip()->nHeight + 1 >= Params().GetConsensus().nPosStartHeight) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Unable to call generatetoaddress in the Proof-of-Stake phase");
+    }
+
     int nGenerate = request.params[0].get_int();
     uint64_t nMaxTries = 1000000;
     if (!request.params[2].isNull()) {
