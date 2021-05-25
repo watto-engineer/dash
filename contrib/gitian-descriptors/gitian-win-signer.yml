@@ -1,5 +1,6 @@
 ---
 name: "bytz-win-signer"
+distro: "ubuntu"
 suites:
 - "bionic"
 architectures:
@@ -17,7 +18,9 @@ files:
 - "osslsigncode-2.0.tar.gz"
 - "bytzcore-win-unsigned.tar.gz"
 script: |
-  BUILD_DIR=`pwd`
+  set -e -o pipefail
+
+  BUILD_DIR="$PWD"
   SIGDIR=${BUILD_DIR}/signature/win
   UNSIGNED_DIR=${BUILD_DIR}/unsigned
 
@@ -34,6 +37,6 @@ script: |
   make
   find ${UNSIGNED_DIR} -name "*-unsigned.exe" | while read i; do
     INFILE="`basename "${i}"`"
-    OUTFILE="`echo "${INFILE}" | sed s/-unsigned//`"
+    OUTFILE="${INFILE/-unsigned}"
     ./osslsigncode attach-signature -in "${i}" -out "${OUTDIR}/${OUTFILE}" -sigin "${SIGDIR}/${INFILE}.pem"
   done

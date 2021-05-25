@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
+# Copyright (c) 2018-2019 The Bitcoin Core developers
+# Copyright (c) 2020-2021 The Bytz Core Developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+# how to use and guide: https://github.com/bytzcurrency/docs/blob/master/gitian-building.md
+# Setup: gitian-build.py --setup --build $SIGNER $VERSION 192.168.1.37 SHA256 bytzcore-binaries
+#usage: gitian-build.py [-h] [-c] [-p] [-u URL] [-v] [-b] [-s] [-B] [-o OS]
+#                       [-j JOBS] [-m MEMORY] [-k] [-d] [-S] [-D] [-n] [-z]
+#                       [-x SERVER] [-l] [-f UPLOADFOLDER] [-y HASH]
+#                       [signer] [version]
 import argparse
 import os
 import subprocess
@@ -7,10 +17,8 @@ import sys
 
 def setup():
     global args, workdir
-    programs = ['ruby', 'git', 'make', 'wget']
-    if args.lxc:
-        programs += ['apt-cacher-ng', 'lxc', 'debootstrap']
-    elif args.kvm:
+    programs = ['ruby', 'git', 'make', 'wget', 'curl']
+    if args.kvm:
         programs += ['apt-cacher-ng', 'python-vm-builder', 'qemu-kvm', 'qemu-utils']
     elif args.docker and not os.path.isfile('/lib/systemd/system/docker.service'):
         dockers = ['docker.io', 'docker-ce']
@@ -19,29 +27,31 @@ def setup():
             if return_code == 0:
                 break
         if return_code != 0:
-            print('Cannot find any way to install Docker', file=sys.stderr)
-            exit(1)
+            print('Cannot find any way to install Docker.', file=sys.stderr)
+            sys.exit(1)
+    else:
+        programs += ['apt-cacher-ng', 'lxc', 'debootstrap']
     subprocess.check_call(['sudo', 'apt-get', 'install', '-qq'] + programs)
     if not os.path.isdir('gitian.sigs'):
-        subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/gitian.sigs.git'])
+        subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/gitian.sigs.git', 'gitian.sigs'])
     if not os.path.isdir('bytz-detached-sigs'):
         subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/bytz-detached-sigs.git'])
     if not os.path.isdir('gitian-builder'):
         subprocess.check_call(['git', 'clone', 'https://github.com/devrandom/gitian-builder.git'])
     if not os.path.isdir('bytz'):
-        subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/bytz.git'])
+        subprocess.check_call(['git', 'clone', '--recurse-submodules', 'https://github.com/bytzcurrency/bytz.git'])
     os.chdir('gitian-builder')
     make_image_prog = ['bin/make-base-vm', '--suite', 'bionic', '--arch', 'amd64']
     if args.docker:
         make_image_prog += ['--docker']
-    elif args.lxc:
+    elif not args.kvm:
         make_image_prog += ['--lxc']
     subprocess.check_call(make_image_prog)
     os.chdir(workdir)
     if args.is_bionic and not args.kvm and not args.docker:
         subprocess.check_call(['sudo', 'sed', '-i', 's/lxcbr0/br0/', '/etc/default/lxc-net'])
         print('Reboot is required')
-        exit(0)
+        sys.exit(0)
 
 def build():
     global args, workdir
@@ -51,7 +61,15 @@ def build():
     os.chdir('gitian-builder')
     os.makedirs('inputs', exist_ok=True)
 
-    subprocess.check_call(['wget', '-O', 'inputs/osslsigncode-2.0.tar.gz', 'https://github.com/mtrojnar/osslsigncode/archive/2.0.tar.gz'])
+    if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
+    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/bytzcurrency/macosx-sdks/downloads/MacOSX10.11.sdk.tar.xz'])
+
+    if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
+    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/gitianuser/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz'])
+
+    if not os.path.isfile('inputs/osslsigncode-2.0.tar.gz'):
+        subprocess.check_call(['wget', '-O', 'inputs/osslsigncode-2.0.tar.gz', 'https://github.com/mtrojnar/osslsigncode/archive/2.0.tar.gz'])
+
     subprocess.check_call(["echo '5a60e0a4b3e0b4d655317b2f12a810211c50242138322b16e7e01c6fbb89d92f inputs/osslsigncode-2.0.tar.gz' | sha256sum -c"], shell=True)
     subprocess.check_call(['make', '-C', '../bytz/depends', 'download', 'SOURCES_PATH=' + os.getcwd() + '/cache/common'])
 
@@ -65,17 +83,22 @@ def build():
         print('\nCompiling ' + args.version + ' Windows')
         subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*-win-unsigned.tar.gz inputs/bytzcore-win-unsigned.tar.gz', shell=True)
+        subprocess.check_call('mv build/out/bytzcore-*-win-unsigned.tar.gz inputs/', shell=True)
         subprocess.check_call('mv build/out/bytzcore-*.zip build/out/bytzcore-*.exe ../bytzcore-binaries/'+args.version, shell=True)
 
     if args.macos:
         print('\nCompiling ' + args.version + ' MacOS')
-        subprocess.check_call(['wget', '-N', '-P', 'inputs', 'https://bitcoincore.org/depends-sources/sdks/MacOSX10.11.sdk.tar.gz'])
-        subprocess.check_output(["echo 'bec9d089ebf2e2dd59b1a811a38ec78ebd5da18cbbcd6ab39d1e59f64ac5033f inputs/MacOSX10.11.sdk.tar.gz' | sha256sum -c"], shell=True)
         subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*-osx-unsigned.tar.gz inputs/bytzcore-osx-unsigned.tar.gz', shell=True)
+        subprocess.check_call('mv build/out/bytzcore-*-osx-unsigned.tar.gz inputs/', shell=True)
         subprocess.check_call('mv build/out/bytzcore-*.tar.gz build/out/bytzcore-*.dmg ../bytzcore-binaries/'+args.version, shell=True)
+
+    os.chdir(workdir)
+
+    if args.hash:
+        os.chdir('bytzcore-binaries/'+args.version)
+        subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
+        subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
 
     os.chdir(workdir)
 
@@ -88,12 +111,15 @@ def build():
         subprocess.check_call(['git', 'commit', '-m', 'Add '+args.version+' unsigned sigs for '+args.signer])
         os.chdir(workdir)
 
+    os.chdir(workdir)
+
 def sign():
     global args, workdir
     os.chdir('gitian-builder')
 
     if args.windows:
         print('\nSigning ' + args.version + ' Windows')
+        subprocess.check_call('cp inputs/bytzcore-' + args.version + '-win-unsigned.tar.gz inputs/bytzcore-win-unsigned.tar.gz', shell=True)
         subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
         subprocess.check_call('mv build/out/bytzcore-*win64-setup.exe ../bytzcore-binaries/'+args.version, shell=True)
@@ -101,6 +127,7 @@ def sign():
 
     if args.macos:
         print('\nSigning ' + args.version + ' MacOS')
+        subprocess.check_call('cp inputs/bytzcore-' + args.version + '-osx-unsigned.tar.gz inputs/bytzcore-osx-unsigned.tar.gz', shell=True)
         subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
         subprocess.check_call('mv build/out/bytzcore-osx-signed.dmg ../bytzcore-binaries/'+args.version+'/bytzcore-'+args.version+'-osx.dmg', shell=True)
@@ -115,27 +142,99 @@ def sign():
         subprocess.check_call(['git', 'commit', '-a', '-m', 'Add '+args.version+' signed binary sigs for '+args.signer])
         os.chdir(workdir)
 
+def createhashes():
+    global args, workdir
+    os.chdir(workdir)
+    os.chdir('bytzcore-binaries/'+args.version)
+    subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
+    subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
+    subprocess.check_call('rm', '-f', '/SHA'+args.hash+'SUMS', shell=True)
+    os.chdir(workdir)
+
+def sshupload():
+    global args, workdir
+    os.chdir(workdir)
+    print('\n'+args.server+': Start uploading all files to the uploadserver.\n')
+    subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version])
+    subprocess.check_call(['scp', '-r', args.uploadfolder+'/'+args.version, args.server+':'+args.uploadfolder+'/'+args.version])
+    os.chdir(workdir)
+
+def logsupload():
+    global args, workdir
+    os.chdir(workdir)
+
+    if args.uploadlogs:
+        print('\n'+args.server+': Start uploading logs to the uploadserver.\n')
+        subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/logs'])
+        subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/result'])
+        subprocess.check_call(['scp', '-r', 'gitian-builder/var', args.server+':'+args.uploadfolder+'/'+args.version+'/logs'])
+        subprocess.check_call(['scp', 'gitian-builder/result/bytzcore-*.yml', args.server+':'+args.uploadfolder+'/'+args.version+'/result'])
+
+    if args.createreleasenotes:
+        print('\n'+args.server+': Start uploading release notes to the uploadserver.\n')
+        subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/release-notes'])
+        subprocess.check_call(['scp', '-r', args.uploadfolder+'/'+args.version+'/release-notes', args.server+':'+args.uploadfolder+'/'+args.version+'/release-notes'])
+
+    os.chdir(workdir)
+
+def releasenotes():
+    global args, workdir
+    os.chdir(workdir)
+
+    if not os.path.isdir(args.uploadfolder+'/'+args.version+'/release-notes'):
+        subprocess.check_call('mkdir -p '+args.uploadfolder+'/'+args.version+'/release-notes', shell=True)
+
+    os.chdir('bytz')
+    
+    if args.previousver:
+        # Create shortlog notes
+        subprocess.check_call('git shortlog --no-merges v'+args.previousver+'..v'+args.version+' > ../bytzcore-binaries/'+args.version+'/release-notes/shortlog_v'+args.previousver+'..v'+args.version+'.md', shell=True)
+        # Create changes notes
+        subprocess.check_call('git log --oneline v'+args.previousver+'..v'+args.version+' > ../bytzcore-binaries/'+args.version+'/release-notes/changes_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        # Create authors notes
+        subprocess.check_call('git log --format='"'- %aN' v'+args.previousver+'..v'+args.version+' | sort -fiu > ../ion-binaries/"+args.version+'/release-notes/authors_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        # Create detailed notes
+        subprocess.check_call('git log v'+args.previousver+'..v'+args.version+' --pretty="format:%at %C(yellow)commit %H%Creset\nAuthor: %an <%ae>\nDate: %aD\n\n %s\n" | sort -r | cut -d" " -f2- | sed -e "s/\\\n/\\`echo -e '+"'"+"\n\r'`/g"+'" | tr -d '+"'\15\32'"+' | less -R  > ../bytzcore-binaries/'+args.version+'/release-notes/detailedlog_'+args.previousver+'-v'+args.version+'.md', shell=True)
+
+    os.chdir(workdir)
+
 def verify():
     global args, workdir
+    rc = 0
     os.chdir('gitian-builder')
 
     print('\nVerifying v'+args.version+' Linux\n')
-    subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-linux', '../bytz/contrib/gitian-descriptors/gitian-linux.yml'])
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-linux', '../bytz/contrib/gitian-descriptors/gitian-linux.yml']):
+        print('Verifying v'+args.version+' Linux FAILED\n')
+        rc = 1
+
     print('\nVerifying v'+args.version+' Windows\n')
-    subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-unsigned', '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-unsigned', '../bytz/contrib/gitian-descriptors/gitian-win.yml']):
+        print('Verifying v'+args.version+' Windows FAILED\n')
+        rc = 1
+
     print('\nVerifying v'+args.version+' MacOS\n')
-    subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-unsigned', '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-unsigned', '../bytz/contrib/gitian-descriptors/gitian-osx.yml']):
+        print('Verifying v'+args.version+' MacOS FAILED\n')
+        rc = 1
+
     print('\nVerifying v'+args.version+' Signed Windows\n')
-    subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-signed', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-signed', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml']):
+        print('Verifying v'+args.version+' Signed Windows FAILED\n')
+        rc = 1
+
     print('\nVerifying v'+args.version+' Signed MacOS\n')
-    subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-signed', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-signed', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml']):
+        print('Verifying v'+args.version+' Signed MacOS FAILED\n')
+        rc = 1
 
     os.chdir(workdir)
+    return rc
 
 def main():
     global args, workdir
 
-    parser = argparse.ArgumentParser(usage='%(prog)s [options] signer version')
+    parser = argparse.ArgumentParser(description='Script for running full Gitian builds.')
     parser.add_argument('-c', '--commit', action='store_true', dest='commit', help='Indicate that the version argument is for a commit or branch')
     parser.add_argument('-p', '--pull', action='store_true', dest='pull', help='Indicate that the version argument is the number of a github repository pull request')
     parser.add_argument('-u', '--url', dest='url', default='https://github.com/bytzcurrency/bytz', help='Specify the URL of the repository. Default is %(default)s')
@@ -146,84 +245,97 @@ def main():
     parser.add_argument('-o', '--os', dest='os', default='lwm', help='Specify which Operating Systems the build is for. Default is %(default)s. l for Linux, w for Windows, m for MacOS')
     parser.add_argument('-j', '--jobs', dest='jobs', default='2', help='Number of processes to use. Default %(default)s')
     parser.add_argument('-m', '--memory', dest='memory', default='2000', help='Memory to allocate in MiB. Default %(default)s')
-    parser.add_argument('-V', '--virtualization', dest='virtualization', default='docker', help='Specify virtualization technology to use: lxc for LXC, kvm for KVM, docker for Docker. Default is %(default)s')
+    parser.add_argument('-k', '--kvm', action='store_true', dest='kvm', help='Use KVM instead of LXC')
+    parser.add_argument('-d', '--docker', action='store_true', dest='docker', help='Use Docker instead of LXC')
     parser.add_argument('-S', '--setup', action='store_true', dest='setup', help='Set up the Gitian building environment. Only works on Debian-based systems (Ubuntu, Debian)')
     parser.add_argument('-D', '--detach-sign', action='store_true', dest='detach_sign', help='Create the assert file for detached signing. Will not commit anything.')
     parser.add_argument('-n', '--no-commit', action='store_false', dest='commit_files', help='Do not commit anything to git')
-    parser.add_argument('signer', help='GPG signer to sign each build assert file')
-    parser.add_argument('version', help='Version number, commit, or branch to build. If building a commit or branch, the -c option must be specified')
-
+    parser.add_argument('-z', '--no-upload',  action='store_false', dest='upload', help='If upload is enabled, files will be uploaded to defined server. If not specified, upload is enabled by default')
+    parser.add_argument('-x', '--server', dest='server', default='defaultuploadserver', help='Use scp to upload file to the server, defines in .ssh as uploadserver, pass serverIp and path to ssh private key. Default is which is configured in your ~/.ssh/config file')
+    parser.add_argument('-l', '--uploadlogs', action='store_true', dest='uploadlogs', help='Upload logs and scripts (var folder)')
+    parser.add_argument('-f', '--uploadfolder', dest='uploadfolder', default='ion-binaries', help='Upload folder on uploadserver')
+    parser.add_argument('-y', '--hash', dest='hash', default='256', help='Create SHA hashes, choose beetwen SHA1, SHA256, SHA512')
+    parser.add_argument('-r', '--createreleasenotes', action='store_true', dest='createreleasenotes', help='Create release notes and changes to previous version, previous version variable must be set')
+    parser.add_argument('-P', '--previousver', dest='previousver', default='unset', help='Previous version for release notes, authors etc.')
+    parser.add_argument('signer', nargs='?', help='GPG signer to sign each build assert file')
+    parser.add_argument('version', nargs='?', help='Version number, commit, or branch to build. If building a commit or branch, the -c option must be specified')
     args = parser.parse_args()
     workdir = os.getcwd()
 
-    args.linux = 'l' in args.os
-    args.windows = 'w' in args.os
-    args.macos = 'm' in args.os
-
     args.is_bionic = b'bionic' in subprocess.check_output(['lsb_release', '-cs'])
+
+    if args.kvm and args.docker:
+        raise Exception('Error: cannot have both kvm and docker')
+
+    # Ensure no more than one environment variable for gitian-builder (USE_LXC, USE_VBOX, USE_DOCKER) is set as they
+    # can interfere (e.g., USE_LXC being set shadows USE_DOCKER; for details see gitian-builder/libexec/make-clean-vm).
+    os.environ['USE_LXC'] = ''
+    os.environ['USE_VBOX'] = ''
+    os.environ['USE_DOCKER'] = ''
+    if args.docker:
+        os.environ['USE_DOCKER'] = '1'
+    elif not args.kvm:
+        os.environ['USE_LXC'] = '1'
+        if 'GITIAN_HOST_IP' not in os.environ.keys():
+            os.environ['GITIAN_HOST_IP'] = '10.0.3.1'
+        if 'LXC_GUEST_IP' not in os.environ.keys():
+            os.environ['LXC_GUEST_IP'] = '10.0.3.5'
+
+    # Script will fail to automaticly download all resources if inputs folder does not exist
+    subprocess.check_call(['mkdir', '-p', 'gitian-builder/inputs'])
+
+    if args.setup:
+        setup()
 
     if args.buildsign:
         args.build = True
         args.sign = True
 
+    if not args.build and not args.sign and not args.verify:
+        sys.exit(0)
+
+    args.linux = 'l' in args.os
+    args.windows = 'w' in args.os
+    args.macos = 'm' in args.os
+
+    # Disable for MacOS if no SDK found
+    if args.macos and not os.path.isfile('gitian-builder/inputs/MacOSX10.11.sdk.tar.xz'):
+        print('Cannot build for MacOS, SDK does not exist. Will build for other OSes')
+        args.macos = False
+
     args.sign_prog = 'true' if args.detach_sign else 'gpg --detach-sign'
 
-    args.lxc = (args.virtualization == 'lxc')
-    args.kvm = (args.virtualization == 'kvm')
-    args.docker = (args.virtualization == 'docker')
-
     script_name = os.path.basename(sys.argv[0])
-    # Set all USE_* environment variables for gitian-builder: USE_LXC, USE_DOCKER and USE_VBOX
-    os.environ['USE_VBOX'] = ''
-    if args.lxc:
-        os.environ['USE_LXC'] = '1'
-        os.environ['USE_DOCKER'] = ''
-        if 'GITIAN_HOST_IP' not in os.environ.keys():
-            os.environ['GITIAN_HOST_IP'] = '10.0.3.1'
-        if 'LXC_GUEST_IP' not in os.environ.keys():
-            os.environ['LXC_GUEST_IP'] = '10.0.3.5'
-    elif args.kvm:
-        os.environ['USE_LXC'] = ''
-        os.environ['USE_DOCKER'] = ''
-    elif args.docker:
-        os.environ['USE_LXC'] = ''
-        os.environ['USE_DOCKER'] = '1'
-    else:
-        print(script_name+': Wrong virtualization option.')
+    if not args.signer:
+        print(script_name+': Missing signer')
         print('Try '+script_name+' --help for more information')
-        exit(1)
-
-    # Signer and version shouldn't be empty
-    if args.signer == '':
-        print(script_name+': Missing signer.')
+        sys.exit(1)
+    if not args.version:
+        print(script_name+': Missing version')
         print('Try '+script_name+' --help for more information')
-        exit(1)
-    if args.version == '':
-        print(script_name+': Missing version.')
-        print('Try '+script_name+' --help for more information')
-        exit(1)
-
+        sys.exit(1)
     # Add leading 'v' for tags
     if args.commit and args.pull:
         raise Exception('Cannot have both commit and pull')
     args.commit = ('' if args.commit else 'v') + args.version
 
-    if args.setup:
-        setup()
-
-    if not args.build and not args.sign and not args.verify:
-        exit(0)
-
     os.chdir('bytz')
     if args.pull:
         subprocess.check_call(['git', 'fetch', args.url, 'refs/pull/'+args.version+'/merge'])
+        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
         os.chdir('../gitian-builder/inputs/bytz')
         subprocess.check_call(['git', 'fetch', args.url, 'refs/pull/'+args.version+'/merge'])
         args.commit = subprocess.check_output(['git', 'show', '-s', '--format=%H', 'FETCH_HEAD'], universal_newlines=True, encoding='utf8').strip()
         args.version = 'pull-' + args.version
+        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
     print(args.commit)
     subprocess.check_call(['git', 'fetch'])
     subprocess.check_call(['git', 'checkout', args.commit])
+    subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+    os.chdir(workdir)
+
+    os.chdir('gitian-builder')
+    subprocess.check_call(['git', 'pull'])
     os.chdir(workdir)
 
     if args.build:
@@ -233,7 +345,22 @@ def main():
         sign()
 
     if args.verify:
-        verify()
+        os.chdir('gitian.sigs')
+        subprocess.check_call(['git', 'pull'])
+        os.chdir(workdir)
+        sys.exit(verify())
+
+    if args.hash:
+        createhashes()
+
+    if args.createreleasenotes:
+        releasenotes()
+
+    if args.uploadlogs:
+        createhashes()
+
+    if args.upload:
+        sshupload()
 
 if __name__ == '__main__':
     main()
