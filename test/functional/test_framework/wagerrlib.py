@@ -22,20 +22,20 @@ class Error(BaseException):
     pass
 
 
-def init(libwagerrcorefile=None):
+def init(libwagerrfile=None):
     global wagerrlib
-    if libwagerrcorefile is None:
-        libwagerrcorefile = "libwagerrcore.so"
+    if libwagerrfile is None:
+        libwagerrfile = "libwagerr.so"
         try:
-            wagerrlib = CDLL(libwagerrcorefile)
+            wagerrlib = CDLL(libwagerrfile)
         except OSError:
             import os
             dir_path = os.path.dirname(os.path.realpath(__file__))
-            wagerrlib = CDLL(dir_path + os.sep + libwagerrcorefile)
+            wagerrlib = CDLL(dir_path + os.sep + libwagerrfile)
     else:
-        wagerrlib = CDLL(libwagerrcorefile)
+        wagerrlib = CDLL(libwagerrfile)
     if wagerrlib is None:
-        raise Error("Cannot find %s shared library", libwagerrcorefile)
+        raise Error("Cannot find %s shared library", libwagerrfile)
 
 
 # Serialization/deserialization tools

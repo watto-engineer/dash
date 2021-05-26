@@ -13,7 +13,7 @@ can be found in the contrib/init folder.
 Service User
 ---------------------------------
 
-All three Linux startup configurations assume the existence of a "wagerrcore" user
+All three Linux startup configurations assume the existence of a "wagerr" user
 and group.  They must be created before attempting to use these scripts.
 The macOS configuration assumes wagerrd will be set up for the current user.
 
@@ -60,23 +60,23 @@ PID file:            `/var/run/wagerrd/wagerrd.pid` (OpenRC and Upstart) or `/ru
 Lock file:           `/var/lock/subsys/wagerrd` (CentOS)
 
 The configuration file, PID directory (if applicable) and data directory
-should all be owned by the wagerrcore user and group.  It is advised for security
+should all be owned by the wagerr user and group.  It is advised for security
 reasons to make the configuration file and data directory only readable by the
-wagerrcore user and group.  Access to wagerr-cli and other wagerrd rpc clients
+wagerr user and group.  Access to wagerr-cli and other wagerrd rpc clients
 can then be controlled by group membership.
 
 NOTE: When using the systemd .service file, the creation of the aforementioned
 directories and the setting of their permissions is automatically handled by
-systemd. Directories are given a permission of 710, giving the wagerrcore user and group
+systemd. Directories are given a permission of 710, giving the wagerr user and group
 access to files under it _if_ the files themselves give permission to the
-wagerrcore user and group to do so (e.g. when `-sysperms` is specified). This does not allow
+wagerr user and group to do so (e.g. when `-sysperms` is specified). This does not allow
 for the listing of files under the directory.
 
 NOTE: It is not currently possible to override `datadir` in
-`/etc/wagerr/wagerr.conf` with the current systemd, OpenRC, and Upstart init
+`/etc/wagerrcore/wagerr.conf` with the current systemd, OpenRC, and Upstart init
 files out-of-the-box. This is because the command line options specified in the
 init files take precedence over the configurations in
-`/etc/wagerr/wagerr.conf`. However, some init systems have their own
+`/etc/wagerrcore/wagerr.conf`. However, some init systems have their own
 configuration mechanisms that would allow for overriding the command line
 options specified in the init files (e.g. setting `BITCOIND_DATADIR` for
 OpenRC).
@@ -136,7 +136,7 @@ This Launch Agent will cause wagerrd to start whenever the user logs in.
 
 NOTE: This approach is intended for those wanting to run wagerrd as the current user.
 You will need to modify org.wagerr.wagerrd.plist if you intend to use it as a
-Launch Daemon with a dedicated wagerrcore user.
+Launch Daemon with a dedicated wagerr user.
 
 Auto-respawn
 -----------------------------------

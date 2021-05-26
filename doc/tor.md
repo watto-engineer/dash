@@ -38,11 +38,11 @@ outgoing connections, but more is possible.
 An example how to start the client if the Tor proxy is running on local host on
 port 9050 and only allows .onion nodes to connect:
 
-	./dashd -onion=127.0.0.1:9050 -onlynet=onion -listen=0 -addnode=ssapp53tmftyjmjb.onion
+	./wagerrd -onion=127.0.0.1:9050 -onlynet=onion -listen=0 -addnode=ssapp53tmftyjmjb.onion
 
 In a typical situation, this suffices to run behind a Tor proxy:
 
-	./dashd -proxy=127.0.0.1:9050
+	./wagerrd -proxy=127.0.0.1:9050
 
 
 ## 2. Run a Dash Core hidden server
@@ -52,17 +52,17 @@ reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equiv
 config file): *Needed for Tor version 0.2.7.0 and older versions of Tor only. For newer
 versions of Tor see [Section 4](#4-automatically-listen-on-tor).*
 
-	HiddenServiceDir /var/lib/tor/dashcore-service/
-	HiddenServicePort 9999 127.0.0.1:9999
-	HiddenServicePort 19999 127.0.0.1:19999
+	HiddenServiceDir /var/lib/tor/wagerrcore-service/
+	HiddenServicePort 55002 127.0.0.1:55002
+	HiddenServicePort 55003 127.0.0.1:55003
 
 The directory can be different of course, but (both) port numbers should be equal to
-your dashd's P2P listen port (9999 by default).
+your wagerrd's P2P listen port (55002 by default).
 
 	-externalip=X   You can tell Dash Core about its publicly reachable address using
 	                this option, and this can be a .onion address. Given the above
 	                configuration, you can find your .onion address in
-	                /var/lib/tor/dashcore-service/hostname. For connections
+	                /var/lib/tor/wagerrcore-service/hostname. For connections
 	                coming from unroutable addresses (such as 127.0.0.1, where the
 	                Tor proxy typically runs), .onion addresses are given
 	                preference for your node to advertise itself with.
@@ -79,44 +79,28 @@ your dashd's P2P listen port (9999 by default).
 
 In a typical situation, where you're only reachable via Tor, this should suffice:
 
-	./dashd -proxy=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -listen
+	./wagerrd -proxy=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -listen
 
 (obviously, replace the .onion address with your own). It should be noted that you still
 listen on all devices and another node could establish a clearnet connection, when knowing
 your address. To mitigate this, additionally bind the address of your Tor proxy:
 
-	./dashd ... -bind=127.0.0.1
+	./wagerrd ... -bind=127.0.0.1
 
 If you don't care too much about hiding your node, and want to be reachable on IPv4
 as well, use `discover` instead:
 
-	./dashd ... -discover
+	./wagerrd ... -discover
 
-and open port 9999 on your firewall (or use port mapping, i.e., `-upnp` or `-natpmp`).
+and open port 55002 on your firewall (or use port mapping, i.e., `-upnp` or `-natpmp`).
 
 If you only want to use Tor to reach .onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
 
-	./dashd -onion=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -discover
+	./wagerrd -onion=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -discover
 
 
-## 3. List of known Dash Core Tor relays
-
-Note: All these nodes are hosted by masternodehosting.com
-
-* l7oq3v7ujau5tfrw.onion
-* vsmegqxisccimsir.onion
-* 4rbha5nrjso54l75.onion
-* 3473226fvgoenztx.onion
-* onn5v3aby2dioicx.onion
-* w5n7s2p3mdq5yf2d.onion
-* ec4qdvujskzasvrb.onion
-* g5e4hvsecwri3inf.onion
-* ys5upbdeotplam3y.onion
-* fijy6aikzxfea54i.onion
-
-
-## 4. Automatically listen on Tor
+## 3. Automatically listen on Tor
 
 Starting with Tor version 0.2.7.1 it is possible, through Tor's control socket
 API, to create and destroy 'ephemeral' hidden services programmatically.
@@ -133,13 +117,13 @@ To show verbose debugging information, pass `-debug=tor`.
 
 Connecting to Tor's control socket API requires one of two authentication methods to be
 configured. It also requires the control socket to be enabled, e.g. put `ControlPort 9051`
-in `torrc` config file. For cookie authentication the user running dashd must have read
+in `torrc` config file. For cookie authentication the user running wagerrd must have read
 access to the `CookieAuthFile` specified in Tor configuration. In some cases this is
 preconfigured and the creation of a hidden service is automatic. If permission problems
 are seen with `-debug=tor` they can be resolved by adding both the user running Tor and
-the user running dashd to the same group and setting permissions appropriately. On
-Debian-based systems the user running dashd can be added to the debian-tor group,
-which has the appropriate permissions. Before starting dashd you will need to re-login
+the user running wagerrd to the same group and setting permissions appropriately. On
+Debian-based systems the user running wagerrd can be added to the debian-tor group,
+which has the appropriate permissions. Before starting wagerrd you will need to re-login
 to allow debian-tor group to be applied. Otherwise you will see the following notice: "tor:
 Authentication cookie /run/tor/control.authcookie could not be opened (check permissions)"
 on debug.log.
@@ -150,7 +134,7 @@ was used when generating the hashed password for the `HashedControlPassword` opt
 in the tor configuration file. The hashed password can be obtained with the command
 `tor --hash-password password` (read the tor manual for more details).
 
-## 5. Privacy recommendations
+## 4. Privacy recommendations
 
 - Do not add anything but Dash Core ports to the hidden service created in section 2.
   If you run a web service too, create a new hidden service for that.

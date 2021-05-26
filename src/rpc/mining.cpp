@@ -462,7 +462,7 @@ static UniValue prioritisetransaction(const JSONRPCRequest& request)
         "Accepts the transaction into mined blocks at a higher (or lower) priority\n",
         {
             {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id."},
-            {"fee_delta", RPCArg::Type::NUM, RPCArg::Optional::NO, "The fee value (in duffs) to add (or subtract, if negative).\n"
+            {"fee_delta", RPCArg::Type::NUM, RPCArg::Optional::NO, "The fee value (in sats) to add (or subtract, if negative).\n"
     "                  Note, that this value is not a fee rate. It is a value to modify absolute fee of the TX.\n"
     "                  The fee is not actually paid, only the algorithm for selecting transactions into a block\n"
     "                  considers the transaction as it would have paid a higher (or lower) fee."},
@@ -586,7 +586,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
                 {
                      {RPCResult::Type::STR, "amount", "(numeric) amount"},
                      {RPCResult::Type::STR, "tokenid", "(string) transaction data encoded in hexadecimal (byte-for-byte)"},
-                     {RPCResult::Type::STR, "tokenamount", "(numeric) difference in value between transaction inputs and outputs (in duffs); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one"},
+                     {RPCResult::Type::STR, "tokenamount", "(numeric) difference in value between transaction inputs and outputs (in sats); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one"},
                 }},
                 {RPCResult::Type::STR, "target", "The hash target"},
                 {RPCResult::Type::NUM_TIME, "mintime", "The minimum timestamp appropriate for the next block time, expressed in " + UNIX_EPOCH_TIME},

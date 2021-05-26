@@ -1,1444 +1,1444 @@
-<TS version="2.1" language="ja">
+<TS version="2.1" language="sk">
 <context>
     <name>AddressBookPage</name>
     <message>
         <source>Enter address or label to search</source>
-        <translation>アドレスかラベルを入力して検索</translation>
+        <translation>Pre vyhľadávanie vložte adresu alebo popis</translation>
     </message>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>右クリックでアドレスまたはラベルを編集</translation>
+        <translation>Pre úpravu adresy alebo popisu kliknite pravým tlačidlom myši</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>新規アドレスの作成</translation>
+        <translation>Vytvoriť novú adresu</translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>新規(&amp;N)</translation>
+        <translation>&amp;Nové</translation>
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>現在選択中のアドレスをクリップボードにコピー</translation>
+        <translation>Kopírovať práve zvolenú adresu do systémovej schránky</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>コピー(&amp;C)</translation>
+        <translation>&amp;Kopírovať</translation>
     </message>
     <message>
         <source>Show QR code for the currently selected address</source>
-        <translation>選択中のアドレスのQRコードを表示</translation>
+        <translation>&amp;Zobraziť QR kód pre zrovna vybrané adresy</translation>
     </message>
     <message>
         <source>&amp;Show QR code</source>
-        <translation>&amp;QRコードを表示</translation>
+        <translation>&amp;Zobraziť QR kód</translation>
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>選択中のアドレスを一覧から削除</translation>
+        <translation>Odstrániť vybranú adresu zo zoznamu</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>削除(&amp;D)</translation>
+        <translation>&amp;Odstániť</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>ファイルに現在のタブにあるデータをエクスポート</translation>
+        <translation>Exportovať dáta z tejto tabuľky do súboru</translation>
     </message>
     <message>
         <source>&amp;Export</source>
-        <translation>エクスポート (&amp;E)</translation>
+        <translation>&amp;Exportovať</translation>
     </message>
     <message>
         <source>C&amp;lose</source>
-        <translation>閉じる(&amp;C)</translation>
+        <translation>&amp;Zatvoriť</translation>
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>送金先のアドレスを選択</translation>
+        <translation>Zvoľte adresu kam poslať mince</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>受取先のアドレスを選択</translation>
+        <translation>Zvoľte adresu na ktorú prijať mince</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
-        <translation>選択(&amp;H)</translation>
+        <translation>&amp;Vybrať</translation>
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>送金アドレス</translation>
+        <translation>Adresa odoslania</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>受取アドレス</translation>
+        <translation>Adresa prijatia</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>これらは送金するためのあなたの Wagerr アドレスです。送金する前に常に金額と受取アドレスを確認してください。</translation>
+        <translation>Toto sú vaše Wagerr adresy pre posielanie platieb. Pred poslaním mincí vždy overte sumu a doručovaciu adresu.</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
-        <translation>これらは、支払いを受け取るためのお客様のWagerrアドレスです。受取タブにある「新しい受取アドレスを作成」のボタンを使用し、新しいアドレスを作成します。</translation>
+        <translation>Toto sú vaše Wagerr adresy na prijímanie platieb. Na vytvorenie nových adries použite tlačidlo „Vytvoriť novú prijímaciu adresu“ na karte prijímania.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
-        <translation>アドレスをコピー (&amp;C)</translation>
+        <translation>&amp;Kopírovať adresu</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>ラベルをコピー (&amp;L)</translation>
+        <translation>Kopírovať &amp;popis</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>編集 (&amp;E)</translation>
+        <translation>&amp;Upraviť</translation>
     </message>
     <message>
         <source>&amp;Show address QR code</source>
-        <translation>&amp;アドレスのQRコードを表示</translation>
+        <translation>&amp;Zobraziť adresový QR kód</translation>
     </message>
     <message>
         <source>QR code</source>
-        <translation>QRコード</translation>
+        <translation>QR kód</translation>
     </message>
     <message>
         <source>Export Address List</source>
-        <translation>アドレスのリストをエクスポート</translation>
+        <translation>Exportovať zoznam adries</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>CSVファイル (*.csv)</translation>
+        <translation>Čiarkou oddelený súbor (*.csv)</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>エクスポート失敗</translation>
+        <translation>Export zlyhal</translation>
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>アドレスのリストを %1 へ保存する際にエラーが発生しました。再試行してください。</translation>
+        <translation>Nastala chyba pri pokuse uložiť zoznam adries do %1. Prosím skúste znovu.</translation>
     </message>
 </context>
 <context>
     <name>AddressTableModel</name>
     <message>
         <source>Label</source>
-        <translation>ラベル</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>アドレス</translation>
+        <translation>Adresa</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>（ラベル無し）</translation>
+        <translation>(bez popisu)</translation>
     </message>
 </context>
 <context>
     <name>AppearanceWidget</name>
     <message>
         <source>Lighter</source>
-        <translation>細くする</translation>
+        <translation>Užšie</translation>
     </message>
     <message>
         <source>Bolder</source>
-        <translation>太くする</translation>
+        <translation>Hrubšie</translation>
     </message>
     <message>
         <source>Font Weight Normal:</source>
-        <translation>文字の太さ（通常）：</translation>
+        <translation>Normálna váha písma:</translation>
     </message>
     <message>
         <source>Smaller</source>
-        <translation>小さくする</translation>
+        <translation>Menšie</translation>
     </message>
     <message>
         <source>Bigger</source>
-        <translation>大きくする</translation>
+        <translation>Väčšie</translation>
     </message>
     <message>
         <source>Font Scale:</source>
-        <translation>文字の大きさ：</translation>
+        <translation>Mierka písma:</translation>
     </message>
     <message>
         <source>Font Family:</source>
-        <translation>フォントファミリー：</translation>
+        <translation>Rodina písma:</translation>
     </message>
     <message>
         <source>Theme:</source>
-        <translation>テーマ：</translation>
+        <translation>Téma</translation>
     </message>
     <message>
         <source>Font Weight Bold:</source>
-        <translation>文字の太さ（太字）：</translation>
+        <translation>Tučná váha písma:</translation>
     </message>
 </context>
 <context>
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>パスフレーズのダイアログ</translation>
+        <translation>Dialóg hesla</translation>
     </message>
     <message>
         <source>Enter passphrase</source>
-        <translation>パスフレーズを入力</translation>
+        <translation>Zadajte heslo</translation>
     </message>
     <message>
         <source>New passphrase</source>
-        <translation>新しいパスフレーズ</translation>
+        <translation>Nové heslo</translation>
     </message>
     <message>
         <source>Repeat new passphrase</source>
-        <translation>新しいパスフレーズを再入力</translation>
+        <translation>Zopakujte nové heslo</translation>
     </message>
     <message>
         <source>Show passphrase</source>
-        <translation>パスフレーズを表示</translation>
+        <translation>Zobraziť prístupovú frázu</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>ウォレットを暗号化</translation>
+        <translation>Zašifrovať peňaženku</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>この操作にはウォレットをアンロックするためのパスフレーズが必要です。</translation>
+        <translation>Táto operácia potrebuje heslo k vašej peňaženke, aby ju mohla dešifrovať.</translation>
     </message>
     <message>
         <source>Unlock wallet for mixing only</source>
-        <translation>ミキシングのためだけにウォレットをアンロック</translation>
+        <translation>Peňaženku odomknúť iba na miešanie</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>ウォレットをアンロック</translation>
+        <translation>Odomknúť peňaženku</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
-        <translation>この操作にはウォレットの暗号化解除のためのパスフレーズが必要です。</translation>
+        <translation>Táto operácia potrebuje heslo k vašej peňaženke na dešifrovanie peňaženky.</translation>
     </message>
     <message>
         <source>Decrypt wallet</source>
-        <translation>ウォレットの暗号化を解除</translation>
+        <translation>Dešifrovať peňaženku</translation>
     </message>
     <message>
         <source>Change passphrase</source>
-        <translation>パスフレーズの変更</translation>
+        <translation>Zmena hesla</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
-        <translation>ウォレットの暗号化を確認</translation>
+        <translation>Potvrďte zašifrovanie peňaženky</translation>
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WAGERR&lt;/b&gt;!</source>
-        <translation>警告: ウォレットを暗号化しパスフレーズを紛失した場合、あなたは &lt;b&gt;すべてのWagerr&lt;/b&gt;を失います!</translation>
+        <translation>Upozornenie: Ak zašifrujete vašu peňaženku a stratíte prístupové heslo, potom &lt;b&gt;prídete o všetky svoje WAGERR-y&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>本当にウォレットを暗号化しますか?</translation>
+        <translation>Ste si istí, že si želáte zašifrovať peňaženku?</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>ウォレットは暗号化されました</translation>
+        <translation>Peňaženka zašifrovaná</translation>
     </message>
     <message>
         <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>ウォレットの新しいパスフレーズを入力します。&lt;br/&gt;パスフレーズには&lt;b&gt;10文字以上のランダムな文字&lt;/b&gt;、または&lt;b&gt;8文字以上の単語&lt;/b&gt;を使用してください。</translation>
+        <translation>Zadajte novú prístupovú frázu pre peňaženku.&lt;br/&gt;Použite prístupovú frázu pozostávajúcu &lt;b&gt;z desiatich alebo viacerých náhodných znakov&lt;/b&gt; alebo &lt;b&gt;ôsmich alebo viacerých slov&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Enter the old passphrase and new passphrase for the wallet.</source>
-        <translation>ウォレットの前のパスフレーズと新しいパスフレーズを入力します。</translation>
+        <translation>Zadajte starú a novú prístupovú frázu pre peňaženku.</translation>
     </message>
     <message>
         <source>Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
-        <translation>ウォレットを暗号化しても、コンピュータに感染したマルウェアから資金を完全に保護することはできませんので、ご注意ください。</translation>
+        <translation>Pamätajte, že šifrovanie vašej peňaženky nemôže plne ochrániť vaše prostriedky pred krádežou škodlivým softvérom, ktorý infikuje váš počítač.</translation>
     </message>
     <message>
         <source>Wallet to be encrypted</source>
-        <translation>暗号化するウォレット</translation>
+        <translation>Peňaženka ktorá má byť zašifrovaná</translation>
     </message>
     <message>
         <source>Your wallet is about to be encrypted. </source>
-        <translation>お客様のウォレットが暗号化されます。</translation>
+        <translation>Vaša peňaženka bude čoskoro zašifrovaná.</translation>
     </message>
     <message>
         <source>Your wallet is now encrypted. </source>
-        <translation>お客様のウォレットは暗号化されました。</translation>
+        <translation>Vaša peňaženka je teraz zašifrovaná.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed and still have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation>重要： 過去のウォレットファイルのバックアップは、暗号化された新しいウォレットファイルに取り替える必要があります。暗号化されていないウォレットファイルの過去のバックアップは同じHDウォレットのシードを含むので、新しい暗号化ウォレットと同様にすべての資産にアクセスできます。</translation>
+        <translation>DÔLEŽITÉ: Všetky doterajšie záložné kópie peňaženky ktoré ste zhotovili by mali byť nahradené novým zašifrovaným súborom s peňaženkou. Predchádzajúce zálohy súboru nezašifrovanej peňaženky obsahujú rovnakú HD frázu a stále majú plný prístup k všetkým vašim finančným prostriedkom rovnako ako nová zašifrovaná peňaženka.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>重要： 過去のウォレットファイルのバックアップは、暗号化された新しいウォレットファイルに取り替える必要があります。セキュリティ上の理由により、暗号化された新しいウォレットを使い始めると、暗号化されていないウォレットファイルのバックアップはすぐに使えなくなります。</translation>
+        <translation>DÔLEŽITÉ: Všetky doterajšie záložné kópie peňaženky ktoré ste zhotovili by mali byť nahradené novým zašifrovaným súborom s peňaženkou. Z bezpečnostných dôvodov sa predchádzajúce kópie nezašifrovanej peňaženky stanú neužitočné keď začnete používať novú zašifrovanú peňaženku.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
-        <translation>ウォレットの暗号化に失敗しました</translation>
+        <translation>Šifrovanie peňaženky zlyhalo</translation>
     </message>
     <message>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
-        <translation>内部エラーによりウォレットの暗号化が失敗しました。ウォレットは暗号化されていません。</translation>
+        <translation>Šifrovanie peňaženky zlyhalo kvôli internej chybe. Vaša peňaženka nebola zašifrovaná.</translation>
     </message>
     <message>
         <source>The supplied passphrases do not match.</source>
-        <translation>入力したパスフレーズが正しくありません。</translation>
+        <translation>Zadané heslá nesúhlasia.</translation>
     </message>
     <message>
         <source>Wallet unlock failed</source>
-        <translation>ウォレットのアンロックに失敗しました。</translation>
+        <translation>Odomykanie peňaženky zlyhalo</translation>
     </message>
     <message>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
-        <translation>入力されたウォレットの暗号化解除のパスフレーズが正しくありません。</translation>
+        <translation>Zadané heslo pre dešifrovanie peňaženky bolo nesprávne.</translation>
     </message>
     <message>
         <source>Wallet decryption failed</source>
-        <translation>ウォレットの暗号化解除に失敗しました。</translation>
+        <translation>Dešifrovanie peňaženky zlyhalo</translation>
     </message>
     <message>
         <source>Wallet passphrase was successfully changed.</source>
-        <translation>ウォレットのパスフレーズが変更されました。</translation>
+        <translation>Heslo k peňaženke bolo úspešne zmenené.</translation>
     </message>
     <message>
         <source>Warning: The Caps Lock key is on!</source>
-        <translation>警告：Caps Lockキーがオンになっています!</translation>
+        <translation>Upozornenie: Caps Lock je zapnutý</translation>
     </message>
 </context>
 <context>
     <name>BanTableModel</name>
     <message>
         <source>IP/Netmask</source>
-        <translation>IPアドレス/ネットマスク</translation>
+        <translation>IP/Sieťová maska</translation>
     </message>
     <message>
         <source>Banned Until</source>
-        <translation>以下の時間までbanする:</translation>
+        <translation>Blokovaný do</translation>
     </message>
 </context>
 <context>
     <name>BitcoinAmountField</name>
     <message>
         <source>Amount in %1</source>
-        <translation>%1にある金額</translation>
+        <translation>Suma v %1</translation>
     </message>
 </context>
 <context>
     <name>BitcoinGUI</name>
     <message>
         <source>A fatal error occurred. Wagerr Core can no longer continue safely and will quit.</source>
-        <translation>重大なエラーが発生しました。 Wagerr Coreは安全に続行できなくなり終了します。</translation>
+        <translation>Došlo k závažnej chybe. Wagerr Core už nemôže bezpečne pokračovať a bude ukončený.</translation>
     </message>
     <message>
         <source>&amp;Overview</source>
-        <translation>概要(&amp;O)</translation>
+        <translation>&amp;Prehľad</translation>
     </message>
     <message>
         <source>Show general overview of wallet</source>
-        <translation>ウォレットの概要を表示</translation>
+        <translation>Zobraziť celkový prehľad o peňaženke</translation>
     </message>
     <message>
         <source>&amp;Send</source>
-        <translation>送金 (&amp;S)</translation>
+        <translation>&amp;Odoslať</translation>
     </message>
     <message>
         <source>Send coins to a Wagerr address</source>
-        <translation>Wagerr アドレスに送金</translation>
+        <translation>Poslať mince na Wagerr adresu</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
-        <translation>受取 (&amp;R)</translation>
+        <translation>&amp;Prijať</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>送金を要求 (QRコードとwagerr:URIを生成)</translation>
+        <translation>Vyžiadať platby (vygeneruje QR kódy a Wagerr: URI)</translation>
     </message>
     <message>
         <source>&amp;Sending addresses</source>
-        <translation>アドレスを送信 (&amp;S)</translation>
+        <translation>&amp;Odosielacie adresy</translation>
     </message>
     <message>
         <source>&amp;Receiving addresses</source>
-        <translation>アドレスを受信 (&amp;R)</translation>
+        <translation>&amp;Prijímacie adresy</translation>
     </message>
     <message>
         <source>Open Wallet</source>
-        <translation>ウォレットを開く</translation>
+        <translation>Otvoriť Peňaženku</translation>
     </message>
     <message>
         <source>Open a wallet</source>
-        <translation>ウォレットを開く</translation>
+        <translation>Otvoriť peňaženku</translation>
     </message>
     <message>
         <source>Close Wallet...</source>
-        <translation>ウォレットを閉じる...</translation>
+        <translation>Zatvoriť Peňaženku...</translation>
     </message>
     <message>
         <source>Close wallet</source>
-        <translation>ウォレットを閉じる</translation>
+        <translation>Zatvoriť peňaženku...</translation>
     </message>
     <message>
         <source>No wallets available</source>
-        <translation>利用可能なウォレットはありません</translation>
+        <translation>Nie je k dispozícii žiadna peňaženka</translation>
     </message>
     <message>
         <source>&amp;Window</source>
-        <translation>ウインドウ (&amp;W)</translation>
+        <translation>&amp;Okno</translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation>最小化する</translation>
+        <translation>Minimalizovať</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation>ズーム</translation>
+        <translation>Priblížiť</translation>
     </message>
     <message>
         <source>Main Window</source>
-        <translation>メインウィンドウ</translation>
+        <translation>Hlavné okno</translation>
     </message>
     <message>
         <source>&amp;Transactions</source>
-        <translation>トランザクション(&amp;T)</translation>
+        <translation>&amp;Transakcie</translation>
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>トランザクション履歴を閲覧</translation>
+        <translation>Prechádzať históriu transakcií</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
-        <translation>マスターノード(&amp;M)</translation>
+        <translation>&amp;Masternódy</translation>
     </message>
     <message>
         <source>Browse masternodes</source>
-        <translation>マスターノードを閲覧</translation>
+        <translation>Prechádzať masternódy</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
-        <translation>終了(&amp;X)</translation>
+        <translation>U&amp;končiť</translation>
     </message>
     <message>
         <source>Quit application</source>
-        <translation>アプリケーションを終了</translation>
+        <translation>Ukončiť program</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
-        <translation>Qtについて(&amp;Q)</translation>
+        <translation>O &amp;Qt</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
-        <translation>Qt についての情報を表示</translation>
+        <translation>Zobrazit informácie o Qt</translation>
     </message>
     <message>
         <source>&amp;Options...</source>
-        <translation>オプション… (&amp;O)</translation>
+        <translation>&amp;Možnosti...</translation>
     </message>
     <message>
         <source>&amp;About %1</source>
-        <translation>%1 について (&amp;A)</translation>
+        <translation>&amp;O %1</translation>
     </message>
     <message>
         <source>Send %1 funds to a Wagerr address</source>
-        <translation>Wagerrアドレスに%1の資金を送金します</translation>
+        <translation>Poslať zdroje %1 na Wagerr adresu</translation>
     </message>
     <message>
         <source>Modify configuration options for %1</source>
-        <translation>%1 の設定を変更</translation>
+        <translation>Upraviť nastavenia pre %1</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
-        <translation>表示/非表示 (&amp;S)</translation>
+        <translation>&amp;Zobraziť / Skryť</translation>
     </message>
     <message>
         <source>Show or hide the main Window</source>
-        <translation>メインウインドウを表示または非表示</translation>
+        <translation>Zobraziť alebo skryť hlavné okno</translation>
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>ウォレットの暗号化… (&amp;E)</translation>
+        <translation>&amp;Zašifrovať peňaženku...</translation>
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
-        <translation>あなたのウォレットの秘密鍵を暗号化</translation>
+        <translation>Zašifruj súkromné kľúče ktoré patria do vašej peňaženky</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>ウォレットのバックアップ… (&amp;B)</translation>
+        <translation>&amp;Backup peňaženku...</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
-        <translation>ウォレットを他の場所にバックアップ</translation>
+        <translation>Zálohovať peňaženku na iné miesto</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
-        <translation>パスフレーズの変更… (&amp;C)</translation>
+        <translation>&amp;Zmena hesla...</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
-        <translation>ウォレット暗号化のためのパスフレーズを変更</translation>
+        <translation>Zmeniť heslo použité na šifrovanie peňaženky</translation>
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>ウォレットをアンロック...(&amp;U)</translation>
+        <translation>&amp;Odomknúť peňaženku</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>ウォレットをアンロック</translation>
+        <translation>Odomknúť peňaženku</translation>
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>ウォレットをロック(&amp;L)</translation>
+        <translation>&amp;Zamknúť peňaženku</translation>
     </message>
     <message>
         <source>Sign &amp;message...</source>
-        <translation>メッセージの署名… (&amp;M)</translation>
+        <translation>Podpísať &amp;správu...</translation>
     </message>
     <message>
         <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>あなたがWagerr アドレスを所有していることを証明するために、あなたのWagerrアドレスでメッセージに署名してください。</translation>
+        <translation>Podpísať správy s vašimi Wagerr adresami ako dôkaz že ich vlastníte</translation>
     </message>
     <message>
         <source>&amp;Verify message...</source>
-        <translation>メッセージの検証… (&amp;V)</translation>
+        <translation>&amp;Overiť správu...</translation>
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>指定されたWagerrアドレスで署名されたことを確認するためにメッセージを検証してください。</translation>
+        <translation>Overiť správy pre uistenie, že boli podpísané zadanými Wagerr adresami</translation>
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>情報 (&amp;I)</translation>
+        <translation>&amp;Informácie</translation>
     </message>
     <message>
         <source>Show diagnostic information</source>
-        <translation>診断情報を表示</translation>
+        <translation>Zobraziť diagnostické informácie </translation>
     </message>
     <message>
         <source>&amp;Debug console</source>
-        <translation>デバッグコンソール(&amp;D)</translation>
+        <translation>&amp;Konzola pre ladenie</translation>
     </message>
     <message>
         <source>Open debugging console</source>
-        <translation>デバッグコンソールを開く</translation>
+        <translation>Otvor konzolu pre ladenie</translation>
     </message>
     <message>
         <source>&amp;Network Monitor</source>
-        <translation>ネットワークモニタ(&amp;N)</translation>
+        <translation>&amp;Kontrola siete</translation>
     </message>
     <message>
         <source>Show network monitor</source>
-        <translation>ネットワークモニタを表示</translation>
+        <translation>Zobraziť kontrolu siete</translation>
     </message>
     <message>
         <source>&amp;Peers list</source>
-        <translation>ネットワークのピアのリスト(&amp;P)</translation>
+        <translation>&amp;Zoznam partnerských uzlov</translation>
     </message>
     <message>
         <source>Show peers info</source>
-        <translation>接続しているピアの情報を表示</translation>
+        <translation>Zobraziť informácie o partnerských uzloch</translation>
     </message>
     <message>
         <source>Wallet &amp;Repair</source>
-        <translation>ウォレットの修復(&amp;R)</translation>
+        <translation>Op&amp;rava peňaženky</translation>
     </message>
     <message>
         <source>Show wallet repair options</source>
-        <translation>ウォレットの修復オプションを表示</translation>
+        <translation>Zobraziť možnosti opravy peňaženky</translation>
     </message>
     <message>
         <source>Open Wallet &amp;Configuration File</source>
-        <translation>ウォレット設定ファイルを開く(&amp;C)</translation>
+        <translation>Otvoriť &amp;konfiguračný súbor peňaženky</translation>
     </message>
     <message>
         <source>Open configuration file</source>
-        <translation>設定ファイルを開く</translation>
+        <translation>Otvoriť konfiguračný súbor </translation>
     </message>
     <message>
         <source>Show Automatic &amp;Backups</source>
-        <translation>自動バックアップを表示(&amp;B)</translation>
+        <translation>Zobraziť automatické &amp;zálohy</translation>
     </message>
     <message>
         <source>Show automatically created wallet backups</source>
-        <translation>自動で生成されたウォレットのバックアップを表示</translation>
+        <translation>Zobraziť automaticky vytvorené zálohy peňaženky</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
-        <translation>過去に使用した送金先アドレスとラベルの一覧を表示</translation>
+        <translation>Zobraziť zoznam použitých adries odosielateľa a ich popisy</translation>
     </message>
     <message>
         <source>Show the list of used receiving addresses and labels</source>
-        <translation>過去に使用した受取先アドレスとラベルの一覧を表示</translation>
+        <translation>Zobraziť zoznam použitých prijímacích adries a ich popisov</translation>
     </message>
     <message>
         <source>Open &amp;URI...</source>
-        <translation>URIを開く… (&amp;U)</translation>
+        <translation>Otvoriť &amp;URI...</translation>
     </message>
     <message>
         <source>Open a wagerr: URI or payment request</source>
-        <translation>wagerr: URIまたは送金リクエストを開く</translation>
+        <translation>Otvoriť wagerr: URI alebo žiadosť o platbu </translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
-        <translation>コマンドラインオプション (&amp;C)</translation>
+        <translation>&amp;Možnosti príkazového riadku</translation>
     </message>
     <message>
         <source>Show the %1 help message to get a list with possible Wagerr command-line options</source>
-        <translation>有効なWagerrのコマンドラインオプションのリストを見るために %1 のヘルプメッセージを表示</translation>
+        <translation>Ukázať %1 zoznam možných nastavení Wagerr pomocou príkazového riadku</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>デフォルトのウォレット</translation>
+        <translation>predvolená peňaženka</translation>
     </message>
     <message>
         <source>%1 client</source>
-        <translation>%1 クライアント</translation>
+        <translation>%1 klient</translation>
     </message>
     <message>
         <source>Wallet: %1
 </source>
-        <translation>ウォレット：%1</translation>
+        <translation>Peňaženka: %1
+</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;unencrypted&lt;/b&gt;</source>
-        <translation>ウォレットは&lt;b&gt;暗号化されていません&lt;/b&gt;</translation>
+        <translation>Peňaženka je &lt;b&gt;nezašifrovaná&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation>ファイル(&amp;F)</translation>
+        <translation>&amp;Súbor</translation>
     </message>
     <message>
         <source>Show information about %1</source>
-        <translation>%1の情報を表示する</translation>
+        <translation>Zobraziť informácie o %1</translation>
     </message>
     <message>
         <source>Create Wallet...</source>
-        <translation>ウォレットを作成する...</translation>
+        <translation>Vytvoriť peňaženku...</translation>
     </message>
     <message>
         <source>Create a new wallet</source>
-        <translation>新しいウォレットを作成する</translation>
+        <translation>Vytvoriť novú peňaženku</translation>
     </message>
     <message>
         <source>%1 &amp;information</source>
-        <translation>%1と情報</translation>
+        <translation>%1 &amp;Informácie</translation>
     </message>
     <message>
         <source>Show the %1 basic information</source>
-        <translation>%1の基本情報を表示する</translation>
+        <translation>Ukázať základné Informácie o %1</translation>
     </message>
     <message>
         <source>&amp;Settings</source>
-        <translation>設定(&amp;S)</translation>
+        <translation>&amp;Nastavenia</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>ヘルプ(&amp;H)</translation>
+        <translation>&amp;Pomoc</translation>
     </message>
     <message>
         <source>Tabs toolbar</source>
-        <translation>タブツールバー</translation>
+        <translation>Lišta záložiek</translation>
     </message>
     <message>
         <source>&amp;Governance</source>
-        <translation>ガバナンス(&amp;G)</translation>
+        <translation>&amp;Dozor</translation>
     </message>
     <message>
         <source>View Governance Proposals</source>
-        <translation>ガバナンス提案を見る</translation>
+        <translation>Zobraziť návrhy dozoru</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n アクティブコネクション</numerusform></translation>
+        <translation><numerusform>%n aktívne spojenie so sieťou Wagerr</numerusform><numerusform>%n aktívne spojenia so sieťou Wagerr</numerusform><numerusform>%n aktívnych spojení so sieťou Wagerr</numerusform><numerusform>%n aktívnych spojení so sieťou Wagerr</numerusform></translation>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation>ネットワークアクティビティは無効化されました</translation>
+        <translation>Sieťová aktivita zakázaná</translation>
     </message>
     <message>
         <source>Syncing Headers (%1%)...</source>
-        <translation>ヘッダーを同期しています (%1%)...</translation>
+        <translation>Synchronizujú sa hlavičky (%1%)...</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
-        <translation>ネットワークに同期中…</translation>
+        <translation>Synchronizácia so sieťou...</translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
-        <translation>ディスク上のブロックのインデックスを作成中...</translation>
+        <translation>Indexujem bloky na disku...</translation>
     </message>
     <message>
         <source>Processing blocks on disk...</source>
-        <translation>ディスク上のブロックを処理中...</translation>
+        <translation>Spracovávam bloky na disku...</translation>
     </message>
     <message>
         <source>Reindexing blocks on disk...</source>
-        <translation>ディスク上のブロックのインデックスを再作成中…</translation>
+        <translation>Reindexujú sa bloky na disku...</translation>
     </message>
     <message>
         <source>Connecting to peers...</source>
-        <translation>ピアに接続中...</translation>
+        <translation>Pripája sa k partnerom...</translation>
     </message>
     <message numerus="yes">
         <source>Processed %n block(s) of transaction history.</source>
-        <translation><numerusform>%n ブロックのトランザクション履歴を処理</numerusform></translation>
+        <translation><numerusform>Spracovaný jeden blok transakčnej histórie.</numerusform><numerusform>Spracované %n bloky transakčnej histórie.</numerusform><numerusform>Spracovaných %n blokov transakčnej histórie.</numerusform><numerusform>Spracovaných %n blokov transakčnej histórie.</numerusform></translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>%1 遅延</translation>
+        <translation>%1 pozadu</translation>
     </message>
     <message>
         <source>Catching up...</source>
-        <translation>追跡中…</translation>
+        <translation>Sťahujem...</translation>
     </message>
     <message>
         <source>Last received block was generated %1 ago.</source>
-        <translation>最後に受信したブロックは %1 前に生成されました。</translation>
+        <translation>Posledný prijatý blok bol vygenerovaný pred %1.</translation>
     </message>
     <message>
         <source>Transactions after this will not yet be visible.</source>
-        <translation>この後のトランザクションはまだ表示されません。</translation>
+        <translation>Novšie transakcie nebudú ešte viditeľné.</translation>
     </message>
     <message>
         <source>Up to date</source>
-        <translation>バージョンは最新です</translation>
+        <translation>Aktualizovaný</translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
-        <translation>追加データを同期中: %p%</translation>
+        <translation>Synchronizujú sa ďalšie dáta: %p%</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>エラー：%1</translation>
+        <translation>Chyba: %1</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation>Upozornenie</translation>
     </message>
     <message>
         <source>Warning: %1</source>
-        <translation>警告：%1</translation>
+        <translation>Upozornenie: %1</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>情報</translation>
+        <translation>Informácie</translation>
     </message>
     <message>
         <source>Received and sent multiple transactions</source>
-        <translation>送受信した複数のトランザクション</translation>
+        <translation>Prijaté a odoslané hromadné transakcie</translation>
     </message>
     <message>
         <source>Sent multiple transactions</source>
-        <translation>送信した複数のトランザクション</translation>
+        <translation>Odoslané hromadné transakcie</translation>
     </message>
     <message>
         <source>Received multiple transactions</source>
-        <translation>受信した複数のトランザクション</translation>
+        <translation>Prijaté hromadné transakcie</translation>
     </message>
     <message>
         <source>Sent Amount: %1
 </source>
-        <translation>送金金額：%1
+        <translation>Poslaná suma: %1
 </translation>
     </message>
     <message>
         <source>Received Amount: %1
 </source>
-        <translation>受取金額：%1
+        <translation>Prijatá suma: %1
 </translation>
     </message>
     <message>
         <source>Date: %1
 </source>
-        <translation>日付: %1
+        <translation>Dátum: %1
 </translation>
     </message>
     <message>
         <source>Amount: %1
 </source>
-        <translation>金額: %1
+        <translation>Suma: %1
 </translation>
     </message>
     <message>
         <source>Type: %1
 </source>
-        <translation>タイプ: %1
+        <translation>Typ: %1
 </translation>
     </message>
     <message>
         <source>Label: %1
 </source>
-        <translation>ラベル: %1
+        <translation>Popis: %1
 </translation>
     </message>
     <message>
         <source>Address: %1
 </source>
-        <translation>アドレス: %1
+        <translation>Adresa: %1
 </translation>
     </message>
     <message>
         <source>Sent transaction</source>
-        <translation>送金トランザクション</translation>
+        <translation>Odoslané transakcie</translation>
     </message>
     <message>
         <source>Incoming transaction</source>
-        <translation>入金トランザクション</translation>
+        <translation>Prijaté transakcie</translation>
     </message>
     <message>
         <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
-        <translation>HDウォレット鍵生成は&lt;b&gt;有効&lt;/b&gt;です。</translation>
+        <translation>Generovanie HD kľúčov je &lt;b&gt;zapnuté&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
-        <translation>ウォレットは &lt;b&gt;暗号化&lt;/b&gt;され、現在&lt;b&gt;アンロック&lt;/b&gt;されています。</translation>
+        <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/b&gt; a momentálne &lt;b&gt;odomknutá&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for mixing only</source>
-        <translation>ウォレットは &lt;b&gt;暗号化&lt;/b&gt;され、現在ミキシングのために&lt;b&gt;アンロック&lt;/b&gt;されています。</translation>
+        <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/b&gt; a momentálne &lt;b&gt;odomknutá&lt;/b&gt; iba pre miešanie</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
-        <translation>ウォレットは&lt;b&gt;暗号化&lt;/b&gt;され、現在 &lt;b&gt;ロック&lt;/b&gt;されています。</translation>
+        <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/b&gt; a momentálne &lt;b&gt;zamknutá&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
-        <translation>プロキシが&lt;b&gt;有効&lt;/b&gt;：%1</translation>
+        <translation>Server proxy je &lt;b&gt;povolený:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Original message:</source>
-        <translation>元のメッセージ：</translation>
+        <translation>Pôvodná správa:</translation>
     </message>
 </context>
 <context>
     <name>CoinControlDialog</name>
     <message>
         <source>Quantity:</source>
-        <translation>数量：</translation>
+        <translation>Množstvo:</translation>
     </message>
     <message>
         <source>Bytes:</source>
-        <translation>バイト：</translation>
+        <translation>Bajtov:</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>総額：</translation>
+        <translation>Suma:</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>手数料：</translation>
+        <translation>Poplatok:</translation>
     </message>
     <message>
         <source>Coin Selection</source>
-        <translation>コイン選択</translation>
+        <translation>Výber mince</translation>
     </message>
     <message>
         <source>Dust:</source>
-        <translation>ダスト：</translation>
+        <translation>Prach:</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>手数料差引後：</translation>
+        <translation>Po poplatku:</translation>
     </message>
     <message>
         <source>Change:</source>
-        <translation>チェンジアドレス：</translation>
+        <translation>Zmena:</translation>
     </message>
     <message>
         <source>(un)select all</source>
-        <translation>すべて選択/選択解除</translation>
+        <translation>(ne)vybrať všetko</translation>
     </message>
     <message>
         <source>toggle lock state</source>
-        <translation>トグルロック状態</translation>
+        <translation>prepnúť stav zámku</translation>
     </message>
     <message>
         <source>Tree mode</source>
-        <translation>ツリーモード</translation>
+        <translation>Stromový režim</translation>
     </message>
     <message>
         <source>List mode</source>
-        <translation>リストモード</translation>
+        <translation>Zoznamový režim</translation>
     </message>
     <message>
         <source>(1 locked)</source>
-        <translation>(1 ロック中)</translation>
+        <translation>(1 zamknutý)</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金額</translation>
+        <translation>Suma</translation>
     </message>
     <message>
         <source>Received with label</source>
-        <translation>ラベルに対する入金一覧</translation>
+        <translation>Prijaté s označením</translation>
     </message>
     <message>
         <source>Received with address</source>
-        <translation>アドレスに対する入金一覧</translation>
+        <translation>Prijaté s adresou</translation>
     </message>
     <message>
         <source>Mixing Rounds</source>
-        <translation>ミキシングのラウンド</translation>
+        <translation>Miešacie kolá</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日付</translation>
+        <translation>Dátum</translation>
     </message>
     <message>
         <source>Confirmations</source>
-        <translation>検証数</translation>
+        <translation>Potvrdenia</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>検証済み</translation>
+        <translation>Potvrdené</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>アドレスをコピー</translation>
+        <translation>Kopírovať adresu</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>ラベルをコピー</translation>
+        <translation>Kopírovať popis</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>金額をコピー</translation>
+        <translation>Kopírovať sumu</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>取引 ID をコピー</translation>
+        <translation>Kopírovať ID transakcie</translation>
     </message>
     <message>
         <source>Lock unspent</source>
-        <translation>未送金トランザクションをロック</translation>
+        <translation>Uzamknúť neminuté</translation>
     </message>
     <message>
         <source>Unlock unspent</source>
-        <translation>未送金トランザクションをアンロック</translation>
+        <translation>Odomknúť neminuté</translation>
     </message>
     <message>
         <source>Copy quantity</source>
-        <translation>数量をコピー</translation>
+        <translation>Kopírovať množstvo</translation>
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>手数料をコピー</translation>
+        <translation>Kopírovať poplatok</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>手数料差引後の金額をコピー</translation>
+        <translation>Kopírovať za poplatok</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation>バイト数をコピー</translation>
+        <translation>Kopírovať bajty</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation>ダストをコピー</translation>
+        <translation>Kopírovať prach</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation>チェンジアドレスをコピー</translation>
+        <translation>Kopírovať zmenu</translation>
     </message>
     <message>
         <source>Please switch to "List mode" to use this function.</source>
-        <translation>この機能を使うにはリストモードにスイッチしてください。</translation>
+        <translation>Pre použitie tejto funkcie prepnite na "Zoznamový mód".</translation>
     </message>
     <message>
         <source>(%1 locked)</source>
-        <translation>(%1 がロック中)</translation>
+        <translation>(%1 zamknutých)</translation>
     </message>
     <message>
         <source>yes</source>
-        <translation>はい</translation>
+        <translation>áno</translation>
     </message>
     <message>
         <source>no</source>
-        <translation>いいえ</translation>
+        <translation>nie</translation>
     </message>
     <message>
         <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
-        <translation>受取額が現在のダスト閾値を下回る場合にはこのラベルは赤くなります。</translation>
+        <translation>Tento popis sčervenie ak ktorýkoľvek príjemca dostane sumu menšiu ako súčasný limit pre "prach".</translation>
     </message>
     <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation>インプットごとに +/- %1 duff(s) が変更可能 </translation>
+        <source>Can vary +/- %1 sat(s) per input.</source>
+        <translation>Môže sa pohybovať +/- %1 sat(y) pre vstup.</translation>
     </message>
     <message>
         <source>Some coins were unselected because they were spent.</source>
-        <translation>使用済みのため、非選択のコインもありました。</translation>
+        <translation>Niektoré mince neboli vybrané, pretože sa už minuli.</translation>
     </message>
     <message>
         <source>Some coins were unselected because they do not have enough mixing rounds.</source>
-        <translation>一部のコインは、ミキシングラウンドが不十分なため、非選択としました。</translation>
+        <translation>Niektoré mince neboli vybrané, pretože nemajú dostatok kôl miešania.</translation>
     </message>
     <message>
         <source>Show all coins</source>
-        <translation>全てのコインを表示する</translation>
+        <translation>Zobraziť všetky mince</translation>
     </message>
     <message>
         <source>Hide %1 coins</source>
-        <translation>%1のコインを非表示にする</translation>
+        <translation>Skryť mince %1</translation>
     </message>
     <message>
         <source>Show all %1 coins</source>
-        <translation>%1全額のコインを表示する</translation>
+        <translation>Zobraziť všetky mince %1</translation>
     </message>
     <message>
         <source>Show spendable coins only</source>
-        <translation>使用可能なコインのみを表示する</translation>
+        <translation>Zobraziť iba minuteľné mince</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>（ラベル無し）</translation>
+        <translation>(bez popisu)</translation>
     </message>
     <message>
         <source>change from %1 (%2)</source>
-        <translation>%1 (%2) からの変更</translation>
+        <translation>zmena od %1 (%2)</translation>
     </message>
     <message>
         <source>(change)</source>
-        <translation>(チェンジ)</translation>
+        <translation>(zmena)</translation>
     </message>
     <message>
         <source>n/a</source>
-        <translation>n/a</translation>
+        <translation>nie je k dispozícii</translation>
     </message>
 </context>
 <context>
     <name>CreateWalletActivity</name>
     <message>
         <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>ウォレット&lt;b&gt;%1&lt;/b&gt;を作成...</translation>
+        <translation>Vytvára sa peňaženka &lt;b&gt;%1&lt;/b&gt;...</translation>
     </message>
     <message>
         <source>Create wallet failed</source>
-        <translation>ウォレットの作成に失敗しました</translation>
+        <translation>Vytvorenie peňaženky zlyhalo</translation>
     </message>
     <message>
         <source>Create wallet warning</source>
-        <translation>ウォレット作成の警告</translation>
+        <translation>Vytvorenie peňaženky s upozornením</translation>
     </message>
 </context>
 <context>
     <name>CreateWalletDialog</name>
     <message>
         <source>Create Wallet</source>
-        <translation>ウォレットを作成する</translation>
+        <translation>Vytvoriť peňaženku</translation>
     </message>
     <message>
         <source>Wallet Name</source>
-        <translation>ウォレット名</translation>
+        <translation>Názov peňaženky</translation>
     </message>
     <message>
         <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
-        <translation>ウォレットを暗号化します。ウォレットは、お客様が選んだパスフレーズで暗号化されます。</translation>
+        <translation>Zašifruje peňaženku. Peňaženka bude zašifrovaná pomocou prístupovej frázy podľa vášho výberu.</translation>
     </message>
     <message>
         <source>Encrypt Wallet</source>
-        <translation>ウォレットを暗号化する</translation>
+        <translation>Zašifrovať peňaženku</translation>
     </message>
     <message>
         <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
-        <translation>このウォレットのプライベートキーを無効にします。プライベートキーを無効にしたウォレットは、プライベートキーを持たず、HDシードやインポートされたプライベートキーを持つことができなくなります。これは時計専用のウォレットに最適です。</translation>
+        <translation>Zakázať súkromné kľúče pre túto peňaženku. Peňaženky so zakázanými súkromnými kľúčmi nebudú mať žiadne súkromné kľúče a nemôžu mať HD pôvod ani importované súkromné kľúče. Toto je ideálne pre peňaženky, ktoré len sledujete.</translation>
     </message>
     <message>
         <source>Disable Private Keys</source>
-        <translation>プライベートキーを無効化する</translation>
+        <translation>Zakázať súkromné kľúče</translation>
     </message>
     <message>
         <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
-        <translation>ブランクウォレットを作成します。ブランクウォレットは、初期状態ではプライベートキーやスクリプトを持ちません。プライベートキーやアドレスは、後からインポートしたり、HDシードを設定したりすることができます。</translation>
+        <translation>Vytvorí prázdnu peňaženku. Prázdne peňaženky pôvodne nemajú súkromné kľúče ani skripty. Súkromné kľúče a adresy je možné importovať, HD zdroj je možný nastaviť neskôr.</translation>
     </message>
     <message>
         <source>Make Blank Wallet</source>
-        <translation>ブランクウォレットを作成する</translation>
+        <translation>Vytvoriť prázdnu peňaženku</translation>
     </message>
     <message>
         <source>Create</source>
-        <translation>作成</translation>
+        <translation>Vytvoriť</translation>
     </message>
 </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
         <source>Edit Address</source>
-        <translation>アドレスの編集</translation>
+        <translation>Upraviť adresu</translation>
     </message>
     <message>
         <source>&amp;Label</source>
-        <translation>ラベル(&amp;L)</translation>
+        <translation>&amp;Popis</translation>
     </message>
     <message>
         <source>The label associated with this address list entry</source>
-        <translation>このアドレスに関連しているラベル</translation>
+        <translation>Popis spojený s týmto záznamom v adresári</translation>
     </message>
     <message>
         <source>&amp;Address</source>
-        <translation>アドレス (&amp;A)</translation>
+        <translation>&amp;Adresa</translation>
     </message>
     <message>
         <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
-        <translation>このアドレスに関連しているアドレス。これは送金アドレス用にのみ変更できます。</translation>
+        <translation>Adresa spojená s týmto záznamom v adresári. Možné upravovať len pre odosielajúce adresy.</translation>
     </message>
     <message>
         <source>New sending address</source>
-        <translation>新しい送金アドレス</translation>
+        <translation>Nová adresa pre odoslanie</translation>
     </message>
     <message>
         <source>Edit receiving address</source>
-        <translation>入金アドレスを編集</translation>
+        <translation>Upraviť adresu pre prijímanie</translation>
     </message>
     <message>
         <source>Edit sending address</source>
-        <translation>送金アドレスを編集</translation>
+        <translation>Upraviť adresu pre odoslanie</translation>
     </message>
     <message>
         <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>入力されたアドレス "%1" は有効なWagerrアドレスではありません。</translation>
+        <translation>Zadaná adresa "%1" nie je platná Wagerr adresa.</translation>
     </message>
     <message>
         <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
-        <translation>アドレス「%1」はラベル「%2」の受信アドレスとして既に存在するため、送信アドレスとして追加することはできません。</translation>
+        <translation>Adresa "%1" už existuje ako prijímacia adresa s menovkou "%2", a preto nemôže byť pridaná ako odosielacia adresa.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book with label "%2".</source>
-        <translation>入力されたアドレス「%1」は、ラベル「%2」のアドレス帳に既に登録されています。</translation>
+        <translation>Zadaná adresa "%1" je už v adresári s menovkou "%2".</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
-        <translation>ウォレットをアンロックできませんでした。</translation>
+        <translation>Nepodarilo sa odomknúť peňaženku.</translation>
     </message>
     <message>
         <source>New key generation failed.</source>
-        <translation>新しいキーの生成に失敗しました。</translation>
+        <translation>Generovanie nového kľúča zlyhalo.</translation>
     </message>
 </context>
 <context>
     <name>FreespaceChecker</name>
     <message>
         <source>A new data directory will be created.</source>
-        <translation>新しいデータ ディレクトリが作成されます。</translation>
+        <translation>Bude vytvorený nový dátový adresár.</translation>
     </message>
     <message>
         <source>name</source>
-        <translation>名前</translation>
+        <translation>názov</translation>
     </message>
     <message>
         <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
-        <translation>ディレクトリがすでに存在します。 新しいディレクトリを作成する場合%1を追加してください。</translation>
+        <translation>Priečinok už existuje. Pridajte "%1" ak chcete vytvoriť nový priečinok tu.</translation>
     </message>
     <message>
         <source>Path already exists, and is not a directory.</source>
-        <translation>パスが存在します。ディレクトリではありません。</translation>
+        <translation>Cesta už existuje a nie je to adresár.</translation>
     </message>
     <message>
         <source>Cannot create data directory here.</source>
-        <translation>ここにデータディレクトリを作成することはできません。</translation>
+        <translation>Tu nemôžem vytvoriť dátový adresár.</translation>
     </message>
 </context>
 <context>
     <name>GovernanceList</name>
     <message>
         <source>Form</source>
-        <translation>フォーム</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <source>Filter List:</source>
-        <translation>フィルターリスト：</translation>
+        <translation>Filtrovať zoznam:</translation>
     </message>
     <message>
         <source>Filter propsal list</source>
-        <translation>フィルター提案リスト</translation>
+        <translation>Filtrovať zoznam návrhov</translation>
     </message>
     <message>
         <source>Proposal Count:</source>
-        <translation>提案回数：</translation>
+        <translation>Počet návrhov:</translation>
     </message>
     <message>
         <source>Filter by Title</source>
-        <translation>タイトルで絞り込む</translation>
+        <translation>Filtrovať podľa názvu</translation>
     </message>
     <message>
         <source>Proposal Info: %1</source>
-        <translation>提案情報：%1</translation>
+        <translation>Informácie o návrhu: %1</translation>
     </message>
 </context>
 <context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
-        <translation>バージョン</translation>
+        <translation>verzia</translation>
     </message>
     <message>
         <source>About %1</source>
-        <translation>%1 について</translation>
+        <translation>O %1</translation>
     </message>
     <message>
         <source>Command-line options</source>
-        <translation>コマンドラインオプション</translation>
+        <translation>Možnosti príkazového riadku</translation>
     </message>
     <message>
         <source>%1 information</source>
-        <translation>%1の情報</translation>
+        <translation>%1 Informácie</translation>
     </message>
     <message>
         <source>&lt;h3&gt;%1 Basics&lt;/h3&gt; %1 gives you true financial privacy by obscuring the origins of your funds. All the Wagerr in your wallet is comprised of different "inputs" which you can think of as separate, discrete coins.&lt;br&gt; %1 uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The %1 process works like this:&lt;/b&gt;&lt;ol type="1"&gt; &lt;li&gt;%1 begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 WAGERR, 0.01 WAGERR, 0.1 WAGERR, 1 WAGERR and 10 WAGERR -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called "masternodes." These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know "who" you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users' wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it's called a "round." Each round of %1 makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these "change addresses." Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have %1 disabled. &lt;hr&gt;For more information, see the &lt;a style="%2" href="%3"&gt;%1 documentation&lt;/a&gt;.</source>
-        <translation>&lt;h3&gt;%1の基本内容&lt;/h3&gt; %1は、お客様の資金の出所を隠すことで、本当の意味での金融プライバシーを提供します。お客様のウォレットにあるすべてのWagerrは、異なる「入力」で構成されており、別個の独立したコインと考えることができます。&lt;br&gt;%1は、革新的なプロセスによって、お客様のインプットと他の2人以上のインプットをミキシングしますが、お客様のウォレットからコインが出ることはありません。お客様はいつでも自分のお金を管理できます。&lt;hr&gt; &lt;b&gt;%1のプロセスは次のように機能します。&lt;/b&gt;&lt;ol type="1"&gt; &lt;li&gt;%1は最初に取引の入力を標準的な金額に分解します。0.001 WAGERR、0.01 WAGERR、0.1 WAGERR、1 WAGERR、10 WAGERRなど、あなたが毎日使っている紙幣と同じような金額になります。&lt;/li&gt; &lt;li&gt;お客様のウォレットは、ネットワーク上にある「マスターノード」と呼ばれる特別に設定されたソフトウェアノードにリクエストを送ります。このとき、これらのマスタノードには、お客様が特定の金額を混合することに関心があると伝えられます。個人を特定できるような情報はマスタノードに送られないため、お客様が「誰」であるか知られることはありません。&lt;/li&gt; &lt;li&gt;他の2人以上の人物が同じようなメッセージを送り、同じ金額のミキシングを希望すると、ミキシングセッションが開始されます。マスターノードは入力をミキシングし、3人のユーザー全員のウォレットに、その時点で変換された入力を3人全員に支払うように指示します。お客様のウォレットは、その金額をウォレット自体に直接支払いますが、別のアドレス（変更アドレスと呼ぶ）になります。&lt;/li&gt; &lt;li&gt;お客様の資金を完全に隠すために、お客様のウォレットではこのプロセスを各金額で何度も繰り返される必要があります。このプロセスが完了する度に、「ラウンド」と呼ばれます。%1の各ラウンドは、お客様の資金が発生した場所を判断するのを指数関数的に難しくします。&lt;/li&gt; &lt;li&gt;このミキシングプロセスはバックグラウンドで行われ、お客様側の介入は一切ありません。お客様が取引をしたいときは、お客様の資金はすでにミキシングされています。さらに待つ必要はありません。&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;重要事項：&lt;/b&gt; お客様のウォレットには、この「変更アドレス」が1000個しか入っていません。ミキシング作業が発生する度に、お客様のアドレスのうち最大9個が使用されます。したがって、この1000個のアドレスは、約100回までのミキシング作業に使えるということです。そのうち900個を使い切ると、お客様はご自身のウォレットにさらにアドレスを作成する必要があります。ただし、これは自動バックアップを有効にしている場合に限ります。&lt;br&gt;そのため、バックアップを無効にしているユーザーは、%1も無効になります。&lt;hr&gt;詳細は、&lt;a style="%2" href="%3"&gt;%1のドキュメント&lt;/a&gt;を参照してください。</translation>
+        <translation>&lt;h3&gt;Základy %1&lt;/h3&gt; %1 vám poskytuje skutočné finančné súkromie skrývaním pôvodu vašich zdrojov. Všetky Wagerre vo vašej peňaženke pozostávajú z rôznych "vstupov", ktoré si môžete predstaviť ako rozdelené,  diskrétne mince.&lt;br&gt; %1 používa zdokonalený proces pre miešanie vašich vstupov so vstupmi iných ľudí bez toho, aby vaše mince museli opustiť peňaženku. Počas celej doby máte kontrolu nad vašimi peniazmi.&lt;hr&gt; &lt;b&gt;Proces %1 funguje nasledovne:&lt;/b&gt;&lt;ol type="1"&gt; &lt;li&gt;%1 začne rozdelením vašich transakčných vstupov na štandardné časti, takzvané denominácie. Tieto denominácie sú 0.001 WAGERR, 0.01 WAGERR, 0.1 WAGERR, 1 WAGERR a 10 WAGERR -- v podstate niečo ako papierové peniaze, ktoré používate každý deň.&lt;/li&gt; &lt;li&gt;Vaša peňaženka potom pošle požiadavok špeciálne nastavenému softvérovému uzlu nazvaného "Masternód". Tieto masternódy sú potom informované, že máte záujem miešať určité denominácie. Masternód neobdrží žiadne informácie ktoré by vás identifikovali, takže nikdy nevie kto ste.&lt;/li&gt; &lt;li&gt;Keď ďalší dvaja ľudia pošlú podobnú správu hovoriacu o tom, že chcú miešať rovnakú denomináciu, začne sa samotné miešanie. Masternód zamieša vstupy a povie peňaženkám všetkých troch používateľov, aby zaplatili teraz už zmiešané vstupy sami sebe. Vaša peňaženka zaplatí tieto denominácie priamo sebe, ale už na inú adresu (nazývanú "meniaca adresa").&lt;/li&gt; &lt;li&gt;Aby boli vaše zdroje plne ukryté, vaša peňaženka musí zopakovať tento proces niekoľko krát s každou denomináciou.  Vždy keď je tento proces dokončený, je nazvaný "kolo". Každé kolo %1 exponenciálne sťažuje určiť, odkiaľ pochádzajú vaše zdroje.&lt;/li&gt; &lt;li&gt;Toto miešanie sa deje na pozadí, bez nutnosti zásahov z vašej strany. Keď si prajete uskutočniť transakciu, vaše zdroje budú už zmiešané. Nie je nutné na nič čakať.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt; &lt;b&gt;DÔLEŽITÉ:&lt;/b&gt; Vaša peňaženka obsahuje iba 1000 takýchto "meniacich adries". Vždy keď prebehne miešanie, použije sa maximálne až 9 vašich adries. To znamená, že týchto 1000 adries vystačí zhruba na 100 miešaní. Keď sa použije 900 adries, vaša peňaženka musí vytvoriť viac adries. Toto je však možné iba vtedy, keď máte zapnuté automatické zálohovanie.&lt;br&gt; V dôsledku toho, používatelia ktorí majú zálohovanie vypnuté, budú mať vypnutý aj %1. &lt;hr&gt;Viac informácií nájdete v &lt;a style="%2" href="%3"&gt;dokumentácií ku %1&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
     <name>Intro</name>
     <message>
         <source>Welcome</source>
-        <translation>ようこそ！
-</translation>
+        <translation>Vitajte</translation>
     </message>
     <message>
         <source>Welcome to %1.</source>
-        <translation>%1 へようこそ。</translation>
+        <translation>Vitajte v %1</translation>
     </message>
     <message>
         <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
-        <translation>これは本プログラムの最初の起動です。%1 がデータを保存する場所を選択して下さい。</translation>
+        <translation>Keďže toto je prvé spustenie programu, môžete si vybrať, kam %1 bude ukladať vaše údaje.</translation>
     </message>
     <message>
         <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
-        <translation>OKをクリックすると、%1は完全な%4ブロックチェーン (%2GB) のダウンロードおよび処理を%4が開始された時点の%3から開始します。</translation>
+        <translation>Keď kliknete na OK tak %1 začne sťahovanie a spracuje celý %4 blockchain (%2GB) počnúc najmladšími transakciami v %3 keď sa %4 prvý krát spustil.</translation>
     </message>
     <message>
         <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
-        <translation>この初期同期には多大なリソースを消費し、あなたのコンピュータでこれまで見つからなかったハードウェア上の問題が発生する場合があります。%1 を実行する度に、中断された時点からダウンロードを再開します。</translation>
+        <translation>Počiatočná synchronizácia je veľmi náročná a môže odhaliť hardvérové problémy vo vašom počítači o ktorých ste do teraz nevedeli. Vždy keď zapnete %1 tak sa sťahovanie začne presne tam kde bolo pred vypnutím.</translation>
     </message>
     <message>
         <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
-        <translation>ブロックチェーンの保存容量に制限を設けることを選択した場合 (剪定) にも、過去のデータのダウンロードおよび処理が必要になります。しかし、これらのデータはディスク使用量を低く抑えるために、後で削除されます。</translation>
+        <translation>Keď ste si vybrali limit na uloženie blockchainu (zmenšenie) tak sa historické dáta budú musieť aj tak stiahnuť a spracovať, ale potom budú zmazané aby sa používanie disku znížilo.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
-        <translation>初期設定のデータディレクトリを使用</translation>
+        <translation>Použiť predvolený dátový adresár</translation>
     </message>
     <message>
         <source>Use a custom data directory:</source>
-        <translation>任意のデータディレクトリを使用：</translation>
+        <translation>Použiť vlastný dátový adresár:</translation>
     </message>
     <message>
         <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
-        <translation>少なくとも%1GBのデータをこのディレクトリに保存する必要があります。またこのデータは時間とともに増加していきます。</translation>
+        <translation>V tomto adresári bude uložené minimálne %1 GB dát, časom sa využité dáta zvýšia.</translation>
     </message>
     <message>
         <source>Approximately %1 GB of data will be stored in this directory.</source>
-        <translation>おおむね%1GBのデータがこのディレクトリに保存されます。</translation>
+        <translation>V tomto adresári bude uložených približne %1 GB dát.</translation>
     </message>
     <message>
         <source>%1 will download and store a copy of the Wagerr block chain.</source>
-        <translation>%1はWagerrのブロックチェーンの複製をダウンロードし保存します。</translation>
+        <translation>%1 stiahne a bude uchovávať kópiu Wagerr blockchainu.</translation>
     </message>
     <message>
         <source>The wallet will also be stored in this directory.</source>
-        <translation>ウォレットもこのディレクトリに保存されます。</translation>
+        <translation>Peňaženka bude tiež uložená v tomto adresári.</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
-        <translation>エラー： 指定のデータディレクトリ "%1" を作成できません。</translation>
+        <translation>Chyba: Zadaný priečinok pre dáta "%1" nemôže byt vytvorený.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <source>%1 GB of free space available</source>
-        <translation>使用可能な空き領域の%1 GB</translation>
+        <translation>%1 GB dostupného voľného miesta</translation>
     </message>
     <message>
         <source>(of %1 GB needed)</source>
-        <translation>(%1 GB 必要)</translation>
+        <translation>(z potrebných %1GB)</translation>
     </message>
 </context>
 <context>
     <name>MasternodeList</name>
     <message>
         <source>Form</source>
-        <translation>フォーム</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>ステータス</translation>
+        <translation>Stav</translation>
     </message>
     <message>
         <source>Filter List:</source>
-        <translation>フィルターリスト:</translation>
+        <translation>Zoznam filtrov:</translation>
     </message>
     <message>
         <source>Filter masternode list</source>
-        <translation>マスターノードのリストをフィルター</translation>
+        <translation>Filtrovať zoznam masternódov</translation>
     </message>
     <message>
         <source>Node Count:</source>
-        <translation>ノード数:</translation>
+        <translation>Počet uzlov:</translation>
     </message>
     <message>
         <source>Show only masternodes this wallet has keys for.</source>
-        <translation>このウォレットがキーを持つマスターノードのみを表示</translation>
+        <translation>Zobraziť len masternódy, pre ktoré má táto peňaženka kľúče.</translation>
     </message>
     <message>
         <source>My masternodes only</source>
-        <translation>自分のマスターノードのみ</translation>
+        <translation>Iba moje masternódy</translation>
     </message>
     <message>
         <source>Service</source>
-        <translation>サービス</translation>
+        <translation>Služba</translation>
     </message>
     <message>
         <source>PoSe Score</source>
-        <translation>PoSeスコア</translation>
+        <translation>PoSe skóre</translation>
     </message>
     <message>
         <source>Registered</source>
-        <translation>登録済み</translation>
+        <translation>Zaregistrované</translation>
     </message>
     <message>
         <source>Last Paid</source>
-        <translation>最新の支払い</translation>
+        <translation>Posledná platba</translation>
     </message>
     <message>
         <source>Next Payment</source>
-        <translation>次の支払い</translation>
+        <translation>Ďalšia platba</translation>
     </message>
     <message>
         <source>Payout Address</source>
-        <translation>支払いアドレス</translation>
+        <translation>Výplatná adresa</translation>
     </message>
     <message>
         <source>Operator Reward</source>
-        <translation>オペレーター報酬</translation>
+        <translation>Odmena operátora</translation>
     </message>
     <message>
         <source>Collateral Address</source>
-        <translation>担保アドレス</translation>
+        <translation>Zaisťovacia adresa</translation>
     </message>
     <message>
         <source>Owner Address</source>
-        <translation>所有者アドレス</translation>
+        <translation>Adresa vlastníka</translation>
     </message>
     <message>
         <source>Voting Address</source>
-        <translation>投票アドレス</translation>
+        <translation>Hlasovacia adresa</translation>
     </message>
     <message>
         <source>Copy ProTx Hash</source>
-        <translation>ProTxハッシュをコピー</translation>
+        <translation>Skopírovať ProTx hash</translation>
     </message>
     <message>
         <source>Copy Collateral Outpoint</source>
-        <translation>担保のアウトポイントをコピー</translation>
+        <translation>Kopírovať zábezpeku Outpoint</translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>更新中...</translation>
+        <translation>Aktualizuje sa...</translation>
     </message>
     <message>
         <source>ENABLED</source>
-        <translation>有効</translation>
+        <translation>AKTÍVNE</translation>
     </message>
     <message>
         <source>POSE_BANNED</source>
-        <translation>POSE_BANNED</translation>
+        <translation>POSE_ZAKÁZANÉ</translation>
     </message>
     <message>
         <source>UNKNOWN</source>
-        <translation>不明</translation>
+        <translation>NEZNÁME</translation>
     </message>
     <message>
         <source>to %1</source>
-        <translation>%1に</translation>
+        <translation>do %1</translation>
     </message>
     <message>
         <source>to UNKNOWN</source>
-        <translation>不明者に</translation>
+        <translation>do NEZNÁME</translation>
     </message>
     <message>
         <source>but not claimed</source>
-        <translation>しかし、請求されていません</translation>
+        <translation>ale nie nárokované</translation>
     </message>
     <message>
         <source>NONE</source>
-        <translation>なし</translation>
+        <translation>ŽIADNE</translation>
     </message>
     <message>
         <source>Filter by any property (e.g. address or protx hash)</source>
-        <translation>プロパティでのフィルタリング（例：アドレスやProTxハッシュなど）</translation>
+        <translation>Filtrovať podľa ľubovoľnej vlastnosti (napr. adresa alebo protx hash)</translation>
     </message>
     <message>
         <source>Please wait...</source>
-        <translation>お待ちください...</translation>
+        <translation>Prosím čakajte...</translation>
     </message>
     <message>
         <source>Additional information for DIP3 Masternode %1</source>
-        <translation>DIP3のマスターノード%1の追加情報</translation>
+        <translation>Ďalšie informácie pre DIP3 Masternode %1</translation>
     </message>
 </context>
 <context>
     <name>ModalOverlay</name>
     <message>
         <source>Form</source>
-        <translation>フォーム</translation>
+        <translation>Forma</translation>
     </message>
     <message>
         <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Wagerr network, as detailed below.</source>
-        <translation>確認できない最新のトランザクションがあるかもしれません。これによりウォレットの残高は不正確なものである可能性があります。この情報はウォレットが一度Wagerrのネットワークへの同期が完了すると正確なものとなります。詳細は下記を参照してください。</translation>
+        <translation>Nedávne transakcie ešte nemusia byť viditeľné a preto môže byť stav vašej peňaženky nesprávny. Informácia bude správna hneď ako vaša peňaženka dokončí synchronizáciu so sieťou Wagerr. Viac detailov nájdete nižšie.</translation>
     </message>
     <message>
         <source>Attempting to spend Wagerr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>表示されてないトランザクションに影響を受けたWagerrを使用しようとするとネットワークに承認されません。</translation>
+        <translation>Pokús o minutie Wagerrov, ktoré sú ovplyvnené "ešte nezobrazenými" transakciami, nebude sieťou akceptovaný.</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
-        <translation>残りのブロック数</translation>
+        <translation>Počet zostávajúcich blokov</translation>
     </message>
     <message>
         <source>Unknown...</source>
-        <translation>不明...</translation>
+        <translation>Neznáme...</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation>最終ブロックの日時</translation>
+        <translation>Čas posledného bloku</translation>
     </message>
     <message>
         <source>Progress</source>
-        <translation>進捗</translation>
+        <translation>Postup synchronizácie</translation>
     </message>
     <message>
         <source>Progress increase per hour</source>
-        <translation>一時間毎の進捗の変化</translation>
+        <translation>Prírastok postupu za hodinu</translation>
     </message>
     <message>
         <source>calculating...</source>
-        <translation>計算中...</translation>
+        <translation>počíta sa...</translation>
     </message>
     <message>
         <source>Estimated time left until synced</source>
-        <translation>同期が完了するまでの推定残り時間</translation>
+        <translation>Odhad času pre dokončenie synchronizácie</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation>非表示</translation>
+        <translation>Skryť</translation>
     </message>
     <message>
         <source>Unknown. Syncing Headers (%1, %2%)...</source>
-        <translation>不明。ヘッダー(%1、%2%)を同期中...</translation>
+        <translation>Neznáme. Synchronizujú sa hlavičky (%1, %2%)...</translation>
     </message>
 </context>
 <context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
-        <translation>URI を開く</translation>
+        <translation>Otvoriť URI</translation>
     </message>
     <message>
         <source>Open payment request from URI or file</source>
-        <translation>URI またはファイルから送金リクエストを開く</translation>
+        <translation>Otvoriť požiadavku na zaplatenie z URI alebo súboru</translation>
     </message>
     <message>
         <source>URI:</source>
@@ -1446,65 +1446,65 @@
     </message>
     <message>
         <source>Select payment request file</source>
-        <translation>送金リクエストファイルを選択してください</translation>
+        <translation>Vyberte súbor s výzvou k platbe</translation>
     </message>
     <message>
         <source>Select payment request file to open</source>
-        <translation>開きたい送金リクエストファイルを選択してください</translation>
+        <translation>Vyberte ktorý súbor s výzvou k platbe otvoriť</translation>
     </message>
 </context>
 <context>
     <name>OpenWalletActivity</name>
     <message>
         <source>Open wallet failed</source>
-        <translation>ウォレットを開くのに失敗しました</translation>
+        <translation>Otvorenie peňaženky zlyhalo</translation>
     </message>
     <message>
         <source>Open wallet warning</source>
-        <translation>ウォレット開示の警告</translation>
+        <translation>Upozornenie pri otvorení peňaženky</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>デフォルトのウォレット</translation>
+        <translation>predvolená peňaženka</translation>
     </message>
     <message>
         <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>&lt;b&gt;%1&lt;/b&gt;のウォレットを開封中...</translation>
+        <translation>Otvára sa peňaženka &lt;b&gt;%1&lt;/b&gt;...</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
         <source>Options</source>
-        <translation>オプション</translation>
+        <translation>Možnosti</translation>
     </message>
     <message>
         <source>&amp;Main</source>
-        <translation>メイン (&amp;M)</translation>
+        <translation>&amp;Hlavné</translation>
     </message>
     <message>
         <source>Size of &amp;database cache</source>
-        <translation>データベースキャッシュのサイズ (&amp;D)</translation>
+        <translation>&amp;Veľkosť vyrovnávacej pamäti databázy</translation>
     </message>
     <message>
         <source>Number of script &amp;verification threads</source>
-        <translation>スクリプト検証用スレッド数 (&amp;V)</translation>
+        <translation>Počet &amp;vlákien overujúcich skript</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
-        <translation>(0 = 自動、0以上 = 指定した数のコアをフリーにする)</translation>
+        <translation>(0 = auto, &lt;0 = nechať toľkoto voľných jadier)</translation>
     </message>
     <message>
         <source>W&amp;allet</source>
-        <translation>ウォレット (&amp;A)</translation>
+        <translation>&amp;Peňaženka</translation>
     </message>
     <message>
         <source>&amp;Appearance</source>
-        <translation>アピアランス(&amp;A)</translation>
+        <translation>&amp;Vzhľad</translation>
     </message>
     <message>
         <source>Prune &amp;block storage to</source>
-        <translation>へのプルーンとブロックストレージ</translation>
+        <translation>Orezať blok úložiska na</translation>
     </message>
     <message>
         <source>GB</source>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
         <source>Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation>この設定を元に戻すには、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
+        <translation>Vrátenie tohto nastavenia si vyžaduje opätovné stiahnutie celého blockchainu.</translation>
     </message>
     <message>
         <source>MiB</source>
@@ -1520,187 +1520,187 @@
     </message>
     <message>
         <source>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</source>
-        <translation>あなたのすべてのマスターノードをリストしている追加のタブを最初のサブタブに表示し&lt;br/&gt;すべてのマスターノードを次のサブタブに表示</translation>
+        <translation>Zobraziť dodatočnú záložku, ktorá vypíše všetky vaše masternódy v prvej pod-zložke&lt;br/&gt;- a všetky masternódy v druhej pod-zložke. </translation>
     </message>
     <message>
         <source>Show Masternodes Tab</source>
-        <translation>マスターノードタブを表示する</translation>
+        <translation>Ukázať záložku masternódov</translation>
     </message>
     <message>
         <source>Show additional tab listing governance proposals.</source>
-        <translation>ガバナンス提案の一覧を追加タブで表示します。</translation>
+        <translation>Zobraziť ďalšiu kartu so zoznamom návrhov.</translation>
     </message>
     <message>
         <source>Show Governance Tab</source>
-        <translation>ガバナンスタブを表示する</translation>
+        <translation>Zobraziť kartu dozoru</translation>
     </message>
     <message>
         <source>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</source>
-        <translation>もし未確認のチェンジを使用することを無効にする場合&lt;br/&gt;トランザクションから生じたチェンジはそのトランザクションが少なくとも一回コンファメーションがないと使用できません。&lt;br/&gt;これはまたあなたのウォレットの残高の計算にも影響を与えます。</translation>
+        <translation>Ak vypnete míňanie nepotvrdeného výdavku tak výdavok z transakcie &lt;br&gt;bude možné použiť až keď daná transakcia bude mať aspoň jedno potvrdenie.&lt;br/&gt; Toto má vplyv aj na výpočet vášho zostatku.</translation>
     </message>
     <message>
         <source>Show mixing interface on Overview screen and reveal an additional screen which allows to spend fully mixed coins only.&lt;br/&gt;A new tab with more settings will also appear in this dialog, please make sure to check them before mixing your coins.</source>
-        <translation>概要画面にミキシングインターフェースを表示し、完全にミキシングされたコインのみを使用できる追加画面を表示します。&lt;br/&gt;このダイアログには、他の設定ができる新しいタブも表示されますので、コインをミキシングする前に必ず確認してください。</translation>
+        <translation>Zobraziť mixovacie rozhranie na obrazovke prehľadu a odhaliť ďalšiu obrazovku, ktorá umožňuje minúť iba úplne zmiešané mince.&lt;br/&gt;V tomto dialógovom okne sa tiež zobrazí nová karta s ďalšími nastaveniami. Pred zmiešaním mincí ich prosím nezabudnite skontrolovať.</translation>
     </message>
     <message>
         <source>Show additional information and buttons on overview screen.</source>
-        <translation>概要画面に追加情報とボタンを表示します。</translation>
+        <translation>Na obrazovke s prehľadom zobraziť dodatočné informácie a tlačítka.</translation>
     </message>
     <message>
         <source>Enable advanced interface</source>
-        <translation>高度なインターフェイスを有効にする</translation>
+        <translation>Zapnúť pokročilé rozhranie</translation>
     </message>
     <message>
         <source>Show system popups for mixing transactions&lt;br/&gt;just like for all other transaction types.</source>
-        <translation>他の全ての取引タイプと同様に、&lt;br/&gt;ミキシング取引にもシステムポップアップを表示します。</translation>
+        <translation>Zobraziť vyskakovacie okná pre miešacie transakcie,&lt;br/&gt; tak ako pre ostatné typy transakcií.</translation>
     </message>
     <message>
         <source>Show popups for mixing transactions</source>
-        <translation>ミキシング取引のポップアップを表示する</translation>
+        <translation>Zobraziť vyskakovacie okná pre miešacie transakcie </translation>
     </message>
     <message>
         <source>Show warning dialog when the wallet has very low number of keys left.</source>
-        <translation>ウォレットのキーの残量が非常に少なくなった場合に、警告ダイアログを表示するようにします。</translation>
+        <translation>Zobraziť dialóg s upozornením ak má vaša peňaženka veľmi málo zostávajúcich kľúčov.</translation>
     </message>
     <message>
         <source>Warn if the wallet is running out of keys</source>
-        <translation>ウォレットのキーが不足している場合に警告を表示する</translation>
+        <translation>Upozorniť ak peňaženke dochádzajú kľúče</translation>
     </message>
     <message>
         <source>Whether to use experimental mode with multiple mixing sessions per block.&lt;br/&gt;Note: You must use this feature carefully.&lt;br/&gt;Make sure you always have recent wallet (auto)backup in a safe place!</source>
-        <translation>ブロックごとに複数のミキシングセッションを行う実験モードを使用する場合。&lt;br/&gt;注意事項：この機能は慎重に使用する必要があります。&lt;br/&gt;常に安全な場所に最新のウォレットの（自動）バックアップをとっておくようにしてください。</translation>
+        <translation>Použiť alebo nepoužiť experimentálny mód s viacerými miešaniami za jeden block.&lt;br/&gt;Poznámka: Túto funkciu používajte opatrne.&lt;br/&gt;Uistite sa, že vždy máte súčasnú peňaženku zálohovanú na bezpečnom mieste.</translation>
     </message>
     <message>
         <source>Enable &amp;multi-session</source>
-        <translation>マルチセッションを有効にする</translation>
+        <translation>Zapnúť &amp;multi-sekciové</translation>
     </message>
     <message>
         <source>Mixing rounds</source>
-        <translation>ミキシングラウンド</translation>
+        <translation>Miešacie kolá</translation>
     </message>
     <message>
         <source>This amount acts as a threshold to turn off mixing once it's reached.</source>
-        <translation>この量に達すると、ミキシングがオフになる閾値として機能します。</translation>
+        <translation>Táto suma slúži ako hranica pre vypnutie miešania akonáhle je dosiahnutá.</translation>
     </message>
     <message>
         <source>Target balance</source>
-        <translation>対象残高</translation>
+        <translation>Cieľový zostatok</translation>
     </message>
     <message>
         <source>Automatically open the Wagerr Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自動的にルーターのWagerr Core クライアントポートを開放します。これはルーターがUPnP機能をサポートしておりUPnP機能が有効な場合にのみ機能します。</translation>
+        <translation>Automaticky otvoriť na smerovači port pre Wagerr Core klient. Toto funguje iba ak váš smerovač  podporuje UPnP a je povolené</translation>
     </message>
     <message>
         <source>Automatically open the Bitcoin client port on the router. This only works when your router supports NAT-PMP and it is enabled. The external port could be random.</source>
-        <translation>ルーターでBitcoinクライアントポートを自動的に開きます。これは、ルーターがNAT-PMPをサポートし、それが有効になっている場合にのみ機能します。外部ポートはランダムになる可能性があります。</translation>
+        <translation>Automaticky otvorte bitcoinový klientsky port na smerovači. Funguje to len vtedy, keď váš smerovač podporuje NAT-PMP a je povolený. Externý port môže byť náhodný.</translation>
     </message>
     <message>
         <source>Map port using NA&amp;T-PMP</source>
-        <translation>NA&amp;T-PMPを使用したマップポート</translation>
+        <translation>Mapovať port pomocou NA&amp;T-PMP</translation>
     </message>
     <message>
         <source>Accept connections from outside.</source>
-        <translation>外部からの接続を許可する。</translation>
+        <translation>Prijímať spojenia zvonka.</translation>
     </message>
     <message>
         <source>Allow incomin&amp;g connections</source>
-        <translation>受信接続を許可する</translation>
+        <translation>Povoliť pric&amp;hádzajúce spojenia</translation>
     </message>
     <message>
         <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>SOCKS5プロキシ経由でWagerrネットワークに接続します。</translation>
+        <translation>Pripojiť sa do siete Wagerr cez proxy SOCKS5.</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
-        <translation>SOCKS5プロキシ（デフォルトプロキシ）経由で接続： (&amp;C)</translation>
+        <translation>&amp;Pripojiť sa cez SOCKS5 proxy (predvolené proxy):</translation>
     </message>
     <message>
         <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
-        <translation>指定されたデフォルトのSOCKS5プロキシを使用して、このネットワークタイプ経由でピアに到達するかどうかを表示。</translation>
+        <translation>Zobrazuje či je poskytované predvolené SOCKS5 proxy používané pre získavanie peerov cez tento typ siete.</translation>
     </message>
     <message>
         <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</source>
-        <translation>Torの非表示サービスを経由してピアに到達するために、別のSOCKS&amp;5プロキシを使用します。</translation>
+        <translation>Použiť samostatný SOCKS&amp;5 proxy server na dosiahnutie počítačov cez skryté služby Tor:</translation>
     </message>
     <message>
         <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
-        <translation>このダイアログで設定されたオプションは、コマンドラインまたは設定ファイルによって上書きされます。</translation>
+        <translation>Možnosti nastavené v tomto dialógovom okne sú prepísané príkazovým riadkom alebo v konfiguračnom súbore:</translation>
     </message>
     <message>
         <source>Hide the icon from the system tray.</source>
-        <translation>システムトレイからアイコンを非表示にします。</translation>
+        <translation>Skryť ikonu zo systémovej lišty.</translation>
     </message>
     <message>
         <source>&amp;Hide tray icon</source>
-        <translation>トレイアイコンを非表示にする(&amp;H)</translation>
+        <translation>&amp;Skryť ikonu v oblasti oznámení</translation>
     </message>
     <message>
         <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
-        <translation>ウィンドウを閉じる際にアプリケーションを終了するのではなく最小化します。このオプションが有効の場合、メニューから終了を選択した場合にのみアプリケーションは閉じられます。</translation>
+        <translation>Minimalizovať namiesto ukončenia aplikácie keď sa okno zavrie. Keď je zvolená táto možnosť, aplikácia sa zavrie len po zvolení Ukončiť v menu.</translation>
     </message>
     <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items.&lt;br/&gt;%s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
-        <translation>メニューアイテムとしてトランザクションタブに表示されるサードパーティのURL (例 ブロックエクスプローラー) :&lt;br/&gt;%s はトランザクションハッシュに置き換えられます。複数のURLは"|"によって区切られます。</translation>
+        <translation>URL tretích strán (napr. prehliadač blockchain) ktoré sa zobrazujú v záložke transakcií ako položky kontextového menu.&lt;br/&gt; %s v URL je nahradené hash-om transakcie. Viaceré URL sú oddelené zvislou čiarou |.</translation>
     </message>
     <message>
         <source>&amp;Third party transaction URLs</source>
-        <translation>サードパーティのトランザクションURL(&amp;T)</translation>
+        <translation>&amp;URL transakcií s tretími stranami</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
-        <translation>コインコントロール機能の表示／非表示</translation>
+        <translation>Či zobrazovať možnosti "Kontroly mincí" alebo nie.</translation>
     </message>
     <message>
         <source>Automatically start %1 after logging in to the system.</source>
-        <translation>システムにログインすると自動的に %1 を起動</translation>
+        <translation>Automaticky spustiť %1 pri prihlásení do systému.</translation>
     </message>
     <message>
         <source>&amp;Start %1 on system login</source>
-        <translation>システムログイン時に %1 を起動 (&amp;S)</translation>
+        <translation>&amp;Spustiť %1 pri prihlásení</translation>
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
-        <translation>コインコントロール機能を有効化 (&amp;C)</translation>
+        <translation>Povoliť možnosti "&amp;kontroly mincí"</translation>
     </message>
     <message>
         <source>&amp;Spend unconfirmed change</source>
-        <translation>未検証のチェンジを使用 (&amp;S)</translation>
+        <translation>&amp;Minúť nepotvrdený výdavok</translation>
     </message>
     <message>
         <source>This setting determines the amount of individual masternodes that an input will be mixed through.&lt;br/&gt;More rounds of mixing gives a higher degree of privacy, but also costs more in fees.</source>
-        <translation>この設定は、入力がミキシングされる個々のマスターノードの量を指定します。&lt;br/&gt;ミキシングのラウンド数を増やすと、より高度なプライバシーが得られますが、その分料金も高くなります。</translation>
+        <translation>Toto nastavenie určuje množstvo jednotlivých masternódov cez ktoré sa bude miešať vstup.&lt;br/&gt; Viac kôl miešania poskytuje väčšiu úroveň súkromia, ale tiež stojí viac na poplatkoch.</translation>
     </message>
     <message>
         <source>&amp;Network</source>
-        <translation>ネットワーク (&amp;N)</translation>
+        <translation>&amp;Sieť</translation>
     </message>
     <message>
         <source>Enabling pruning significantly reduces the disk space required to store transactions. All blocks are still fully validated. Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation>プルーニングを有効にすると、取引を保存するのに必要なディスク容量が大幅に削減されます。すべてのブロックは完全に検証されたままです。この設定を元に戻すには、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
+        <translation>Povolenie orezávania výrazne znižuje miesto na disku potrebné na ukladanie transakcií. Všetky bloky sú stále plne overené. Vrátenie tohto nastavenia si vyžaduje opätovné stiahnutie celého blockchainu.</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
-        <translation>UPnPを使ってポートを割り当て (&amp;U)</translation>
+        <translation>Mapovať port pomocou &amp;UPnP</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
-        <translation>プロキシの IP：(&amp;I) </translation>
+        <translation>Proxy &amp;IP:</translation>
     </message>
     <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
-        <translation>プロキシのIPアドレス (例 IPv4： 127.0.0.1 / IPv6： ::1)</translation>
+        <translation>IP adresy proxy (napr. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
     </message>
     <message>
         <source>&amp;Port:</source>
-        <translation>ポート ：(&amp;P)</translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
         <source>Port of the proxy (e.g. 9050)</source>
-        <translation>プロキシのポート番号 (例 9050)</translation>
+        <translation>Port proxy (napr. 9050)</translation>
     </message>
     <message>
         <source>Used for reaching peers via:</source>
-        <translation>ピアへ到達するために使われた方法:</translation>
+        <translation>Použité pre získavanie peerov cez:</translation>
     </message>
     <message>
         <source>IPv4</source>
@@ -1716,655 +1716,655 @@
     </message>
     <message>
         <source>Connect to the Wagerr network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Tor秘匿サービスを利用するため独立なSOCKS5プロキシ経由でWagerrネットワークに接続</translation>
+        <translation>Pripojiť sa do siete Wagerr cez oddelené SOCKS5 proxy pre skryté služby Tor.</translation>
     </message>
     <message>
         <source>Show only a tray icon after minimizing the window.</source>
-        <translation>ウインドウを最小化したあとトレイアイコンだけを表示</translation>
+        <translation>Zobraziť len ikonu na lište po minimalizovaní okna.</translation>
     </message>
     <message>
         <source>&amp;Minimize to the tray instead of the taskbar</source>
-        <translation>タスクバーの代わりにトレイに最小化 (&amp;M)</translation>
+        <translation>&amp;Zobraziť len ikonu na lište po minimalizovaní okna</translation>
     </message>
     <message>
         <source>M&amp;inimize on close</source>
-        <translation>閉じる時に最小化 (&amp;I)</translation>
+        <translation>M&amp;inimalizovať pri zatvorení</translation>
     </message>
     <message>
         <source>&amp;Display</source>
-        <translation>表示 (&amp;D)</translation>
+        <translation>&amp;Zobrazenie</translation>
     </message>
     <message>
         <source>User Interface &amp;language:</source>
-        <translation>ユーザインターフェースの言語 ：(&amp;L)</translation>
+        <translation>&amp;Jazyk užívateľského rozhrania:</translation>
     </message>
     <message>
         <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
-        <translation>ここでユーザーインターフェースの言語を設定できます。設定を反映するには %1 を再起動します。</translation>
+        <translation>Jazyk uživateľského rozhrania sa dá nastaviť tu. Toto nastavenie sa uplatní až po reštarte %1.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
 https://www.transifex.com/projects/p/wagerr/</source>
-        <translation>希望の言語がない場合または翻訳に問題がある場合はこちらで翻訳にご協力ください。:
+        <translation>Chýbajúci alebo nekompletný preklad? Pomôžte nám tu:
 https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
-        <translation>表示する単位 ：(&amp;U)</translation>
+        <translation>&amp;Zobrazovať hodnoty v jednotkách:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>インターフェース上の表示とコインの送金で使用するデフォルトの単位を選択</translation>
+        <translation>Zvoľte predvolenú jednotku delenia, ktorá sa zobrazí pri posielaní mincí</translation>
     </message>
     <message>
         <source>Decimal digits</source>
-        <translation>10進数</translation>
+        <translation>Decimálne čísla</translation>
     </message>
     <message>
         <source>Reset all client options to default.</source>
-        <translation>すべてのオプションを初期値に戻します。</translation>
+        <translation>Vynulovať všetky voľby klienta na predvolené.</translation>
     </message>
     <message>
         <source>&amp;Reset Options</source>
-        <translation>オプションのリセット (&amp;R)</translation>
+        <translation>&amp;Vynulovať voľby</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation>OK(&amp;O)</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation>キャンセル (&amp;C)</translation>
+        <translation>&amp;Zrušiť</translation>
     </message>
     <message>
         <source>Enable %1 features</source>
-        <translation>%1の機能を有効にする</translation>
+        <translation>Povoliť možnosti %1</translation>
     </message>
     <message>
         <source>default</source>
-        <translation>デフォルト設定</translation>
+        <translation>predvolené</translation>
     </message>
     <message>
         <source>Confirm options reset</source>
-        <translation>オプションのリセットの確認</translation>
+        <translation>Potvrdiť obnovenie možností</translation>
     </message>
     <message>
         <source>Client restart required to activate changes.</source>
-        <translation>変更を有効にするにはクライアントを再起動する必要があります。</translation>
+        <translation>Reštart klienta potrebný pre aktivovanie zmien.</translation>
     </message>
     <message>
         <source>Client will be shut down. Do you want to proceed?</source>
-        <translation>クライアントを終了します。続行してもよろしいですか？</translation>
+        <translation>Klient bude vypnutý, chcete pokračovať?</translation>
     </message>
     <message>
         <source>This change would require a client restart.</source>
-        <translation>この変更はクライアントの再起動が必要です。</translation>
+        <translation>Táto zmena by vyžadovala reštart klienta.</translation>
     </message>
     <message>
         <source>The supplied proxy address is invalid.</source>
-        <translation>プロキシアドレスが無効です。</translation>
+        <translation>Zadaná proxy adresa je neplatná.</translation>
     </message>
 </context>
 <context>
     <name>OverviewPage</name>
     <message>
         <source>Form</source>
-        <translation>フォーム</translation>
+        <translation>Forma</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>表示された情報は古いかもしれません。接続が確立されればあなたのウォレットは Wagerrネットワークと自動的に同期しますが、このプロセスはまだ完了していません。</translation>
+        <translation>Zobrazené informácie môžu byť zastaralé. Vaša peňaženka sa automaticky zosynchronizuje so sieťou Wagerr akonáhle nadviaže spojenie, avšak tento proces ešte nebol dokončený.</translation>
     </message>
     <message>
         <source>Available:</source>
-        <translation>利用可能：</translation>
+        <translation>Disponibilné:</translation>
     </message>
     <message>
         <source>Your current spendable balance</source>
-        <translation>あなたの利用可能な残高</translation>
+        <translation>Váš aktuálny disponibilný zostatok</translation>
     </message>
     <message>
         <source>Pending:</source>
-        <translation>検証待ち：</translation>
+        <translation>Čakajúce:</translation>
     </message>
     <message>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
-        <translation>未検証で利用可能残高に反映されていないトランザクション数</translation>
+        <translation>Suma transakcií ktoré ešte neboli potvrdené a ešte sa nepočítajú do disponibilného zostatku</translation>
     </message>
     <message>
         <source>Immature:</source>
-        <translation>未完成：</translation>
+        <translation>Nezrelé:</translation>
     </message>
     <message>
         <source>Mined balance that has not yet matured</source>
-        <translation>不完全な状態の残高</translation>
+        <translation>Vyťažený zostatok ktorý ešte nedosiahol zrelosť</translation>
     </message>
     <message>
         <source>Balances</source>
-        <translation>残高</translation>
+        <translation>Zostatky</translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
-        <translation>監視限定のアドレスへの未検証トランザクション</translation>
+        <translation>Nepotvrdené transakcie pre adresy ktoré sa iba sledujú</translation>
     </message>
     <message>
         <source>Mined balance in watch-only addresses that has not yet matured</source>
-        <translation>不完全な状態の監視限定のアドレスの残高</translation>
+        <translation>Vyťažená suma pre adresy ktoré sa iba sledujú ale ešte nie je dozretá</translation>
     </message>
     <message>
         <source>Total:</source>
-        <translation>合計：</translation>
+        <translation>Celkovo:</translation>
     </message>
     <message>
         <source>Your current total balance</source>
-        <translation>あなたの現在の残高の合計</translation>
+        <translation>Váš súčasný celkový zostatok</translation>
     </message>
     <message>
         <source>Current total balance in watch-only addresses</source>
-        <translation>監視限定アドレスの現在の残高の合計</translation>
+        <translation>Aktuálny celkový zostatok pre adries ktoré sa iba sledujú</translation>
     </message>
     <message>
         <source>Watch-only:</source>
-        <translation>ウォッチオンリー：</translation>
+        <translation>Iba sledované:</translation>
     </message>
     <message>
         <source>Your current balance in watch-only addresses</source>
-        <translation>あなたのウォッチオンリーのアドレスの現在の残高の合計</translation>
+        <translation>Váš celkový zostatok pre adresy ktoré sa iba sledujú</translation>
     </message>
     <message>
         <source>Spendable:</source>
-        <translation>使用可能：</translation>
+        <translation>Použiteľné:</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation>ステータス：</translation>
+        <translation>Stav:</translation>
     </message>
     <message>
         <source>Enabled/Disabled</source>
-        <translation>有効/無効</translation>
+        <translation>Zapnuté/Vypnuté</translation>
     </message>
     <message>
         <source>Completion:</source>
-        <translation>完了:</translation>
+        <translation>Dokončenie:</translation>
     </message>
     <message>
         <source>Amount and Rounds:</source>
-        <translation>金額とラウンド</translation>
+        <translation>Čiastka a kolá:</translation>
     </message>
     <message>
         <source>0 WAGERR / 0 Rounds</source>
-        <translation>0 WAGERR / 0 ラウンド</translation>
+        <translation>0 WAGERR / 0 Kôl</translation>
     </message>
     <message>
         <source>Submitted Denom:</source>
-        <translation>通貨単位:</translation>
+        <translation>Odoslaná denominácia:</translation>
     </message>
     <message>
         <source>n/a</source>
-        <translation>N/A</translation>
+        <translation>nie je k dispozícii</translation>
     </message>
     <message>
         <source>Recent transactions</source>
-        <translation>直近のトランザクション</translation>
+        <translation>Nedávne transakcie</translation>
     </message>
     <message>
         <source>Start/Stop Mixing</source>
-        <translation>ミキシング開始/停止 </translation>
+        <translation>Začať/Zastaviť miešanie</translation>
     </message>
     <message>
         <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
-        <translation>マスターノードに送った通貨単位&lt;br&gt;ミキシングをするには他のユーザーが正確に同じ通貨単位を送る必要があります。</translation>
+        <translation>Denominácie ktoré ste odoslali na Masternode. &lt;br&gt;Pre miešanie, ostatný používatelia musia odoslať rovnakú sumu denominácií.</translation>
     </message>
     <message>
         <source>out of sync</source>
-        <translation>未同期</translation>
+        <translation>nesynchronizované</translation>
     </message>
     <message>
         <source>Automatic backups are disabled, no mixing available!</source>
-        <translation>自動バックアップが無効でミキシングは利用不可能です！</translation>
+        <translation>Automatické zálohy sú de-aktivované, miešanie nie je dostupné!</translation>
     </message>
     <message>
         <source>No inputs detected</source>
-        <translation>インプットが検知できません</translation>
+        <translation>Žiadne detekované vstupy</translation>
     </message>
     <message>
         <source>%1 Balance</source>
-        <translation>%1の残額</translation>
+        <translation>%1 Zostatok</translation>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
-        <translation><numerusform>%n ラウンド</numerusform></translation>
+        <translation><numerusform>%n kolo</numerusform><numerusform>%n kolá</numerusform><numerusform>%n kôl</numerusform><numerusform>%n kôl</numerusform></translation>
     </message>
     <message>
         <source>Found enough compatible inputs to mix %1</source>
-        <translation>%1をミキシングするのに十分な互換性のある入力が見つかりました。</translation>
+        <translation>Nájdený dostatok kompatibilných vstupov na miešanie %1</translation>
     </message>
     <message>
         <source>Not enough compatible inputs to mix &lt;span style='%1'&gt;%2&lt;/span&gt;,&lt;br&gt;will mix &lt;span style='%1'&gt;%3&lt;/span&gt; instead</source>
-        <translation>&lt;span style='%1'&gt;%2&lt;/span&gt;をミキシングするのに十分な互換性のある入力がないため、&lt;br&gt;代わりに&lt;span style='%1'&gt;%3&lt;/span&gt;をミキシングします。</translation>
+        <translation>Nedostatok kompatibilných vstupov na miešanie &lt;span style='%1'&gt;%2&lt;/span&gt;, &lt;br&gt; namieša namiesto toho &lt;span style='%1'&gt;%3&lt;/span&gt;</translation>
     </message>
     <message>
         <source>Overall progress</source>
-        <translation>すべての進捗</translation>
+        <translation>Celkový progres</translation>
     </message>
     <message>
         <source>Denominated</source>
-        <translation>ミキシング準備完了</translation>
+        <translation>Denominované </translation>
     </message>
     <message>
         <source>Partially mixed</source>
-        <translation>ミキシング一部完了</translation>
+        <translation>Čiastočne zmiešané</translation>
     </message>
     <message>
         <source>Mixed</source>
-        <translation>ミキシング完了</translation>
+        <translation>Zmiešané</translation>
     </message>
     <message numerus="yes">
         <source>Denominated inputs have %5 of %n rounds on average</source>
-        <translation><numerusform>分割されるインプットは平均的に %5 ／ %n ラウンド です。</numerusform></translation>
+        <translation><numerusform>Denominované vstup má v priemere %5 z %n kôl</numerusform><numerusform>Denominované vstupy majú v priemere %5 z %n kôl</numerusform><numerusform>Denominované vstupy majú v priemere %5 z %n kôl</numerusform><numerusform>Denominované vstupy majú v priemere %5 z %n kôl</numerusform></translation>
     </message>
     <message>
         <source>keys left: %1</source>
-        <translation>残されたキー: %1</translation>
+        <translation>zostávajúce kľúče: %1</translation>
     </message>
     <message>
         <source>Start %1</source>
-        <translation>%1を開始する</translation>
+        <translation>Začať %1</translation>
     </message>
     <message>
         <source>If you don't want to see internal %1 fees/transactions select "Most Common" as Type on the "Transactions" tab.</source>
-        <translation>内部にある%1の料金や取引を表示しない場合は、「取引」タブでタイプとして「最も一般的なもの」を選択します。</translation>
+        <translation>Ak nechcete vidieť interné %1 poplatky/transakcie, vyberte "Najčastejšie" ako typ na záložke "Transakcie".</translation>
     </message>
     <message>
         <source>%1 requires at least %2 to use.</source>
-        <translation>%1を使用するには、最低%2が必要です。</translation>
+        <translation>Pre použitie vyžaduje %1 aspoň %2.</translation>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling %1.</source>
-        <translation>ウォレットがロックされ、ユーザーがロック解除を拒否しました。%1を無効にしています。</translation>
+        <translation>Peňaženka je zamknutá a používateľ ju odmietol odomknúť. Vypínam %1.</translation>
     </message>
     <message>
         <source>Stop %1</source>
-        <translation>%1を停止する</translation>
+        <translation>Zastaviť %1</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation>無効</translation>
+        <translation>Vypnuté</translation>
     </message>
     <message>
         <source>Very low number of keys left since last automatic backup!</source>
-        <translation>前回の自動バックアップから残されたキーの数がほとんどありません！</translation>
+        <translation>Od poslednej automatickej zálohy zostáva veľmi málo kľúčov!</translation>
     </message>
     <message>
         <source>We are about to create a new automatic backup for you, however &lt;span style='%1'&gt; you should always make sure you have backups saved in some safe place&lt;/span&gt;!</source>
-        <translation>今から新しい自動バックアップを作成しますが、&lt;span style='%1'&gt;常に安全な場所にバックアップが保存されていることを確認してください&lt;/span&gt;。</translation>
+        <translation>Chystáme sa pre Vás vytvoriť automatickú zálohu, avšak &lt;span style='%1'&gt;mali by ste sa uistiť, že máte zálohy uložené na bezpečnom mieste&lt;/span&gt;!</translation>
     </message>
     <message>
         <source>Note: You can turn this message off in options.</source>
-        <translation>注記: このメッセージはオプションで非表示にできます。</translation>
+        <translation>Poznámka: Túto správu môžete vypnúť v nastaveniach.</translation>
     </message>
     <message>
         <source>WARNING! Something went wrong on automatic backup</source>
-        <translation>警告! 自動バックアップに異常が生じています。</translation>
+        <translation>UPOZORNENIE: S automatickými zálohami nie je niečo v poriadku</translation>
     </message>
     <message>
         <source>ERROR! Failed to create automatic backup</source>
-        <translation>エラー! 自動バックアップ作成に失敗しました。</translation>
+        <translation>CHYBA! Nepodarilo sa vytvoriť automatickú zálohu</translation>
     </message>
     <message>
         <source>Mixing is disabled, please close your wallet and fix the issue!</source>
-        <translation>ミキシングは無効です。ウォレットを閉じて問題を解決してください。</translation>
+        <translation>Miešanie je vypnuté. Zatvorte prosím vašu peňaženku a opravte problém.</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>有効</translation>
+        <translation>Povolené </translation>
     </message>
     <message>
         <source>see debug.log for details.</source>
-        <translation>詳細を debug.log で確認</translation>
+        <translation>podrobnosti nájdete v debug.log.</translation>
     </message>
     <message>
         <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
-        <translation>警告! キープールの補充に失敗しました。ウォレットをアンロックしてキープールを補充してください</translation>
+        <translation>UPOZORNENIE! Chyba pri doplňovaní zásobníku kľúčov. Pre doplnenie musíte odomknúť vašu peňaženku.</translation>
     </message>
 </context>
 <context>
     <name>PaymentServer</name>
     <message>
         <source>Payment request error</source>
-        <translation>支払いリクエストのエラー</translation>
+        <translation>Chyba pri vyžiadaní platby</translation>
     </message>
     <message>
         <source>Cannot start wagerr: click-to-pay handler</source>
-        <translation>Wagerr を起動できません: click-to-pay ハンドラー</translation>
+        <translation>Wagerr sa nedá spustiť: click-to-pay handler</translation>
     </message>
     <message>
         <source>URI handling</source>
-        <translation>URI のハンドリング</translation>
+        <translation>Spracovanie URI</translation>
     </message>
     <message>
         <source>'wagerr://' is not a valid URI. Use 'wagerr:' instead.</source>
-        <translation>「wagerr://」は有効なURIではありません。代わりに「wagerr:」を使ってください。</translation>
+        <translation>„wagerr://“ nie je platný URI. Namiesto toho použite „wagerr:“.</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
-        <translation>支払いリクエストの取得先URLが無効です： %1</translation>
+        <translation>URL pre stiahnutie výzvy na zaplatenie je neplatné: %1</translation>
     </message>
     <message>
         <source>Cannot process payment request because BIP70 support was not compiled in.</source>
-        <translation>BIP70のサポートがコンパイルされていないため、支払いリクエストを処理できません。</translation>
+        <translation>Nie je možné spracovať žiadosť o platbu, pretože podpora BIP70 nebola skompilovaná.</translation>
     </message>
     <message>
         <source>Invalid payment address %1</source>
-        <translation>支払いのアドレス　%1　は無効です</translation>
+        <translation>Neplatná adresa platby %1</translation>
     </message>
     <message>
         <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI を解析できません! これは無効な Wagerr アドレスあるいは不正な形式の URI パラメーターによって引き起こされた可能性があります。</translation>
+        <translation>URI sa nedá analyzovať! Toto môže byť spôsobené neplatnou Wagerr adresou, alebo nesprávnym tvarom URI parametrov.</translation>
     </message>
     <message>
         <source>Payment request file handling</source>
-        <translation>支払いリクエストファイルを処理しています</translation>
+        <translation>Obsluha súboru s požiadavkou na platbu</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
-        <translation>支払いリクエストファイルを読み込めませんでした！無効な支払いリクエストファイルが原因である可能性があります。</translation>
+        <translation>Súbor s požiadavkou na platbu sa nedá prečítať! Môže to byť spôsobené neplatným súborom s požiadavkou.</translation>
     </message>
     <message>
         <source>Payment request rejected</source>
-        <translation>支払い要求は拒否されました</translation>
+        <translation>Požiadavka na platbu zamietnutá</translation>
     </message>
     <message>
         <source>Payment request network doesn't match client network.</source>
-        <translation>支払いリクエストのネットワークは現在のクライアントのネットワークに一致しません。</translation>
+        <translation>Sieť požiadavky na platbu sa nezhoduje s klientovou sieťou</translation>
     </message>
     <message>
         <source>Payment request expired.</source>
-        <translation>支払いリクエストの期限が切れました。</translation>
+        <translation>Vypršala platnosť požiadavky na platbu.</translation>
     </message>
     <message>
         <source>Payment request is not initialized.</source>
-        <translation>支払いリクエストは開始されていません。</translation>
+        <translation>Požiadavka na platbu nie je inicializovaná.</translation>
     </message>
     <message>
         <source>Unverified payment requests to custom payment scripts are unsupported.</source>
-        <translation>カスタム支払いスクリプトに対する未検証の支払いリクエストはサポートされていません。</translation>
+        <translation>Program nepodporuje neoverené platobné výzvy na vlastná skripty.</translation>
     </message>
     <message>
         <source>Invalid payment request.</source>
-        <translation>無効な支払いリクエスト。</translation>
+        <translation>Chybná požiadavka na platbu.</translation>
     </message>
     <message>
         <source>Requested payment amount of %1 is too small (considered dust).</source>
-        <translation>リクエストされた支払い額 %1 は少なすぎます (ダストとみなされます)。</translation>
+        <translation>Požadovaná platba sumy  %1 je príliš malá (považovaná za prach).</translation>
     </message>
     <message>
         <source>Refund from %1</source>
-        <translation>%1 からの返金</translation>
+        <translation>Vrátené z %1</translation>
     </message>
     <message>
         <source>Payment request %1 is too large (%2 bytes, allowed %3 bytes).</source>
-        <translation>支払リクエスト %1 は大きすぎます（%2bytesですが、上限%3bytesまで許されます）。</translation>
+        <translation>Požiadavka na platbu %1 je príliš veľká (%2 bytov, dovolených %3 bytov).</translation>
     </message>
     <message>
         <source>Error communicating with %1: %2</source>
-        <translation>%1: %2とコミュニケーションエラー</translation>
+        <translation>Chyba komunikácie s %1: %2 </translation>
     </message>
     <message>
         <source>Payment request cannot be parsed!</source>
-        <translation>支払いリクエストを読み込めませんでした！</translation>
+        <translation>Požiadavka na platbu sa nedá analyzovať!</translation>
     </message>
     <message>
         <source>Bad response from server %1</source>
-        <translation>サーバー %1のレスポンスは無効</translation>
+        <translation>Zlá odpoveď zo servera %1</translation>
     </message>
     <message>
         <source>Network request error</source>
-        <translation>ネットワークリクエストのエラー</translation>
+        <translation>Chyba požiadavky siete</translation>
     </message>
     <message>
         <source>Payment acknowledged</source>
-        <translation>支払いを確認しました</translation>
+        <translation>Platba potvrdená</translation>
     </message>
 </context>
 <context>
     <name>PeerTableModel</name>
     <message>
         <source>NodeId</source>
-        <translation>ノードID</translation>
+        <translation>ID uzlu</translation>
     </message>
     <message>
         <source>Node/Service</source>
-        <translation>ノード/サービス</translation>
+        <translation>Uzol/Služba</translation>
     </message>
     <message>
         <source>User Agent</source>
-        <translation>ユーザーエージェント</translation>
+        <translation>Agent používateľa</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation>Ping</translation>
+        <translation>Odozva</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>送金しました</translation>
+        <translation>Odoslané</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>受け取りました</translation>
+        <translation>Prijaté</translation>
     </message>
 </context>
 <context>
     <name>Proposal</name>
     <message>
         <source>Passing +%1</source>
-        <translation>+%1のパッシング</translation>
+        <translation>Prechádza +%1</translation>
     </message>
     <message>
         <source>Needs additional %1 votes</source>
-        <translation>%1の追加投票が必要です</translation>
+        <translation>Vyžaduje dodatočných %1 hlasov</translation>
     </message>
 </context>
 <context>
     <name>ProposalModel</name>
     <message>
         <source>Yes</source>
-        <translation>はい</translation>
+        <translation>Áno</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>いいえ</translation>
+        <translation>Nie</translation>
     </message>
     <message>
         <source>Hash</source>
-        <translation>ハッシュ</translation>
+        <translation>Hash</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>タイトル</translation>
+        <translation>Názov</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>起動</translation>
+        <translation>Štart</translation>
     </message>
     <message>
         <source>End</source>
-        <translation>終了</translation>
+        <translation>Koniec</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金額</translation>
+        <translation>Suma</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation>アクティブ</translation>
+        <translation>Aktívne</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>ステータス</translation>
+        <translation>Stav</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Choose data directory on startup (default: %u)</source>
-        <translation>起動時にデータディレクトリを選択する（デフォルト：%u）</translation>
+        <translation>Vyberte dátový priečinok pri štarte (predvolené: %u)</translation>
     </message>
     <message>
         <source>Set the font family. Possible values: %1. (default: %2)</source>
-        <translation>フォントファミリを設定する。設定可能な値：%1。(デフォルト：%2)</translation>
+        <translation>Nastaviť rodinu písma. Možné hodnoty: %1. (predvolené: %2)</translation>
     </message>
     <message>
         <source>Set a scale factor which gets applied to the base font size. Possible range %1 (smallest fonts) to %2 (largest fonts). (default: %3)</source>
-        <translation>基本の文字サイズに適用されるスケールファクターを設定します。設定可能な範囲は、%1（最小の文字）〜%2（最大の文字）です。（デフォルト：%3）</translation>
+        <translation>Nastavte mierku, ktorá sa použije na základnú veľkosť písma. Možný rozsah %1 (najmenšie písma) až %2 (najväčšie písma). (predvolené: %3)</translation>
     </message>
     <message>
         <source>Set the font weight for bold texts. Possible range %1 to %2 (default: %3)</source>
-        <translation>太字の文字の太さを設定します。設定可能範囲：%1〜%2（デフォルト：%3）</translation>
+        <translation>Nastavte váhu písma pre tučné texty. Možný rozsah %1 až %2 (predvolené : %3)</translation>
     </message>
     <message>
         <source>Set the font weight for normal texts. Possible range %1 to %2 (default: %3)</source>
-        <translation>通常の文字に対する文字の太さを設定します。設定可能範囲：%1〜%2（デフォルト：%3）</translation>
+        <translation>Nastavte váhu písma pre normálne texty. Možný rozsah %1 až %2 (predvolené : %3)</translation>
     </message>
     <message>
         <source>Set language, for example "de_DE" (default: system locale)</source>
-        <translation>言語を設定します。例：「de_DE」（デフォルト：システムロケール）</translation>
+        <translation>Nastaviť jazyk, napríklad "sk_SK" (predvolené: systémový)</translation>
     </message>
     <message>
         <source>Start minimized</source>
-        <translation>最小化を開始する</translation>
+        <translation>Spustiť minimalizované</translation>
     </message>
     <message>
         <source>Reset all settings changed in the GUI</source>
-        <translation>GUIで変更した設定をすべてリセットする</translation>
+        <translation>Zrušiť všetky zmeny v GUI</translation>
     </message>
     <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
-        <translation>支払いリクエストのSSLルート証明書を設定する（デフォルト：-system-）</translation>
+        <translation>Nastaviť koreňový certifikát pre výzvy na platbu (predvolené: -system-)</translation>
     </message>
     <message>
         <source>Show splash screen on startup (default: %u)</source>
-        <translation>起動時にスプラッシュ・スクリーンを表示（デフォルト：%u）</translation>
+        <translation>Zobraziť uvítaciu obrazovku pri spustení (predvolené: %u)</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
-        <translation>エラー：指定されたデータ・ディレクトリ「%1」は存在しません。</translation>
+        <translation>Chyba: Zadaný dátový adresár "%1" neexistuje.</translation>
     </message>
     <message>
         <source>Error: Cannot parse configuration file: %1.</source>
-        <translation>エラー：%1の構成ファイルを解析できません。</translation>
+        <translation>Chyba: Nie je možné načítať konfiguračný súbor: %1.</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>エラー：%1</translation>
+        <translation>Chyba: %1</translation>
     </message>
     <message>
         <source>Error: Failed to load application fonts.</source>
-        <translation>エラー：アプリケーションフォントの読み込みに失敗しました。</translation>
+        <translation>Chyba: Nepodarilo sa načítať písma aplikácie.</translation>
     </message>
     <message>
         <source>Error: Specified font-family invalid. Valid values: %1.</source>
-        <translation>エラー：指定されたフォントファミリが無効です。有効値：%1。</translation>
+        <translation>Chyba: Zadaná rodina fontov je neplatná. Platné hodnoty: %1.</translation>
     </message>
     <message>
         <source>Error: Specified font-weight-normal invalid. Valid range %1 to %2.</source>
-        <translation>エラー：指定された文字の太さ（通常）は無効です。有効範囲は、%1～%2です。</translation>
+        <translation>Chyba: Zadaná hodnota normálnej váhy fontu je neplatná. Platný rozsah %1 až %2.</translation>
     </message>
     <message>
         <source>Error: Specified font-weight-bold invalid. Valid range %1 to %2.</source>
-        <translation>エラー：指定された文字の太さ（太字）は無効です。有効範囲は、%1～%2です。</translation>
+        <translation>Chyba: Zadaná hodnota tučnej váhy fontu je neplatná. Platný rozsah %1 až %2.</translation>
     </message>
     <message>
         <source>Error: Specified font-scale invalid. Valid range %1 to %2.</source>
-        <translation>エラー：指定された文字の大きさは無効です。有効範囲は、%1～%2です。</translation>
+        <translation>Chyba: Zadaná hodnota škálovania fontu je neplatná. Platný rozsah %1 až %2.</translation>
     </message>
     <message>
         <source>Error: Invalid -custom-css-dir path.</source>
-        <translation>エラー：無効な-custom-css-dirパスです。</translation>
+        <translation>Chyba: Neplatná cesta -custom-css-dir.</translation>
     </message>
     <message>
         <source>Error: %1 CSS file(s) missing in -custom-css-dir path.</source>
-        <translation>エラー：%1のCSSファイルが-custom-css-dirパスにありません。</translation>
+        <translation>Chyba: %1 CSS súbor(ov) chýba v ceste -custom-css-dir.</translation>
     </message>
     <message>
         <source>%1 didn't yet exit safely...</source>
-        <translation>%1 はまだ安全に終了していません</translation>
+        <translation>%1 nebol ešte bezpečne ukončený...</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>総額</translation>
+        <translation>Suma</translation>
     </message>
     <message>
         <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Wagerrアドレスを入力してください (例 %1)</translation>
+        <translation>Zadajte Wagerr adresu (e.g. %1)</translation>
     </message>
     <message>
         <source>Appearance Setup</source>
-        <translation>アピアランスのセットアップ</translation>
+        <translation>Nastavenie vzhľadu</translation>
     </message>
     <message>
         <source>Please choose your preferred settings for the appearance of %1</source>
-        <translation>%1の表示に関して、お好みの設定をお選びください。</translation>
+        <translation>Vyberte prosím preferované nastavenia vzhľadu %1</translation>
     </message>
     <message>
         <source>This can also be adjusted later in the "Appearance" tab of the preferences.</source>
-        <translation>これは、初期設定の「表示」タブで後で調整することも可能です。</translation>
+        <translation>Toto je tiež možné upraviť neskôr na karte „Vzhľad“ v predvoľbách.</translation>
     </message>
     <message>
         <source>%1 d</source>
-        <translation>%1日</translation>
+        <translation>%1 d</translation>
     </message>
     <message>
         <source>%1 h</source>
-        <translation>%1時</translation>
+        <translation>%1 h</translation>
     </message>
     <message>
         <source>%1 m</source>
-        <translation>%1分</translation>
+        <translation>%1 m</translation>
     </message>
     <message>
         <source>%1 s</source>
-        <translation>%1秒</translation>
+        <translation>%1 s</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>なし</translation>
+        <translation>Žiadne</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation>N/A</translation>
+        <translation>Nie je k dispozícii</translation>
     </message>
     <message>
         <source>%1 ms</source>
-        <translation>%1ミリ秒</translation>
+        <translation>%1 ms</translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
-        <translation><numerusform>%n 秒</numerusform></translation>
+        <translation><numerusform>%n sekunda</numerusform><numerusform>%n sekundy</numerusform><numerusform>%n sekúnd</numerusform><numerusform>%n sekúnd</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation><numerusform>%n 分</numerusform></translation>
+        <translation><numerusform>%n minúta</numerusform><numerusform>%n minúty</numerusform><numerusform>%n minút</numerusform><numerusform>%n minút</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation><numerusform>%n 時間</numerusform></translation>
+        <translation><numerusform>%n hodina</numerusform><numerusform>%n hodiny</numerusform><numerusform>%n hodín</numerusform><numerusform>%n hodín</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation><numerusform>%n 日</numerusform></translation>
+        <translation><numerusform>%n deň</numerusform><numerusform>%n dni</numerusform><numerusform>%n dní</numerusform><numerusform>%n dní</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
-        <translation><numerusform>%n 週</numerusform></translation>
+        <translation><numerusform>%n týždeň</numerusform><numerusform>%n týždne</numerusform><numerusform>%n týždňov</numerusform><numerusform>%n týždňov</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation><numerusform>%n 年</numerusform></translation>
+        <translation><numerusform>%n rok</numerusform><numerusform>%n roky</numerusform><numerusform>%n rokov</numerusform><numerusform>%n rokov</numerusform></translation>
     </message>
     <message>
         <source>%1 and %2</source>
-        <translation>%1 と %2</translation>
+        <translation> %1 a  %2</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -2384,617 +2384,617 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>不明</translation>
+        <translation>neznámy</translation>
     </message>
 </context>
 <context>
     <name>QRDialog</name>
     <message>
         <source>QR-Code Title</source>
-        <translation>QRコードタイトル</translation>
+        <translation>Názov QR-kódu</translation>
     </message>
     <message>
         <source>QR Code</source>
-        <translation>QRコード</translation>
+        <translation>QR kód</translation>
     </message>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>画像を保存...(&amp;S)</translation>
+        <translation>&amp;Uložiť obrázok...</translation>
     </message>
     <message>
         <source>Error creating QR Code.</source>
-        <translation>QRコード生成エラー</translation>
+        <translation>Chyba pri vytváraní QR kódu.</translation>
     </message>
 </context>
 <context>
     <name>QRGeneralImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>画像を保存...(&amp;S)</translation>
+        <translation>&amp;Uložiť obrázok...</translation>
     </message>
     <message>
         <source>&amp;Copy Image</source>
-        <translation>画像をコピー(&amp;C)</translation>
+        <translation>&amp;Kopírovať obrázok</translation>
     </message>
     <message>
         <source>Save QR Code</source>
-        <translation>QR コードの保存</translation>
+        <translation>Uložiť QR Code</translation>
     </message>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>PNG画像ファイル(*.png)</translation>
+        <translation>PNG obrázok (*.png)</translation>
     </message>
 </context>
 <context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>画像を保存… (&amp;S)</translation>
+        <translation>&amp;Uložiť obrázok...</translation>
     </message>
     <message>
         <source>&amp;Copy Image</source>
-        <translation>画像をコピー(&amp;C)</translation>
+        <translation>&amp;Kopírovať obrázok</translation>
     </message>
     <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation>結果のURIが長すぎるため、ラベル/メッセージのテキストを減らしてみてください。</translation>
+        <translation>Výsledné URI je príliš dlhé, skrátite text pre popis / správu.</translation>
     </message>
     <message>
         <source>Error encoding URI into QR Code.</source>
-        <translation>URIをQRコードにエンコードする際にエラーが発生しました。</translation>
+        <translation>Chyba v zakódovaní URI do QR kódu</translation>
     </message>
     <message>
         <source>QR code support not available.</source>
-        <translation>QRコードには対応していません。</translation>
+        <translation>Podpora QR kódov nie je k dispozícii.</translation>
     </message>
     <message>
         <source>Save QR Code</source>
-        <translation>QR コードの保存</translation>
+        <translation>Uložiť QR kód</translation>
     </message>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>PNG画像ファイル(*.png)</translation>
+        <translation>PNG obrázok (*.png)</translation>
     </message>
 </context>
 <context>
     <name>RPCConsole</name>
     <message>
         <source>Tools window</source>
-        <translation>ツールウィンドウ</translation>
+        <translation>Okno nástrojov</translation>
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>インフォメーション (&amp;I)</translation>
+        <translation>&amp;Informácie</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>一般</translation>
+        <translation>Všeobecné</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>名前</translation>
+        <translation>Názov</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation>N/A</translation>
+        <translation>Nie je k dispozícii</translation>
     </message>
     <message>
         <source>Number of connections</source>
-        <translation>接続数</translation>
+        <translation>Počet pripojení</translation>
     </message>
     <message>
         <source>&amp;Open</source>
-        <translation>開く (&amp;O)</translation>
+        <translation>&amp;Otvoriť</translation>
     </message>
     <message>
         <source>Startup time</source>
-        <translation>起動した日時</translation>
+        <translation>Čas spustenia</translation>
     </message>
     <message>
         <source>Network</source>
-        <translation>ネットワーク</translation>
+        <translation>Sieť</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation>最終ブロックの日時</translation>
+        <translation>Čas posledného bloku</translation>
     </message>
     <message>
         <source>Debug log file</source>
-        <translation>デバッグ用ログファイル</translation>
+        <translation>Súbor záznamu ladenia</translation>
     </message>
     <message>
         <source>Client version</source>
-        <translation>クライアントのバージョン</translation>
+        <translation>Verzia klienta</translation>
     </message>
     <message>
         <source>Block chain</source>
-        <translation>ブロックチェーン</translation>
+        <translation>Reťazec blokov</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
-        <translation>マスターノードの数</translation>
+        <translation>Počet masternódov</translation>
     </message>
     <message>
         <source>Memory Pool</source>
-        <translation>メモリープール</translation>
+        <translation>Pamäť Poolu</translation>
     </message>
     <message>
         <source>Current number of transactions</source>
-        <translation>現在のトランザクション数</translation>
+        <translation>Aktuálny počet transakcií</translation>
     </message>
     <message>
         <source>Memory usage</source>
-        <translation>メモリ使用量</translation>
+        <translation>Využitie pamäte</translation>
     </message>
     <message>
         <source>&amp;Console</source>
-        <translation>コンソール (&amp;C)</translation>
+        <translation>&amp;Konzola</translation>
     </message>
     <message>
         <source>Clear console</source>
-        <translation>コンソールをクリア</translation>
+        <translation>Vymazať konzolu</translation>
     </message>
     <message>
         <source>&amp;Network Traffic</source>
-        <translation>ネットワークトラフィック (&amp;N)</translation>
+        <translation>&amp;Sieťová prevádzka</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>受取完了</translation>
+        <translation>Prijaté</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>送金完了</translation>
+        <translation>Odoslané</translation>
     </message>
     <message>
         <source>&amp;Peers</source>
-        <translation>ピア (&amp;P)</translation>
+        <translation>&amp;Partnerské uzly</translation>
     </message>
     <message>
         <source>Wallet:</source>
-        <translation>ウォレット：</translation>
+        <translation>Peňaženka:</translation>
     </message>
     <message>
         <source>Banned peers</source>
-        <translation>Banされたピア</translation>
+        <translation>Zablokované spojenia</translation>
     </message>
     <message>
         <source>Select a peer to view detailed information.</source>
-        <translation>詳細を確認したいピアを選択してください。</translation>
+        <translation>Pre detailné informácie vyberte partnerský uzol.</translation>
     </message>
     <message>
         <source>Whitelisted</source>
-        <translation>ホワイトリスト</translation>
+        <translation>Povolené</translation>
     </message>
     <message>
         <source>Direction</source>
-        <translation>ディレクション</translation>
+        <translation>Smer</translation>
     </message>
     <message>
         <source>Version</source>
-        <translation>バージョン</translation>
+        <translation>Verzia</translation>
     </message>
     <message>
         <source>Starting Block</source>
-        <translation>開始ブロック</translation>
+        <translation>Počiatočný Blok</translation>
     </message>
     <message>
         <source>Synced Headers</source>
-        <translation>同期済みヘッダ</translation>
+        <translation>Synchronizované hlavičky</translation>
     </message>
     <message>
         <source>Synced Blocks</source>
-        <translation>同期済みブロック</translation>
+        <translation>Synchronizované bloky</translation>
     </message>
     <message>
         <source>Rescan blockchain files 1</source>
-        <translation>ブロックチェーンファイル1の再スキャンをする</translation>
+        <translation>Znova prehľadať blockchain 1</translation>
     </message>
     <message>
         <source>Rescan blockchain files 2</source>
-        <translation>ブロックチェーンファイル2の再スキャンをする</translation>
+        <translation>Znova prehľadať blockchain 2</translation>
     </message>
     <message>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockchain files or missing/obsolete transactions.</source>
-        <translation>下記のボタンは、ウォレットを修復し、破損したブロックチェーンファイルや欠落または削除された取引の問題を修正するためのコマンドラインオプションを使用してウォレットを再起動します。</translation>
+        <translation>Nižšie uvedené tlačidlá reštartujú peňaženku s možnosťami príkazového riadka na opravu peňaženky, riešenie problémov s poškodenými súbormi blockchainu alebo chýbajúcimi/zastaranými transakciami.</translation>
     </message>
     <message>
         <source>-rescan=1: Rescan the block chain for missing wallet transactions starting from wallet creation time.</source>
-        <translation>-rescan=1：ウォレット作成時から始まるウォレット取引の欠落のために、ブロックチェーンを再スキャンします。</translation>
+        <translation>-rescan=1: Znova prehľadať reťazec blokov pre nájdenie chýbajúcich transakcií peňaženky od času jej vytvorenia.</translation>
     </message>
     <message>
         <source>-rescan=2: Rescan the block chain for missing wallet transactions starting from genesis block.</source>
-        <translation>-rescan=2：ジェネシスブロックから始まるウォレット取引の欠落のために、ブロックチェーンを再スキャンします。</translation>
+        <translation>-rescan=2: Znova prehľadať reťazec blokov pre nájdenie chýbajúcich transakcií peňaženky od času vytvorenia prvého bloku.</translation>
     </message>
     <message>
         <source>Wallet Path</source>
-        <translation>ウォレットパス</translation>
+        <translation>Cesta k peňaženke</translation>
     </message>
     <message>
         <source>User Agent</source>
-        <translation>ユーザーエージェント</translation>
+        <translation>Agent používateľa</translation>
     </message>
     <message>
         <source>Datadir</source>
-        <translation>データディレクトリ</translation>
+        <translation>Priečinok s dátami</translation>
     </message>
     <message>
         <source>To specify a non-default location of the data directory use the '%1' option.</source>
-        <translation>データディレクトリのデフォルトでない場所を指定するには、「%1」のオプションを使用します。</translation>
+        <translation>Ak chcete zadať iné ako predvolené umiestnenie adresára údajov, použite voľbu '%1'.</translation>
     </message>
     <message>
         <source>Blocksdir</source>
-        <translation>ブロックディレクトリ</translation>
+        <translation>Blocksdir</translation>
     </message>
     <message>
         <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
-        <translation>ブロックディレクトリのデフォルトでない場所を指定するには、「%1」のオプションを使用します。</translation>
+        <translation>Ak chcete zadať iné ako predvolené umiestnenie adresára blokov, použite voľbu '%1'.</translation>
     </message>
     <message>
         <source>Current block height</source>
-        <translation>現在のブロックの高さ</translation>
+        <translation>Aktuálna výška bloku</translation>
     </message>
     <message>
         <source>Last block hash</source>
-        <translation>直近のブロックハッシュ</translation>
+        <translation>Hash posledný bloku</translation>
     </message>
     <message>
         <source>Latest ChainLocked block hash</source>
-        <translation>最新のチェーンロックされたブロックハッシュ</translation>
+        <translation>Najnovší blokový hash ChainLocked</translation>
     </message>
     <message>
         <source>Latest ChainLocked block height</source>
-        <translation>最新のチェーンロックされたブロックの高さ</translation>
+        <translation>Najnovšia výška bloku ChainLocked</translation>
     </message>
     <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>現在のデータディレクトリから %1 デバッグ用ログファイルを開きます。ログファイルが巨大な場合数秒かかることがあります。</translation>
+        <translation>Otvoriť %1 ladiaci výpis z aktuálnej zložky. Pri veľkých súboroch to môže chvíľu trvať.</translation>
     </message>
     <message>
         <source>InstantSend locks</source>
-        <translation>インスタントセンドロック</translation>
+        <translation>Zámky InstantSend</translation>
     </message>
     <message>
         <source>(none)</source>
-        <translation>(なし)</translation>
+        <translation>(žiadne)</translation>
     </message>
     <message>
         <source>Decrease font size</source>
-        <translation>文字サイズを縮小</translation>
+        <translation>Zmenšiť písmo</translation>
     </message>
     <message>
         <source>Increase font size</source>
-        <translation>文字サイズを拡大</translation>
+        <translation>Zväčšiť písmo</translation>
     </message>
     <message>
         <source>&amp;Reset</source>
-        <translation>&amp;リセット</translation>
+        <translation>&amp;Resetovať</translation>
     </message>
     <message>
         <source>Node Type</source>
-        <translation>ノードの種類</translation>
+        <translation>Typ uzla</translation>
     </message>
     <message>
         <source>PoSe Score</source>
-        <translation>PoSeスコア</translation>
+        <translation>PoSe skóre</translation>
     </message>
     <message>
         <source>Services</source>
-        <translation>サービス</translation>
+        <translation>Služby</translation>
     </message>
     <message>
         <source>Ban Score</source>
-        <translation>Banスコア</translation>
+        <translation>Skóre zákazu</translation>
     </message>
     <message>
         <source>Connection Time</source>
-        <translation>接続時間</translation>
+        <translation>Čas pripojenia</translation>
     </message>
     <message>
         <source>Last Send</source>
-        <translation>最終送信</translation>
+        <translation>Posledné poslané</translation>
     </message>
     <message>
         <source>Last Receive</source>
-        <translation>最終受信</translation>
+        <translation>Posledné prijaté</translation>
     </message>
     <message>
         <source>Ping Time</source>
-        <translation>Ping時間</translation>
+        <translation>Doba odozvy</translation>
     </message>
     <message>
         <source>The duration of a currently outstanding ping.</source>
-        <translation>現在実行中のpingにかかっている時間</translation>
+        <translation>Trvanie aktuálneho pingu</translation>
     </message>
     <message>
         <source>Ping Wait</source>
-        <translation>Ping待ち</translation>
+        <translation>Čakanie na ping</translation>
     </message>
     <message>
         <source>Min Ping</source>
-        <translation>最小Ping</translation>
+        <translation>Minimálna odozva</translation>
     </message>
     <message>
         <source>Time Offset</source>
-        <translation>時間オフセット</translation>
+        <translation>Časový posun</translation>
     </message>
     <message>
         <source>&amp;Wallet Repair</source>
-        <translation>ウォレット修復（&amp;W)</translation>
+        <translation>&amp;Oprava peňaženky</translation>
     </message>
     <message>
         <source>Recover transactions 1</source>
-        <translation>トランザクション1のリカバー</translation>
+        <translation>Znova prehľadať transakcie 1</translation>
     </message>
     <message>
         <source>Recover transactions 2</source>
-        <translation>トランザクション2のリカバー</translation>
+        <translation>Znova prehľadať transakcie 2</translation>
     </message>
     <message>
         <source>Upgrade wallet format</source>
-        <translation>ウォレットフォーマットのアップグレード</translation>
+        <translation>Inovovať formát peňaženky</translation>
     </message>
     <message>
         <source>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation>-zapwallettxes=1: ブロックチェーンからトランザクションをリカバーします(メタデータは保持します　例　アカウントオーナー)</translation>
+        <translation>-zapwallettxes=1: Obnoviť transakcie z blockchainu (zachovať metaúdaje, napr. vlastníka účtu).</translation>
     </message>
     <message>
         <source>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</source>
-        <translation>-zapwallettxes=2: ブロックチェーンからトランザクションをリカバーします (メタデータは保持しません)</translation>
+        <translation>-zapwallettxes=2: Obnoviť transakcie z blockchainu (zahodiť metaúdaje).</translation>
     </message>
     <message>
         <source>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation>-upgradewallet: 起動時にウォレットを最新のフォーマットにアップグレードします(注意: これはウォレット自体のアップグレードではありません！)</translation>
+        <translation>-upgradewallet: Inovácia peňaženky na posledný formát pri spustený. (Poznámka: toto NIE je aktualizácia samotnej peňaženky!)</translation>
     </message>
     <message>
         <source>Wallet repair options.</source>
-        <translation>ウォレット修復オプション</translation>
+        <translation>Možnosti opravy peňaženky.</translation>
     </message>
     <message>
         <source>Rebuild index</source>
-        <translation>インデックスのリビルド</translation>
+        <translation>Znova vytvoriť index</translation>
     </message>
     <message>
         <source>-reindex: Rebuild block chain index from current blk000??.dat files.</source>
-        <translation>-reindex: 現在の blk000??.dat ファイルからブロックチェーンインデックスをリビルドします</translation>
+        <translation>-reindex: Znovu vytvoriť index reťazca blokov zo súčastného blk000??.dat súboru.</translation>
     </message>
     <message>
         <source>&amp;Disconnect</source>
-        <translation>切断 (&amp;D)</translation>
+        <translation>&amp;Odpojiť</translation>
     </message>
     <message>
         <source>Ban for</source>
-        <translation>Banする:</translation>
+        <translation>Zakázať na</translation>
     </message>
     <message>
         <source>1 &amp;hour</source>
-        <translation>1時間 (&amp;H)</translation>
+        <translation>1 &amp;hodina</translation>
     </message>
     <message>
         <source>1 &amp;day</source>
-        <translation>1日 (&amp;D)</translation>
+        <translation>1 &amp;deň</translation>
     </message>
     <message>
         <source>1 &amp;week</source>
-        <translation>1週間 (&amp;W)</translation>
+        <translation>1 &amp;týždeň</translation>
     </message>
     <message>
         <source>1 &amp;year</source>
-        <translation>1年 (&amp;Y)</translation>
+        <translation>1 &amp;rok</translation>
     </message>
     <message>
         <source>&amp;Unban</source>
-        <translation>Banを解除する (&amp;U)</translation>
+        <translation>&amp;Zrušiť zákaz</translation>
     </message>
     <message>
         <source>Welcome to the %1 RPC console.</source>
-        <translation>%1 RPCコンソールへようこそ。</translation>
+        <translation>Vitajte v %1 RPC konzole</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
-        <translation>上下の矢印を使用して履歴をナビゲートし、 %1 を使用して画面をクリアします。</translation>
+        <translation>Použi šipky hore a dolu pre navigáciu históriou a %1 pre vyčistenie obrazovky.</translation>
     </message>
     <message>
         <source>Type %1 for an overview of available commands.</source>
-        <translation>利用可能なコマンドの概要については、%1と入力してください。</translation>
+        <translation>Zadajte %1 a získate prehľad dostupných príkazov.</translation>
     </message>
     <message>
         <source>For more information on using this console type %1.</source>
-        <translation>このコンソールの使用に関する詳細は、%1と入力してください。</translation>
+        <translation>Ďalšie informácie o používaní tejto konzoly získate zadaním %1.</translation>
     </message>
     <message>
         <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
-        <translation>警告：詐欺師は常にアクティブであり、ユーザーにここへのコマンドを入力させ、ウォレットの中身を盗みます。 コマンドの影響を完全に理解せずにこのコンソールを使用しないでください。</translation>
+        <translation>UPOZORNENIE: Podvodníci sú aktívni a hovoria používateľom, aby sem zadávali príkazy pričom kradnú obsah peňaženky. Nepoužívajte túto konzolu bez úplného pochopenia dopadov takýchto príkazov.</translation>
     </message>
     <message>
         <source>In:</source>
-        <translation>入力：</translation>
+        <translation>Dnu:</translation>
     </message>
     <message>
         <source>Out:</source>
-        <translation>出力：</translation>
+        <translation>Von:</translation>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation>ネットワーク活動は無効化されました</translation>
+        <translation>Sieťová aktivita zakázaná</translation>
     </message>
     <message>
         <source>Total: %1 (Enabled: %2)</source>
-        <translation>合計: %1 (有効: %2)</translation>
+        <translation>Celkovo: %1 (Povolené: %2)</translation>
     </message>
     <message>
         <source>Executing command without any wallet</source>
-        <translation>ウォレットなしでコマンドを実行する</translation>
+        <translation>Vykonávanie príkazu bez akejkoľvek peňaženky</translation>
     </message>
     <message>
         <source>Executing command using "%1" wallet</source>
-        <translation>「%1」のウォレットを使用してコマンドを実行する</translation>
+        <translation>Vykonávanie príkazu použitím peňaženky "%1"</translation>
     </message>
     <message>
         <source>(node id: %1)</source>
-        <translation>(ノードID: %1)</translation>
+        <translation>(ID uzlu: %1)</translation>
     </message>
     <message>
         <source>via %1</source>
-        <translation>%1経由</translation>
+        <translation>cez %1</translation>
     </message>
     <message>
         <source>never</source>
-        <translation>一度もなし</translation>
+        <translation>nikdy</translation>
     </message>
     <message>
         <source>Inbound</source>
-        <translation>インバウンド</translation>
+        <translation>Vstupné</translation>
     </message>
     <message>
         <source>Outbound</source>
-        <translation>アウトバウンド</translation>
+        <translation>Výstupné</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>はい</translation>
+        <translation>Áno</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>いいえ</translation>
+        <translation>Nie</translation>
     </message>
     <message>
         <source>Regular</source>
-        <translation>通常</translation>
+        <translation>Pravidelné</translation>
     </message>
     <message>
         <source>Masternode</source>
-        <translation>マスターノード</translation>
+        <translation>Masternode</translation>
     </message>
     <message>
         <source>Verified Masternode</source>
-        <translation>認証済のマスターノード</translation>
+        <translation>Overený masternód</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>不明</translation>
+        <translation>Neznáme</translation>
     </message>
 </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはWagerrネットワークを通じて支払いと共に送信されるわけではありません。</translation>
+        <translation>Pripojiť ku vyžiadanej platbe voliteľnú správu, ktorá sa zobrazí, keď bude žiadosť otvorená. Poznámka: Správa nebude poslaná spolu s platbou cez sieť Wagerr.</translation>
     </message>
     <message>
         <source>&amp;Message:</source>
-        <translation>メッセージ: (&amp;M)</translation>
+        <translation>&amp;Správa:</translation>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address.</source>
-        <translation>新しい受け取り用アドレスに紐づく任意のラベル。</translation>
+        <translation>Voliteľný popis ktorý sa pridá k tejto novej prijímajúcej adrese.</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはWagerrネットワークを通じて支払いと共に送信されるわけではありません。</translation>
+        <translation>Pripojiť ku vyžiadanej platbe voliteľnú správu, ktorá sa zobrazí, keď bude žiadosť otvorená. &lt;br&gt;Poznámka: Správa nebude poslaná spolu s platbou cez sieť Wagerr.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
-        <translation>このフォームを使用して支払いのリクエストを行いましょう。すべての項目は&lt;b&gt;任意入力&lt;/b&gt;です。</translation>
+        <translation>Použite tento formulár pre vyžiadanie platby. Všetky polia sú &lt;b&gt;voliteľné&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>ラベル (&amp;L)</translation>
+        <translation>&amp;Popis:</translation>
     </message>
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
-        <translation>リクエストする任意の金額。特定の金額をリクエストしない場合にはこの欄は空白のままかゼロにしてください。</translation>
+        <translation>Voliteľná požadovaná suma. Nechajte prázdne alebo nulu ak nepožadujete určitú sumu.</translation>
     </message>
     <message>
         <source>&amp;Amount:</source>
-        <translation>総額 (&amp;A)</translation>
+        <translation>&amp;Suma:</translation>
     </message>
     <message>
         <source>&amp;Create new receiving address</source>
-        <translation>新しい受取アドレスを作成(&amp;C)</translation>
+        <translation>&amp;Vytvoriť novú prijímaciu adresu</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation>このフォームの全ての入力項目をクリア</translation>
+        <translation>Vyčistiť všetky polia formulára.</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation>クリア</translation>
+        <translation>Vyčistiť</translation>
     </message>
     <message>
         <source>Requested payments history</source>
-        <translation>支払いリクエスト履歴</translation>
+        <translation>História vyžiadaných platieb</translation>
     </message>
     <message>
         <source>Show the selected request (does the same as double clicking an entry)</source>
-        <translation>選択されたリクエストを表示（項目をダブルクリックでも表示）</translation>
+        <translation>Zobraz zvolenú požiadavku (urobí to isté ako dvoj-klik na záznam)</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation>表示</translation>
+        <translation>Zobraziť</translation>
     </message>
     <message>
         <source>Remove the selected entries from the list</source>
-        <translation>リストから選択項目を削除</translation>
+        <translation>Odstrániť zvolené záznamy zo zoznamu</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>削除</translation>
+        <translation>Odstrániť</translation>
     </message>
     <message>
         <source>Enter a label to associate with the new receiving address</source>
-        <translation>新しい受信アドレスと関連付けるラベルを入力します。</translation>
+        <translation>Zadajte štítok, ktorý chcete priradiť k novej prijímacej adrese</translation>
     </message>
     <message>
         <source>Enter a message to attach to the payment request</source>
-        <translation>支払いリクエストに添付するメッセージを入力します</translation>
+        <translation>Zadajte správu, ktorá sa má priložiť k žiadosti o platbu</translation>
     </message>
     <message>
         <source>Copy URI</source>
-        <translation>URI をコピー</translation>
+        <translation>Kopírovať URI</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>アドレスをコピー</translation>
+        <translation>Kopírovať adresu</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>ラベルをコピーする</translation>
+        <translation>Kopírovať popis</translation>
     </message>
     <message>
         <source>Copy message</source>
-        <translation>メッセージをコピー</translation>
+        <translation>Kopírovať správu</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>総額のコピー</translation>
+        <translation>Kopírovať sumu</translation>
     </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
     <message>
         <source>QR Code</source>
-        <translation>QRコード</translation>
+        <translation>QR kód</translation>
     </message>
     <message>
         <source>Copy &amp;URI</source>
-        <translation>URI をコピー (&amp;U)</translation>
+        <translation>Kopírovať &amp;URI</translation>
     </message>
     <message>
         <source>Copy &amp;Address</source>
-        <translation>アドレスをコピー(&amp;A)</translation>
+        <translation>Kopírovať &amp;adresu</translation>
     </message>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>画像を保存… (&amp;S)</translation>
+        <translation>&amp;Uložiť obrázok...</translation>
     </message>
     <message>
         <source>Request payment to %1</source>
-        <translation>%1 へ支払いリクエストを行う</translation>
+        <translation>Vyžiadať platbu pre %1</translation>
     </message>
     <message>
         <source>Payment information</source>
-        <translation>支払い情報</translation>
+        <translation>Informácia o platbe</translation>
     </message>
     <message>
         <source>URI</source>
@@ -3002,380 +3002,380 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>アドレス</translation>
+        <translation>Adresa</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>総額</translation>
+        <translation>Suma</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>ラベル</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>メッセージ</translation>
+        <translation>Správa</translation>
     </message>
     <message>
         <source>Wallet</source>
-        <translation>ウォレット</translation>
+        <translation>Peňaženka</translation>
     </message>
 </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
         <source>Date</source>
-        <translation>日付</translation>
+        <translation>Dátum</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>ラベル</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>メッセージ</translation>
+        <translation>Správa</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>（ラベル無し）</translation>
+        <translation>(bez popisu)</translation>
     </message>
     <message>
         <source>(no message)</source>
-        <translation>（メッセージなし）</translation>
+        <translation>(žiadna správa)</translation>
     </message>
     <message>
         <source>(no amount requested)</source>
-        <translation>(金額指定なし)</translation>
+        <translation>(nepožadovaná žiadna suma)</translation>
     </message>
     <message>
         <source>Requested</source>
-        <translation>リクエスト完了</translation>
+        <translation>Požadované</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <source>Send Coins</source>
-        <translation>送金</translation>
+        <translation>Poslať Mince</translation>
     </message>
     <message>
         <source>Coin Control Features</source>
-        <translation>コインコントロール機能</translation>
+        <translation>Možnosti "Kontroly mincí"</translation>
     </message>
     <message>
         <source>Inputs...</source>
-        <translation>インプット…</translation>
+        <translation>Vstupy...</translation>
     </message>
     <message>
         <source>automatically selected</source>
-        <translation>自動選択</translation>
+        <translation>automaticky vybraté</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
-        <translation>残高不足です！</translation>
+        <translation>Nedostatok prostriedkov!</translation>
     </message>
     <message>
         <source>Quantity:</source>
-        <translation>数量：</translation>
+        <translation>Množstvo:</translation>
     </message>
     <message>
         <source>Bytes:</source>
-        <translation>バイト：</translation>
+        <translation>Bajtov:</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>総額：</translation>
+        <translation>Suma:</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>手数料：</translation>
+        <translation>Poplatok:</translation>
     </message>
     <message>
         <source>Dust:</source>
-        <translation>ダスト：</translation>
+        <translation>Prach:</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>手数料差引後：</translation>
+        <translation>Po poplatku:</translation>
     </message>
     <message>
         <source>Change:</source>
-        <translation>チェンジ：</translation>
+        <translation>Zmena:</translation>
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>これが有効にもかかわらずチェンジアドレスが空欄であったり無効な場合には、チェンジは新しく生成されたアドレスへ送金されます。</translation>
+        <translation>Ak aktivované ale adresa pre výdavok je prázdna alebo neplatná, výdavok bude poslaný na novovytvorenú adresu.</translation>
     </message>
     <message>
         <source>Custom change address</source>
-        <translation>カスタマイズされたチェンジアドレス</translation>
+        <translation>Vlastná adresa zmeny</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>
-        <translation>トランザクション手数料：</translation>
+        <translation>Transakčný poplatok</translation>
     </message>
     <message>
         <source>Choose...</source>
-        <translation>選択…</translation>
+        <translation>Vybrať...</translation>
     </message>
     <message>
         <source>Confirmation time target:</source>
-        <translation>検証時間ターゲット:</translation>
+        <translation>Cieľový čas potvrdenia:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 duffs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 duffs in fee,&lt;br /&gt;while "at least" pays 1000 duffs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>カスタマイズされた手数料が1000duffsに設定され、トランザクションが250 bytesしかなかった場合、キロバイトあたりでは250 duffsしか手数料を支払いませんが&lt;br /&gt;最低でも1000 duffs支払います。1キロバイト以上のトランザクションに対しては、1キロバイトあたり1000duffs支払います。</translation>
+        <source>If the custom fee is set to 1000 sats and the transaction is only 250 bytes, then "per kilobyte" only pays 250 sats in fee,&lt;br /&gt;while "at least" pays 1000 sats. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>Ak je vlastný poplatok nastavený na 1000 satov a transakcia je len 250 bytov, v tom prípade sa "za kilobajt" zaplatí  na poplatkoch iba 250 satov, &lt;br /&gt;zatiaľ čo "pri najmenšom" zaplatí 1000 satov. Pre transakcie väčšie ako jeden kilobajt, obe zaplatia rovnako za kilobajt. </translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for wagerr transactions than the network can process.</source>
-        <translation>最低限の手数料しか支払わなくても、トランザクション量以上のスペースが対象ブロックにあれば問題ありません。&lt;br /&gt;しかし、ネットワークが処理できる以上のWagerrのトランザクション需要があれば、処理されないトランザクションになり得ることに注意してください。</translation>
+        <translation>Platenie minimálneho poplatku je v poriadku pokiaľ je objem transakcií menší ako je miesto v bloku. &lt;br /&gt;Buďte opatrný pretože to môže skončiť s nikdy nepotvrdenými transakciami, akonáhle je dopyt po Wagerr transakciách väčší ako dokáže sieť Wagerr spracovať.</translation>
     </message>
     <message>
         <source>per kilobyte</source>
-        <translation>1キロバイトあたり手数料</translation>
+        <translation>za kilobajt</translation>
     </message>
     <message>
         <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
-        <translation>フォールバックフィーを使用すると、承認に数時間から数日かかる（あるいは承認されない）トランザクションが送信される可能性があります。手数料を手動で選択するか、ブロックチェーン全体の検証が完了するまで待ってください。</translation>
+        <translation>Používanie fallbackfee môže mať za následok odoslanie transakcie, ktorá sa bude potvrdzovať niekoľko hodín alebo dní (prípadne nikdy). Zvážte možnosť výberu poplatku ručne alebo počkajte, než potvrdíte kompletný reťazec blokov.</translation>
     </message>
     <message>
         <source>Note: Not enough data for fee estimation, using the fallback fee instead.</source>
-        <translation>注：フォールバックフィーを代わりに使用しているので、手数料の見積もりに十分なデータがありません。</translation>
+        <translation>Poznámka: Nedostatok údajov na odhad poplatku, použije sa preddefinovaná hodnota.</translation>
     </message>
     <message>
         <source>Hide transaction fee settings</source>
-        <translation>取引手数料設定の非表示</translation>
+        <translation>Skryť nastavenia transakčných poplatkov</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation>非表示</translation>
+        <translation>Skryť</translation>
     </message>
     <message>
         <source>(read the tooltip)</source>
-        <translation>（ツールチップをお読みください）</translation>
+        <translation>(čítať popis)</translation>
     </message>
     <message>
         <source>Recommended:</source>
-        <translation>推奨：</translation>
+        <translation>Doporučené:</translation>
     </message>
     <message>
         <source>Custom:</source>
-        <translation>カスタム：</translation>
+        <translation>Vlastné:</translation>
     </message>
     <message>
         <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
-        <translation>（スマート手数料はまだ初期化されていません。これには約数ブロックほどかかります…）</translation>
+        <translation>(Inteligentný poplatok nebol ešte inicializovaný. Obvykle to trvá nekoľko blokov...)</translation>
     </message>
     <message>
         <source>Confirm the send action</source>
-        <translation>送金確認</translation>
+        <translation>Potvrďte odoslanie</translation>
     </message>
     <message>
         <source>S&amp;end</source>
-        <translation>送金 (&amp;E)</translation>
+        <translation>&amp;Odoslať</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation>全ての入力項目をクリア</translation>
+        <translation>Vyčistiť všetky polia formulára.</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>すべてクリア (&amp;A)</translation>
+        <translation>Zmazať &amp;všetko</translation>
     </message>
     <message>
         <source>Send to multiple recipients at once</source>
-        <translation>一度に複数のアドレスに送金</translation>
+        <translation>Poslať viacerým príjemcom naraz</translation>
     </message>
     <message>
         <source>Add &amp;Recipient</source>
-        <translation>受取人を追加 (&amp;R)</translation>
+        <translation>&amp;Pridať príjemcu</translation>
     </message>
     <message>
         <source>Balance:</source>
-        <translation>残高：</translation>
+        <translation>Zostatok:</translation>
     </message>
     <message>
         <source>Copy quantity</source>
-        <translation>数量をコピー</translation>
+        <translation>Kopírovať množstvo</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>総額のコピー</translation>
+        <translation>Kopírovať sumu</translation>
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>手数料をコピーす</translation>
+        <translation>Kopírovať poplatok</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>手数料差引後の金額をコピー</translation>
+        <translation>Kopírovať po poplatku</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation>バイト数をコピー</translation>
+        <translation>Kopírovať bajty</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation>ダストをコピー</translation>
+        <translation>Kopírovať prach</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation>チェンジをコピー</translation>
+        <translation>Kopírovať zmenu</translation>
     </message>
     <message>
         <source>%1 (%2 blocks)</source>
-        <translation>%1 (%2 ブロック)</translation>
+        <translation>%1 (%2 blokov)</translation>
     </message>
     <message>
         <source>from wallet %1</source>
-        <translation>%1のウォレットから</translation>
+        <translation>z peňaženky %1</translation>
     </message>
     <message>
         <source>using</source>
-        <translation>使用中</translation>
+        <translation>používa</translation>
     </message>
     <message>
         <source>%1 to %2</source>
-        <translation>%1 から %2</translation>
+        <translation>%1 do %2</translation>
     </message>
     <message>
         <source>Are you sure you want to send?</source>
-        <translation>送ってよろしいですか？</translation>
+        <translation>Určite chcete odoslať transakciu?</translation>
     </message>
     <message>
         <source>&lt;b&gt;(%1 of %2 entries displayed)&lt;/b&gt;</source>
-        <translation>&lt;b&gt;(%1 ／%2 項目を表示)&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;(%1 z %2 zobrazených položiek)&lt;/b&gt;</translation>
     </message>
     <message>
         <source>S&amp;end mixed funds</source>
-        <translation>ミックスファンドを送金する</translation>
+        <translation>&amp;Posielať zmiešané zdroje</translation>
     </message>
     <message>
         <source>Confirm the %1 send action</source>
-        <translation>%1の送金処理を確認</translation>
+        <translation>Potvrďte akciu pre poslanie %1</translation>
     </message>
     <message>
         <source>%1 funds only</source>
-        <translation>%1の資金のみ</translation>
+        <translation>Iba %1 prostriedky</translation>
     </message>
     <message>
         <source>any available funds</source>
-        <translation>利用可能なファンド </translation>
+        <translation>akékoľvek dostupné zdroje</translation>
     </message>
     <message>
         <source>Transaction fee</source>
-        <translation>取引手数料</translation>
+        <translation>Poplatok za transakciu</translation>
     </message>
     <message>
         <source>(%1 transactions have higher fees usually due to no change output being allowed)</source>
-        <translation>（%1の取引は、通常変更出力が許可されていないため、手数料が高くなります）</translation>
+        <translation>(Transakcie typu %1 majú zvyčajne vyššie poplatky, pretože nie sú povolené žiadne zmeny výstupu)</translation>
     </message>
     <message>
         <source>Transaction size: %1</source>
-        <translation>取引額：%1</translation>
+        <translation>Veľkosť transakcie: %1</translation>
     </message>
     <message>
         <source>Fee rate: %1</source>
-        <translation>料金レート：%1</translation>
+        <translation>Sadzba poplatku: %1</translation>
     </message>
     <message numerus="yes">
         <source>This transaction will consume %n input(s)</source>
-        <translation><numerusform>この取引は、%n個の入力を消費します。</numerusform></translation>
+        <translation><numerusform>Táto transakcia spotrebuje %n vstup</numerusform><numerusform>Táto transakcia spotrebuje %n vstupy</numerusform><numerusform>Táto transakcia spotrebuje %n vstupov</numerusform><numerusform>Táto transakcia spotrebuje %n vstupov</numerusform></translation>
     </message>
     <message>
         <source>Warning: Using %1 with %2 or more inputs can harm your privacy and is not recommended</source>
-        <translation>警告：%1を%2以上の入力で使用すると、プライバシーが侵害される可能性があり、推奨できません。</translation>
+        <translation>Varovanie: Použitie %1 s %2 alebo viac vstupmi môže poškodiť vaše súkromie a neodporúča sa</translation>
     </message>
     <message>
         <source>Click to learn more</source>
-        <translation>クリックしてさらに詳しく</translation>
+        <translation>Kliknutím sa dozviete viac</translation>
     </message>
     <message>
         <source>Total Amount</source>
-        <translation>総額</translation>
+        <translation>Celková suma</translation>
     </message>
     <message>
         <source>or</source>
-        <translation>または</translation>
+        <translation>alebo</translation>
     </message>
     <message>
         <source>Confirm send coins</source>
-        <translation>送金確認</translation>
+        <translation>Potvrdiť odoslanie mincí</translation>
     </message>
     <message>
         <source>The recipient address is not valid. Please recheck.</source>
-        <translation>受取アドレスが正しくありません。再チェックしてください。</translation>
+        <translation>Adresa príjemcu je neplatná. Prosím, overte ju.</translation>
     </message>
     <message>
         <source>The amount to pay must be larger than 0.</source>
-        <translation>支払い額は0より大きくないといけません。</translation>
+        <translation>Suma platby musí byť väčšia ako 0.</translation>
     </message>
     <message>
         <source>The amount exceeds your balance.</source>
-        <translation>総額が残高を超えています。</translation>
+        <translation>Suma je vyššia ako váš zostatok.</translation>
     </message>
     <message>
         <source>The total exceeds your balance when the %1 transaction fee is included.</source>
-        <translation>%1 の取引手数料を含めると総額が残高を超えています。</translation>
+        <translation>Celková suma prevyšuje váš zostatok ak sú započítané %1 transakčné poplatky.</translation>
     </message>
     <message>
         <source>Duplicate address found: addresses should only be used once each.</source>
-        <translation>重複したアドレスが見つかりました: アドレスは一度のみ使用することができます。</translation>
+        <translation>Našla sa duplicitná adresa: každá adresa by sa mala použiť len raz.</translation>
     </message>
     <message>
         <source>Transaction creation failed!</source>
-        <translation>トラザクションの作成に失敗しました!</translation>
+        <translation>Vytvorenie transakcie zlyhalo!</translation>
     </message>
     <message>
         <source>A fee higher than %1 is considered an absurdly high fee.</source>
-        <translation>%1 よりも高い手数料の場合手数料が異常に高すぎると判断されます。</translation>
+        <translation>Poplatok vyšší ako %1 sa považuje za neprimerane vysoký.</translation>
     </message>
     <message>
         <source>Payment request expired.</source>
-        <translation>支払いリクエストの期限が切れました。</translation>
+        <translation>Vypršala platnosť požiadavky na platbu.</translation>
     </message>
     <message>
         <source>Pay only the required fee of %1</source>
-        <translation>リクエストされた手数料 %1 のみを支払う</translation>
+        <translation>Zaplatiť iba požadovaný poplatok %1</translation>
     </message>
     <message numerus="yes">
         <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>%n ブロック以内に検証が開始されると予想されます</numerusform></translation>
+        <translation><numerusform>Odhad pre začiatok potvrdzovania je %n blok.</numerusform><numerusform>Odhad pre začiatok potvrdzovania sú %n bloky.</numerusform><numerusform>Odhad pre začiatok potvrdzovania je %n blokov.</numerusform><numerusform>Odhad pre začiatok potvrdzovania je %n blokov.</numerusform></translation>
     </message>
     <message>
         <source>Warning: Invalid Wagerr address</source>
-        <translation>警告：Wagerrアドレスが無効です</translation>
+        <translation>Upozornenie: Neplatná Wagerr adresa</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
-        <translation>警告：未知のチェンジアドレスです</translation>
+        <translation>Upozornenie: Neznáma adresa pre výdavok</translation>
     </message>
     <message>
         <source>Confirm custom change address</source>
-        <translation>カスタムチェンジアドレスを確認</translation>
+        <translation>Potvrďte zmenu adresy</translation>
     </message>
     <message>
         <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
-        <translation>チェンジとして指定されたアドレスはこのウォレットに属していません。このウォレットの一部またはすべてのファンドがこのアドレスへ送金されます。よろしいですか？</translation>
+        <translation>Zadaná adresa nie je súčasťou tejto peňaženky. Časť alebo všetky peniaze z peňaženky môžu byť odoslané na túto adresu. Ste si istý?</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>（ラベル無し）</translation>
+        <translation>(bez popisu)</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
         <source>Pay &amp;To:</source>
-        <translation>送り先: (&amp;T)</translation>
+        <translation>Zapla&amp;tiť:</translation>
     </message>
     <message>
         <source>The Wagerr address to send the payment to</source>
-        <translation>送金先Wagerrアドレス</translation>
+        <translation>Wagerr adresa pre poslanie platby</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>以前に使用したアドレスを選択</translation>
+        <translation>Vybrať predtým použitú adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -3383,7 +3383,7 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>クリップボードからアドレスをペースト</translation>
+        <translation>Vložiť adresu zo schránky</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -3391,104 +3391,104 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Remove this entry</source>
-        <translation>この項目を削除</translation>
+        <translation>Odstrániť túto položku</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>ラベル (&amp;L)</translation>
+        <translation>&amp;Popis:</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to the list of used addresses</source>
-        <translation>このアドレスに対するラベルを入力することで使用済みアドレスの一覧に追加することができます</translation>
+        <translation>Vložte popis pre túto adresu aby sa uložila do zoznamu použitých adries</translation>
     </message>
     <message>
         <source>A&amp;mount:</source>
-        <translation>金額： (&amp;M)</translation>
+        <translation>Su&amp;ma:</translation>
     </message>
     <message>
         <source>The amount to send in the selected unit</source>
-        <translation>選択した単位で送金する金額</translation>
+        <translation>Suma na odoslanie vo vybranej jednotke</translation>
     </message>
     <message>
         <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of Wagerr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>手数料は総額から差し引かれます。受取人は入力した金額より少ないWagerrを受け取ります。複数の受取人を選択した場合、手数料は等しく分割されます。</translation>
+        <translation>Poplatok sa odpočíta od čiastky, ktorú odosielate. Príjemca dostane menej Wagerr ako zadáte. Ak je vybraných viacero príjemcov, poplatok je rozdelený rovnakým dielom.</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
-        <translation>総額から手数料を差し引いて送金(&amp;U)</translation>
+        <translation>Odpočítať poplatok od s&amp;umy</translation>
     </message>
     <message>
         <source>Use available balance</source>
-        <translation>利用可能な残高を使用する</translation>
+        <translation>Použite dostupný zostatok</translation>
     </message>
     <message>
         <source>Message:</source>
-        <translation>メッセージ：</translation>
+        <translation>Správa:</translation>
     </message>
     <message>
         <source>A message that was attached to the wagerr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>Wagerr: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはWagerrネットワークを経由して送信されるわけではありません。</translation>
+        <translation>Správa ktorá bola pripojená ku wagerr: URI ktorá sa uchová spolu s transakciou pre vašu referenciu. Poznámka: Táto správa nebude poslaná cez sieť Wagerr.</translation>
     </message>
     <message>
         <source>This is an unauthenticated payment request.</source>
-        <translation>これは未認証の支払いリクエストです。</translation>
+        <translation>Toto je neoverená výzva k platbe.</translation>
     </message>
     <message>
         <source>This is an authenticated payment request.</source>
-        <translation>これは認証済みの支払いリクエストです。</translation>
+        <translation>Toto je overená výzva k platbe.</translation>
     </message>
     <message>
         <source>Pay To:</source>
-        <translation>支払い先：</translation>
+        <translation>Platba pre:</translation>
     </message>
     <message>
         <source>Memo:</source>
-        <translation>メモ：</translation>
+        <translation>Poznámka:</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to your address book</source>
-        <translation>アドレス帳に追加するにはこのアドレスのラベルを入力します</translation>
+        <translation>Vložte popis pre túto adresu aby sa pridala do adresára</translation>
     </message>
 </context>
 <context>
     <name>SendConfirmationDialog</name>
     <message>
         <source>Send</source>
-        <translation>送金</translation>
+        <translation>Poslať</translation>
     </message>
 </context>
 <context>
     <name>ShutdownWindow</name>
     <message>
         <source>%1 is shutting down...</source>
-        <translation>%1 をシャットダウンしています...</translation>
+        <translation>%1 sa vypína...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
-        <translation>このウィンドウが消えるまでコンピュータをシャットダウンしないで下さい。</translation>
+        <translation>Nevypínajte počítač pokým toto okno nezmizne.</translation>
     </message>
 </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
         <source>Signatures - Sign / Verify a Message</source>
-        <translation>署名 - メッセージの署名/検証</translation>
+        <translation>Podpisy - Podpísať / Overiť správu</translation>
     </message>
     <message>
         <source>&amp;Sign Message</source>
-        <translation>メッセージの署名 (&amp;S)</translation>
+        <translation>&amp;Podpísať Správu</translation>
     </message>
     <message>
         <source>You can sign messages/agreements with your addresses to prove you can receive Wagerr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>あなたのアドレスを使用してあなたがWagerrを受け取ることができるようにメッセージやアグリーメントに署名できます。充分に詳細が判明していてあなたが確認しているものだけに署名してください。フィッシングによってあなたの署名を読み取られないように注意してください。</translation>
+        <translation>Môžete podpísať správy/dohody svojou adresou aby ste dokázali, že na ňu prijať Wagerr. Buďte opatrní a nepodpisuje nič vágne alebo náhodné, nakoľko útoky typu "phishing" vás môžu lákať k ich podpísaniu vašej identity. Podpisujte iba vyhlásenia s úplnými detailami s ktorými súhlasíte.</translation>
     </message>
     <message>
         <source>The Wagerr address to sign the message with</source>
-        <translation>メッセージを署名する際に使用するWagerrアドレス</translation>
+        <translation>Wagerr adresa na podpísanie správy</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>前に使用したアドレスを選ぶ</translation>
+        <translation>Vybrať predtým použitú adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -3496,7 +3496,7 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>クリップボードからアドレスをペースト</translation>
+        <translation>Vložiť adresu zo schránky</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -3504,446 +3504,446 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Enter the message you want to sign here</source>
-        <translation>ここにあなたが署名するメッセージを入力</translation>
+        <translation>Vložte správu ktorú chcete podpísať</translation>
     </message>
     <message>
         <source>Signature</source>
-        <translation>署名</translation>
+        <translation>Podpis</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
-        <translation>現在の署名をシステムのクリップボードにコピー</translation>
+        <translation>Kopírovať práve zvolenú adresu do systémovej schránky</translation>
     </message>
     <message>
         <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>この Wagerr アドレスを所有していることを証明するためにメッセージに署名</translation>
+        <translation>Podpísať spravu aby ste dokázali, že vlastníte túto Wagerr adresu</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
-        <translation>メッセージの署名 (&amp;M)</translation>
+        <translation>Podpísať &amp;správu</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
-        <translation>入力項目の内容をすべて消去</translation>
+        <translation>Vynulovať všetky polia podpisu správy</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>すべてクリア (&amp;A)</translation>
+        <translation>Zmazať &amp;všetko</translation>
     </message>
     <message>
         <source>&amp;Verify Message</source>
-        <translation>メッセージの検証 (&amp;V)</translation>
+        <translation>&amp;Overiť správu...</translation>
     </message>
     <message>
         <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
-        <translation>受取人のアドレスとメッセージ（改行やスペース、タブなども完全に一致するよう注意してください）および署名を以下に入力し、メッセージを検証してください。中間者攻撃により騙されるのを防ぐため、署名対象のメッセージに書かれていること以上の意味を署名から読み取ろうとしないよう注意してください。これは署名作成者がこのアドレスで受け取ることを証明するだけであり、トランザクションの送信者を証明するものではないことに注意してください！</translation>
+        <translation>Vložte adresu príjemcu, správu (uistite sa, že presne kopírujete ukončenia riadkov, medzery, odrážky, atď.) a podpis pre potvrdenie správy. Buďte opatrní a nedomýšľajte si viac než je uvedené v samotnej podpísanej správe a môžete sa tak vyhnúť podvodu MITM útokom. Toto len potvrdzuje, že podpisujúca strana môže prijímať na tejto adrese, nepotvrdzuje to vlastníctvo žiadnej transakcie!</translation>
     </message>
     <message>
         <source>The Wagerr address the message was signed with</source>
-        <translation>メッセージの署名に使用されたWagerrアドレス</translation>
+        <translation>Adresa Wagerr s ktorou bola podpísaná správa</translation>
     </message>
     <message>
         <source>The signed message to verify</source>
-        <translation>検証する署名付きメッセージ</translation>
+        <translation>Podpísaná správa na overenie</translation>
     </message>
     <message>
         <source>The signature given when the message was signed</source>
-        <translation>メッセージの署名時に付与された署名</translation>
+        <translation>Podpis daný pri podpise správy</translation>
     </message>
     <message>
         <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>指定されたWagerrアドレスで署名されたことを確認するためメッセージを検証</translation>
+        <translation>Overiť správu pre uistenie, že bola podpísaná zadanou Wagerr adresou</translation>
     </message>
     <message>
         <source>Verify &amp;Message</source>
-        <translation>メッセージの検証 (&amp;M)</translation>
+        <translation>Overiť &amp;správu</translation>
     </message>
     <message>
         <source>Reset all verify message fields</source>
-        <translation>入力項目の内容をすべて消去</translation>
+        <translation>Vynulovať všetky polia overenia správy</translation>
     </message>
     <message>
         <source>Enter a message to be signed</source>
-        <translation>署名するメッセージを入力する</translation>
+        <translation>Zadajte správu na podpis</translation>
     </message>
     <message>
         <source>Click "Sign Message" to generate signature</source>
-        <translation>署名を作成するには"メッセージの署名"をクリックしてください</translation>
+        <translation>Pre získanie podpisu kliknite na "Podpísať Správu"</translation>
     </message>
     <message>
         <source>Enter a message to be verified</source>
-        <translation>検証するメッセージを入力する</translation>
+        <translation>Zadajte správu na overenie</translation>
     </message>
     <message>
         <source>Enter a signature for the message to be verified</source>
-        <translation>検証するメッセージに署名を入力する</translation>
+        <translation>Zadajte podpis správy, ktorá sa má overiť</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
-        <translation>無効なアドレスが入力されました。</translation>
+        <translation>Zadaná adresa je neplatná.</translation>
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>アドレスを確かめてからもう一度試してください。</translation>
+        <translation>Prosím skontrolujte adresu a skúste znova.</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>入力されたアドレスに関連するキーがありません。</translation>
+        <translation>Vložená adresa nezodpovedá žiadnemu kľúcu.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>ウォレットのアンロックはキャンセルされました。</translation>
+        <translation>Odomknutie peňaženky bolo zrušené.</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>入力されたアドレスのプライベートキーは利用できません。</translation>
+        <translation>Súkromný kľúč pre vložená adresu nieje k dispozícii.</translation>
     </message>
     <message>
         <source>Message signing failed.</source>
-        <translation>メッセージの署名に失敗しました。</translation>
+        <translation>Podpísanie správy zlyhalo.</translation>
     </message>
     <message>
         <source>Message signed.</source>
-        <translation>メッセージに署名しました。</translation>
+        <translation>Správa podpísaná.</translation>
     </message>
     <message>
         <source>The signature could not be decoded.</source>
-        <translation>署名はデコードできません。</translation>
+        <translation>Podpis nie je možné dekódovať.</translation>
     </message>
     <message>
         <source>Please check the signature and try again.</source>
-        <translation>署名を確認してからもう一度試してください。</translation>
+        <translation>Prosím skontrolujte podpis a skúste znova.</translation>
     </message>
     <message>
         <source>The signature did not match the message digest.</source>
-        <translation>署名はメッセージダイジェストと一致しませんでした。</translation>
+        <translation>Podpis sa nezhoduje so zhrnutím správy</translation>
     </message>
     <message>
         <source>Message verification failed.</source>
-        <translation>メッセージの検証に失敗しました。</translation>
+        <translation>Overenie správy zlyhalo.</translation>
     </message>
     <message>
         <source>Message verified.</source>
-        <translation>メッセージは検証されました。</translation>
+        <translation>Správa overená.</translation>
     </message>
 </context>
 <context>
     <name>SplashScreen</name>
     <message>
         <source>[testnet]</source>
-        <translation>[testnet]</translation>
+        <translation>[testovacia sieť]</translation>
     </message>
 </context>
 <context>
     <name>TrafficGraphWidget</name>
     <message>
         <source>KB/s</source>
-        <translation>KB/秒</translation>
+        <translation>KB/s</translation>
     </message>
     <message>
         <source>Total</source>
-        <translation>合計</translation>
+        <translation>Celkovo</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>受取済</translation>
+        <translation>Prijaté</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>送金済</translation>
+        <translation>Odoslané</translation>
     </message>
 </context>
 <context>
     <name>TransactionDesc</name>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>%n 以上のブロックをオープン</numerusform></translation>
+        <translation><numerusform>Otvoriť pre %n ďalší blok</numerusform><numerusform>Otvoriť pre %n ďalšie bloky</numerusform><numerusform>Otvoriť pre %n ďalších blokov</numerusform><numerusform>Otvoriť pre %n ďalších blokov</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
-        <translation> %1 までオープン</translation>
+        <translation>Otvorené do %1</translation>
     </message>
     <message>
         <source>conflicted</source>
-        <translation>コンフリクト発生</translation>
+        <translation>sporné</translation>
     </message>
     <message>
         <source>0/unconfirmed, %1</source>
-        <translation>0/未確認、%1</translation>
+        <translation>0/nepotvrdené, %1</translation>
     </message>
     <message>
         <source>in memory pool</source>
-        <translation>メモリプール内</translation>
+        <translation>v transakčnom zásobníku</translation>
     </message>
     <message>
         <source>not in memory pool</source>
-        <translation>メモリプール外</translation>
+        <translation>nie je v transakčnom zásobníku</translation>
     </message>
     <message>
         <source>abandoned</source>
-        <translation>中止</translation>
+        <translation>opustené</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
-        <translation>%1/未確認</translation>
+        <translation>%1/nepotvrdené</translation>
     </message>
     <message>
         <source>%1 confirmations</source>
-        <translation>%1の確認</translation>
+        <translation>%1 potvrdení</translation>
     </message>
     <message>
         <source>locked via ChainLocks</source>
-        <translation>チェーンロックでロック中</translation>
+        <translation>zamknuté pomocou ChainLocks</translation>
     </message>
     <message>
         <source>verified via InstantSend</source>
-        <translation>InstantSendで検証済み</translation>
+        <translation>overené cez InstantSend</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>ステータス</translation>
+        <translation>Stav</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日付</translation>
+        <translation>Dátum</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>ソース</translation>
+        <translation>Zdroj</translation>
     </message>
     <message>
         <source>Generated</source>
-        <translation>生成済</translation>
+        <translation>Vygenerované</translation>
     </message>
     <message>
         <source>From</source>
-        <translation>送信元</translation>
+        <translation>Od</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>未確認</translation>
+        <translation>neznámy</translation>
     </message>
     <message>
         <source>To</source>
-        <translation>送信先</translation>
+        <translation>Pre</translation>
     </message>
     <message>
         <source>own address</source>
-        <translation>自分のアドレス</translation>
+        <translation>vlastná adresa</translation>
     </message>
     <message>
         <source>watch-only</source>
-        <translation>監視のみ</translation>
+        <translation>iba sledovanie</translation>
     </message>
     <message>
         <source>label</source>
-        <translation>ラベル</translation>
+        <translation>popis</translation>
     </message>
     <message>
         <source>Credit</source>
-        <translation>クレジット</translation>
+        <translation>Kredit</translation>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>%n 以上のブロックがマチュア</numerusform></translation>
+        <translation><numerusform>dozreje za %n ďalší blok</numerusform><numerusform>dozreje za %n ďalšie bloky</numerusform><numerusform>dozreje za %n ďalších blokov</numerusform><numerusform>dozreje za %n ďalších blokov</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
-        <translation>未承認</translation>
+        <translation>neprijaté</translation>
     </message>
     <message>
         <source>Debit</source>
-        <translation>引き落とし額</translation>
+        <translation>Debet</translation>
     </message>
     <message>
         <source>Total debit</source>
-        <translation>総出金額</translation>
+        <translation>Celkový debet</translation>
     </message>
     <message>
         <source>Total credit</source>
-        <translation>総入金額</translation>
+        <translation>Celkový kredit</translation>
     </message>
     <message>
         <source>Transaction fee</source>
-        <translation>トランザクション手数料</translation>
+        <translation>Transakčný poplatok</translation>
     </message>
     <message>
         <source>Net amount</source>
-        <translation>正味金額</translation>
+        <translation>Suma netto</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>メッセージ</translation>
+        <translation>Správa</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation>コメント</translation>
+        <translation>Komentár</translation>
     </message>
     <message>
         <source>Transaction ID</source>
-        <translation>トランザクションID</translation>
+        <translation>ID transakcie</translation>
     </message>
     <message>
         <source>Output index</source>
-        <translation>出力インデックス</translation>
+        <translation>Index výstupu</translation>
     </message>
     <message>
         <source>Transaction total size</source>
-        <translation>トランザクションの全体サイズ</translation>
+        <translation>Celková veľkosť transakcie</translation>
     </message>
     <message>
         <source> (Certificate was not verified)</source>
-        <translation>（証明書は未確認です）</translation>
+        <translation>(Certifikát nebol overený)</translation>
     </message>
     <message>
         <source>Merchant</source>
-        <translation>マーチャント</translation>
+        <translation>Kupec</translation>
     </message>
     <message>
         <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>生成されたコインは使う前に%1のブロックを完成させる必要があります。あなたがこのブロックを生成した時、このブロックはブロックチェーンに追加されるためにネットワークにブロードキャストされました。ブロックチェーンの追加に失敗した場合、状態が"不承認"に変更されて生成されたコインは使えなくなります。これは別のノードがあなたの数秒前にブロックを生成する場合に時々起こります。</translation>
+        <translation>Vytvorené coins musia dospieť %1 blokov kým môžu byť minuté. Keď vytvoríte tento blok, bude rozoslaný do siete aby bol akceptovaný do reťaze blokov. Ak sa nedostane reťaze, jeho stav sa zmení na "zamietnutý" a nebude sa dať minúť. Toto sa môže občas stať ak iná nóda vytvorí blok približne v tom istom čase.</translation>
     </message>
     <message>
         <source>Debug information</source>
-        <translation>デバッグ情報</translation>
+        <translation>Ladiace informácie</translation>
     </message>
     <message>
         <source>Transaction</source>
-        <translation>取引</translation>
+        <translation>Transakcie</translation>
     </message>
     <message>
         <source>Inputs</source>
-        <translation>入力</translation>
+        <translation>Vstupy</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>総額</translation>
+        <translation>Suma</translation>
     </message>
     <message>
         <source>true</source>
-        <translation>正しい</translation>
+        <translation>pravda</translation>
     </message>
     <message>
         <source>false</source>
-        <translation>正しくない</translation>
+        <translation>nepravda</translation>
     </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
     <message>
         <source>This pane shows a detailed description of the transaction</source>
-        <translation>ここでは取引の詳細を表示しています</translation>
+        <translation>Táto časť obrazovky zobrazuje detailný popis transakcie</translation>
     </message>
     <message>
         <source>Details for %1</source>
-        <translation>%1 の詳細</translation>
+        <translation>Podrobnosti pre %1</translation>
     </message>
 </context>
 <context>
     <name>TransactionTableModel</name>
     <message>
         <source>Date</source>
-        <translation>日付</translation>
+        <translation>Dátum</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>タイプ</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Address / Label</source>
-        <translation>アドレス / ラベル</translation>
+        <translation>Adresa / Popis</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>%n 以上のブロックをオープン</numerusform></translation>
+        <translation><numerusform>Otvoriť pre %n ďalší blok</numerusform><numerusform>Otvoriť pre %n ďalšie bloky</numerusform><numerusform>Otvoriť pre %n ďalších blokov</numerusform><numerusform>Otvoriť pre %n ďalších blokov</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
-        <translation> %1 までオープン</translation>
+        <translation>Otvorené do %1</translation>
     </message>
     <message>
         <source>Unconfirmed</source>
-        <translation>未検証</translation>
+        <translation>Nepotvrdené</translation>
     </message>
     <message>
         <source>Abandoned</source>
-        <translation>中止</translation>
+        <translation>Opustené</translation>
     </message>
     <message>
         <source>Confirming (%1 of %2 recommended confirmations)</source>
-        <translation>検証中（%2の推奨検証数のうち、%1検証が完了）</translation>
+        <translation> Potvrdzuje sa (%1 zo %2 odporúčaných potvrdení)</translation>
     </message>
     <message>
         <source>Confirmed (%1 confirmations)</source>
-        <translation>検証されました (%1 検証済み)</translation>
+        <translation>Potvrdené (%1 potvrdení)</translation>
     </message>
     <message>
         <source>Conflicted</source>
-        <translation>コンフリクト発生</translation>
+        <translation>V rozpore</translation>
     </message>
     <message>
         <source>Immature (%1 confirmations, will be available after %2)</source>
-        <translation>マチュアでない状態（%1検証。%2検証完了後に使用可能となります）</translation>
+        <translation>Nezrelé (%1 potvrdení, bude k dispozícii po %2)</translation>
     </message>
     <message>
         <source>Generated but not accepted</source>
-        <translation>生成されましたが承認されませんでした</translation>
+        <translation>Vypočítané ale neakceptované</translation>
     </message>
     <message>
         <source>verified via InstantSend</source>
-        <translation>InstantSendで検証済み</translation>
+        <translation>overené cez InstantSend</translation>
     </message>
     <message>
         <source>locked via ChainLocks</source>
-        <translation>チェーンロックでロック中</translation>
+        <translation>zamknuté pomocou ChainLocks</translation>
     </message>
     <message>
         <source>Received with</source>
-        <translation>受信元</translation>
+        <translation>Prijaté z</translation>
     </message>
     <message>
         <source>Received from</source>
-        <translation>送信元</translation>
+        <translation>Prijaté od:</translation>
     </message>
     <message>
         <source>Received via %1</source>
-        <translation>%1から受取済</translation>
+        <translation>Prijaté cez %1</translation>
     </message>
     <message>
         <source>Sent to</source>
-        <translation>送金先</translation>
+        <translation>Odoslané na</translation>
     </message>
     <message>
         <source>Payment to yourself</source>
-        <translation>自分自身への支払い</translation>
+        <translation>Platba sebe samému</translation>
     </message>
     <message>
         <source>Mined</source>
-        <translation>マイニング済</translation>
+        <translation>Vyťažené</translation>
     </message>
     <message>
         <source>%1 Mixing</source>
-        <translation>%1 ミキシング</translation>
+        <translation>%1 miešanie</translation>
     </message>
     <message>
         <source>%1 Collateral Payment</source>
-        <translation>%1 担保の支払い</translation>
+        <translation>Zaisťovacia %1 platba</translation>
     </message>
     <message>
         <source>%1 Make Collateral Inputs</source>
-        <translation>%1 担保の情報を入力する</translation>
+        <translation>Uskutočnené zaisťovacie %1 vstupy</translation>
     </message>
     <message>
         <source>%1 Create Denominations</source>
-        <translation>%1 デノミネーションを作成する</translation>
+        <translation>Vytvorené denominácie %1</translation>
     </message>
     <message>
         <source>%1 Send</source>
-        <translation>%1 送金する</translation>
+        <translation>%1 poslať</translation>
     </message>
     <message>
         <source>watch-only</source>
-        <translation>ウォッチオンリー</translation>
+        <translation>iba sledovanie</translation>
     </message>
     <message>
         <source>(n/a)</source>
@@ -3951,186 +3951,186 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>（ラベル無し）</translation>
+        <translation>(bez popisu)</translation>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation>トランザクションステータス。このフィールドの上にカーソルを置くと検証数を表示します。</translation>
+        <translation>Stav transakcie. Pohybujte myšou nad týmto poľom pre zobrazenie počtu potvrdení.</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
-        <translation>トランザクションを受信した日時</translation>
+        <translation>Dátum a čas prijatia transakcie.</translation>
     </message>
     <message>
         <source>Type of transaction.</source>
-        <translation>トランザクションの種類</translation>
+        <translation>Typ transakcie.</translation>
     </message>
     <message>
         <source>Whether or not a watch-only address is involved in this transaction.</source>
-        <translation>ウォッチオンリーのアドレスがこのトランザクションに含まれているかどうか</translation>
+        <translation>Či sú ale nie sú, adresy iba na sledovanie zahrnuté v tejto transakcii.</translation>
     </message>
     <message>
         <source>User-defined intent/purpose of the transaction.</source>
-        <translation>ユーザー定義のトランザクションの意図／目的</translation>
+        <translation>Užívateľsky určený účel transakcie.</translation>
     </message>
     <message>
         <source>Amount removed from or added to balance.</source>
-        <translation>残高に追加または削除された総額</translation>
+        <translation>Suma pridaná alebo odobraná k zostatku.</translation>
     </message>
 </context>
 <context>
     <name>TransactionView</name>
     <message>
         <source>All</source>
-        <translation>すべて</translation>
+        <translation>Všetko</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>今日</translation>
+        <translation>Dnes</translation>
     </message>
     <message>
         <source>This week</source>
-        <translation>今週</translation>
+        <translation>Tento týždeň</translation>
     </message>
     <message>
         <source>This month</source>
-        <translation>今月</translation>
+        <translation>Tento mesiac</translation>
     </message>
     <message>
         <source>Last month</source>
-        <translation>先月</translation>
+        <translation>Minulý mesiac</translation>
     </message>
     <message>
         <source>This year</source>
-        <translation>今年</translation>
+        <translation>Tento rok</translation>
     </message>
     <message>
         <source>Range...</source>
-        <translation>期間…</translation>
+        <translation>Rozsah...</translation>
     </message>
     <message>
         <source>Most Common</source>
-        <translation>通常</translation>
+        <translation>Najčastejšie</translation>
     </message>
     <message>
         <source>Received with</source>
-        <translation>受信元</translation>
+        <translation>Prijaté z</translation>
     </message>
     <message>
         <source>Sent to</source>
-        <translation>送金先</translation>
+        <translation>Odoslané na</translation>
     </message>
     <message>
         <source>%1 Send</source>
-        <translation>%1 送金する</translation>
+        <translation>%1 poslať</translation>
     </message>
     <message>
         <source>%1 Make Collateral Inputs</source>
-        <translation>%1 担保の情報を入力する</translation>
+        <translation>Uskutočnené zaisťovacie %1 vstupy</translation>
     </message>
     <message>
         <source>%1 Create Denominations</source>
-        <translation>%1 デノミネーションを作成する</translation>
+        <translation>Vytvorené denominácie %1</translation>
     </message>
     <message>
         <source>%1 Mixing</source>
-        <translation>%1 ミキシング</translation>
+        <translation>%1 miešanie</translation>
     </message>
     <message>
         <source>%1 Collateral Payment</source>
-        <translation>%1 担保の支払い</translation>
+        <translation>Zaisťovacia %1 platba</translation>
     </message>
     <message>
         <source>To yourself</source>
-        <translation>自分自身へ</translation>
+        <translation>Samému sebe</translation>
     </message>
     <message>
         <source>Mined</source>
-        <translation>採掘済</translation>
+        <translation>Vyťažené</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation>その他</translation>
+        <translation>Iné</translation>
     </message>
     <message>
         <source>Enter address, transaction id, or label to search</source>
-        <translation>アドレス、取引ID、ラベルを入力して検索する</translation>
+        <translation>Ak chcete vyhľadávať, zadajte adresu, ID transakcie alebo štítok</translation>
     </message>
     <message>
         <source>Min amount</source>
-        <translation>最小の額</translation>
+        <translation>Minimálna suma</translation>
     </message>
     <message>
         <source>Abandon transaction</source>
-        <translation>トランザクション中止</translation>
+        <translation>Opustené transakcie</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>アドレスをコピー</translation>
+        <translation>Kopírovať adresu</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>ラベルをコピー</translation>
+        <translation>Kopírovať popis</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>総額のコピー</translation>
+        <translation>Kopírovať sumu</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>トランザクションIDをコピー</translation>
+        <translation>Kopírovať ID transakcie</translation>
     </message>
     <message>
         <source>Copy raw transaction</source>
-        <translation>原トランザクションをコピー</translation>
+        <translation>Skopírovať neupravenú transakciu</translation>
     </message>
     <message>
         <source>Copy full transaction details</source>
-        <translation>トランザクションの詳細すべてをコピー</translation>
+        <translation>Kopírovať všetky podrobnosti o transakcii</translation>
     </message>
     <message>
         <source>Edit address label</source>
-        <translation>アドレスのラベルを編集</translation>
+        <translation>Upraviť štítok s adresou</translation>
     </message>
     <message>
         <source>Show transaction details</source>
-        <translation>トランザクションの詳細を表示</translation>
+        <translation>Zobraziť podrobnosti transakcie</translation>
     </message>
     <message>
         <source>Show address QR code</source>
-        <translation>アドレスのQRコードを表示</translation>
+        <translation>Zobraziť adresový QR kód</translation>
     </message>
     <message>
         <source>Export Transaction History</source>
-        <translation>トランザクション履歴をエクスポート</translation>
+        <translation>Exportovať históriu transakcií</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>CSVファイル (*.csv)</translation>
+        <translation>Čiarkou oddelovaný súbor (*.csv)</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>検証済</translation>
+        <translation>Potvrdené</translation>
     </message>
     <message>
         <source>Watch-only</source>
-        <translation>ウォッチオンリー</translation>
+        <translation>Iba sledovanie</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日付</translation>
+        <translation>Dátum</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>タイプ</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>ラベル</translation>
+        <translation>Popis</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>アドレス</translation>
+        <translation>Adresa</translation>
     </message>
     <message>
         <source>ID</source>
@@ -4138,1042 +4138,1043 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>エクスポート失敗</translation>
+        <translation>Export zlyhal</translation>
     </message>
     <message>
         <source>There was an error trying to save the transaction history to %1.</source>
-        <translation>トランザクション履歴を %1 へ保存する際にエラーが発生しました</translation>
+        <translation>Vyskytla sa chyba pri pokuse o uloženie histórie transakcií do %1.</translation>
     </message>
     <message>
         <source>Exporting Successful</source>
-        <translation>エクスポート成功</translation>
+        <translation>Export úspešný</translation>
     </message>
     <message>
         <source>The transaction history was successfully saved to %1.</source>
-        <translation>トランザクション履歴は正常に%1に保存されました</translation>
+        <translation>História transakciá bola úspešne uložená do %1.</translation>
     </message>
     <message>
         <source>QR code</source>
-        <translation>QRコード</translation>
+        <translation>QR kód</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation>期間：</translation>
+        <translation>Rozsah:</translation>
     </message>
     <message>
         <source>to</source>
-        <translation>から</translation>
+        <translation>do</translation>
     </message>
 </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
         <source>Unit to show amounts in. Click to select another unit.</source>
-        <translation>金額を表示する際の単位。クリックすることで他の単位を選択します。</translation>
+        <translation>Jednotka pre zobrazovanie súm. Kliknite pre zvolenie inej jednotky.</translation>
     </message>
 </context>
 <context>
     <name>WalletController</name>
     <message>
         <source>Close wallet</source>
-        <translation>ウォレットを閉じる</translation>
+        <translation>Zatvoriť peňaženku...</translation>
     </message>
     <message>
         <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
-        <translation>&lt;i&gt;%1&lt;/i&gt;のウォレットを本当に閉じますか。</translation>
+        <translation>Naozaj chcete zatvoriť peňaženku &lt;i&gt;%1&lt;/i&gt;?</translation>
     </message>
     <message>
         <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
-        <translation>ウォレットを長時間閉じると、プルーニングが有効な場合、チェーン全体を再同期しなければならないことがあります。</translation>
+        <translation>Príliš dlhé zatvorenie peňaženky môže viesť k nutnosti opätovnej synchronizácie celého reťazca, ak je povolené orezávanie.</translation>
     </message>
 </context>
 <context>
     <name>WalletFrame</name>
     <message>
         <source>No wallet has been loaded.</source>
-        <translation>ウォレットがロードされていません</translation>
+        <translation>Nie je načítaná peňaženka.</translation>
     </message>
 </context>
 <context>
     <name>WalletModel</name>
     <message>
         <source>Send Coins</source>
-        <translation>送金</translation>
+        <translation>Poslať Mince</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>デフォルトのウォレット</translation>
+        <translation>predvolená peňaženka</translation>
     </message>
 </context>
 <context>
     <name>WalletView</name>
     <message>
         <source>&amp;Export</source>
-        <translation>エクスポート (&amp;E)</translation>
+        <translation>&amp;Exportovať</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>ファイルに現在のタブのデータをエクスポート</translation>
+        <translation>Exportovať tento náhľad do súboru</translation>
     </message>
     <message>
         <source>Selected amount:</source>
-        <translation>選択した額:</translation>
+        <translation>Označená suma:</translation>
     </message>
     <message>
         <source>Backup Wallet</source>
-        <translation>ウォレットのバックアップ</translation>
+        <translation>Zálohovať peňaženku</translation>
     </message>
     <message>
         <source>Wallet Data (*.dat)</source>
-        <translation>ウォレットデータ (*.dat)</translation>
+        <translation>Údaje peňaženky (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>
-        <translation>バックアップ失敗</translation>
+        <translation>Záloha zlyhala</translation>
     </message>
     <message>
         <source>There was an error trying to save the wallet data to %1.</source>
-        <translation>ウォレットデータを%1へ保存する際にエラーが発生しました</translation>
+        <translation>Vyskytla sa chyba pri pokuse o uloženie dát peňaženky do %1.</translation>
     </message>
     <message>
         <source>Backup Successful</source>
-        <translation>バックアップ成功</translation>
+        <translation>Záloha úspešná</translation>
     </message>
     <message>
         <source>The wallet data was successfully saved to %1.</source>
-        <translation>ウォレットデータは正常に%1に保存されました</translation>
+        <translation>Dáta peňaženky boli úspešne uložené do %1.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation>Zrušiť</translation>
     </message>
 </context>
 <context>
     <name>wagerr-core</name>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
-        <translation>エラー： 受信中の接続をリッスンするのに失敗しました (エラー %s )</translation>
+        <translation>Chyba: Počúvanie prichádzajúcich spojení zlyhalo (vrátená chyba je %s)</translation>
     </message>
     <message>
         <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
-        <translation>料金の見積もりに失敗しました。フォールバックフィーは無効です。数ブロック待つか、-fallbackfeeを有効にしてください。</translation>
+        <translation>Odhad poplatku zlyhal. Fallbackfee je zakázaný. Počkajte niekoľko blokov alebo povoľte -fallbackfee.</translation>
     </message>
     <message>
         <source>This error could occur if this wallet was not shutdown cleanly and was last loaded using a build with a newer version of Berkeley DB. If so, please use the software that last loaded this wallet</source>
-        <translation>このエラーは、このウォレットが正常にシャットダウンされず、Berkeley DBの新しいバージョンを含むビルドを使用して直前にロードされた場合に発生する可能性があります。その場合は、このウォレットを直前にロードしたソフトウェアを使用してください。</translation>
+        <translation>Táto chyba sa môže vyskytnúť, ak táto peňaženka nebola vypnutá čisto a bola naposledy načítaná pomocou zostavy s novšou verziou Berkeley DB. Ak áno, použite softvér, ktorý naposledy načítal túto peňaženku</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
-        <translation>これはリリース前のテストビルドです - 各自の責任で利用すること - 採掘や商取引に使用しないでください</translation>
+        <translation>Toto je predbežná testovacia zostava - používate na vlastné riziko - nepoužívajte na ťaženie alebo obchodné aplikácie</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
-        <translation>警告： ネットワークは完全に同意しないようです。マイナーは何らかの問題を経験しているようです。</translation>
+        <translation>Upozornenie: Zdá sa že sieť úplne nesúhlasí! Niektorí ťažiari majú zrejme ťažkosti.</translation>
     </message>
     <message>
         <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
-        <translation>警告： ピアと完全に同意しないようです！あなたはアップグレードする必要があるかもしれません。または他のノードがアップグレードする必要があるかもしれません。</translation>
+        <translation>Upozornenie: Zjavne sa úplne nezhodujeme s našimi peer-mi! Možno potrebujete prejsť na novšiu verziu alebo ostatné uzly potrebujú vyššiu verziu.</translation>
     </message>
     <message>
         <source>Already have that input.</source>
-        <translation>常時そのインプットを保持</translation>
+        <translation>Tento vstup už máme.</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
-        <translation>ウォレットのダウングレードはできません</translation>
+        <translation>Nie je možné prejsť na staršiu verziu peňaženky</translation>
     </message>
     <message>
         <source>Collateral not valid.</source>
-        <translation>コラテラルが無効です</translation>
+        <translation>Zaistenie je neplatné.</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
-        <translation>破損したブロックデータベースが検知されました</translation>
+        <translation>Zistený poškodený blok databázy</translation>
     </message>
     <message>
         <source>Do you want to rebuild the block database now?</source>
-        <translation>ブロックデータベースを今すぐ再構築しますか?</translation>
+        <translation>Chcete znovu zostaviť databázu blokov?</translation>
     </message>
     <message>
         <source>Done loading</source>
-        <translation>読み込み完了</translation>
+        <translation>Načítanie hotové</translation>
     </message>
     <message>
         <source>Entries are full.</source>
-        <translation>エントリーがいっぱいです</translation>
+        <translation>Položky sú plné.</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
-        <translation>ブロックデータベースの初期化中にエラー</translation>
+        <translation>Chyba pri inicializácii databázy blokov</translation>
     </message>
     <message>
         <source>Error initializing wallet database environment %s!</source>
-        <translation>ウォレットのデータベース環境 %s 初期化エラー!</translation>
+        <translation>Chyba pri inicializácii databázového prostredia peňaženky %s!</translation>
     </message>
     <message>
         <source>Error loading block database</source>
-        <translation>ブロックデータベースの読み込みエラー</translation>
+        <translation>Chyba pri načítaní databázy blokov</translation>
     </message>
     <message>
         <source>Error opening block database</source>
-        <translation>ブロックデータベースの開始エラー</translation>
+        <translation>Chyba pri otváraní databázy blokov</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
-        <translation>データベースの読み込みエラー。シャットダウンします。</translation>
+        <translation>Chyba pri načítaní z databázy, ukončuje sa.</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
-        <translation>ポートのリッスンに失敗しました。必要であれば -listen=0 を使用してください。</translation>
+        <translation>Nepodarilo sa počúvať na žiadnom porte. Použite -listen=0 ak to takto chcete.</translation>
     </message>
     <message>
         <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation>-maxtxfee が非常に高く設定されています！ひとつのトランザクションでこの量の手数料が支払われてしまうことがあります。</translation>
+        <translation>-maxtxfee je nastavené veľmi vysoko! Takto vysoký poplatok môže byť zaplatebý v jednej transakcii.</translation>
     </message>
     <message>
         <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
-        <translation>特定の接続を提供し、同時にアドルマンに発信接続を探させることができません。</translation>
+        <translation>Nedajú sa poskytnúť konkrétne spojenia a nechať súčasne addrman nájsť odchádzajúce spojenia.</translation>
     </message>
     <message>
         <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>未確認の分割されたアウトプットを検出しました。継続を確認するまで待機します。</translation>
+        <translation>Nájdené nepotvrdené denominované výstupy, pre pokračovanie sa čaká kým sa nepotvrdia.</translation>
     </message>
     <message>
         <source>Invalid -socketevents ('%s') specified. Only these modes are supported: %s</source>
-        <translation>無効な-socketevents（「%s」）が指定されました。これらのモード（%s）のみサポートされています。</translation>
+        <translation>Zadané neplatné -socketevents ('%s'). Podporované sú iba tieto režimy: %s</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
-        <translation>-maxtxfee=&lt;amount&gt; の数量の指定が無効です: '%s' (トランザクションが詰まってしまうのを防ぐため、少なくとも %s の最小中継手数料を指定しなければいけません)</translation>
+        <translation>Neplatná suma pre -maxtxfee=&lt;amount&gt;: '%s' (aby sa transakcia nezasekla, minimálny prenosový poplatok musí byť aspoň %s)</translation>
     </message>
     <message>
         <source>Transaction index can't be disabled with governance validation enabled. Either start with -disablegovernance command line switch or enable transaction index.</source>
-        <translation>ガバナンス検証を有効にした状態で、取引インデックスを無効化することはできません。-disablegovernanceのコマンドラインスイッチで開始するか、取引インデックスを有効にしてください。</translation>
+        <translation>Transakčný index nie je možné zakázať, ak je povolené overenie riadenia. Začnite buď prepínačom príkazového riadku -disablegovernance, alebo povolte index transakcií.</translation>
     </message>
     <message>
         <source>Can't mix: no compatible inputs found!</source>
-        <translation>ミキシング不可: 互換性のあるインプットが見つかりません</translation>
+        <translation>Nedá sa miešať: nezostávajú žiadne kompatibilné zdroje.</translation>
     </message>
     <message>
         <source>Entry exceeds maximum size.</source>
-        <translation>エントリーが最大サイズを超えました。</translation>
+        <translation>Vstup prekračuje maximálnu veľkosť.</translation>
     </message>
     <message>
         <source>Found enough users, signing ( waiting %s )</source>
-        <translation>充分なユーザーを発見しました、サインしています ( 待機中 %s )</translation>
+        <translation>Nájdený dostatok používateľov, pospisuje sa ( čakanie %s )</translation>
     </message>
     <message>
         <source>Found enough users, signing ...</source>
-        <translation>充分なユーザーを発見しました、サインしています </translation>
+        <translation>Nájdený dostatok používateľov, pospisuje sa ...</translation>
     </message>
     <message>
         <source>Importing...</source>
-        <translation>インポートしています…</translation>
+        <translation>Importuje sa...</translation>
     </message>
     <message>
         <source>Incompatible mode.</source>
-        <translation>非互換性モード</translation>
+        <translation>Nekompatibilný mód.</translation>
     </message>
     <message>
         <source>Incompatible version.</source>
-        <translation>非互換性バージョン</translation>
+        <translation>Nekompatibilná verzia.</translation>
     </message>
     <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
-        <translation>不正なブロックが発見されたか、またはジェネシスブロックが発見されませんでした。ネットワークの datadir が間違っていませんか?</translation>
+        <translation>Nesprávny alebo žiadny genesis blok nájdený. Nesprávny dátový priečinok alebo sieť?</translation>
     </message>
     <message>
         <source>Input is not valid.</source>
-        <translation>インプットが無効です</translation>
+        <translation>Vstup nie je platný.</translation>
     </message>
     <message>
         <source>Insufficient funds.</source>
-        <translation>残高が不足しています</translation>
+        <translation>Nedostatok prostriedkov.</translation>
     </message>
     <message>
         <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
-        <translation>-ディスカードフィー=&lt;amount&gt;の額: '%s' が無効です</translation>
+        <translation>Neplatná suma pre -discardfee=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
-        <translation>-paytxfee=&lt;amount&gt; に対する無効な数量です： '%s' (少なくとも %s でなければいけません)</translation>
+        <translation>Neplatná suma pre -paytxfee=&lt;amount&gt;: '%s' (musí byť aspoň %s)</translation>
     </message>
     <message>
         <source>Invalid minimum number of spork signers specified with -minsporkkeys</source>
-        <translation>-minsporkkeysで指定されたスポーク署名者の最小数が無効です</translation>
+        <translation>Neplatný minimálny počet spork podpisovateľov určených pomocou -minsporkkeys</translation>
     </message>
     <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
-        <translation>キープールが枯渇しました。まずはじめに keypoolrefill を呼び出してください。</translation>
+        <translation>Vyčerpal sa zásobník kľúčov, zavolať najskôr keypoolrefill</translation>
     </message>
     <message>
         <source>Loading banlist...</source>
-        <translation>banリストを読み込んでいます...</translation>
+        <translation>Načítavam banlist...</translation>
     </message>
     <message>
         <source>Loading fulfilled requests cache...</source>
-        <translation>承認されたリクエストキャッシュを読み込んでいます...</translation>
+        <translation>Načíta sa vyrovnávacia pamäť splnených zadaní...</translation>
     </message>
     <message>
         <source>Loading masternode cache...</source>
-        <translation>マスターノードキャッシュを読み込んでいます...</translation>
+        <translation>Načíta sa vyrovnávacia pamäť masternode...</translation>
     </message>
     <message>
         <source>Lock is already in place.</source>
-        <translation>すでにロックされています</translation>
+        <translation>Zámok je už na mieste.</translation>
     </message>
     <message>
         <source>Mixing in progress...</source>
-        <translation>ミキシング中...</translation>
+        <translation>Prebieha miešanie...</translation>
     </message>
     <message>
         <source>Need to specify a port with -whitebind: '%s'</source>
-        <translation>-whitebind を用いてポートを指定する必要があります： '%s'</translation>
+        <translation>Je potrebné zadať port s -whitebind: '%s'</translation>
     </message>
     <message>
         <source>No Masternodes detected.</source>
-        <translation>マスターノードが検出されません</translation>
+        <translation>Nezistený žiadny Masternode.</translation>
     </message>
     <message>
         <source>No compatible Masternode found.</source>
-        <translation>互換性のあるマスターノードが検出されません</translation>
+        <translation>Nekompatibilný Masternode zdroj.</translation>
     </message>
     <message>
         <source>Not enough funds to mix.</source>
-        <translation>ミキシングの資金が足りません</translation>
+        <translation>Nedostatok zdrojov pre miešanie.</translation>
     </message>
     <message>
         <source>Not in the Masternode list.</source>
-        <translation>マスターノードリストにありません</translation>
+        <translation>Nie je v zozname Masternode.</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>マスターノードにサブミット、待機中 %s</translation>
+        <translation>Odoslané na masternode, čaká vo fronte %s</translation>
     </message>
     <message>
         <source>Synchronization finished</source>
-        <translation>同期完了</translation>
+        <translation>Synchronizácia dokončená</translation>
     </message>
     <message>
         <source>Unable to start HTTP server. See debug log for details.</source>
-        <translation>HTTPサーバを開始できませんでした。詳細はデバッグログをご確認ください。</translation>
+        <translation>Nepodarilo sa spustiť HTTP server. Pre viac detailov zobrazte debug log.</translation>
     </message>
     <message>
         <source>Unknown response.</source>
-        <translation>不明なレスポンス</translation>
+        <translation>Neznáma odpoveď.</translation>
     </message>
     <message>
         <source>User Agent comment (%s) contains unsafe characters.</source>
-        <translation>ユーザーエージェントのコメント (%s) には安全でない文字が含まれています。</translation>
+        <translation>Komentár u typu klienta (%s) obsahuje riskantné znaky.</translation>
     </message>
     <message>
         <source>Verifying wallet(s)...</source>
-        <translation>ウォレットを検証中…</translation>
+        <translation>Overuje sa peňaženka(y)...</translation>
     </message>
     <message>
         <source>Will retry...</source>
-        <translation>再試行...</translation>
+        <translation>Skúsime znovu...</translation>
     </message>
     <message>
         <source>Can't find random Masternode.</source>
-        <translation>ランダムなマスターノードを発見できません</translation>
+        <translation>Nedá sa nájsť náhodný Masternode.</translation>
     </message>
     <message>
         <source>%s can't be lower than %s</source>
-        <translation>%sは%sより低くできません。</translation>
+        <translation>%s nemôže byť nižšia ako %s</translation>
     </message>
     <message>
         <source>%s is idle.</source>
-        <translation>%sはアイドル状態です。</translation>
+        <translation>%s je nečinný.</translation>
     </message>
     <message>
         <source>Can't mix while sync in progress.</source>
-        <translation>同期中はミキシングできません</translation>
+        <translation>Miešanie nefunguje počas synchronizácie.</translation>
     </message>
     <message>
         <source>Invalid netmask specified in -whitelist: '%s'</source>
-        <translation>-whitelist で指定された無効なネットマスク： '%s'</translation>
+        <translation>Nadaná neplatná netmask vo -whitelist: '%s'</translation>
     </message>
     <message>
         <source>Invalid script detected.</source>
-        <translation>無効なスクリプトが検出されました</translation>
+        <translation>Zistený neplatný skript.</translation>
     </message>
     <message>
         <source>%s file contains all private keys from this wallet. Do not share it with anyone!</source>
-        <translation>%s ファイルはこのウォレットのプライベートキーをすべて保有しています。誰ともシェアしないでください。</translation>
+        <translation>Súbor %s obsahuje všetky súkromné kľúče z tejto peňaženky. Nezdieľajte s nikým!</translation>
     </message>
     <message>
         <source>Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.</source>
-        <translation>バックアップ作成失敗、ファイルは既に存在します！これはウォレットを60秒以内にリスタートしたときに発生することがあります。これで問題なければ先に進むことができます。</translation>
+        <translation>Chyba pri vytváraní zálohy, lebo súbor už existuje! Toto môže nastať v prípade, ak ste reštartovali peňaženku za menej ako 60 sekúnd. Ak Vám to nevadí, môžete pokračovať.</translation>
     </message>
     <message>
         <source>Make sure to encrypt your wallet and delete all non-encrypted backups after you have verified that the wallet works!</source>
-        <translation>ウォレットが動作することを確認したら、必ずウォレットを暗号化し、暗号化されていないバックアップをすべて削除してください！</translation>
+        <translation>Uistite sa, že máte vašu peňaženku zašifrovanú a zmazané všetky nezašifrované zálohy potom ako ste overili, že peňaženka funguje!</translation>
     </message>
     <message>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
-        <translation>剪定が最小値の %d MiB以下に設定されています。もっと大きな値を使用してください。</translation>
+        <translation>Orezanie nastavené pod minimálnu hodnotu %d MiB. Prosím použite vyššiu hodnotu.</translation>
     </message>
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
-        <translation>剪定: 最後のウォレット同期ポイントは、剪定されたデータよりも過去のものとなっています。-reindexをする必要があります (剪定されたノードの場合、ブロックチェイン全体をダウンロードしてください)</translation>
+        <translation>Orezávanie: posledná synchronizácia peňaženky prebehla už pred orezanými dátami. Je treba spustiť -reindex (stiahne znovu celý blockchain v prípade orezaného uzlu)</translation>
     </message>
     <message>
         <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
-        <translation>剪定モードでは再スキャンを行うことはできません。-reindexを使用し、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
+        <translation>V orezanom režime nie je možné reťazec blokov pre-skenovať. Musíte vykonať -reindex, čo znova stiahne celý blockchain.</translation>
     </message>
     <message>
         <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
-        <translation>ブロックのデータベースに未来の時刻のブロックが含まれています。これはおそらくお使いのコンピュータに設定されている日時が間違っていることを示しています。お使いのコンピュータの日時が本当に正しい場合にのみ、ブロックのデータベースの再構築を行ってください。</translation>
+        <translation>Databáza blokov obsahuje blok, ktorý vyzerá byť z budúcnosti. Toto môže byť spôsobené nesprávnym systémovým časom vášho počítača. Obnovujte databázu blokov len keď ste si istý, že systémový čas je nastavený správne.</translation>
     </message>
     <message>
         <source>The transaction amount is too small to send after the fee has been deducted</source>
-        <translation>手数料差引後のトランザクションの金額が小さすぎるため、送金できません。</translation>
+        <translation>Po odpočítaní poplatku je suma transakcie príliš malá pre odoslanie</translation>
     </message>
     <message>
         <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
-        <translation>ネットワークバージョン文字 (%i) の長さが最大の長さ (%i) を超えています。UAコメントの数や長さを削減してください。</translation>
+        <translation>Celková dĺžka verzie sieťového reťazca (%i) prekračuje maximálnu dĺžku (%i). Znížte počet a veľkosť parametra  uacomments.</translation>
     </message>
     <message>
         <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
-        <translation>警告! キープールの補充に失敗しました、ウォレットをアンロックしてキープールを補充してください</translation>
+        <translation>UPOZORNENIE! Chyba pri doplňovaní zásobníku kľúčov. Pre doplnenie musíte odomknúť vašu peňaženku.</translation>
     </message>
     <message>
         <source>Wallet is locked, can't replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.</source>
-        <translation>ウォレットがロックされているのでキープールを補充できません!自動バックアップとミキシングが無効なので、ウォレットをアンロックしてキープールを補充してください。</translation>
+        <translation>Peňaženka je zamknutá takže sa nedá doplniť zásobník kľúčov. Automatické zálohy a miešanie sú vypnuté. Pre doplnenie musíte odomknúť vašu peňaženku.</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -timestampindex</source>
-        <translation>-timestampindexを変更するには、-reindexを使用してデータベースを再構築する必要があります。</translation>
+        <translation>Potrebujete prebudovať databázu použitím -reindex zmeniť -timestampindex</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation>非剪定モードに戻るためには-reindexオプションを使用してデータベースを再構築する必要があります。これによりブロックチェーン全体の再ダウンロードが行われます。</translation>
+        <translation>K návratu k neorezanému režimu je treba prestavať databázu použitím -reindex. Tiež sa znova stiahne celý blockchain</translation>
     </message>
     <message>
         <source>%s failed</source>
-        <translation>%sは失敗しました</translation>
+        <translation>%s zlyhalo</translation>
     </message>
     <message>
         <source>-maxmempool must be at least %d MB</source>
-        <translation>-maxmempoolは最低でも %d MB必要です</translation>
+        <translation>-maxmempool musí byť najmenej %d MB</translation>
     </message>
     <message>
         <source>Automatic backups disabled</source>
-        <translation>自動バックアップ無効</translation>
+        <translation>Automatické zálohy sú deaktivované</translation>
     </message>
     <message>
         <source>Cannot set -peerblockfilters without -blockfilterindex.</source>
-        <translation>-peerblockfiltersを-blockfilterindexなしで設定することはできません。</translation>
+        <translation>Nie je možné nastaviť -peerblockfilters bez -blockfilterindex.</translation>
     </message>
     <message>
         <source>Config setting for %s only applied on %s network when in [%s] section.</source>
-        <translation>%sの構成設定は、[%s]セクションにある場合、%sネットワークにのみ適用されます。</translation>
+        <translation>Nastavenie konfigurácie pre %s sa použije iba v sieti %s v sekcii [%s].</translation>
     </message>
     <message>
         <source>Could not find asmap file %s</source>
-        <translation>%sのasmapファイルが見つかりませんでした</translation>
+        <translation>Nepodarilo sa nájsť súbor asmap %s</translation>
     </message>
     <message>
         <source>Could not parse asmap file %s</source>
-        <translation>%sのasmapファイルを解析できませんでした</translation>
+        <translation>Nepodarilo sa načítať súbor asmap %s</translation>
     </message>
     <message>
         <source>ERROR! Failed to create automatic backup</source>
-        <translation>エラー! 自動バックアップ作成失敗</translation>
+        <translation>CHYBA! Nepodarilo sa vytvoriť automatickú zálohu</translation>
     </message>
     <message>
         <source>Error loading %s: Private keys can only be disabled during creation</source>
-        <translation>%sの読み込みエラー：プライベートキーは作成時にのみ無効化できます。</translation>
+        <translation>Chyba pri načítavaní %s: Súkromné kľúče je možné deaktivovať iba počas vytvárania</translation>
     </message>
     <message>
         <source>Error upgrading evo database</source>
-        <translation>Evoデータベースのアップグレードエラー</translation>
+        <translation>Chyba pri aktualizácii databázy evo</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occurred, see debug.log for details</source>
-        <translation>エラー：致命的な内部エラーが発生しました。詳細はdebug.logを参照してください</translation>
+        <translation>Chyba: Vyskytla sa interná chyba, pre viac informácií zobrazte debug.log</translation>
     </message>
     <message>
         <source>Error: Disk space is low for %s</source>
-        <translation>エラー：%sのディスク容量が不足しています</translation>
+        <translation>Chyba: Miesta na disku pre %s je málo</translation>
     </message>
     <message>
         <source>Error: failed to add socket to epollfd (epoll_ctl returned error %s)</source>
-        <translation>エラー：epollfdへのソケットの追加に失敗しました（epoll_ctlは、%sのエラーを返しました）</translation>
+        <translation>Chyba: Nepodaril sa pridať soket do epollfd (epoll_ctl vrátil chybu %s)</translation>
     </message>
     <message>
         <source>Exceeded max tries.</source>
-        <translation>最大試行回数を超えました。</translation>
+        <translation>Prekročený maximálny počet pokusov.</translation>
     </message>
     <message>
         <source>Failed to commit EvoDB</source>
-        <translation>EvoDBのコミットに失敗しました</translation>
+        <translation>Nepodarilo sa vykonať EvoDB</translation>
     </message>
     <message>
         <source>Failed to create backup %s!</source>
-        <translation>バックアップ作成 %s失敗!</translation>
+        <translation>Nepodarilo sa vytvoriť zálohu %s!</translation>
     </message>
     <message>
         <source>Failed to create backup, error: %s</source>
-        <translation>バックアップ作成失敗、エラー: %s</translation>
+        <translation>Nepodarilo sa vytvoriť zálohu, chyba: %s</translation>
     </message>
     <message>
         <source>Failed to delete backup, error: %s</source>
-        <translation>バックアップ削除失敗、エラー: %s</translation>
+        <translation>Nepodarilo sa vymazať zálohu, chyba: %s</translation>
     </message>
     <message>
         <source>Failed to rescan the wallet during initialization</source>
-        <translation>初期化中にウォレットの再スキャンに失敗しました</translation>
+        <translation>Počas inicializácie sa nepodarilo znova naskenovať peňaženku</translation>
     </message>
     <message>
         <source>Invalid P2P permission: '%s'</source>
-        <translation>無効なP2P許可：「%s」</translation>
+        <translation>Neplatné povolenie P2P: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
-        <translation>無効な額 -fallbackfee=&lt;amount&gt;: '%s'</translation>
+        <translation>Neplatná suma pre -fallbackfee=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
         <source>Invalid masternodeblsprivkey. Please see documentation.</source>
-        <translation>マスターノードBLS秘密鍵が無効です。ドキュメントをお読み下さい。</translation>
+        <translation>Neplatný masternodeblsprivkey. Pozrite si dokumentáciu.</translation>
     </message>
     <message>
         <source>Loading block index...</source>
-        <translation>ブロックインデックスを読み込んでいます…</translation>
+        <translation>Načítavanie zoznamu blokov...</translation>
     </message>
     <message>
         <source>Loading governance cache...</source>
-        <translation>ガバナンスキャッシュを読み込み中...</translation>
+        <translation>Načíta sa vyrovnávacia pamäť správy...</translation>
     </message>
     <message>
         <source>Loading sporks cache...</source>
-        <translation>スポークキャッシュを読み込み中...</translation>
+        <translation>Načíta sa vyrovnávacia pamäť sporks...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
-        <translation>ウォレットを読み込んでいます… (%3.2f %%)</translation>
+        <translation>Načítavanie peňaženky... (%3.2f %%)</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation>ウォレットを読み込んでいます…</translation>
+        <translation>Načítavanie peňaženky...</translation>
     </message>
     <message>
         <source>Masternode queue is full.</source>
-        <translation>マスターノードキューがいっぱいです</translation>
+        <translation>Fronta Masternode je plná</translation>
     </message>
     <message>
         <source>Masternode:</source>
-        <translation>マスターノード:</translation>
+        <translation>Masternode:</translation>
     </message>
     <message>
         <source>Missing input transaction information.</source>
-        <translation>不明なインプットトランザクション情報</translation>
+        <translation>Chýbajú vstupy transakčnej informácie.</translation>
     </message>
     <message>
         <source>No errors detected.</source>
-        <translation>エラーは検出されていません。</translation>
+        <translation>Nezistená žiadna chyba.</translation>
     </message>
     <message>
         <source>No matching denominations found for mixing.</source>
-        <translation>ミキシング用の分割がマッチしていません。</translation>
+        <translation>Nenájdené zhodné denominované zdroje pre miešanie.</translation>
     </message>
     <message>
         <source>Not compatible with existing transactions.</source>
-        <translation>既存のトランザクションと互換性がありません。</translation>
+        <translation>Nie je kompatibilné s existujúcou transakciou.</translation>
     </message>
     <message>
         <source>Not enough file descriptors available.</source>
-        <translation>使用可能なファイルディスクリプタが不足しています。</translation>
+        <translation>Nedostatok kľúčových slov súboru.</translation>
     </message>
     <message>
         <source>Prune cannot be configured with a negative value.</source>
-        <translation>剪定値は負の値に設定できません。</translation>
+        <translation>Orezanie nemôže byť nastavené na zápornú hodnotu.</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -blockfilterindex.</source>
-        <translation>プルーンモードは、-blockfilterindexと互換性がありません。</translation>
+        <translation>Režim orezávania nie je kompatibilný s -blockfilterindex.</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -disablegovernance=false.</source>
-        <translation>プルーンモードは、-disablegovernance=falseと互換性がありません。</translation>
+        <translation>Orezávanie nie je kompatibilné s -disablegovernance=false.</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -txindex.</source>
-        <translation>剪定モードは-txindexと互換性がありません。</translation>
+        <translation>Orezávanie nie je kompatibilné s -txindex.</translation>
     </message>
     <message>
         <source>Pruning blockstore...</source>
-        <translation>ブロックストアを剪定しています…</translation>
+        <translation>Redukovanie blockstore...</translation>
     </message>
     <message>
         <source>Section [%s] is not recognized.</source>
-        <translation>[%s]のセクションは認識されません。</translation>
+        <translation>Sekcia [%s] nie je rozpoznaná.</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" does not exist</source>
-        <translation>指定された-walletdirの「%s」は存在しません</translation>
+        <translation>Zadaný -walletdir "%s" neexistuje</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" is a relative path</source>
-        <translation>指定された-walletdirの「%s」は相対パスです</translation>
+        <translation>Zadaný -walletdir "%s" je relatívna cesta</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" is not a directory</source>
-        <translation>指定された-walletdirの「%s」はディレクトリではありません</translation>
+        <translation>Zadaný -walletdir "%s" nie je adresár</translation>
     </message>
     <message>
         <source>Synchronizing blockchain...</source>
-        <translation>ブロックチェーンの同期中…</translation>
+        <translation>Synchronizuje sa blockchain...</translation>
     </message>
     <message>
         <source>The specified config file %s does not exist
 </source>
-        <translation>指定された構成ファイルの%sは存在しません</translation>
+        <translation>Zadaný konfiguračný súbor %s neexistuje
+</translation>
     </message>
     <message>
         <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation>ウォレットは最小中継手数料を下回る額の支払を拒否します。</translation>
+        <translation>Peňaženka zabráni zaplateniu menšej sumy ako je minimálny poplatok.</translation>
     </message>
     <message>
         <source>This is expected because you are running a pruned node.</source>
-        <translation>これは、プルーニングされたノードを実行しているため、予想されます。</translation>
+        <translation>Tot je očakávané, pretože používate orezaný uzol.</translation>
     </message>
     <message>
         <source>This is the minimum transaction fee you pay on every transaction.</source>
-        <translation>これはすべてのトランザクションに対して最低限支払うべき手数料です。</translation>
+        <translation>Toto je minimálny poplatok za transakciu pri každej transakcii.</translation>
     </message>
     <message>
         <source>This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>これは取引を送信する場合に支払う取引手数料です。</translation>
+        <translation>Toto je poplatok za transakciu pri odoslaní transakcie.</translation>
     </message>
     <message>
         <source>Transaction amounts must not be negative</source>
-        <translation>トランザクションの総額はマイナスではあってはいけません。。</translation>
+        <translation>Sumy transakcií nesmú byť záporné</translation>
     </message>
     <message>
         <source>Transaction has too long of a mempool chain</source>
-        <translation>トランザクションのmempoolチェーンが長過ぎます。</translation>
+        <translation>Transakcia má v transakčnom zásobníku príliš dlhý reťazec</translation>
     </message>
     <message>
         <source>Transaction must have at least one recipient</source>
-        <translation>トランザクションは最低ひとつの受取先が必要です。</translation>
+        <translation>Transakcia musí mať aspoň jedného príjemcu</translation>
     </message>
     <message>
         <source>Transaction too large</source>
-        <translation>トランザクション量が大きすぎます。</translation>
+        <translation>Transakcia je príliš veľká</translation>
     </message>
     <message>
         <source>Trying to connect...</source>
-        <translation>接続中です...</translation>
+        <translation>Pokúšame sa pripojiť...</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer. %s is probably already running.</source>
-        <translation>このコンピュータの %s にバインドすることができません。おそらく %s は既に実行されています。</translation>
+        <translation>Nedá sa pripojiť k %s na tomto počítači. %s už pravdepodobne beží.</translation>
     </message>
     <message>
         <source>Unable to create the PID file '%s': %s</source>
-        <translation>PIDファイルの「%s」を作成できません：%s</translation>
+        <translation>Nie je možné vytvoriť súbor PID '%s': %s</translation>
     </message>
     <message>
         <source>Unable to generate initial keys</source>
-        <translation>初期キーが生成できません</translation>
+        <translation>Nie je možné vygenerovať počiatočné kľúče</translation>
     </message>
     <message>
         <source>Unknown -blockfilterindex value %s.</source>
-        <translation>%sは、不明な-blockfilterindexの値です。</translation>
+        <translation>Neznáma -blockfilterindex hodnota %s.</translation>
     </message>
     <message>
         <source>Upgrading UTXO database</source>
-        <translation>UTXOデータベースを更新しています</translation>
+        <translation>Vylepšuje sa databáza neminutých výstupov (UTXO)</translation>
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart %s to complete</source>
-        <translation>ウォレットが書き直される必要がありました: 完了するために %s を再起動します</translation>
+        <translation>Peňaženka musí byť prepísaná: pre dokončenie reštartujte %s</translation>
     </message>
     <message>
         <source>Warning: unknown new rules activated (versionbit %i)</source>
-        <translation>警告: 未知の新しいルールがアクティベートされました (バージョンビット %i)</translation>
+        <translation>Upozornenie: aktivovaná neznáme nové pravidlá (verzový bit %i)</translation>
     </message>
     <message>
         <source>Wasn't able to create wallet backup folder %s!</source>
-        <translation>ウォレットバックアップフォルダー作成不可 %s!</translation>
+        <translation>Nepodarilo sa vytvorenie priečinku pre zálohu %s!</translation>
     </message>
     <message>
         <source>You can not start a masternode with wallet enabled.</source>
-        <translation>ウォレットを有効にした状態でマスターノードを起動することはできません。</translation>
+        <translation>Nie je možné spustiť masternód s povolenou peňaženkou.</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -addressindex</source>
-        <translation>-addressindexを変更するために、-reindexを使用してデータベースを再構築する必要があります</translation>
+        <translation>Potrebujete prebudovať databázu použitím -reindex zmeniť -addressindex</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -spentindex</source>
-        <translation>-spentindexを変更するために、-reindexを使用してデータベースを再構築する必要があります</translation>
+        <translation>Potrebujete prebudovať databázu použitím -reindex zmeniť -spentindex</translation>
     </message>
     <message>
         <source>no mixing available.</source>
-        <translation>ミキシングは利用できません。</translation>
+        <translation>miešanie nedostupné.</translation>
     </message>
     <message>
         <source>see debug.log for details.</source>
-        <translation>詳細はdebug.logを参照してください。</translation>
+        <translation>podrobnosti nájdete v debug.log.</translation>
     </message>
     <message>
         <source>The %s developers</source>
-        <translation>%s の開発者</translation>
+        <translation>Vývojári %s</translation>
     </message>
     <message>
         <source>%s uses exact denominated amounts to send funds, you might simply need to mix some more coins.</source>
-        <translation>%sは正確に換算した金額を送金するため、単純にいくらかのコインをミキシングする必要があるかもしれません。</translation>
+        <translation>Pre poslanie zdrojov používa %s presné denominované sumy, možno iba potrebujete zmiešať viac mincí. </translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
-        <translation>データディレクトリ %s のロックを取得することができません。おそらく %s は実行中です。</translation>
+        <translation>Nedá sa uzamknúť zložka %s. %s pravdepodobne už beží.</translation>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
-        <translation>MITソフトウェアライセンスのもとで配布されています。付属のファイル %s または %s を参照してください</translation>
+        <translation>Distribuované pod softvérovou licenciou MIT, viď sprievodný súbor %s alebo %s</translation>
     </message>
     <message>
         <source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source>
-        <translation>%s読み込みエラー: 既存の非HDウォレット上でHDを有効化できません</translation>
+        <translation>Chyba pri načítaní %s: Nemôžete zapnúť HD na už existujúcej nie-HD peňaženke</translation>
     </message>
     <message>
         <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation>%s の読み込みエラー! すべてのキーは正しく読み取れますが、トランザクションデータやアドレス帳のエントリが失われたか、正しくない可能性があります。</translation>
+        <translation>Nastala chyba pri čítaní súboru %s! Všetky kľúče sa prečítali správne, ale dáta o transakciách alebo záznamy v adresári môžu chýbať alebo byť nesprávne.</translation>
     </message>
     <message>
         <source>Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?</source>
-        <translation>無効なdevnetジェネシスブロックが発見されたか、またはdevnetジェネシスブロックが発見されません。 特定のdevnet用のデータディレクトリが間違ってませんか?</translation>
+        <translation>Nebol nájdený správny, prípadne žiadny základný blok. Nezadali ste nesprávny dátový priečinok alebo vývojársku sieť?</translation>
     </message>
     <message>
         <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
-        <translation>あなたのPCの日付と時刻が正しいことを確認して下さい！ もしあなたの時計が正しくなければ %s が正確に動作しません。</translation>
+        <translation>Prosím skontrolujte systémový čas a dátum. Keď je váš čas nesprávny, %s nebude fungovať správne.</translation>
     </message>
     <message>
         <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
-        <translation>%s が有用だと感じられた方はぜひプロジェクトへの貢献をお願いします。ソフトウェアのより詳細な情報については %s をご覧ください。</translation>
+        <translation>Keď si myslíte, že %s je užitočný, podporte nás. Pre viac informácií o software navštívte %s.</translation>
     </message>
     <message>
         <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
-        <translation>これはこのレベルでお釣りがダストよりも少額の場合に破棄できる取引手数料です</translation>
+        <translation>Toto je transakčný poplatok, ktorý môžete zahodiť, ak je výdavok menší ako prach pri tejto úrovni</translation>
     </message>
     <message>
         <source>This is the transaction fee you may pay when fee estimates are not available.</source>
-        <translation>これは手数料の推定機能が利用できない場合に支払うトランザクション手数料です。</translation>
+        <translation>Toto je poplatok za transakciu keď odhad poplatkov ešte nie je k dispozícii.</translation>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation>この製品はOpenSSLプロジェクトにより開発されたソフトウェアをOpenSSLツールキット %s として利用しています &lt;https://www.openssl.org/&gt;。また、Eric Young氏により開発された暗号ソフトウェア、Thomas Bernard氏により書かれたUPnPソフトウェアを用いています。</translation>
+        <translation>Tento produkt zahrňuje programy vyvinuté projektom OpenSSL pre použití v OpenSSL Toolkite %s a kryptografický program od Erika Younga a program UPnP od Thomasa Bernarda.</translation>
     </message>
     <message>
         <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
-        <translation>ブロックを再生できません。 -reindex-chainstateを使用してデータベースを再構築する必要があります。</translation>
+        <translation>Bloky nie je možné prehrať. Potrebujete prebudovať databázu použitím -reindex-chainstate.</translation>
     </message>
     <message>
         <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
-        <translation>警告：プライベートキーが、無効化されたものと一緒にウォレット{%s}で検出されました</translation>
+        <translation>Upozornenie: Boli zistené súkromné kľúče v peňaženke {%s} so zakázanými súkromnými kľúčmi</translation>
     </message>
     <message>
         <source>%d of last 100 blocks have unexpected version</source>
-        <translation>最新の100ブロックの %d で予期しないバージョンがあります。</translation>
+        <translation>%d z posledných 100 blokov má neočakávanú verziu</translation>
     </message>
     <message>
         <source>%s is not a valid backup folder!</source>
-        <translation>%s は無効なバックアップフォルダーです!</translation>
+        <translation>%s nie je platný priečinok pre zálohu!</translation>
     </message>
     <message>
         <source>%s is only allowed with a single wallet file</source>
-        <translation>%sは、単一のウォレットファイルでのみ許可されます</translation>
+        <translation>%s je povolené iba s jedným súborom peňaženky</translation>
     </message>
     <message>
         <source>%s is set very high!</source>
-        <translation>%s の設定値は高すぎます！</translation>
+        <translation>Hodnota %s je nastavená veľmi vysoko!</translation>
     </message>
     <message>
         <source>%s request incomplete:</source>
-        <translation>%sのリクエストが未完了です。</translation>
+        <translation>%s žiadosť nie je dokončená:</translation>
     </message>
     <message>
         <source>-devnet can only be specified once</source>
-        <translation>-devnet は一度だけ指定できます</translation>
+        <translation>-devnet môže byť zadaný iba raz</translation>
     </message>
     <message>
         <source>-port must be specified when -devnet and -listen are specified</source>
-        <translation>-port は、 -devnet と -listen が指定されたときに指定しなければなりません。</translation>
+        <translation>-port musí byť špecifikovaný, keď sú zadané -devnet a -listen</translation>
     </message>
     <message>
         <source>-rpcport must be specified when -devnet and -server are specified</source>
-        <translation>-rpcport は、 -devnet と -server が指定されたとき指定しなければなりません。</translation>
+        <translation>-rpcport musí byť zadaný, keď sú špecifikované -devnet a -server</translation>
     </message>
     <message>
         <source>A fatal internal error occurred, see debug.log for details</source>
-        <translation>致命的な内部エラーが発生しました。詳細は、debug.logを参照してください。</translation>
+        <translation>Vyskytla sa závažná interná chyba, podrobnosti nájdete v debug.log</translation>
     </message>
     <message>
         <source>Cannot resolve -%s address: '%s'</source>
-        <translation>-%s アドレス '%s' を解決できません</translation>
+        <translation>Nedá preložiť -%s adresu: '%s'</translation>
     </message>
     <message>
         <source>Cannot write to data directory '%s'; check permissions.</source>
-        <translation>「%s」のデータディレクトリに書き込めません。権限を確認してください。</translation>
+        <translation>Nie je možné zapisovať do dátového adresára '%s'. Skontrolujte povolenia.</translation>
     </message>
     <message>
         <source>Change index out of range</source>
-        <translation>チェンジインデックスが範囲外です</translation>
+        <translation>Menný index mimo rozsah</translation>
     </message>
     <message>
         <source>Copyright (C)</source>
-        <translation>Copyright (C)</translation>
+        <translation>Autorské práva (C)</translation>
     </message>
     <message>
         <source>Disk space is too low!</source>
-        <translation>ディスク容量が少なすぎます。</translation>
+        <translation>Príliš málo miesta na disku!</translation>
     </message>
     <message>
         <source>Error loading %s</source>
-        <translation>%s 読み込みエラー</translation>
+        <translation>Chyba načítania %s</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet corrupted</source>
-        <translation>%s 読み込みエラー: ウォレットが壊れました</translation>
+        <translation>Chyba načítania %s: Peňaženka je poškodená</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet requires newer version of %s</source>
-        <translation>%s の読み込みに失敗しました: ウォレットにはより新しいバージョンの %s が必要です。</translation>
+        <translation>Chyba načítania %s: Peňaženka vyžaduje novšiu verziu %s</translation>
     </message>
     <message>
         <source>Error loading %s: You can't disable HD on an already existing HD wallet</source>
-        <translation>読み込みエラー %s: 既存のHDウォレット上のHDを無効化できません</translation>
+        <translation>Chyba pri načítaní %s: Nemôžete vypnúť HD na už existujúcej HD peňaženke</translation>
     </message>
     <message>
         <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
-        <translation>ウォレットの読み込みエラー %s。重複する -walletファイル名が指定されました。</translation>
+        <translation>Chyba pri načítaní peňaženky %s. Bol špecifikovaný duplikáty parameter -wallet.</translation>
     </message>
     <message>
         <source>Error upgrading chainstate database</source>
-        <translation>チェーンステートデータベースのアップグレードエラー</translation>
+        <translation>Chyba pri vylepšení databáze reťzcov blokov</translation>
     </message>
     <message>
         <source>Error: failed to add socket to kqueuefd (kevent returned error %s)</source>
-        <translation>エラー：kqueuefdへのソケットの追加に失敗しました (keventが、%sのエラーを返しました）</translation>
+        <translation>Chyba: Nepodaril sa pridať soket do kqueuefd (kevent vrátil chybu %s)</translation>
     </message>
     <message>
         <source>Failed to clear fulfilled requests cache at %s</source>
-        <translation>%sで、完了したリクエストのキャッシュの削除に失敗しました</translation>
+        <translation>Nepodarilo sa vymazať vyrovnávaciu pamäť splnených požiadaviek o %s</translation>
     </message>
     <message>
         <source>Failed to clear governance cache at %s</source>
-        <translation>%sで、ガバナンスのキャッシュの削除に失敗しました</translation>
+        <translation>Nepodarilo sa vymazať vyrovnávaciu pamäť dozoru o %s</translation>
     </message>
     <message>
         <source>Failed to clear masternode cache at %s</source>
-        <translation>%sで、マスタノードのキャッシュの削除に失敗しました</translation>
+        <translation>Vymazanie vyrovnávacej pamäte masternode sa nepodarilo o %s</translation>
     </message>
     <message>
         <source>Failed to find mixing queue to join</source>
-        <translation>ミキシングキューの検出に失敗</translation>
+        <translation>Nepodarilo sa nájsť frontu miešania</translation>
     </message>
     <message>
         <source>Failed to load fulfilled requests cache from %s</source>
-        <translation>%sから完了したリクエストのキャッシュをロードするのに失敗しました</translation>
+        <translation>Chyba pri načítaní vyrovnávajúcej pamäti splnených zadaní z %s</translation>
     </message>
     <message>
         <source>Failed to load governance cache from %s</source>
-        <translation>%sからガバナンスのキャッシュをロードするのに失敗しました</translation>
+        <translation>Chyba pri načítaní vyrovnávajúcej pamäti dozoru z %s</translation>
     </message>
     <message>
         <source>Failed to load masternode cache from %s</source>
-        <translation>%sからマスターノードのキャッシュをロードするのに失敗しました</translation>
+        <translation>Chyba pri načítaní vyrovnávajúcej pamäti masternode z %s</translation>
     </message>
     <message>
         <source>Failed to load sporks cache from %s</source>
-        <translation>%sからスポークのキャッシュをロードするのに失敗しました</translation>
+        <translation>Chyba pri načítaní vyrovnávajúcej pamäti sporks z %s</translation>
     </message>
     <message>
         <source>Failed to start a new mixing queue</source>
-        <translation>新しいミキシングキューの開始に失敗</translation>
+        <translation>Nepodarilo sa spustiť novú frontu miešania</translation>
     </message>
     <message>
         <source>Incorrect -rescan mode, falling back to default value</source>
-        <translation>再スキャンモードが正しくないため、デフォルト値に戻ります</translation>
+        <translation>Nesprávny -rescan režim, vracia sa späť k predvolenej hodnote</translation>
     </message>
     <message>
         <source>Initialization sanity check failed. %s is shutting down.</source>
-        <translation>初期化時の健全性チェックに失敗しました。%s を終了します。</translation>
+        <translation>Kontrola čistoty pri inicializácií zlyhala. %s sa vypína.</translation>
     </message>
     <message>
         <source>Inputs vs outputs size mismatch.</source>
-        <translation>インプットとアウトプットのサイズがミスマッチです。</translation>
+        <translation>Nesúlad veľkosti vstupov a výstupov.</translation>
     </message>
     <message>
         <source>Invalid -onion address or hostname: '%s'</source>
-        <translation>無効な -onion アドレスまたはホスト名: '%s'</translation>
+        <translation>Neplatná -onion adresa alebo hostiteľ: '%s'</translation>
     </message>
     <message>
         <source>Invalid -proxy address or hostname: '%s'</source>
-        <translation>無効な -proxy アドレスまたはホスト名: '%s'</translation>
+        <translation>Neplatná -proxy adresa alebo hostiteľ: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
-        <translation>無効な額 -%s=&lt;amount&gt;: '%s'</translation>
+        <translation>Neplatná suma pre -%s=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
         <source>Invalid spork address specified with -sporkaddr</source>
-        <translation>-sporkaddrに指定された無効なスポークアドレスI</translation>
+        <translation>Neplatná spork adresa určená pomocou -sporkaddr</translation>
     </message>
     <message>
         <source>Loading P2P addresses...</source>
-        <translation>P2Pアドレスを読み込んでいます...</translation>
+        <translation>Načítavam P2P adresy…</translation>
     </message>
     <message>
         <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
-        <translation>システム上の制約から、-maxconnections を %d から %d に削減します。</translation>
+        <translation>Obmedzuje sa -maxconnections z %d na %d kvôli systémovým obmedzeniam.</translation>
     </message>
     <message>
         <source>Replaying blocks...</source>
-        <translation>ブロックをリプレイ中…</translation>
+        <translation>Prebieha nahratie blokov ...</translation>
     </message>
     <message>
         <source>Rescanning...</source>
-        <translation>再スキャン中…</translation>
+        <translation>Znova prehľadávam...</translation>
     </message>
     <message>
         <source>Session not complete!</source>
-        <translation>セッション未完了！</translation>
+        <translation>Relácia nie je dokončená!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
-        <translation>セッションタイムアウト</translation>
+        <translation>Relácia vypršala.</translation>
     </message>
     <message>
         <source>Signing transaction failed</source>
-        <translation>トランザクションの署名に失敗</translation>
+        <translation>Podpisovanie transakcie zlyhalo</translation>
     </message>
     <message>
         <source>Specified blocks directory "%s" does not exist.</source>
-        <translation>指定されたブロックディレクトリの「%s」は存在しません。</translation>
+        <translation>Zadaný adresár s blokmi "%s" neexistuje.</translation>
     </message>
     <message>
         <source>Last queue was created too recently.</source>
-        <translation>直近のキューがかなり最近に作成されました。</translation>
+        <translation>Posledný dotaz bol vytvorený príliš nedávno.</translation>
     </message>
     <message>
         <source>%s corrupt. Try using the wallet tool wagerr-wallet to salvage or restoring a backup.</source>
-        <translation>%sが破損しています。ウォレットツールのwagerr-walletを使用してサルベージするか、バックアップを復元してみてください。</translation>
+        <translation>%s poškodený. Skúste použiť nástroj peňaženky wagerr-wallet na záchranu alebo obnovenie zálohy.</translation>
     </message>
     <message>
         <source>Can't generate a change-address key. No keys in the internal keypool and can't generate any keys.</source>
-        <translation>change-addressキーを生成できません。内部キープールにキーがなく、キーを生成できません。</translation>
+        <translation>Nedá sa vygenerovať kľúč na zmenu adresy. V internej oblasti kľúčov nie sú žiadne kľúče a nemožno generovať žiadne kľúče.</translation>
     </message>
     <message>
         <source>Last successful action was too recent.</source>
-        <translation>直近の成功したアクションが最新過ぎでした。</translation>
+        <translation>Posledná akcia bola pred chvíľou.</translation>
     </message>
     <message>
         <source>Starting network threads...</source>
-        <translation>ネットワークのスレッドを起動しています...</translation>
+        <translation>Spúšťajú sa sieťové vlákna...</translation>
     </message>
     <message>
         <source>Synchronizing governance objects...</source>
-        <translation>ガバナンスオブジェクトを同期中...</translation>
+        <translation>Synchronizujú sa objekty správy...</translation>
     </message>
     <message>
         <source>The source code is available from %s.</source>
-        <translation>ソースコードは %s より入手可能です。</translation>
+        <translation>Zdrojový kód je dostupný z %s</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>
-        <translation>トランザクションの金額が小さすぎて手数料を支払えません</translation>
+        <translation>Suma transakcie je príliš malá na zaplatenie poplatku</translation>
     </message>
     <message>
         <source>This is experimental software.</source>
-        <translation>これは実験的なソフトウェアです。</translation>
+        <translation>Toto je experimentálny softvér. </translation>
     </message>
     <message>
         <source>Transaction amount too small</source>
-        <translation>トランザクションの額が少な過ぎます</translation>
+        <translation>Suma transakcie je príliš malá</translation>
     </message>
     <message>
         <source>Transaction created successfully.</source>
-        <translation>トランザクション作成に成功</translation>
+        <translation>Transakcia úspešne vytvorená</translation>
     </message>
     <message>
         <source>Transaction fees are too high.</source>
-        <translation>トランザクション手数料が高すぎます</translation>
+        <translation>Transakčné poplatky sú príliš vysoké</translation>
     </message>
     <message>
         <source>Transaction not valid.</source>
-        <translation>トランザクションが無効です</translation>
+        <translation>Neplatná transakcia.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
-        <translation>このコンピュータの %s にバインドすることができません (バインドが返したエラーは %s)</translation>
+        <translation>Na tomto počítači sa nedá vytvoriť väzba %s (vytvorenie väzby vrátilo chybu %s)</translation>
     </message>
     <message>
         <source>Unable to locate enough mixed funds for this transaction.</source>
-        <translation>この取引に十分なミキシング資金を確保できません。</translation>
+        <translation>Pre túto transakciu sa nepodarilo nájsť dostatok zmiešaných prostriedkov.</translation>
     </message>
     <message>
         <source>Unable to locate enough non-denominated funds for this transaction.</source>
-        <translation>この取引に十分な外貨建ての資金を確保できません。</translation>
+        <translation>Pre túto transakciu sa nepodarilo nájsť dostatok ne-denominovaných finančných prostriedkov.</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
-        <translation>スポークメッセージに署名できません、キーが間違ってませんか?</translation>
+        <translation>Nedá sa podpísať spork správa, žeby zlý kľúč?</translation>
     </message>
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
-        <translation>-onlynet で指定された '%s' は未知のネットワークです</translation>
+        <translation>Špecifikovaná neznáma sieť v -onlynet: '%s'</translation>
     </message>
     <message>
         <source>Unknown state: id = %u</source>
-        <translation>未知の状態: id = %u</translation>
+        <translation>Neznámy stav: id = %u</translation>
     </message>
     <message>
         <source>Unsupported logging category %s=%s.</source>
-        <translation>サポートされていないロギングカテゴリ %s=%s.</translation>
+        <translation>Nepodporovaná záznamová kategória %s =%s.</translation>
     </message>
     <message>
         <source>Upgrading txindex database</source>
-        <translation>txindexデータベースのアップグレード</translation>
+        <translation>Aktualizácia databázy txindex</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
-        <translation>ブロックの検証中…</translation>
+        <translation>Overovanie blokov...</translation>
     </message>
     <message>
         <source>Very low number of keys left: %d</source>
-        <translation>非常に少ない数のキー: %d</translation>
+        <translation>Zostáva veľmi málo kľúčov: %d</translation>
     </message>
     <message>
         <source>Wallet is locked.</source>
-        <translation>ウォレットはロックされています。</translation>
+        <translation>Peňaženka je zamknutá.</translation>
     </message>
     <message>
         <source>Warning: can't use %s and %s together, will prefer %s</source>
-        <translation>警告：%sと%sを一緒に使うことはできません。%sを優先します。</translation>
+        <translation>Upozornenie: Nemôžete používať %s a %s súčasne, bude sa preferovať %s</translation>
     </message>
     <message>
         <source>Warning: incorrect parameter %s, path must exist! Using default path.</source>
-        <translation>警告：パラメータの%sが正しくありません。パスは必須となります。デフォルトのパスを使用しています。</translation>
+        <translation>Upozornenie: nesprávny parameter %s, cesta musí existovať! Použije sa predvolené cesta.</translation>
     </message>
     <message>
         <source>You are starting with governance validation disabled.</source>
-        <translation>お客様はガバナンスの検証を無効にした状態で開始しています。</translation>
+        <translation>Začínate s deaktivovaným overením riadenia.</translation>
     </message>
     <message>
         <source>You can not disable governance validation on a masternode.</source>
-        <translation>マスターノードでガバナンスの検証を無効化することはできません。</translation>
+        <translation>Overenie riadenia nemôžete na masternóde deaktivovať.</translation>
     </message>
     <message>
         <source>Your entries added successfully.</source>
-        <translation>あなたの追加エントリーは成功しました。</translation>
+        <translation>Vaše položky boli úspešne pridané.</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
-        <translation>ウォレットからすべてのトランザクションを消去しています…</translation>
+        <translation>Vymazať všetky transakcie z peňaženky...</translation>
     </message>
 </context>
 </TS>

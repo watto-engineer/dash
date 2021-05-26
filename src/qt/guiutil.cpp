@@ -883,8 +883,8 @@ fs::path static GetAutostartFilePath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetAutostartDir() / "wagerrcore.desktop";
-    return GetAutostartDir() / strprintf("wagerrcore-%s.desktop", chain);
+        return GetAutostartDir() / "wagerr.desktop";
+    return GetAutostartDir() / strprintf("wagerr-%s.desktop", chain);
 }
 
 bool GetStartOnSystemStartup()
@@ -924,7 +924,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         if (!optionFile.good())
             return false;
         std::string chain = gArgs.GetChainName();
-        // Write a wagerrcore.desktop file to the autostart directory:
+        // Write a wagerr.desktop file to the autostart directory:
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
         if (chain == CBaseChainParams::MAIN)
