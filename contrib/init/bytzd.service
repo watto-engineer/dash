@@ -13,9 +13,9 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/bytzd -daemon -conf=/etc/bytz/bytz.conf -pid=/run/bytzd/bytzd.pid
-# Creates /run/bytz owned by bytzcore
+# Creates /run/bytz owned by bytz
 RuntimeDirectory=bytzd
-User=bytzcore
+User=bytz
 Type=forking
 PIDFile=/run/bytzd/bytzd.pid
 Restart=on-failure

@@ -166,22 +166,22 @@ Codesigner only: Create Windows/OS X detached signatures:
 
 Codesigner only: Sign the osx binary:
 
-    transfer bytzcore-osx-unsigned.tar.gz to osx for signing
-    tar xf bytzcore-osx-unsigned.tar.gz
+    transfer bytz-osx-unsigned.tar.gz to osx for signing
+    tar xf bytz-osx-unsigned.tar.gz
     ./detached-sig-create.sh -s "Key ID" -o runtime
     Enter the keychain password and authorize the signature
     Move signature-osx.tar.gz back to the gitian host
 
 Codesigner only: Sign the windows binaries:
 
-    tar xf bytzcore-win-unsigned.tar.gz
+    tar xf bytz-win-unsigned.tar.gz
     ./detached-sig-create.sh -key /path/to/codesign.key
     Enter the passphrase for the key when prompted
     signature-win.tar.gz will be created
 
 Codesigner only: Commit the detached codesign payloads:
 
-    cd ~/bytzcore-detached-sigs
+    cd ~/bytz-detached-sigs
     checkout the appropriate branch for this release series
     rm -rf *
     tar xf signature-osx.tar.gz

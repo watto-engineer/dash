@@ -127,7 +127,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::ALL, "1"},
     {BCLog::ALL, "all"},
 
-    //Start Bytz
+    //Start Dash
     {BCLog::CHAINLOCKS, "chainlocks"},
     {BCLog::GOBJECT, "gobject"},
     {BCLog::INSTANTSEND, "instantsend"},
@@ -140,7 +140,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::COINJOIN, "coinjoin"},
     {BCLog::SPORK, "spork"},
     {BCLog::NETCONN, "netconn"},
-    //End Bytz
+    //End Dash
 
     //Start Bytz
     {BCLog::ZEROCOIN, "zerocoin"},

@@ -879,7 +879,7 @@
         <translation>يتحول هذا التصنيف إلى اللون الأحمر إذا تلقى أي مستلم مبلغا أصغر من عتبة الغبار الحالية.</translation>
     </message>
     <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
+        <source>Can vary +/- %1 sat(s) per input.</source>
         <translation>يمكن أن تختلف +/-%1 داف (ق) لكل مدخلات.</translation>
     </message>
     <message>
@@ -2724,7 +2724,7 @@ https://www.transifex.com/projects/p/bytz/</translation>
         <translation>هدف وقت التأكيد:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 duffs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 duffs in fee,&lt;br /&gt;while "at least" pays 1000 duffs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <source>If the custom fee is set to 1000 sats and the transaction is only 250 bytes, then "per kilobyte" only pays 250 sats in fee,&lt;br /&gt;while "at least" pays 1000 sats. For transactions bigger than a kilobyte both pay by kilobyte.</source>
         <translation>إذا تم تعيين الرسوم الجمركية على 1000 دافع وكانت المعاملة 250 بايتًا فقط ، فإن "كل كيلوبايت" يدفع 250 جنيهًا فقط رسومًا ،&lt;br /&gt; بينما "على الأقل" يدفع 1000 دفين. لمعاملات أكبر من كيلوبايت تدفع كل من كيلوبايت.</translation>
     </message>
     <message>

@@ -186,7 +186,7 @@
 - [`b8c1d66fb`](https://github.com/bytzcurrency/bytz/commit/b8c1d66fb) Merge #10795: No longer ever reuse keypool indexes
 - [`d04633d28`](https://github.com/bytzcurrency/bytz/commit/d04633d28) Merge #10707: Better API for estimatesmartfee RPC
 - [`65cd33479`](https://github.com/bytzcurrency/bytz/commit/65cd33479) Tools window: Information - make "InstantSend locks" and "Number of Masternodes" fields copyable
-- [`ddef2025b`](https://github.com/bytzcurrency/bytz/commit/ddef2025b) sat -> duff
+- [`ddef2025b`](https://github.com/bytzcurrency/bytz/commit/ddef2025b) sat -> sat
 - [`a7e20cd4c`](https://github.com/bytzcurrency/bytz/commit/a7e20cd4c) Use chainparams passed into ATMPW
 - [`e6df5690a`](https://github.com/bytzcurrency/bytz/commit/e6df5690a) Drop segwit related parts and fix cs_main issues
 - [`70e386580`](https://github.com/bytzcurrency/bytz/commit/70e386580) Backport meaningful parts of 8149/2b1f6f9ccf36f1e0a2c9d99154e1642f796d7c2b

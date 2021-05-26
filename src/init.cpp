@@ -2016,7 +2016,7 @@ bool AppInitMain()
                 }
 
                 if (!fDisableGovernance && !fTxIndex
-                   && chainparams.NetworkIDString() != CBaseChainParams::REGTEST) { // TODO remove this when pruning is fixed. See https://github.com/bytzcurrency/bytz/pull/1817 and https://github.com/bytzcurrency/bytz/pull/1743
+                   && chainparams.NetworkIDString() != CBaseChainParams::REGTEST) { // TODO remove this when pruning is fixed. See https://github.com/dashpay/dash/pull/1817 and https://github.com/dashpay/dash/pull/1743
                     return InitError(_("Transaction index can't be disabled with governance validation enabled. Either start with -disablegovernance command line switch or enable transaction index."));
                 }
 
@@ -2341,7 +2341,7 @@ bool AppInitMain()
         }
     }
 
-    // ********************************************************* Step 10c: schedule Bytz-specific tasks
+    // ********************************************************* Step 10c: schedule Dash-specific tasks
 
     scheduler.scheduleEvery(std::bind(&CNetFulfilledRequestManager::DoMaintenance, std::ref(netfulfilledman)), 60 * 1000);
     scheduler.scheduleEvery(std::bind(&CMasternodeSync::DoMaintenance, std::ref(masternodeSync), std::ref(*g_connman)), 1 * 1000);

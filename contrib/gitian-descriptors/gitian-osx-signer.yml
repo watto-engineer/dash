@@ -11,7 +11,7 @@ remotes:
 - "url": "https://github.com/bytzcurrency/bytz-detached-sigs.git"
   "dir": "signature"
 files:
-- "bytzcore-osx-unsigned.tar.gz"
+- "bytz-osx-unsigned.tar.gz"
 script: |
   set -e -o pipefail
   WRAP_DIR=$HOME/wrapped
@@ -27,8 +27,8 @@ script: |
     echo "\$REAL \$@" >> $WRAP_DIR/${prog}
     chmod +x ${WRAP_DIR}/${prog}
   done
-  UNSIGNED=bytzcore-osx-unsigned.tar.gz
-  SIGNED=bytzcore-osx-signed.dmg
+  UNSIGNED=bytz-osx-unsigned.tar.gz
+  SIGNED=bytz-osx-signed.dmg
   tar -xf ${UNSIGNED}
   OSX_VOLNAME="$(cat osx_volname)"
   ./detached-sig-apply.sh ${UNSIGNED} signature/osx

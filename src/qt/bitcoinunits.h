@@ -60,7 +60,7 @@ public:
         BYTZ,
         mBYTZ,
         uBYTZ,
-        duffs
+        sats
     };
 
     enum SeparatorStyle

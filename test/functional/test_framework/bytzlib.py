@@ -22,20 +22,20 @@ class Error(BaseException):
     pass
 
 
-def init(libbytzcorefile=None):
+def init(libbytzfile=None):
     global bytzlib
-    if libbytzcorefile is None:
-        libbytzcorefile = "libbytzcore.so"
+    if libbytzfile is None:
+        libbytzfile = "libbytz.so"
         try:
-            bytzlib = CDLL(libbytzcorefile)
+            bytzlib = CDLL(libbytzfile)
         except OSError:
             import os
             dir_path = os.path.dirname(os.path.realpath(__file__))
-            bytzlib = CDLL(dir_path + os.sep + libbytzcorefile)
+            bytzlib = CDLL(dir_path + os.sep + libbytzfile)
     else:
-        bytzlib = CDLL(libbytzcorefile)
+        bytzlib = CDLL(libbytzfile)
     if bytzlib is None:
-        raise Error("Cannot find %s shared library", libbytzcorefile)
+        raise Error("Cannot find %s shared library", libbytzfile)
 
 
 # Serialization/deserialization tools

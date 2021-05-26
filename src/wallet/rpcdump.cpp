@@ -916,7 +916,7 @@ UniValue dumpwallet(const JSONRPCRequest& request)
     file << "\n";
 
     UniValue obj(UniValue::VOBJ);
-    obj.pushKV("bytzcoreversion", CLIENT_BUILD);
+    obj.pushKV("bytzversion", CLIENT_BUILD);
     obj.pushKV("lastblockheight", chainActive.Height());
     obj.pushKV("lastblockhash", chainActive.Tip()->GetBlockHash().ToString());
     obj.pushKV("lastblocktime", FormatISO8601DateTime(chainActive.Tip()->GetBlockTime()));

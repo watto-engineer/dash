@@ -5,7 +5,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 # how to use and guide: https://github.com/bytzcurrency/docs/blob/master/gitian-building.md
-# Setup: gitian-build.py --setup --build $SIGNER $VERSION 192.168.1.37 SHA256 bytzcore-binaries
+# Setup: gitian-build.py --setup --build $SIGNER $VERSION 192.168.1.37 SHA256 bytz-binaries
 #usage: gitian-build.py [-h] [-c] [-p] [-u URL] [-v] [-b] [-s] [-B] [-o OS]
 #                       [-j JOBS] [-m MEMORY] [-k] [-d] [-S] [-D] [-n] [-z]
 #                       [-x SERVER] [-l] [-f UPLOADFOLDER] [-y HASH]
@@ -56,7 +56,7 @@ def setup():
 def build():
     global args, workdir
 
-    os.makedirs('bytzcore-binaries/' + args.version, exist_ok=True)
+    os.makedirs('bytz-binaries/' + args.version, exist_ok=True)
     print('\nBuilding Dependencies\n')
     os.chdir('gitian-builder')
     os.makedirs('inputs', exist_ok=True)
@@ -77,26 +77,26 @@ def build():
         print('\nCompiling ' + args.version + ' Linux')
         subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-linux.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-linux', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-linux.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*.tar.gz build/out/src/bytzcore-*.tar.gz ../bytzcore-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/bytz-*.tar.gz build/out/src/bytz-*.tar.gz ../bytz-binaries/'+args.version, shell=True)
 
     if args.windows:
         print('\nCompiling ' + args.version + ' Windows')
         subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*-win-unsigned.tar.gz inputs/', shell=True)
-        subprocess.check_call('mv build/out/bytzcore-*.zip build/out/bytzcore-*.exe ../bytzcore-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/bytz-*-win-unsigned.tar.gz inputs/', shell=True)
+        subprocess.check_call('mv build/out/bytz-*.zip build/out/bytz-*.exe ../bytz-binaries/'+args.version, shell=True)
 
     if args.macos:
         print('\nCompiling ' + args.version + ' MacOS')
         subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*-osx-unsigned.tar.gz inputs/', shell=True)
-        subprocess.check_call('mv build/out/bytzcore-*.tar.gz build/out/bytzcore-*.dmg ../bytzcore-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/bytz-*-osx-unsigned.tar.gz inputs/', shell=True)
+        subprocess.check_call('mv build/out/bytz-*.tar.gz build/out/bytz-*.dmg ../bytz-binaries/'+args.version, shell=True)
 
     os.chdir(workdir)
 
     if args.hash:
-        os.chdir('bytzcore-binaries/'+args.version)
+        os.chdir('bytz-binaries/'+args.version)
         subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
         subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
 
@@ -119,18 +119,18 @@ def sign():
 
     if args.windows:
         print('\nSigning ' + args.version + ' Windows')
-        subprocess.check_call('cp inputs/bytzcore-' + args.version + '-win-unsigned.tar.gz inputs/bytzcore-win-unsigned.tar.gz', shell=True)
+        subprocess.check_call('cp inputs/bytz-' + args.version + '-win-unsigned.tar.gz inputs/bytz-win-unsigned.tar.gz', shell=True)
         subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
-        subprocess.check_call('mv build/out/bytzcore-*win64-setup.exe ../bytzcore-binaries/'+args.version, shell=True)
-        subprocess.check_call('mv build/out/bytzcore-*win32-setup.exe ../bytzcore-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/bytz-*win64-setup.exe ../bytz-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/bytz-*win32-setup.exe ../bytz-binaries/'+args.version, shell=True)
 
     if args.macos:
         print('\nSigning ' + args.version + ' MacOS')
-        subprocess.check_call('cp inputs/bytzcore-' + args.version + '-osx-unsigned.tar.gz inputs/bytzcore-osx-unsigned.tar.gz', shell=True)
+        subprocess.check_call('cp inputs/bytz-' + args.version + '-osx-unsigned.tar.gz inputs/bytz-osx-unsigned.tar.gz', shell=True)
         subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
-        subprocess.check_call('mv build/out/bytzcore-osx-signed.dmg ../bytzcore-binaries/'+args.version+'/bytzcore-'+args.version+'-osx.dmg', shell=True)
+        subprocess.check_call('mv build/out/bytz-osx-signed.dmg ../bytz-binaries/'+args.version+'/bytz-'+args.version+'-osx.dmg', shell=True)
 
     os.chdir(workdir)
 
@@ -145,7 +145,7 @@ def sign():
 def createhashes():
     global args, workdir
     os.chdir(workdir)
-    os.chdir('bytzcore-binaries/'+args.version)
+    os.chdir('bytz-binaries/'+args.version)
     subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
     subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
     subprocess.check_call('rm', '-f', '/SHA'+args.hash+'SUMS', shell=True)
@@ -168,7 +168,7 @@ def logsupload():
         subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/logs'])
         subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/result'])
         subprocess.check_call(['scp', '-r', 'gitian-builder/var', args.server+':'+args.uploadfolder+'/'+args.version+'/logs'])
-        subprocess.check_call(['scp', 'gitian-builder/result/bytzcore-*.yml', args.server+':'+args.uploadfolder+'/'+args.version+'/result'])
+        subprocess.check_call(['scp', 'gitian-builder/result/bytz-*.yml', args.server+':'+args.uploadfolder+'/'+args.version+'/result'])
 
     if args.createreleasenotes:
         print('\n'+args.server+': Start uploading release notes to the uploadserver.\n')
@@ -188,13 +188,13 @@ def releasenotes():
     
     if args.previousver:
         # Create shortlog notes
-        subprocess.check_call('git shortlog --no-merges v'+args.previousver+'..v'+args.version+' > ../bytzcore-binaries/'+args.version+'/release-notes/shortlog_v'+args.previousver+'..v'+args.version+'.md', shell=True)
+        subprocess.check_call('git shortlog --no-merges v'+args.previousver+'..v'+args.version+' > ../bytz-binaries/'+args.version+'/release-notes/shortlog_v'+args.previousver+'..v'+args.version+'.md', shell=True)
         # Create changes notes
-        subprocess.check_call('git log --oneline v'+args.previousver+'..v'+args.version+' > ../bytzcore-binaries/'+args.version+'/release-notes/changes_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        subprocess.check_call('git log --oneline v'+args.previousver+'..v'+args.version+' > ../bytz-binaries/'+args.version+'/release-notes/changes_'+args.previousver+'-v'+args.version+'.md', shell=True)
         # Create authors notes
         subprocess.check_call('git log --format='"'- %aN' v'+args.previousver+'..v'+args.version+' | sort -fiu > ../ion-binaries/"+args.version+'/release-notes/authors_'+args.previousver+'-v'+args.version+'.md', shell=True)
         # Create detailed notes
-        subprocess.check_call('git log v'+args.previousver+'..v'+args.version+' --pretty="format:%at %C(yellow)commit %H%Creset\nAuthor: %an <%ae>\nDate: %aD\n\n %s\n" | sort -r | cut -d" " -f2- | sed -e "s/\\\n/\\`echo -e '+"'"+"\n\r'`/g"+'" | tr -d '+"'\15\32'"+' | less -R  > ../bytzcore-binaries/'+args.version+'/release-notes/detailedlog_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        subprocess.check_call('git log v'+args.previousver+'..v'+args.version+' --pretty="format:%at %C(yellow)commit %H%Creset\nAuthor: %an <%ae>\nDate: %aD\n\n %s\n" | sort -r | cut -d" " -f2- | sed -e "s/\\\n/\\`echo -e '+"'"+"\n\r'`/g"+'" | tr -d '+"'\15\32'"+' | less -R  > ../bytz-binaries/'+args.version+'/release-notes/detailedlog_'+args.previousver+'-v'+args.version+'.md', shell=True)
 
     os.chdir(workdir)
 

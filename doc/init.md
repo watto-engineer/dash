@@ -13,7 +13,7 @@ can be found in the contrib/init folder.
 Service User
 ---------------------------------
 
-All three Linux startup configurations assume the existence of a "bytzcore" user
+All three Linux startup configurations assume the existence of a "bytz" user
 and group.  They must be created before attempting to use these scripts.
 The OS X configuration assumes bytzd will be set up for the current user.
 
@@ -54,23 +54,23 @@ Paths
 All three configurations assume several paths that might need to be adjusted.
 
 Binary:              `/usr/bin/bytzd`  
-Configuration file:  `/etc/bytzcore/bytz.conf`  
+Configuration file:  `/etc/bytz/bytz.conf`  
 Data directory:      `/var/lib/bytzd`  
 PID file:            `/var/run/bytzd/bytzd.pid` (OpenRC and Upstart) or `/var/lib/bytzd/bytzd.pid` (systemd)  
 Lock file:           `/var/lock/subsys/bytzd` (CentOS)  
 
 The configuration file, PID directory (if applicable) and data directory
-should all be owned by the bytzcore user and group.  It is advised for security
+should all be owned by the bytz user and group.  It is advised for security
 reasons to make the configuration file and data directory only readable by the
-bytzcore user and group.  Access to bytz-cli and other bytzd rpc clients
+bytz user and group.  Access to bytz-cli and other bytzd rpc clients
 can then be controlled by group membership.
 
 ### Mac OS X
 
 Binary:              `/usr/local/bin/bytzd`  
-Configuration file:  `~/Library/Application Support/BytzCore/bytz.conf`  
-Data directory:      `~/Library/Application Support/BytzCore`  
-Lock file:           `~/Library/Application Support/BytzCore/.lock`  
+Configuration file:  `~/Library/Application Support/Bytz/bytz.conf`  
+Data directory:      `~/Library/Application Support/Bytz`  
+Lock file:           `~/Library/Application Support/Bytz/.lock`  
 
 Installing Service Configuration
 -----------------------------------
@@ -120,7 +120,7 @@ This Launch Agent will cause bytzd to start whenever the user logs in.
 
 NOTE: This approach is intended for those wanting to run bytzd as the current user.
 You will need to modify org.bytz.bytzd.plist if you intend to use it as a
-Launch Daemon with a dedicated bytzcore user.
+Launch Daemon with a dedicated bytz user.
 
 Auto-respawn
 -----------------------------------

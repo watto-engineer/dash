@@ -366,7 +366,7 @@ See detailed [change log](https://github.com/bytzcurrency/bytz/compare/v0.12.2.3
 - [`836e10471`](https://github.com/bytzcurrency/bytz/commit/836e10471) Bump proto to 70210 (#2109)
 - [`23ba94b37`](https://github.com/bytzcurrency/bytz/commit/23ba94b37) Bump remaining min protocols (#2097)
 - [`9299a84b1`](https://github.com/bytzcurrency/bytz/commit/9299a84b1) Bump few consts (#2096)
-- [`7b43720f0`](https://github.com/bytzcurrency/bytz/commit/7b43720f0) Fix copying of final binaries into bytzcore-binaries (#2090)
+- [`7b43720f0`](https://github.com/bytzcurrency/bytz/commit/7b43720f0) Fix copying of final binaries into bytz-binaries (#2090)
 - [`cc593615e`](https://github.com/bytzcurrency/bytz/commit/cc593615e) Bump copyright year to 2018 (#2087)
 - [`2129ee4d8`](https://github.com/bytzcurrency/bytz/commit/2129ee4d8) Add docker support when doing Gitian builds (#2084)
 - [`6a1456ef4`](https://github.com/bytzcurrency/bytz/commit/6a1456ef4) Update gitian key for codablock (#2085)

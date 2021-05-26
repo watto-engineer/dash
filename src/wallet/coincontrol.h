@@ -103,7 +103,7 @@ public:
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }
 
-    // Bytz-specific helpers
+    // Dash-specific helpers
 
     void UseCoinJoin(bool fUseCoinJoin)
     {

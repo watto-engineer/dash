@@ -62,7 +62,7 @@ LIBBITCOIN_ZMQ=libbytz_zmq.a
 endif
 if BUILD_BITCOIN_LIBS
 LIBBITCOINCONSENSUS=libbytzconsensus.la
-LIBBITCOINCORE=libbytzcore.la
+LIBBITCOINCORE=libbytz.la
 endif
 if ENABLE_WALLET
 LIBBITCOIN_WALLET=libbytz_wallet.a
@@ -461,10 +461,10 @@ libbytz_wallet_a_SOURCES = \
   wallet/coinselection.cpp \
   $(BITCOIN_CORE_H)
 
-libbytzcore_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbytzcore_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbytz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbytz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-libbytzcore_a_SOURCES = \
+libbytz_a_SOURCES = \
   bytzlib/bytzlib.cpp \
   script/sigcommon.cpp \
   hash.cpp \
@@ -788,18 +788,18 @@ bytz_tx_LDADD = \
 bytz_tx_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(CRYPTO_LIBS) $(BLS_LIBS)
 #
 
-# bytzcore library #
+# bytz library #
 if BUILD_BITCOIN_LIBS
-libbytzcore_la_SOURCES = $(libbytzcore_a_SOURCES) $(crypto_libbytz_crypto_a_SOURCES)
+libbytz_la_SOURCES = $(libbytz_a_SOURCES) $(crypto_libbytz_crypto_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
-  libbytzcore_la_SOURCES += compat/glibc_compat.cpp
+  libbytz_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libbytzcore_la_LDFLAGS = $(AM_LDFLAGS) $(SSL_LIBS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS)
-libbytzcore_la_LIBADD = $(LIBSECP256K1)
-libbytzcore_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
-libbytzcore_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbytz_la_LDFLAGS = $(AM_LDFLAGS) $(SSL_LIBS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS)
+libbytz_la_LIBADD = $(LIBSECP256K1)
+libbytz_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libbytz_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
 #

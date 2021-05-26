@@ -22,7 +22,7 @@ QList<BitcoinUnits::Unit> BitcoinUnits::availableUnits()
     unitlist.append(BYTZ);
     unitlist.append(mBYTZ);
     unitlist.append(uBYTZ);
-    unitlist.append(duffs);
+    unitlist.append(sats);
     return unitlist;
 }
 
@@ -33,7 +33,7 @@ bool BitcoinUnits::valid(int unit)
     case BYTZ:
     case mBYTZ:
     case uBYTZ:
-    case duffs:
+    case sats:
         return true;
     default:
         return false;
@@ -49,7 +49,7 @@ QString BitcoinUnits::name(int unit)
             case BYTZ: return QString("BYTZ");
             case mBYTZ: return QString("mBYTZ");
             case uBYTZ: return QString::fromUtf8("μBYTZ");
-            case duffs: return QString("duffs");
+            case sats: return QString("sats");
             default: return QString("???");
         }
     }
@@ -60,7 +60,7 @@ QString BitcoinUnits::name(int unit)
             case BYTZ: return QString("tBYTZ");
             case mBYTZ: return QString("mtBYTZ");
             case uBYTZ: return QString::fromUtf8("μtBYTZ");
-            case duffs: return QString("tduffs");
+            case sats: return QString("tsats");
             default: return QString("???");
         }
     }
@@ -75,7 +75,7 @@ QString BitcoinUnits::description(int unit)
             case BYTZ: return QString("Bytz");
             case mBYTZ: return QString("Milli-Bytz (1 / 1" THIN_SP_UTF8 "000)");
             case uBYTZ: return QString("Micro-Bytz (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-Bytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case sats: return QString("Ten Nano-Bytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -86,7 +86,7 @@ QString BitcoinUnits::description(int unit)
             case BYTZ: return QString("TestBytzs");
             case mBYTZ: return QString("Milli-TestBytz (1 / 1" THIN_SP_UTF8 "000)");
             case uBYTZ: return QString("Micro-TestBytz (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-TestBytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case sats: return QString("Ten Nano-TestBytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -99,7 +99,7 @@ qint64 BitcoinUnits::factor(int unit)
     case BYTZ:  return 100000000;
     case mBYTZ: return 100000;
     case uBYTZ: return 100;
-    case duffs: return 1;
+    case sats: return 1;
     default:   return 100000000;
     }
 }
@@ -111,7 +111,7 @@ int BitcoinUnits::decimals(int unit)
     case BYTZ: return 8;
     case mBYTZ: return 5;
     case uBYTZ: return 2;
-    case duffs: return 0;
+    case sats: return 0;
     default: return 0;
     }
 }

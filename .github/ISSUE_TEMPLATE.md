@@ -2,10 +2,6 @@
 
 This issue tracker is only for technical issues related to Bytz Core.
 
-General Bytz questions and/or support requests and are best directed to the [Bytzcurrency Reddit](https://www.reddit.com/r/bytzcurrency/).
-
-To report critical security issues, email infosec@bytz.gg and/or see the BYTZ bug bounty program on [Bugcrowd](https://bugcrowd.com/bytzdigitalcash) instead of creating Github issues.
-
 ### Describe the issue
 
 ### Can you reliably reproduce the issue?

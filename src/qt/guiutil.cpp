@@ -869,8 +869,8 @@ fs::path static GetAutostartFilePath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetAutostartDir() / "bytzcore.desktop";
-    return GetAutostartDir() / strprintf("bytzcore-%s.lnk", chain);
+        return GetAutostartDir() / "bytz.desktop";
+    return GetAutostartDir() / strprintf("bytz-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
@@ -910,7 +910,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         if (!optionFile.good())
             return false;
         std::string chain = gArgs.GetChainName();
-        // Write a bytzcore.desktop file to the autostart directory:
+        // Write a bytz.desktop file to the autostart directory:
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
         if (chain == CBaseChainParams::MAIN)
