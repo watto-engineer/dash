@@ -167,22 +167,22 @@ Codesigner only: Create Windows/macOS detached signatures:
 
 Codesigner only: Sign the macOS binary:
 
-    transfer wagerrcore-osx-unsigned.tar.gz to macOS for signing
-    tar xf wagerrcore-osx-unsigned.tar.gz
+    transfer /wagerr-osx-unsigned.tar.gz to macOS for signing
+    tar xf wagerr-osx-unsigned.tar.gz
     ./detached-sig-create.sh -s "Key ID" -o runtime
     Enter the keychain password and authorize the signature
     Move signature-osx.tar.gz back to the gitian host
 
 Codesigner only: Sign the windows binaries:
 
-    tar xf wagerrcore-win-unsigned.tar.gz
+    tar xf wagerr-win-unsigned.tar.gz
     ./detached-sig-create.sh -key /path/to/codesign.key
     Enter the passphrase for the key when prompted
     signature-win.tar.gz will be created
 
 Codesigner only: Commit the detached codesign payloads:
 
-    cd ~/wagerrcore-detached-sigs
+    cd ~/wagerr-detached-sigs
     checkout the appropriate branch for this release series
     rm -rf *
     tar xf signature-osx.tar.gz

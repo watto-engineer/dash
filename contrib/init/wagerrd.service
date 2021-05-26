@@ -5,45 +5,20 @@
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/wagerr/wagerr.conf, except for those explicitly specified as arguments
-# in ExecStart=
+# /etc/wagerr/wagerr.conf
 
 [Unit]
 Description=Wagerr daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/wagerrd -daemon \
-                                                            -pid=/run/wagerrd/wagerrd.pid \
-                                                            -conf=/etc/wagerr/wagerr.conf  \
-                                                            -datadir=/var/lib/wagerrd
-
-# Process management
-####################
-
+ExecStart=/usr/bin/wagerrd -daemon -conf=/etc/wagerr/wagerr.conf -pid=/run/wagerrd/wagerrd.pid
+# Creates /run/wagerr owned by wagerr
+RuntimeDirectory=wagerrd
+User=wagerr
 Type=forking
 PIDFile=/run/wagerrd/wagerrd.pid
 Restart=on-failure
-TimeoutStopSec=600
-
-# Directory creation and permissions
-####################################
-
-# Run as wagerr:wagerr
-User=wagerrcore
-Group=wagerrcore
-
-# /run/wagerrd
-RuntimeDirectory=wagerrd
-RuntimeDirectoryMode=0710
-
-# /etc/wagerr
-ConfigurationDirectory=wagerr
-ConfigurationDirectoryMode=0710
-
-# /var/lib/wagerrd
-StateDirectory=wagerrd
-StateDirectoryMode=0710
 
 # Hardening measures
 ####################

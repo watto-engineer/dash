@@ -51,7 +51,7 @@ LIBBITCOIN_ZMQ=libbitcoin_zmq.a
 endif
 if BUILD_BITCOIN_LIBS
 LIBBITCOINCONSENSUS=libwagerrconsensus.la
-LIBBITCOINCORE=libwagerrcore.la
+LIBBITCOINCORE=libwagerr.la
 endif
 if ENABLE_WALLET
 LIBBITCOIN_WALLET=libbitcoin_wallet.a
@@ -503,10 +503,10 @@ libbitcoin_server_a_SOURCES = \
   zwgr/zerocoindb.cpp \
   $(BITCOIN_CORE_H)
 
-libwagerrcore_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libwagerrcore_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libwagerr_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libwagerr_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-libwagerrcore_a_SOURCES = \
+libwagerr_a_SOURCES = \
   wagerrlib/wagerrlib.cpp \
   script/sigcommon.cpp \
   hash.cpp \
@@ -962,16 +962,16 @@ wagerr_wallet_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(EVENT_PTHREA
 
 # wagerrcore library #
 if BUILD_BITCOIN_LIBS
-libwagerrcore_la_SOURCES = $(libwagerrcore_a_SOURCES) $(crypto_libwagerr_crypto_a_SOURCES)
+libwagerr_la_SOURCES = $(libwagerr_a_SOURCES) $(crypto_libwagerr_crypto_a_SOURCES)
 
 if GLIBC_BACK_COMPAT
-  libwagerrcore_la_SOURCES += compat/glibc_compat.cpp
+  libwagerr_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libwagerrcore_la_LDFLAGS = $(AM_LDFLAGS) $(SSL_LIBS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS)
-libwagerrcore_la_LIBADD = $(LIBSECP256K1)
-libwagerrcore_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
-libwagerrcore_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libwagerr_la_LDFLAGS = $(AM_LDFLAGS) $(SSL_LIBS) $(CRYPTO_LIBS) $(BOOST_LIBS) -no-undefined $(RELDFLAGS)
+libwagerr_la_LIBADD = $(LIBSECP256K1)
+libwagerr_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libwagerr_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
 #

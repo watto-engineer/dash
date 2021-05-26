@@ -946,7 +946,7 @@ UniValue dumpwallet(const JSONRPCRequest& request)
     file << "\n";
 
     UniValue obj(UniValue::VOBJ);
-    obj.pushKV("wagerrcoreversion", CLIENT_BUILD);
+    obj.pushKV("wagerrversion", CLIENT_BUILD);
     obj.pushKV("lastblockheight", tip_height.value_or(-1));
     obj.pushKV("lastblockhash", tip_height ? pwallet->chain().getBlockHash(*tip_height).ToString() : NullUniValue);
     obj.pushKV("lastblocktime", tip_height ? FormatISO8601DateTime(pwallet->chain().getBlockTime(*tip_height)) : NullUniValue);

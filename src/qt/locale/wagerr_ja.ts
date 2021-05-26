@@ -1,717 +1,716 @@
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="ja">
 <context>
     <name>AddressBookPage</name>
     <message>
         <source>Enter address or label to search</source>
-        <translation>输入地址或标签来搜索</translation>
+        <translation>アドレスかラベルを入力して検索</translation>
     </message>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>右键点击编辑地址或标签</translation>
+        <translation>右クリックでアドレスまたはラベルを編集</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>创建新地址</translation>
+        <translation>新規アドレスの作成</translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>新建(&amp;N)</translation>
+        <translation>新規(&amp;N)</translation>
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>复制当前选中的地址到系统剪贴板</translation>
+        <translation>現在選択中のアドレスをクリップボードにコピー</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>复制(&amp;C)</translation>
+        <translation>コピー(&amp;C)</translation>
     </message>
     <message>
         <source>Show QR code for the currently selected address</source>
-        <translation>显示当前选中地址的二维码</translation>
+        <translation>選択中のアドレスのQRコードを表示</translation>
     </message>
     <message>
         <source>&amp;Show QR code</source>
-        <translation>&amp;显示二维码</translation>
+        <translation>&amp;QRコードを表示</translation>
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>从列表中删除选中的地址</translation>
+        <translation>選択中のアドレスを一覧から削除</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>删除(&amp;D)</translation>
+        <translation>削除(&amp;D)</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>导出当前数据到文件</translation>
+        <translation>ファイルに現在のタブにあるデータをエクスポート</translation>
     </message>
     <message>
         <source>&amp;Export</source>
-        <translation>导出(&amp;E)</translation>
+        <translation>エクスポート (&amp;E)</translation>
     </message>
     <message>
         <source>C&amp;lose</source>
-        <translation>关闭(&amp;C)</translation>
+        <translation>閉じる(&amp;C)</translation>
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>选择发款地址</translation>
+        <translation>送金先のアドレスを選択</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>选择收款地址</translation>
+        <translation>受取先のアドレスを選択</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
-        <translation>选择(&amp;H)</translation>
+        <translation>選択(&amp;H)</translation>
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>正在发送地址</translation>
+        <translation>送金アドレス</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>正在接收地址</translation>
+        <translation>受取アドレス</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>这些是您要付款过去的Wagerr地址。在付款之前，务必要检查金额和收款地址是否正确。</translation>
+        <translation>これらは送金するためのあなたの Wagerr アドレスです。送金する前に常に金額と受取アドレスを確認してください。</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
-        <translation>这些是用于接收付款的Wagerr地址. 使用接收标签中的 '创建新接收地址' 按钮来创建新地址.</translation>
+        <translation>これらは、支払いを受け取るためのお客様のWagerrアドレスです。受取タブにある「新しい受取アドレスを作成」のボタンを使用し、新しいアドレスを作成します。</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
-        <translation>复制地址(&amp;C)</translation>
+        <translation>アドレスをコピー (&amp;C)</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>复制标签(&amp;L)</translation>
+        <translation>ラベルをコピー (&amp;L)</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>编辑(&amp;E)</translation>
+        <translation>編集 (&amp;E)</translation>
     </message>
     <message>
         <source>&amp;Show address QR code</source>
-        <translation>&amp;显示地址二维码</translation>
+        <translation>&amp;アドレスのQRコードを表示</translation>
     </message>
     <message>
         <source>QR code</source>
-        <translation>二维码</translation>
+        <translation>QRコード</translation>
     </message>
     <message>
         <source>Export Address List</source>
-        <translation>导出地址列表</translation>
+        <translation>アドレスのリストをエクスポート</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>逗号分隔文件 (*.csv)</translation>
+        <translation>CSVファイル (*.csv)</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>导出失败</translation>
+        <translation>エクスポート失敗</translation>
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>尝试保存地址列表至%1时发生错误。请重新执行操作。</translation>
+        <translation>アドレスのリストを %1 へ保存する際にエラーが発生しました。再試行してください。</translation>
     </message>
 </context>
 <context>
     <name>AddressTableModel</name>
     <message>
         <source>Label</source>
-        <translation>标签</translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>地址</translation>
+        <translation>アドレス</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(无标签)</translation>
+        <translation>（ラベル無し）</translation>
     </message>
 </context>
 <context>
     <name>AppearanceWidget</name>
     <message>
         <source>Lighter</source>
-        <translation>更小</translation>
+        <translation>細くする</translation>
     </message>
     <message>
         <source>Bolder</source>
-        <translation>更大</translation>
+        <translation>太くする</translation>
     </message>
     <message>
         <source>Font Weight Normal:</source>
-        <translation>字体粗细正常:</translation>
+        <translation>文字の太さ（通常）：</translation>
     </message>
     <message>
         <source>Smaller</source>
-        <translation>更小</translation>
+        <translation>小さくする</translation>
     </message>
     <message>
         <source>Bigger</source>
-        <translation>更大</translation>
+        <translation>大きくする</translation>
     </message>
     <message>
         <source>Font Scale:</source>
-        <translation>字体大小:</translation>
+        <translation>文字の大きさ：</translation>
     </message>
     <message>
         <source>Font Family:</source>
-        <translation>字体系列:</translation>
+        <translation>フォントファミリー：</translation>
     </message>
     <message>
         <source>Theme:</source>
-        <translation>主题:</translation>
+        <translation>テーマ：</translation>
     </message>
     <message>
         <source>Font Weight Bold:</source>
-        <translation>字体粗体:</translation>
+        <translation>文字の太さ（太字）：</translation>
     </message>
 </context>
 <context>
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>密码对话框</translation>
+        <translation>パスフレーズのダイアログ</translation>
     </message>
     <message>
         <source>Enter passphrase</source>
-        <translation>输入密码</translation>
+        <translation>パスフレーズを入力</translation>
     </message>
     <message>
         <source>New passphrase</source>
-        <translation>新密码</translation>
+        <translation>新しいパスフレーズ</translation>
     </message>
     <message>
         <source>Repeat new passphrase</source>
-        <translation>重复新密码</translation>
+        <translation>新しいパスフレーズを再入力</translation>
     </message>
     <message>
         <source>Show passphrase</source>
-        <translation>显示密码</translation>
+        <translation>パスフレーズを表示</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>加密钱包</translation>
+        <translation>ウォレットを暗号化</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>此操作需要您首先使用密码解锁该钱包。</translation>
+        <translation>この操作にはウォレットをアンロックするためのパスフレーズが必要です。</translation>
     </message>
     <message>
         <source>Unlock wallet for mixing only</source>
-        <translation>解锁钱包用以混币</translation>
+        <translation>ミキシングのためだけにウォレットをアンロック</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>解锁钱包</translation>
+        <translation>ウォレットをアンロック</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
-        <translation>该操作需要您首先使用密码解密钱包。</translation>
+        <translation>この操作にはウォレットの暗号化解除のためのパスフレーズが必要です。</translation>
     </message>
     <message>
         <source>Decrypt wallet</source>
-        <translation>解密钱包</translation>
+        <translation>ウォレットの暗号化を解除</translation>
     </message>
     <message>
         <source>Change passphrase</source>
-        <translation>更改密码</translation>
+        <translation>パスフレーズの変更</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
-        <translation>确认加密钱包</translation>
+        <translation>ウォレットの暗号化を確認</translation>
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WAGERR&lt;/b&gt;!</source>
-        <translation>警告:如果把钱包加​​密后又忘记密码，您就会从此&lt;b&gt;失去所有的Wagerr&lt;/b&gt;！</translation>
+        <translation>警告: ウォレットを暗号化しパスフレーズを紛失した場合、あなたは &lt;b&gt;すべてのWagerr&lt;/b&gt;を失います!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>您确定需要为钱包加密吗？</translation>
+        <translation>本当にウォレットを暗号化しますか?</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>钱包已加密</translation>
+        <translation>ウォレットは暗号化されました</translation>
     </message>
     <message>
         <source>Enter the new passphrase for the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>输入钱包的新密码. &lt;br/&gt;密码请用&lt;b&gt;十个或更多随机字符&lt;/b&gt;, 或&lt;b&gt;8个以上的单词&lt;/b&gt;.</translation>
+        <translation>ウォレットの新しいパスフレーズを入力します。&lt;br/&gt;パスフレーズには&lt;b&gt;10文字以上のランダムな文字&lt;/b&gt;、または&lt;b&gt;8文字以上の単語&lt;/b&gt;を使用してください。</translation>
     </message>
     <message>
         <source>Enter the old passphrase and new passphrase for the wallet.</source>
-        <translation>输入钱包的旧密码和新密码.</translation>
+        <translation>ウォレットの前のパスフレーズと新しいパスフレーズを入力します。</translation>
     </message>
     <message>
         <source>Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
-        <translation>切记, 加密您的钱包并不能完全防止您的资金被感染您电脑的恶意软件窃取.</translation>
+        <translation>ウォレットを暗号化しても、コンピュータに感染したマルウェアから資金を完全に保護することはできませんので、ご注意ください。</translation>
     </message>
     <message>
         <source>Wallet to be encrypted</source>
-        <translation>钱包需要加密</translation>
+        <translation>暗号化するウォレット</translation>
     </message>
     <message>
         <source>Your wallet is about to be encrypted. </source>
-        <translation>您的钱包即将被加密.</translation>
+        <translation>お客様のウォレットが暗号化されます。</translation>
     </message>
     <message>
         <source>Your wallet is now encrypted. </source>
-        <translation>您的钱包现已被加密.</translation>
+        <translation>お客様のウォレットは暗号化されました。</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed and still have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation>重要提示：请用新生成的加密钱包文件替换旧的钱包备份文件。先前未加密的旧钱包备份文件含有同样的HD种子，能够像新加密的钱包一样获取您的资金，而无需输入密码。</translation>
+        <translation>重要： 過去のウォレットファイルのバックアップは、暗号化された新しいウォレットファイルに取り替える必要があります。暗号化されていないウォレットファイルの過去のバックアップは同じHDウォレットのシードを含むので、新しい暗号化ウォレットと同様にすべての資産にアクセスできます。</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>重要提示：您以前备份的钱包文件应该替换成最新生成的加密钱包文件。从安全性上考虑，您以前备份的未加密的钱包文件，在您使用新的加密钱包后将无效，请重新备份。</translation>
+        <translation>重要： 過去のウォレットファイルのバックアップは、暗号化された新しいウォレットファイルに取り替える必要があります。セキュリティ上の理由により、暗号化された新しいウォレットを使い始めると、暗号化されていないウォレットファイルのバックアップはすぐに使えなくなります。</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
-        <translation>钱包加密失败</translation>
+        <translation>ウォレットの暗号化に失敗しました</translation>
     </message>
     <message>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
-        <translation>由于一个本地错误，加密钱包的操作已经失败。您的钱包没能被加密。</translation>
+        <translation>内部エラーによりウォレットの暗号化が失敗しました。ウォレットは暗号化されていません。</translation>
     </message>
     <message>
         <source>The supplied passphrases do not match.</source>
-        <translation>密码不匹配。</translation>
+        <translation>入力したパスフレーズが正しくありません。</translation>
     </message>
     <message>
         <source>Wallet unlock failed</source>
-        <translation>钱包解锁失败</translation>
+        <translation>ウォレットのアンロックに失敗しました。</translation>
     </message>
     <message>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
-        <translation>用于解密钱包的密码不正确。</translation>
+        <translation>入力されたウォレットの暗号化解除のパスフレーズが正しくありません。</translation>
     </message>
     <message>
         <source>Wallet decryption failed</source>
-        <translation>钱包解密失败。</translation>
+        <translation>ウォレットの暗号化解除に失敗しました。</translation>
     </message>
     <message>
         <source>Wallet passphrase was successfully changed.</source>
-        <translation>修改钱包密码成功。</translation>
+        <translation>ウォレットのパスフレーズが変更されました。</translation>
     </message>
     <message>
         <source>Warning: The Caps Lock key is on!</source>
-        <translation>警告：大写锁定键处于打开状态！</translation>
+        <translation>警告：Caps Lockキーがオンになっています!</translation>
     </message>
 </context>
 <context>
     <name>BanTableModel</name>
     <message>
         <source>IP/Netmask</source>
-        <translation>IP/子网掩码</translation>
+        <translation>IPアドレス/ネットマスク</translation>
     </message>
     <message>
         <source>Banned Until</source>
-        <translation>在此之前禁止：</translation>
+        <translation>以下の時間までbanする:</translation>
     </message>
 </context>
 <context>
     <name>BitcoinAmountField</name>
     <message>
         <source>Amount in %1</source>
-        <translation>金额 %1</translation>
+        <translation>%1にある金額</translation>
     </message>
 </context>
 <context>
     <name>BitcoinGUI</name>
     <message>
         <source>A fatal error occurred. Wagerr Core can no longer continue safely and will quit.</source>
-        <translation>发生严重错误。Wagerr Core钱包不再能安全地运行下去，程序将会关闭。</translation>
+        <translation>重大なエラーが発生しました。 Wagerr Coreは安全に続行できなくなり終了します。</translation>
     </message>
     <message>
         <source>&amp;Overview</source>
-        <translation>概况(&amp;O)</translation>
+        <translation>概要(&amp;O)</translation>
     </message>
     <message>
         <source>Show general overview of wallet</source>
-        <translation>显示钱包概况</translation>
+        <translation>ウォレットの概要を表示</translation>
     </message>
     <message>
         <source>&amp;Send</source>
-        <translation>发送(&amp;S)</translation>
+        <translation>送金 (&amp;S)</translation>
     </message>
     <message>
         <source>Send coins to a Wagerr address</source>
-        <translation>发送币至Wagerr地址</translation>
+        <translation>Wagerr アドレスに送金</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
-        <translation>接收(&amp;R)</translation>
+        <translation>受取 (&amp;R)</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>请求付款(生成二维码和Wagerr付款协议的URI)</translation>
+        <translation>送金を要求 (QRコードとwagerr:URIを生成)</translation>
     </message>
     <message>
         <source>&amp;Sending addresses</source>
-        <translation>&amp;发送地址</translation>
+        <translation>アドレスを送信 (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Receiving addresses</source>
-        <translation>&amp;收款地址</translation>
+        <translation>アドレスを受信 (&amp;R)</translation>
     </message>
     <message>
         <source>Open Wallet</source>
-        <translation>打开钱包</translation>
+        <translation>ウォレットを開く</translation>
     </message>
     <message>
         <source>Open a wallet</source>
-        <translation>打开一个钱包</translation>
+        <translation>ウォレットを開く</translation>
     </message>
     <message>
         <source>Close Wallet...</source>
-        <translation>关闭钱包...</translation>
+        <translation>ウォレットを閉じる...</translation>
     </message>
     <message>
         <source>Close wallet</source>
-        <translation>关闭钱包</translation>
+        <translation>ウォレットを閉じる</translation>
     </message>
     <message>
         <source>No wallets available</source>
-        <translation>没有可用的钱包</translation>
+        <translation>利用可能なウォレットはありません</translation>
     </message>
     <message>
         <source>&amp;Window</source>
-        <translation>&amp;窗口</translation>
+        <translation>ウインドウ (&amp;W)</translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation>最小化</translation>
+        <translation>最小化する</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation>放大</translation>
+        <translation>ズーム</translation>
     </message>
     <message>
         <source>Main Window</source>
-        <translation>主窗口</translation>
+        <translation>メインウィンドウ</translation>
     </message>
     <message>
         <source>&amp;Transactions</source>
-        <translation>交易记录(&amp;T)</translation>
+        <translation>トランザクション(&amp;T)</translation>
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>查看交易历史</translation>
+        <translation>トランザクション履歴を閲覧</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
-        <translation>主节点(&amp;M)</translation>
+        <translation>マスターノード(&amp;M)</translation>
     </message>
     <message>
         <source>Browse masternodes</source>
-        <translation>浏览主节点</translation>
+        <translation>マスターノードを閲覧</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
-        <translation>退出(&amp;X)</translation>
+        <translation>終了(&amp;X)</translation>
     </message>
     <message>
         <source>Quit application</source>
-        <translation>退出程序</translation>
+        <translation>アプリケーションを終了</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
-        <translation>关于 &amp;Qt</translation>
+        <translation>Qtについて(&amp;Q)</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
-        <translation>显示 Qt 相关信息</translation>
+        <translation>Qt についての情報を表示</translation>
     </message>
     <message>
         <source>&amp;Options...</source>
-        <translation>选项(&amp;O)...</translation>
+        <translation>オプション… (&amp;O)</translation>
     </message>
     <message>
         <source>&amp;About %1</source>
-        <translation>关于 %1</translation>
+        <translation>%1 について (&amp;A)</translation>
     </message>
     <message>
         <source>Send %1 funds to a Wagerr address</source>
-        <translation>发送%1资金至一个Wagerr地址</translation>
+        <translation>Wagerrアドレスに%1の資金を送金します</translation>
     </message>
     <message>
         <source>Modify configuration options for %1</source>
-        <translation>修改%1配置选项</translation>
+        <translation>%1 の設定を変更</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
-        <translation>显示 / 隐藏(&amp;S)</translation>
+        <translation>表示/非表示 (&amp;S)</translation>
     </message>
     <message>
         <source>Show or hide the main Window</source>
-        <translation>显示或隐藏主窗口</translation>
+        <translation>メインウインドウを表示または非表示</translation>
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>加密钱包(&amp;E)...</translation>
+        <translation>ウォレットの暗号化… (&amp;E)</translation>
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
-        <translation>对钱包中的私钥加密</translation>
+        <translation>あなたのウォレットの秘密鍵を暗号化</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>备份钱包(&amp;B)...</translation>
+        <translation>ウォレットのバックアップ… (&amp;B)</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
-        <translation>备份钱包到其他文件夹</translation>
+        <translation>ウォレットを他の場所にバックアップ</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
-        <translation>更改密码(&amp;C)...</translation>
+        <translation>パスフレーズの変更… (&amp;C)</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
-        <translation>更改钱包加密口令</translation>
+        <translation>ウォレット暗号化のためのパスフレーズを変更</translation>
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>解锁钱包(&amp;U)</translation>
+        <translation>ウォレットをアンロック...(&amp;U)</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>解锁钱包</translation>
+        <translation>ウォレットをアンロック</translation>
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>锁定钱包(&amp;L)</translation>
+        <translation>ウォレットをロック(&amp;L)</translation>
     </message>
     <message>
         <source>Sign &amp;message...</source>
-        <translation>消息签名(&amp;M)...</translation>
+        <translation>メッセージの署名… (&amp;M)</translation>
     </message>
     <message>
         <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>使用您的Wagerr地址进行消息签名以证明对此地址的所有权</translation>
+        <translation>あなたがWagerr アドレスを所有していることを証明するために、あなたのWagerrアドレスでメッセージに署名してください。</translation>
     </message>
     <message>
         <source>&amp;Verify message...</source>
-        <translation>验证消息(&amp;V)...</translation>
+        <translation>メッセージの検証… (&amp;V)</translation>
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>验证消息是用来确定此消息是用指定的Wagerr地址签发的</translation>
+        <translation>指定されたWagerrアドレスで署名されたことを確認するためにメッセージを検証してください。</translation>
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>信息(&amp;I)</translation>
+        <translation>情報 (&amp;I)</translation>
     </message>
     <message>
         <source>Show diagnostic information</source>
-        <translation>显示诊断信息</translation>
+        <translation>診断情報を表示</translation>
     </message>
     <message>
         <source>&amp;Debug console</source>
-        <translation>Debug控制台(&amp;D)</translation>
+        <translation>デバッグコンソール(&amp;D)</translation>
     </message>
     <message>
         <source>Open debugging console</source>
-        <translation>打开调试控制台</translation>
+        <translation>デバッグコンソールを開く</translation>
     </message>
     <message>
         <source>&amp;Network Monitor</source>
-        <translation>网络流量监控(&amp;N)</translation>
+        <translation>ネットワークモニタ(&amp;N)</translation>
     </message>
     <message>
         <source>Show network monitor</source>
-        <translation>显示网络流量监控</translation>
+        <translation>ネットワークモニタを表示</translation>
     </message>
     <message>
         <source>&amp;Peers list</source>
-        <translation>节点列表(&amp;P)</translation>
+        <translation>ネットワークのピアのリスト(&amp;P)</translation>
     </message>
     <message>
         <source>Show peers info</source>
-        <translation>显示节点信息</translation>
+        <translation>接続しているピアの情報を表示</translation>
     </message>
     <message>
         <source>Wallet &amp;Repair</source>
-        <translation>钱包&amp;修复</translation>
+        <translation>ウォレットの修復(&amp;R)</translation>
     </message>
     <message>
         <source>Show wallet repair options</source>
-        <translation>显示钱包修复选项</translation>
+        <translation>ウォレットの修復オプションを表示</translation>
     </message>
     <message>
         <source>Open Wallet &amp;Configuration File</source>
-        <translation>打开钱包配置文件(&amp;C)</translation>
+        <translation>ウォレット設定ファイルを開く(&amp;C)</translation>
     </message>
     <message>
         <source>Open configuration file</source>
-        <translation>打开配置文件</translation>
+        <translation>設定ファイルを開く</translation>
     </message>
     <message>
         <source>Show Automatic &amp;Backups</source>
-        <translation>显示自动备份(&amp;B)</translation>
+        <translation>自動バックアップを表示(&amp;B)</translation>
     </message>
     <message>
         <source>Show automatically created wallet backups</source>
-        <translation>显示自动创建的钱包备份</translation>
+        <translation>自動で生成されたウォレットのバックアップを表示</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
-        <translation>显示用过的发送地址和标签的列表</translation>
+        <translation>過去に使用した送金先アドレスとラベルの一覧を表示</translation>
     </message>
     <message>
         <source>Show the list of used receiving addresses and labels</source>
-        <translation>显示用过的接收地址和标签的列表</translation>
+        <translation>過去に使用した受取先アドレスとラベルの一覧を表示</translation>
     </message>
     <message>
         <source>Open &amp;URI...</source>
-        <translation>打开 &amp;URI...</translation>
+        <translation>URIを開く… (&amp;U)</translation>
     </message>
     <message>
         <source>Open a wagerr: URI or payment request</source>
-        <translation>打开一个Wagerr协议的URI或付款请求</translation>
+        <translation>wagerr: URIまたは送金リクエストを開く</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
-        <translation>命令行选项(&amp;C)</translation>
+        <translation>コマンドラインオプション (&amp;C)</translation>
     </message>
     <message>
         <source>Show the %1 help message to get a list with possible Wagerr command-line options</source>
-        <translation>显示 %1 帮助信息，获取可用命令行选项列表</translation>
+        <translation>有効なWagerrのコマンドラインオプションのリストを見るために %1 のヘルプメッセージを表示</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>默认钱包</translation>
+        <translation>デフォルトのウォレット</translation>
     </message>
     <message>
         <source>%1 client</source>
-        <translation>%1 客戶</translation>
+        <translation>%1 クライアント</translation>
     </message>
     <message>
         <source>Wallet: %1
 </source>
-        <translation>钱包: %1
-</translation>
+        <translation>ウォレット：%1</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;unencrypted&lt;/b&gt;</source>
-        <translation>钱包 &lt;b&gt;未加密&lt;/b&gt;</translation>
+        <translation>ウォレットは&lt;b&gt;暗号化されていません&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation>文件(&amp;F)</translation>
+        <translation>ファイル(&amp;F)</translation>
     </message>
     <message>
         <source>Show information about %1</source>
-        <translation>显示有关%1的相关信息</translation>
+        <translation>%1の情報を表示する</translation>
     </message>
     <message>
         <source>Create Wallet...</source>
-        <translation>创建钱包...</translation>
+        <translation>ウォレットを作成する...</translation>
     </message>
     <message>
         <source>Create a new wallet</source>
-        <translation>创建一个新钱包</translation>
+        <translation>新しいウォレットを作成する</translation>
     </message>
     <message>
         <source>%1 &amp;information</source>
-        <translation>%1 &amp;信息</translation>
+        <translation>%1と情報</translation>
     </message>
     <message>
         <source>Show the %1 basic information</source>
-        <translation>显示%1基础信息</translation>
+        <translation>%1の基本情報を表示する</translation>
     </message>
     <message>
         <source>&amp;Settings</source>
-        <translation>设置(&amp;S)</translation>
+        <translation>設定(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>帮助(&amp;H)</translation>
+        <translation>ヘルプ(&amp;H)</translation>
     </message>
     <message>
         <source>Tabs toolbar</source>
-        <translation>分页工具栏</translation>
+        <translation>タブツールバー</translation>
     </message>
     <message>
         <source>&amp;Governance</source>
-        <translation>&amp;治理</translation>
+        <translation>ガバナンス(&amp;G)</translation>
     </message>
     <message>
         <source>View Governance Proposals</source>
-        <translation>查看治理提案</translation>
+        <translation>ガバナンス提案を見る</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n个有效的Wagerr网络连接</numerusform></translation>
+        <translation><numerusform>%n アクティブコネクション</numerusform></translation>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation>网络活动已禁用</translation>
+        <translation>ネットワークアクティビティは無効化されました</translation>
     </message>
     <message>
         <source>Syncing Headers (%1%)...</source>
-        <translation>同步区块头部 (%1%)...</translation>
+        <translation>ヘッダーを同期しています (%1%)...</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
-        <translation>正在与网络同步...</translation>
+        <translation>ネットワークに同期中…</translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
-        <translation>正在为硬盘中的区块建立索引...</translation>
+        <translation>ディスク上のブロックのインデックスを作成中...</translation>
     </message>
     <message>
         <source>Processing blocks on disk...</source>
-        <translation>正在处理硬盘中的区块...</translation>
+        <translation>ディスク上のブロックを処理中...</translation>
     </message>
     <message>
         <source>Reindexing blocks on disk...</source>
-        <translation>正在为硬盘中的区块重建索引...</translation>
+        <translation>ディスク上のブロックのインデックスを再作成中…</translation>
     </message>
     <message>
         <source>Connecting to peers...</source>
-        <translation>正在连接到节点……</translation>
+        <translation>ピアに接続中...</translation>
     </message>
     <message numerus="yes">
         <source>Processed %n block(s) of transaction history.</source>
-        <translation><numerusform>已处理了%n个区块的交易记录。</numerusform></translation>
+        <translation><numerusform>%n ブロックのトランザクション履歴を処理</numerusform></translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>落后 %1 </translation>
+        <translation>%1 遅延</translation>
     </message>
     <message>
         <source>Catching up...</source>
-        <translation>更新中...</translation>
+        <translation>追跡中…</translation>
     </message>
     <message>
         <source>Last received block was generated %1 ago.</source>
-        <translation>最新收到的区块产生于%1之前。</translation>
+        <translation>最後に受信したブロックは %1 前に生成されました。</translation>
     </message>
     <message>
         <source>Transactions after this will not yet be visible.</source>
-        <translation>在此之后的交易尚未可见</translation>
+        <translation>この後のトランザクションはまだ表示されません。</translation>
     </message>
     <message>
         <source>Up to date</source>
-        <translation>已更新</translation>
+        <translation>バージョンは最新です</translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
-        <translation>正在同步附加数据：%p%</translation>
+        <translation>追加データを同期中: %p%</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>错误</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>错误: %1</translation>
+        <translation>エラー：%1</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -719,620 +718,621 @@
     </message>
     <message>
         <source>Warning: %1</source>
-        <translation>警告: %1</translation>
+        <translation>警告：%1</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>信息</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <source>Received and sent multiple transactions</source>
-        <translation>已接收和发送的多重交易</translation>
+        <translation>送受信した複数のトランザクション</translation>
     </message>
     <message>
         <source>Sent multiple transactions</source>
-        <translation>已发送的多重交易</translation>
+        <translation>送信した複数のトランザクション</translation>
     </message>
     <message>
         <source>Received multiple transactions</source>
-        <translation>已接收的多重交易</translation>
+        <translation>受信した複数のトランザクション</translation>
     </message>
     <message>
         <source>Sent Amount: %1
 </source>
-        <translation>已发送数额: %1
+        <translation>送金金額：%1
 </translation>
     </message>
     <message>
         <source>Received Amount: %1
 </source>
-        <translation>已接收数额: %1
+        <translation>受取金額：%1
 </translation>
     </message>
     <message>
         <source>Date: %1
 </source>
-        <translation>日期：%1
+        <translation>日付: %1
 </translation>
     </message>
     <message>
         <source>Amount: %1
 </source>
-        <translation>金额：%1
+        <translation>金額: %1
 </translation>
     </message>
     <message>
         <source>Type: %1
 </source>
-        <translation>类型：%1
+        <translation>タイプ: %1
 </translation>
     </message>
     <message>
         <source>Label: %1
 </source>
-        <translation>标签：%1
+        <translation>ラベル: %1
 </translation>
     </message>
     <message>
         <source>Address: %1
 </source>
-        <translation>地址：%1
+        <translation>アドレス: %1
 </translation>
     </message>
     <message>
         <source>Sent transaction</source>
-        <translation>发送交易</translation>
+        <translation>送金トランザクション</translation>
     </message>
     <message>
         <source>Incoming transaction</source>
-        <translation>接收交易</translation>
+        <translation>入金トランザクション</translation>
     </message>
     <message>
         <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
-        <translation>HD密钥生成&lt;b&gt;启用&lt;/b&gt;</translation>
+        <translation>HDウォレット鍵生成は&lt;b&gt;有効&lt;/b&gt;です。</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
-        <translation>钱包已被&lt;b&gt;加密&lt;/b&gt;，当前为&lt;b&gt;解锁&lt;/b&gt;状态</translation>
+        <translation>ウォレットは &lt;b&gt;暗号化&lt;/b&gt;され、現在&lt;b&gt;アンロック&lt;/b&gt;されています。</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for mixing only</source>
-        <translation>钱包已经&lt;b&gt;加密&lt;/b&gt;  ，当前为 &lt;b&gt;解锁&lt;/b&gt;状态以进行混币</translation>
+        <translation>ウォレットは &lt;b&gt;暗号化&lt;/b&gt;され、現在ミキシングのために&lt;b&gt;アンロック&lt;/b&gt;されています。</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
-        <translation>钱包已被&lt;b&gt;加密&lt;/b&gt;，当前为&lt;b&gt;锁定&lt;/b&gt;状态</translation>
+        <translation>ウォレットは&lt;b&gt;暗号化&lt;/b&gt;され、現在 &lt;b&gt;ロック&lt;/b&gt;されています。</translation>
     </message>
     <message>
         <source>Proxy is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
-        <translation>代理服务器 &lt;b&gt;已启用&lt;/b&gt;: %1</translation>
+        <translation>プロキシが&lt;b&gt;有効&lt;/b&gt;：%1</translation>
     </message>
     <message>
         <source>Original message:</source>
-        <translation>原始信息:</translation>
+        <translation>元のメッセージ：</translation>
     </message>
 </context>
 <context>
     <name>CoinControlDialog</name>
     <message>
         <source>Quantity:</source>
-        <translation>总量：</translation>
+        <translation>数量：</translation>
     </message>
     <message>
         <source>Bytes:</source>
-        <translation>字节：</translation>
+        <translation>バイト：</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>金额：</translation>
+        <translation>総額：</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>费用：</translation>
+        <translation>手数料：</translation>
     </message>
     <message>
         <source>Coin Selection</source>
-        <translation>选择币</translation>
+        <translation>コイン選択</translation>
     </message>
     <message>
         <source>Dust:</source>
-        <translation>零散金额：</translation>
+        <translation>ダスト：</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>加上交易费用后：</translation>
+        <translation>手数料差引後：</translation>
     </message>
     <message>
         <source>Change:</source>
-        <translation>找零金额：</translation>
+        <translation>チェンジアドレス：</translation>
     </message>
     <message>
         <source>(un)select all</source>
-        <translation>(不)全选</translation>
+        <translation>すべて選択/選択解除</translation>
     </message>
     <message>
         <source>toggle lock state</source>
-        <translation>切换锁定状态</translation>
+        <translation>トグルロック状態</translation>
     </message>
     <message>
         <source>Tree mode</source>
-        <translation>树状模式</translation>
+        <translation>ツリーモード</translation>
     </message>
     <message>
         <source>List mode</source>
-        <translation>列表模式</translation>
+        <translation>リストモード</translation>
     </message>
     <message>
         <source>(1 locked)</source>
-        <translation>(1 锁定)</translation>
+        <translation>(1 ロック中)</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金额</translation>
+        <translation>金額</translation>
     </message>
     <message>
         <source>Received with label</source>
-        <translation>收款标签</translation>
+        <translation>ラベルに対する入金一覧</translation>
     </message>
     <message>
         <source>Received with address</source>
-        <translation>收款地址</translation>
+        <translation>アドレスに対する入金一覧</translation>
     </message>
     <message>
         <source>Mixing Rounds</source>
-        <translation>混币循环数</translation>
+        <translation>ミキシングのラウンド</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日期</translation>
+        <translation>日付</translation>
     </message>
     <message>
         <source>Confirmations</source>
-        <translation>确认</translation>
+        <translation>検証数</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>已确认</translation>
+        <translation>検証済み</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>复制地址</translation>
+        <translation>アドレスをコピー</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>复制标签</translation>
+        <translation>ラベルをコピー</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>复制金额</translation>
+        <translation>金額をコピー</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>复制交易编号</translation>
+        <translation>取引 ID をコピー</translation>
     </message>
     <message>
         <source>Lock unspent</source>
-        <translation>锁定未花费</translation>
+        <translation>未送金トランザクションをロック</translation>
     </message>
     <message>
         <source>Unlock unspent</source>
-        <translation>解锁未花费</translation>
+        <translation>未送金トランザクションをアンロック</translation>
     </message>
     <message>
         <source>Copy quantity</source>
-        <translation>复制金额</translation>
+        <translation>数量をコピー</translation>
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>复制交易费</translation>
+        <translation>手数料をコピー</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>复制含交易费的金额</translation>
+        <translation>手数料差引後の金額をコピー</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation>复制字节</translation>
+        <translation>バイト数をコピー</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation>复制零钱金额</translation>
+        <translation>ダストをコピー</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation>复制零钱</translation>
+        <translation>チェンジアドレスをコピー</translation>
     </message>
     <message>
         <source>Please switch to "List mode" to use this function.</source>
-        <translation>请切换到“列表模式”来使用此功能。</translation>
+        <translation>この機能を使うにはリストモードにスイッチしてください。</translation>
     </message>
     <message>
         <source>(%1 locked)</source>
-        <translation>(%1 锁定)</translation>
+        <translation>(%1 がロック中)</translation>
     </message>
     <message>
         <source>yes</source>
-        <translation>是</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>no</source>
-        <translation>否</translation>
+        <translation>いいえ</translation>
     </message>
     <message>
         <source>This label turns red if any recipient receives an amount smaller than the current dust threshold.</source>
-        <translation>当任何一个收款金额小于目前的零散金额上限时，文字会变红色。</translation>
+        <translation>受取額が現在のダスト閾値を下回る場合にはこのラベルは赤くなります。</translation>
     </message>
     <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation>每笔输入可能会有 +/- %1个duff(s)的偏差.</translation>
+        <source>Can vary +/- %1 sat(s) per input.</source>
+        <translation>インプットごとに +/- %1 sat(s) が変更可能 </translation>
     </message>
     <message>
         <source>Some coins were unselected because they were spent.</source>
-        <translation>一些币被取消选择, 因为它们已经被发送了.</translation>
+        <translation>使用済みのため、非選択のコインもありました。</translation>
     </message>
     <message>
         <source>Some coins were unselected because they do not have enough mixing rounds.</source>
-        <translation>一些币被取消选择, 因为它们没有足够的混币循环.</translation>
+        <translation>一部のコインは、ミキシングラウンドが不十分なため、非選択としました。</translation>
     </message>
     <message>
         <source>Show all coins</source>
-        <translation>显示所有币</translation>
+        <translation>全てのコインを表示する</translation>
     </message>
     <message>
         <source>Hide %1 coins</source>
-        <translation>隐藏 %1 的币</translation>
+        <translation>%1のコインを非表示にする</translation>
     </message>
     <message>
         <source>Show all %1 coins</source>
-        <translation>显示所有%1的币</translation>
+        <translation>%1全額のコインを表示する</translation>
     </message>
     <message>
         <source>Show spendable coins only</source>
-        <translation>只显示可使用的币</translation>
+        <translation>使用可能なコインのみを表示する</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(无标签)</translation>
+        <translation>（ラベル無し）</translation>
     </message>
     <message>
         <source>change from %1 (%2)</source>
-        <translation>来自%1的找零 (%2)</translation>
+        <translation>%1 (%2) からの変更</translation>
     </message>
     <message>
         <source>(change)</source>
-        <translation>(找零)</translation>
+        <translation>(チェンジ)</translation>
     </message>
     <message>
         <source>n/a</source>
-        <translation>不可用</translation>
+        <translation>n/a</translation>
     </message>
 </context>
 <context>
     <name>CreateWalletActivity</name>
     <message>
         <source>Creating Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>正在创建钱包 &lt;b&gt;%1&lt;/b&gt;...</translation>
+        <translation>ウォレット&lt;b&gt;%1&lt;/b&gt;を作成...</translation>
     </message>
     <message>
         <source>Create wallet failed</source>
-        <translation>创建钱包失败</translation>
+        <translation>ウォレットの作成に失敗しました</translation>
     </message>
     <message>
         <source>Create wallet warning</source>
-        <translation>创建钱包警告</translation>
+        <translation>ウォレット作成の警告</translation>
     </message>
 </context>
 <context>
     <name>CreateWalletDialog</name>
     <message>
         <source>Create Wallet</source>
-        <translation>创建钱包</translation>
+        <translation>ウォレットを作成する</translation>
     </message>
     <message>
         <source>Wallet Name</source>
-        <translation>钱包名称</translation>
+        <translation>ウォレット名</translation>
     </message>
     <message>
         <source>Encrypt the wallet. The wallet will be encrypted with a passphrase of your choice.</source>
-        <translation>加密钱包. 钱包将以您选择的密码进行加密.</translation>
+        <translation>ウォレットを暗号化します。ウォレットは、お客様が選んだパスフレーズで暗号化されます。</translation>
     </message>
     <message>
         <source>Encrypt Wallet</source>
-        <translation>加密钱包</translation>
+        <translation>ウォレットを暗号化する</translation>
     </message>
     <message>
         <source>Disable private keys for this wallet. Wallets with private keys disabled will have no private keys and cannot have an HD seed or imported private keys. This is ideal for watch-only wallets.</source>
-        <translation>禁用此钱包的私钥. 禁用私钥的钱包将没有私钥, 且不能有HD种子或导入私钥. 这个选项适用于仅用于观察的钱包.</translation>
+        <translation>このウォレットのプライベートキーを無効にします。プライベートキーを無効にしたウォレットは、プライベートキーを持たず、HDシードやインポートされたプライベートキーを持つことができなくなります。これは時計専用のウォレットに最適です。</translation>
     </message>
     <message>
         <source>Disable Private Keys</source>
-        <translation>禁用私钥</translation>
+        <translation>プライベートキーを無効化する</translation>
     </message>
     <message>
         <source>Make a blank wallet. Blank wallets do not initially have private keys or scripts. Private keys and addresses can be imported, or an HD seed can be set, at a later time.</source>
-        <translation>创建一个空白钱包. 空白钱包初始没有私钥或脚本. 随后可以导入私钥或地址, 或可以设置HD种子.</translation>
+        <translation>ブランクウォレットを作成します。ブランクウォレットは、初期状態ではプライベートキーやスクリプトを持ちません。プライベートキーやアドレスは、後からインポートしたり、HDシードを設定したりすることができます。</translation>
     </message>
     <message>
         <source>Make Blank Wallet</source>
-        <translation>创建空白钱包</translation>
+        <translation>ブランクウォレットを作成する</translation>
     </message>
     <message>
         <source>Create</source>
-        <translation>创建</translation>
+        <translation>作成</translation>
     </message>
 </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
         <source>Edit Address</source>
-        <translation>编辑地址</translation>
+        <translation>アドレスの編集</translation>
     </message>
     <message>
         <source>&amp;Label</source>
-        <translation>标签(&amp;L)</translation>
+        <translation>ラベル(&amp;L)</translation>
     </message>
     <message>
         <source>The label associated with this address list entry</source>
-        <translation>与此地址相关的标签项</translation>
+        <translation>このアドレスに関連しているラベル</translation>
     </message>
     <message>
         <source>&amp;Address</source>
-        <translation>地址(&amp;A)</translation>
+        <translation>アドレス (&amp;A)</translation>
     </message>
     <message>
         <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
-        <translation>该地址已与地址列表中的条目关联。只有发送地址才能被修改。</translation>
+        <translation>このアドレスに関連しているアドレス。これは送金アドレス用にのみ変更できます。</translation>
     </message>
     <message>
         <source>New sending address</source>
-        <translation>新建发送地址</translation>
+        <translation>新しい送金アドレス</translation>
     </message>
     <message>
         <source>Edit receiving address</source>
-        <translation>编辑接收地址</translation>
+        <translation>入金アドレスを編集</translation>
     </message>
     <message>
         <source>Edit sending address</source>
-        <translation>编辑发送地址</translation>
+        <translation>送金アドレスを編集</translation>
     </message>
     <message>
         <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>输入的地址“%1”不是有效的Wagerr地址。</translation>
+        <translation>入力されたアドレス "%1" は有効なWagerrアドレスではありません。</translation>
     </message>
     <message>
         <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
-        <translation>地址 "%1" 已作为带有标签 "%2" 的接收地址存在, 因此无法被添加为发送地址.</translation>
+        <translation>アドレス「%1」はラベル「%2」の受信アドレスとして既に存在するため、送信アドレスとして追加することはできません。</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book with label "%2".</source>
-        <translation>输入的地址 "%1" 已经在地址簿中存在, 标签为 "%2".</translation>
+        <translation>入力されたアドレス「%1」は、ラベル「%2」のアドレス帳に既に登録されています。</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
-        <translation>无法解锁钱包</translation>
+        <translation>ウォレットをアンロックできませんでした。</translation>
     </message>
     <message>
         <source>New key generation failed.</source>
-        <translation>新的密钥生成失败。</translation>
+        <translation>新しいキーの生成に失敗しました。</translation>
     </message>
 </context>
 <context>
     <name>FreespaceChecker</name>
     <message>
         <source>A new data directory will be created.</source>
-        <translation>一个新的数据目录将被创建。</translation>
+        <translation>新しいデータ ディレクトリが作成されます。</translation>
     </message>
     <message>
         <source>name</source>
-        <translation>名称</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
-        <translation>目录已存在。如果您打算在这里创建一个新目录，添加 %1。</translation>
+        <translation>ディレクトリがすでに存在します。 新しいディレクトリを作成する場合%1を追加してください。</translation>
     </message>
     <message>
         <source>Path already exists, and is not a directory.</source>
-        <translation>路径已存在，并且不是一个目录。</translation>
+        <translation>パスが存在します。ディレクトリではありません。</translation>
     </message>
     <message>
         <source>Cannot create data directory here.</source>
-        <translation>无法在此创建数据目录。</translation>
+        <translation>ここにデータディレクトリを作成することはできません。</translation>
     </message>
 </context>
 <context>
     <name>GovernanceList</name>
     <message>
         <source>Form</source>
-        <translation>表格</translation>
+        <translation>フォーム</translation>
     </message>
     <message>
         <source>Filter List:</source>
-        <translation>筛选列表:</translation>
+        <translation>フィルターリスト：</translation>
     </message>
     <message>
         <source>Filter propsal list</source>
-        <translation>筛选提案列表</translation>
+        <translation>フィルター提案リスト</translation>
     </message>
     <message>
         <source>Proposal Count:</source>
-        <translation>提案数量:</translation>
+        <translation>提案回数：</translation>
     </message>
     <message>
         <source>Filter by Title</source>
-        <translation>按标题筛选</translation>
+        <translation>タイトルで絞り込む</translation>
     </message>
     <message>
         <source>Proposal Info: %1</source>
-        <translation>提案信息: %1</translation>
+        <translation>提案情報：%1</translation>
     </message>
 </context>
 <context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
-        <translation>版本</translation>
+        <translation>バージョン</translation>
     </message>
     <message>
         <source>About %1</source>
-        <translation>關於 %1</translation>
+        <translation>%1 について</translation>
     </message>
     <message>
         <source>Command-line options</source>
-        <translation>命令行选项</translation>
+        <translation>コマンドラインオプション</translation>
     </message>
     <message>
         <source>%1 information</source>
-        <translation>%1信息</translation>
+        <translation>%1の情報</translation>
     </message>
     <message>
         <source>&lt;h3&gt;%1 Basics&lt;/h3&gt; %1 gives you true financial privacy by obscuring the origins of your funds. All the Wagerr in your wallet is comprised of different "inputs" which you can think of as separate, discrete coins.&lt;br&gt; %1 uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The %1 process works like this:&lt;/b&gt;&lt;ol type="1"&gt; &lt;li&gt;%1 begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 WAGERR, 0.01 WAGERR, 0.1 WAGERR, 1 WAGERR and 10 WAGERR -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called "masternodes." These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know "who" you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users' wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it's called a "round." Each round of %1 makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these "change addresses." Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have %1 disabled. &lt;hr&gt;For more information, see the &lt;a style="%2" href="%3"&gt;%1 documentation&lt;/a&gt;.</source>
-        <translation>&lt;h3&gt;%1基础知识&lt;/h3&gt;%1通过隐藏您的资金来源为您提供真正的财务隐私。您的钱包中所有的Wagerr都由不同的“输入”组成，您可以将其视为分开的离散硬币。&lt;br&gt;%1使用创新的方法将您的输入与其他两个人的输入相结合，而过程中不会让您的Wagerr离开您的钱包。每时每刻，您仍然控制着您的钱。&lt;hr&gt;&lt;b&gt;%1的运作原理如下：&lt;/b&gt;&lt;ol type="1"&gt;&lt;li&gt;%1首先将您的交易分柝成多个标准面额的交易。这些标准面额分别为0.001 WAGERR，0.01 WAGERR，0.1 WAGERR，1 WAGERR和10 WAGERR --有点像您每天使用的纸币。&lt;/li&gt;&lt;li&gt;您的钱包然后发送请求到网络上有专门配置的软件节点，称为“主节点”。这些主节点会收到您希望混合一些资金的通知。没有可识别的信息发送到主节点，所以他们永远不会知道您是“谁”。&lt;li&gt;当另外两个人发送类似的消息时，表示希望混合相同的面额的话，混合会话就会开始。相关的主节点会混合这些输入，并指示所有三个用户的钱包将已经转换了输入的交易支付给自己。您的钱包直接支付给自己，但是付给不同的位址（称之为找零地址）。&lt;/li&gt;&lt;li&gt;为了完全掩盖您的资金来源，您的钱包必须以每个面额来重复此过程数次。每次这个过程完成后，都称之为一个“循环”。每个循环的%1都会令确定您的资金来源的工作倍加困难。&lt;/li&gt;&lt;li&gt;这种混合过程发生在后台，而不需要您进行任何操作。当您想进行交易时，您的资金将已被混币处理。不需再花额外的时间等待。&lt;/li&gt;&lt;/ol&gt;&lt;hr&gt;重要：&lt;b&gt;您的钱包只能拥有1000个“找零地址”。每次混合事件发生时，最多会使用9个找零地址。这意味着这1000个地址可以容许100次的混合事件。当其的中900个已经被使用后，您的钱包必须创建更多的地址。如果您启用了自动备份，则只能够这样做。&lt;br&gt;因此，禁用备份的用户也将禁用%1。&lt;hr&gt;如欲了解更多信息请参阅&lt;a style="%2" href="%3"&gt;%1文档&lt;/a&gt;。</translation>
+        <translation>&lt;h3&gt;%1の基本内容&lt;/h3&gt; %1は、お客様の資金の出所を隠すことで、本当の意味での金融プライバシーを提供します。お客様のウォレットにあるすべてのWagerrは、異なる「入力」で構成されており、別個の独立したコインと考えることができます。&lt;br&gt;%1は、革新的なプロセスによって、お客様のインプットと他の2人以上のインプットをミキシングしますが、お客様のウォレットからコインが出ることはありません。お客様はいつでも自分のお金を管理できます。&lt;hr&gt; &lt;b&gt;%1のプロセスは次のように機能します。&lt;/b&gt;&lt;ol type="1"&gt; &lt;li&gt;%1は最初に取引の入力を標準的な金額に分解します。0.001 WAGERR、0.01 WAGERR、0.1 WAGERR、1 WAGERR、10 WAGERRなど、あなたが毎日使っている紙幣と同じような金額になります。&lt;/li&gt; &lt;li&gt;お客様のウォレットは、ネットワーク上にある「マスターノード」と呼ばれる特別に設定されたソフトウェアノードにリクエストを送ります。このとき、これらのマスタノードには、お客様が特定の金額を混合することに関心があると伝えられます。個人を特定できるような情報はマスタノードに送られないため、お客様が「誰」であるか知られることはありません。&lt;/li&gt; &lt;li&gt;他の2人以上の人物が同じようなメッセージを送り、同じ金額のミキシングを希望すると、ミキシングセッションが開始されます。マスターノードは入力をミキシングし、3人のユーザー全員のウォレットに、その時点で変換された入力を3人全員に支払うように指示します。お客様のウォレットは、その金額をウォレット自体に直接支払いますが、別のアドレス（変更アドレスと呼ぶ）になります。&lt;/li&gt; &lt;li&gt;お客様の資金を完全に隠すために、お客様のウォレットではこのプロセスを各金額で何度も繰り返される必要があります。このプロセスが完了する度に、「ラウンド」と呼ばれます。%1の各ラウンドは、お客様の資金が発生した場所を判断するのを指数関数的に難しくします。&lt;/li&gt; &lt;li&gt;このミキシングプロセスはバックグラウンドで行われ、お客様側の介入は一切ありません。お客様が取引をしたいときは、お客様の資金はすでにミキシングされています。さらに待つ必要はありません。&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;重要事項：&lt;/b&gt; お客様のウォレットには、この「変更アドレス」が1000個しか入っていません。ミキシング作業が発生する度に、お客様のアドレスのうち最大9個が使用されます。したがって、この1000個のアドレスは、約100回までのミキシング作業に使えるということです。そのうち900個を使い切ると、お客様はご自身のウォレットにさらにアドレスを作成する必要があります。ただし、これは自動バックアップを有効にしている場合に限ります。&lt;br&gt;そのため、バックアップを無効にしているユーザーは、%1も無効になります。&lt;hr&gt;詳細は、&lt;a style="%2" href="%3"&gt;%1のドキュメント&lt;/a&gt;を参照してください。</translation>
     </message>
 </context>
 <context>
     <name>Intro</name>
     <message>
         <source>Welcome</source>
-        <translation>欢迎</translation>
+        <translation>ようこそ！
+</translation>
     </message>
     <message>
         <source>Welcome to %1.</source>
-        <translation>欢迎使用 %1</translation>
+        <translation>%1 へようこそ。</translation>
     </message>
     <message>
         <source>As this is the first time the program is launched, you can choose where %1 will store its data.</source>
-        <translation>由于这是第一次启动此程序，您可以选择%1的数据所存储的位置</translation>
+        <translation>これは本プログラムの最初の起動です。%1 がデータを保存する場所を選択して下さい。</translation>
     </message>
     <message>
         <source>When you click OK, %1 will begin to download and process the full %4 block chain (%2GB) starting with the earliest transactions in %3 when %4 initially launched.</source>
-        <translation>当您点击确认后，%1 将会在 %4 启动时从  %3 中最早的交易开始，下载并处理完整的 %4 区块链 (%2GB)。</translation>
+        <translation>OKをクリックすると、%1は完全な%4ブロックチェーン (%2GB) のダウンロードおよび処理を%4が開始された時点の%3から開始します。</translation>
     </message>
     <message>
         <source>This initial synchronisation is very demanding, and may expose hardware problems with your computer that had previously gone unnoticed. Each time you run %1, it will continue downloading where it left off.</source>
-        <translation>最初的同步过程是非常吃力的，同时可能会暴露您电脑上的一些硬件方面的小毛病，尽管您可能之前没有注意过。您每运行%1，它就会继续从之前中断的地方下载.</translation>
+        <translation>この初期同期には多大なリソースを消費し、あなたのコンピュータでこれまで見つからなかったハードウェア上の問題が発生する場合があります。%1 を実行する度に、中断された時点からダウンロードを再開します。</translation>
     </message>
     <message>
         <source>If you have chosen to limit block chain storage (pruning), the historical data must still be downloaded and processed, but will be deleted afterward to keep your disk usage low.</source>
-        <translation>如果您选择限制区块链存储大小（区块链裁剪模式），程序依然会下载并处理全部历史数据，此后才会删除不必须的部分，占用最少的存储空间。</translation>
+        <translation>ブロックチェーンの保存容量に制限を設けることを選択した場合 (剪定) にも、過去のデータのダウンロードおよび処理が必要になります。しかし、これらのデータはディスク使用量を低く抑えるために、後で削除されます。</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
-        <translation>使用默认的数据目录</translation>
+        <translation>初期設定のデータディレクトリを使用</translation>
     </message>
     <message>
         <source>Use a custom data directory:</source>
-        <translation>使用自定义的数据目录：</translation>
+        <translation>任意のデータディレクトリを使用：</translation>
     </message>
     <message>
         <source>At least %1 GB of data will be stored in this directory, and it will grow over time.</source>
-        <translation>此目录中至少会保存 %1 GB 的数据，并且尺寸还会随着时间增长。</translation>
+        <translation>少なくとも%1GBのデータをこのディレクトリに保存する必要があります。またこのデータは時間とともに増加していきます。</translation>
     </message>
     <message>
         <source>Approximately %1 GB of data will be stored in this directory.</source>
-        <translation>会在此目录中存储约 %1 GB 的数据。</translation>
+        <translation>おおむね%1GBのデータがこのディレクトリに保存されます。</translation>
     </message>
     <message>
         <source>%1 will download and store a copy of the Wagerr block chain.</source>
-        <translation>%1 将会下载并存储Wagerr区块链.</translation>
+        <translation>%1はWagerrのブロックチェーンの複製をダウンロードし保存します。</translation>
     </message>
     <message>
         <source>The wallet will also be stored in this directory.</source>
-        <translation>钱包也会被保存在这个目录中。</translation>
+        <translation>ウォレットもこのディレクトリに保存されます。</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
-        <translation>错误：指定的数据目录“%1”无法被创建。</translation>
+        <translation>エラー： 指定のデータディレクトリ "%1" を作成できません。</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>错误</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <source>%1 GB of free space available</source>
-        <translation>%1GB的可用空间</translation>
+        <translation>使用可能な空き領域の%1 GB</translation>
     </message>
     <message>
         <source>(of %1 GB needed)</source>
-        <translation>(需要 %1 GB的空间)</translation>
+        <translation>(%1 GB 必要)</translation>
     </message>
 </context>
 <context>
     <name>MasternodeList</name>
     <message>
         <source>Form</source>
-        <translation>表单</translation>
+        <translation>フォーム</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>状态</translation>
+        <translation>ステータス</translation>
     </message>
     <message>
         <source>Filter List:</source>
-        <translation>筛选列表：</translation>
+        <translation>フィルターリスト:</translation>
     </message>
     <message>
         <source>Filter masternode list</source>
-        <translation>筛选主节点列表</translation>
+        <translation>マスターノードのリストをフィルター</translation>
     </message>
     <message>
         <source>Node Count:</source>
-        <translation>节点数：</translation>
+        <translation>ノード数:</translation>
     </message>
     <message>
         <source>Show only masternodes this wallet has keys for.</source>
-        <translation>仅显示此钱包拥有私钥的主节点</translation>
+        <translation>このウォレットがキーを持つマスターノードのみを表示</translation>
     </message>
     <message>
         <source>My masternodes only</source>
-        <translation>仅我的主节点</translation>
+        <translation>自分のマスターノードのみ</translation>
     </message>
     <message>
         <source>Service</source>
-        <translation>服务</translation>
+        <translation>サービス</translation>
     </message>
     <message>
         <source>PoSe Score</source>
-        <translation>PoSe 扣分</translation>
+        <translation>PoSeスコア</translation>
     </message>
     <message>
         <source>Registered</source>
-        <translation>已注册的</translation>
+        <translation>登録済み</translation>
     </message>
     <message>
         <source>Last Paid</source>
-        <translation>最近支付</translation>
+        <translation>最新の支払い</translation>
     </message>
     <message>
         <source>Next Payment</source>
-        <translation>下次支付</translation>
+        <translation>次の支払い</translation>
     </message>
     <message>
         <source>Payout Address</source>
-        <translation>付款地址</translation>
+        <translation>支払いアドレス</translation>
     </message>
     <message>
         <source>Operator Reward</source>
-        <translation>运行者奖励</translation>
+        <translation>オペレーター報酬</translation>
     </message>
     <message>
         <source>Collateral Address</source>
-        <translation>保证金地址</translation>
+        <translation>担保アドレス</translation>
     </message>
     <message>
         <source>Owner Address</source>
-        <translation>所有者地址</translation>
+        <translation>所有者アドレス</translation>
     </message>
     <message>
         <source>Voting Address</source>
-        <translation>投票地址</translation>
+        <translation>投票アドレス</translation>
     </message>
     <message>
         <source>Copy ProTx Hash</source>
-        <translation>复制 ProTx Hash</translation>
+        <translation>ProTxハッシュをコピー</translation>
     </message>
     <message>
         <source>Copy Collateral Outpoint</source>
-        <translation>复制保证金输出点</translation>
+        <translation>担保のアウトポイントをコピー</translation>
     </message>
     <message>
         <source>Updating...</source>
@@ -1340,7 +1340,7 @@
     </message>
     <message>
         <source>ENABLED</source>
-        <translation>ENABLED</translation>
+        <translation>有効</translation>
     </message>
     <message>
         <source>POSE_BANNED</source>
@@ -1348,97 +1348,97 @@
     </message>
     <message>
         <source>UNKNOWN</source>
-        <translation>UNKNOWN</translation>
+        <translation>不明</translation>
     </message>
     <message>
         <source>to %1</source>
-        <translation>至 %1</translation>
+        <translation>%1に</translation>
     </message>
     <message>
         <source>to UNKNOWN</source>
-        <translation>至 UNKNOWN</translation>
+        <translation>不明者に</translation>
     </message>
     <message>
         <source>but not claimed</source>
-        <translation>但未认领</translation>
+        <translation>しかし、請求されていません</translation>
     </message>
     <message>
         <source>NONE</source>
-        <translation>NONE</translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Filter by any property (e.g. address or protx hash)</source>
-        <translation>按任何属性筛选 (例. 地址或protx hash)</translation>
+        <translation>プロパティでのフィルタリング（例：アドレスやProTxハッシュなど）</translation>
     </message>
     <message>
         <source>Please wait...</source>
-        <translation>请稍等...</translation>
+        <translation>お待ちください...</translation>
     </message>
     <message>
         <source>Additional information for DIP3 Masternode %1</source>
-        <translation>DIP3 主节点 %1 的额外信息</translation>
+        <translation>DIP3のマスターノード%1の追加情報</translation>
     </message>
 </context>
 <context>
     <name>ModalOverlay</name>
     <message>
         <source>Form</source>
-        <translation>表单</translation>
+        <translation>フォーム</translation>
     </message>
     <message>
         <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Wagerr network, as detailed below.</source>
-        <translation>最近的交易可能尚未显示，因此您的钱包的余额可能不正确。一旦您的钱包完成与Wagerr网络的同步，这个信息将会修正，如下所述。</translation>
+        <translation>確認できない最新のトランザクションがあるかもしれません。これによりウォレットの残高は不正確なものである可能性があります。この情報はウォレットが一度Wagerrのネットワークへの同期が完了すると正確なものとなります。詳細は下記を参照してください。</translation>
     </message>
     <message>
         <source>Attempting to spend Wagerr that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>假如您正在尝试花费尚未显示出来的Wagerr，这个交易将不会被网络所接受。</translation>
+        <translation>表示されてないトランザクションに影響を受けたWagerrを使用しようとするとネットワークに承認されません。</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
-        <translation>剩余区块数量</translation>
+        <translation>残りのブロック数</translation>
     </message>
     <message>
         <source>Unknown...</source>
-        <translation>未知...</translation>
+        <translation>不明...</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation>上一区块时间</translation>
+        <translation>最終ブロックの日時</translation>
     </message>
     <message>
         <source>Progress</source>
-        <translation>进度</translation>
+        <translation>進捗</translation>
     </message>
     <message>
         <source>Progress increase per hour</source>
-        <translation>每小时进度增加</translation>
+        <translation>一時間毎の進捗の変化</translation>
     </message>
     <message>
         <source>calculating...</source>
-        <translation>正在计算...</translation>
+        <translation>計算中...</translation>
     </message>
     <message>
         <source>Estimated time left until synced</source>
-        <translation>预计剩余同步时间</translation>
+        <translation>同期が完了するまでの推定残り時間</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation>隐藏</translation>
+        <translation>非表示</translation>
     </message>
     <message>
         <source>Unknown. Syncing Headers (%1, %2%)...</source>
-        <translation>未知状态. 同步区块头部 (%1, %2%)...</translation>
+        <translation>不明。ヘッダー(%1、%2%)を同期中...</translation>
     </message>
 </context>
 <context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
-        <translation>打开 URI</translation>
+        <translation>URI を開く</translation>
     </message>
     <message>
         <source>Open payment request from URI or file</source>
-        <translation>打开来自URI或文件的付款请求 </translation>
+        <translation>URI またはファイルから送金リクエストを開く</translation>
     </message>
     <message>
         <source>URI:</source>
@@ -1446,65 +1446,65 @@
     </message>
     <message>
         <source>Select payment request file</source>
-        <translation>选择付款请求文件 </translation>
+        <translation>送金リクエストファイルを選択してください</translation>
     </message>
     <message>
         <source>Select payment request file to open</source>
-        <translation>选择需要打开的付款请求文件 </translation>
+        <translation>開きたい送金リクエストファイルを選択してください</translation>
     </message>
 </context>
 <context>
     <name>OpenWalletActivity</name>
     <message>
         <source>Open wallet failed</source>
-        <translation>打开钱包失败</translation>
+        <translation>ウォレットを開くのに失敗しました</translation>
     </message>
     <message>
         <source>Open wallet warning</source>
-        <translation>打开钱包警告</translation>
+        <translation>ウォレット開示の警告</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>默认钱包</translation>
+        <translation>デフォルトのウォレット</translation>
     </message>
     <message>
         <source>Opening Wallet &lt;b&gt;%1&lt;/b&gt;...</source>
-        <translation>正在打开钱包 &lt;b&gt;%1&lt;/b&gt;...</translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt;のウォレットを開封中...</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
         <source>Options</source>
-        <translation>选项</translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <source>&amp;Main</source>
-        <translation>主要(&amp;M)</translation>
+        <translation>メイン (&amp;M)</translation>
     </message>
     <message>
         <source>Size of &amp;database cache</source>
-        <translation>数据库缓存大小(&amp;D)</translation>
+        <translation>データベースキャッシュのサイズ (&amp;D)</translation>
     </message>
     <message>
         <source>Number of script &amp;verification threads</source>
-        <translation>脚本&amp; 验证 进程数 </translation>
+        <translation>スクリプト検証用スレッド数 (&amp;V)</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
-        <translation>(0 = 自动, &lt;0 = 保留处理器核心不用的数目)</translation>
+        <translation>(0 = 自動、0以上 = 指定した数のコアをフリーにする)</translation>
     </message>
     <message>
         <source>W&amp;allet</source>
-        <translation>钱包(&amp;A)</translation>
+        <translation>ウォレット (&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Appearance</source>
-        <translation>&amp;外观</translation>
+        <translation>アピアランス(&amp;A)</translation>
     </message>
     <message>
         <source>Prune &amp;block storage to</source>
-        <translation>修剪&amp;区块存储到</translation>
+        <translation>へのプルーンとブロックストレージ</translation>
     </message>
     <message>
         <source>GB</source>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
         <source>Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation>还原此设置需要重新下载整个区块链.</translation>
+        <translation>この設定を元に戻すには、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
     </message>
     <message>
         <source>MiB</source>
@@ -1520,187 +1520,187 @@
     </message>
     <message>
         <source>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</source>
-        <translation>显示其他标签，在第一个子标签列出所有您的主节点&lt;br/&gt;在第二个子标签列出所有网络上的主节点。</translation>
+        <translation>あなたのすべてのマスターノードをリストしている追加のタブを最初のサブタブに表示し&lt;br/&gt;すべてのマスターノードを次のサブタブに表示</translation>
     </message>
     <message>
         <source>Show Masternodes Tab</source>
-        <translation>显示主节点标签页</translation>
+        <translation>マスターノードタブを表示する</translation>
     </message>
     <message>
         <source>Show additional tab listing governance proposals.</source>
-        <translation>显示列出治理提案的其他标签页.</translation>
+        <translation>ガバナンス提案の一覧を追加タブで表示します。</translation>
     </message>
     <message>
         <source>Show Governance Tab</source>
-        <translation>显示治理标签页</translation>
+        <translation>ガバナンスタブを表示する</translation>
     </message>
     <message>
         <source>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</source>
-        <translation>如果您禁用还未确认的零钱，那么交易中找零的零钱&lt;br/&gt;至少需要1个确认才能使用。&lt;br/&gt;这也会影响余额的计算。</translation>
+        <translation>もし未確認のチェンジを使用することを無効にする場合&lt;br/&gt;トランザクションから生じたチェンジはそのトランザクションが少なくとも一回コンファメーションがないと使用できません。&lt;br/&gt;これはまたあなたのウォレットの残高の計算にも影響を与えます。</translation>
     </message>
     <message>
         <source>Show mixing interface on Overview screen and reveal an additional screen which allows to spend fully mixed coins only.&lt;br/&gt;A new tab with more settings will also appear in this dialog, please make sure to check them before mixing your coins.</source>
-        <translation>在概览屏幕上显示混币界面，并显示一个仅允许使用完全混币资金的界面。&lt;br/&gt;该对话框中还将出现一个具有更多设置的标签，请确保在混币前检查这些设置。</translation>
+        <translation>概要画面にミキシングインターフェースを表示し、完全にミキシングされたコインのみを使用できる追加画面を表示します。&lt;br/&gt;このダイアログには、他の設定ができる新しいタブも表示されますので、コインをミキシングする前に必ず確認してください。</translation>
     </message>
     <message>
         <source>Show additional information and buttons on overview screen.</source>
-        <translation>在概况页面上显示额外信息和按钮。</translation>
+        <translation>概要画面に追加情報とボタンを表示します。</translation>
     </message>
     <message>
         <source>Enable advanced interface</source>
-        <translation>启用高级界面</translation>
+        <translation>高度なインターフェイスを有効にする</translation>
     </message>
     <message>
         <source>Show system popups for mixing transactions&lt;br/&gt;just like for all other transaction types.</source>
-        <translation>显示混币交易的系统弹出窗口 &lt;br/&gt; 如同其他所有交易类型一样。</translation>
+        <translation>他の全ての取引タイプと同様に、&lt;br/&gt;ミキシング取引にもシステムポップアップを表示します。</translation>
     </message>
     <message>
         <source>Show popups for mixing transactions</source>
-        <translation>显示混币交易的弹出窗口</translation>
+        <translation>ミキシング取引のポップアップを表示する</translation>
     </message>
     <message>
         <source>Show warning dialog when the wallet has very low number of keys left.</source>
-        <translation>当钱包公钥所剩无几时，显示警告对话框。</translation>
+        <translation>ウォレットのキーの残量が非常に少なくなった場合に、警告ダイアログを表示するようにします。</translation>
     </message>
     <message>
         <source>Warn if the wallet is running out of keys</source>
-        <translation>钱包公钥将用完时提示警告</translation>
+        <translation>ウォレットのキーが不足している場合に警告を表示する</translation>
     </message>
     <message>
         <source>Whether to use experimental mode with multiple mixing sessions per block.&lt;br/&gt;Note: You must use this feature carefully.&lt;br/&gt;Make sure you always have recent wallet (auto)backup in a safe place!</source>
-        <translation>是否使用实验性质的模式，当中每个内存块都会有多个混合会话。&lt;br/&gt;注意：您必须小心使用此功能。&lt;br/&gt;确保您总是有最近的钱包（自动）备份在一个安全的地方！</translation>
+        <translation>ブロックごとに複数のミキシングセッションを行う実験モードを使用する場合。&lt;br/&gt;注意事項：この機能は慎重に使用する必要があります。&lt;br/&gt;常に安全な場所に最新のウォレットの（自動）バックアップをとっておくようにしてください。</translation>
     </message>
     <message>
         <source>Enable &amp;multi-session</source>
-        <translation>启动&amp;多轮</translation>
+        <translation>マルチセッションを有効にする</translation>
     </message>
     <message>
         <source>Mixing rounds</source>
-        <translation>混币循环数</translation>
+        <translation>ミキシングラウンド</translation>
     </message>
     <message>
         <source>This amount acts as a threshold to turn off mixing once it's reached.</source>
-        <translation>此金额作为关闭混币的阈值。</translation>
+        <translation>この量に達すると、ミキシングがオフになる閾値として機能します。</translation>
     </message>
     <message>
         <source>Target balance</source>
-        <translation>目标余额</translation>
+        <translation>対象残高</translation>
     </message>
     <message>
         <source>Automatically open the Wagerr Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自动在路由器打开Wagerr Core客户端端口。此项只在路由器支持UPnP且开启时有效。</translation>
+        <translation>自動的にルーターのWagerr Core クライアントポートを開放します。これはルーターがUPnP機能をサポートしておりUPnP機能が有効な場合にのみ機能します。</translation>
     </message>
     <message>
         <source>Automatically open the Bitcoin client port on the router. This only works when your router supports NAT-PMP and it is enabled. The external port could be random.</source>
-        <translation>自动打开路由器上Bitcoin客户端端口. 这仅在您的路由器支持NAT-PMP并且已启用时才有效. 外部端口可以是随机的.</translation>
+        <translation>ルーターでBitcoinクライアントポートを自動的に開きます。これは、ルーターがNAT-PMPをサポートし、それが有効になっている場合にのみ機能します。外部ポートはランダムになる可能性があります。</translation>
     </message>
     <message>
         <source>Map port using NA&amp;T-PMP</source>
-        <translation>使用NA&amp;T-PMP映射端口</translation>
+        <translation>NA&amp;T-PMPを使用したマップポート</translation>
     </message>
     <message>
         <source>Accept connections from outside.</source>
-        <translation>接受来自外部的连接.</translation>
+        <translation>外部からの接続を許可する。</translation>
     </message>
     <message>
         <source>Allow incomin&amp;g connections</source>
-        <translation>允许连入连接</translation>
+        <translation>受信接続を許可する</translation>
     </message>
     <message>
         <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>通过SOCKS5代理连接Wagerr网络。</translation>
+        <translation>SOCKS5プロキシ経由でWagerrネットワークに接続します。</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
-        <translation>通过SOCKS5代理连接 (默认代理)(&amp;C)：</translation>
+        <translation>SOCKS5プロキシ（デフォルトプロキシ）経由で接続： (&amp;C)</translation>
     </message>
     <message>
         <source>Shows if the supplied default SOCKS5 proxy is used to reach peers via this network type.</source>
-        <translation>如果是使用提供的默认SOCKS5代理来连接到节点就加以显示。</translation>
+        <translation>指定されたデフォルトのSOCKS5プロキシを使用して、このネットワークタイプ経由でピアに到達するかどうかを表示。</translation>
     </message>
     <message>
         <source>Use separate SOCKS&amp;5 proxy to reach peers via Tor hidden services:</source>
-        <translation>使用独立的SOCK&amp;5代理服务器, 并通过Tor隐藏服务到对等用户群:</translation>
+        <translation>Torの非表示サービスを経由してピアに到達するために、別のSOCKS&amp;5プロキシを使用します。</translation>
     </message>
     <message>
         <source>Options set in this dialog are overridden by the command line or in the configuration file:</source>
-        <translation>此对话框中设置的选项被命令行或配置文件覆盖:</translation>
+        <translation>このダイアログで設定されたオプションは、コマンドラインまたは設定ファイルによって上書きされます。</translation>
     </message>
     <message>
         <source>Hide the icon from the system tray.</source>
-        <translation>隐藏系统托盘中的图标.</translation>
+        <translation>システムトレイからアイコンを非表示にします。</translation>
     </message>
     <message>
         <source>&amp;Hide tray icon</source>
-        <translation>&amp;隐藏托盘图标</translation>
+        <translation>トレイアイコンを非表示にする(&amp;H)</translation>
     </message>
     <message>
         <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</source>
-        <translation>窗口被关闭时最小化而不是退出应用程序。当此选项启用时，应用程序只会在菜单中选择退出时退出。</translation>
+        <translation>ウィンドウを閉じる際にアプリケーションを終了するのではなく最小化します。このオプションが有効の場合、メニューから終了を選択した場合にのみアプリケーションは閉じられます。</translation>
     </message>
     <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items.&lt;br/&gt;%s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
-        <translation>出现在交易的选项卡的上下文菜单项的第三方URL（例如，区块链查询网站）。&lt;br/&gt;URL中的 %s被替换为交易哈希。多个URL需用竖线 | 分隔。</translation>
+        <translation>メニューアイテムとしてトランザクションタブに表示されるサードパーティのURL (例 ブロックエクスプローラー) :&lt;br/&gt;%s はトランザクションハッシュに置き換えられます。複数のURLは"|"によって区切られます。</translation>
     </message>
     <message>
         <source>&amp;Third party transaction URLs</source>
-        <translation>&amp;第三方交易链接</translation>
+        <translation>サードパーティのトランザクションURL(&amp;T)</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
-        <translation>是否显示交易源地址控制功能。</translation>
+        <translation>コインコントロール機能の表示／非表示</translation>
     </message>
     <message>
         <source>Automatically start %1 after logging in to the system.</source>
-        <translation>在登入系统后自动启动 %1</translation>
+        <translation>システムにログインすると自動的に %1 を起動</translation>
     </message>
     <message>
         <source>&amp;Start %1 on system login</source>
-        <translation>系统登入时启动 %1</translation>
+        <translation>システムログイン時に %1 を起動 (&amp;S)</translation>
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
-        <translation>启动交易源地址控制功能(&amp;C)</translation>
+        <translation>コインコントロール機能を有効化 (&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Spend unconfirmed change</source>
-        <translation>可以花还未确认的零钱(&amp;S)</translation>
+        <translation>未検証のチェンジを使用 (&amp;S)</translation>
     </message>
     <message>
         <source>This setting determines the amount of individual masternodes that an input will be mixed through.&lt;br/&gt;More rounds of mixing gives a higher degree of privacy, but also costs more in fees.</source>
-        <translation>此选项用以调整进行混币操作的主节点数量。&lt;br/&gt;越多的循环次数提供了更高级别的隐私保护，同时也会花费更多的手续费。</translation>
+        <translation>この設定は、入力がミキシングされる個々のマスターノードの量を指定します。&lt;br/&gt;ミキシングのラウンド数を増やすと、より高度なプライバシーが得られますが、その分料金も高くなります。</translation>
     </message>
     <message>
         <source>&amp;Network</source>
-        <translation>网络(&amp;N)</translation>
+        <translation>ネットワーク (&amp;N)</translation>
     </message>
     <message>
         <source>Enabling pruning significantly reduces the disk space required to store transactions. All blocks are still fully validated. Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation>启用修剪会显著减少用于存储交易的磁盘空间. 所有区块仍然经过充分验证. 恢复此设置需要重新下载整个区块链.</translation>
+        <translation>プルーニングを有効にすると、取引を保存するのに必要なディスク容量が大幅に削減されます。すべてのブロックは完全に検証されたままです。この設定を元に戻すには、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
-        <translation>使用UPnP映射端口(&amp;U)</translation>
+        <translation>UPnPを使ってポートを割り当て (&amp;U)</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
-        <translation>代理服务器IP(&amp;I)：</translation>
+        <translation>プロキシの IP：(&amp;I) </translation>
     </message>
     <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
-        <translation>代理的 IP 地址 (例如 IPv4: 127.0.0.1 / IPv6: ::1)</translation>
+        <translation>プロキシのIPアドレス (例 IPv4： 127.0.0.1 / IPv6： ::1)</translation>
     </message>
     <message>
         <source>&amp;Port:</source>
-        <translation>端口(&amp;P)：</translation>
+        <translation>ポート ：(&amp;P)</translation>
     </message>
     <message>
         <source>Port of the proxy (e.g. 9050)</source>
-        <translation>代理端口（例如 9050）</translation>
+        <translation>プロキシのポート番号 (例 9050)</translation>
     </message>
     <message>
         <source>Used for reaching peers via:</source>
-        <translation>连接到节点的方式：</translation>
+        <translation>ピアへ到達するために使われた方法:</translation>
     </message>
     <message>
         <source>IPv4</source>
@@ -1716,627 +1716,627 @@
     </message>
     <message>
         <source>Connect to the Wagerr network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>通过另一个SOCKS5代理服务器作为Tor隐藏服务来连接到Wagerr网络。</translation>
+        <translation>Tor秘匿サービスを利用するため独立なSOCKS5プロキシ経由でWagerrネットワークに接続</translation>
     </message>
     <message>
         <source>Show only a tray icon after minimizing the window.</source>
-        <translation>最小化窗口后仅显示托盘图标。</translation>
+        <translation>ウインドウを最小化したあとトレイアイコンだけを表示</translation>
     </message>
     <message>
         <source>&amp;Minimize to the tray instead of the taskbar</source>
-        <translation>最小化到托盘(&amp;M)</translation>
+        <translation>タスクバーの代わりにトレイに最小化 (&amp;M)</translation>
     </message>
     <message>
         <source>M&amp;inimize on close</source>
-        <translation>单击关闭按钮最小化(&amp;I)</translation>
+        <translation>閉じる時に最小化 (&amp;I)</translation>
     </message>
     <message>
         <source>&amp;Display</source>
-        <translation>显示(&amp;D)</translation>
+        <translation>表示 (&amp;D)</translation>
     </message>
     <message>
         <source>User Interface &amp;language:</source>
-        <translation>用户界面语言(&amp;L)：</translation>
+        <translation>ユーザインターフェースの言語 ：(&amp;L)</translation>
     </message>
     <message>
         <source>The user interface language can be set here. This setting will take effect after restarting %1.</source>
-        <translation>可以在这里设定用户界面的语言。这个设定在重启 %1 后才会生效。</translation>
+        <translation>ここでユーザーインターフェースの言語を設定できます。設定を反映するには %1 を再起動します。</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
 https://www.transifex.com/projects/p/wagerr/</source>
-        <translation>缺少相关语言或翻译不完整？请到这里协助翻译：
+        <translation>希望の言語がない場合または翻訳に問題がある場合はこちらで翻訳にご協力ください。:
 https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
-        <translation>显示金额的单位:</translation>
+        <translation>表示する単位 ：(&amp;U)</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>选择操作界面和付款时，显示金额的默认细分单位。</translation>
+        <translation>インターフェース上の表示とコインの送金で使用するデフォルトの単位を選択</translation>
     </message>
     <message>
         <source>Decimal digits</source>
-        <translation>小数位数</translation>
+        <translation>10進数</translation>
     </message>
     <message>
         <source>Reset all client options to default.</source>
-        <translation>恢复客户端的缺省设置。</translation>
+        <translation>すべてのオプションを初期値に戻します。</translation>
     </message>
     <message>
         <source>&amp;Reset Options</source>
-        <translation>恢复缺省设置(&amp;R)</translation>
+        <translation>オプションのリセット (&amp;R)</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation>确定(&amp;O)</translation>
+        <translation>OK(&amp;O)</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation>取消(&amp;C)</translation>
+        <translation>キャンセル (&amp;C)</translation>
     </message>
     <message>
         <source>Enable %1 features</source>
-        <translation>启动 %1特性</translation>
+        <translation>%1の機能を有効にする</translation>
     </message>
     <message>
         <source>default</source>
-        <translation>默认</translation>
+        <translation>デフォルト設定</translation>
     </message>
     <message>
         <source>Confirm options reset</source>
-        <translation>确认恢复缺省设置</translation>
+        <translation>オプションのリセットの確認</translation>
     </message>
     <message>
         <source>Client restart required to activate changes.</source>
-        <translation>更改生效需要重启客户端。</translation>
+        <translation>変更を有効にするにはクライアントを再起動する必要があります。</translation>
     </message>
     <message>
         <source>Client will be shut down. Do you want to proceed?</source>
-        <translation>客户端即将关闭，您想继续吗？</translation>
+        <translation>クライアントを終了します。続行してもよろしいですか？</translation>
     </message>
     <message>
         <source>This change would require a client restart.</source>
-        <translation>此更改需要重启客户端。</translation>
+        <translation>この変更はクライアントの再起動が必要です。</translation>
     </message>
     <message>
         <source>The supplied proxy address is invalid.</source>
-        <translation>提供的代理服务器地址无效。</translation>
+        <translation>プロキシアドレスが無効です。</translation>
     </message>
 </context>
 <context>
     <name>OverviewPage</name>
     <message>
         <source>Form</source>
-        <translation>表单</translation>
+        <translation>フォーム</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>显示的信息也许已过期。当与Wagerr网络连接后钱包程序会自动同步，但现在还未完成。</translation>
+        <translation>表示された情報は古いかもしれません。接続が確立されればあなたのウォレットは Wagerrネットワークと自動的に同期しますが、このプロセスはまだ完了していません。</translation>
     </message>
     <message>
         <source>Available:</source>
-        <translation>可使用的余额：</translation>
+        <translation>利用可能：</translation>
     </message>
     <message>
         <source>Your current spendable balance</source>
-        <translation>您当前可使用的余额</translation>
+        <translation>あなたの利用可能な残高</translation>
     </message>
     <message>
         <source>Pending:</source>
-        <translation>等待中的余额：</translation>
+        <translation>検証待ち：</translation>
     </message>
     <message>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
-        <translation>尚未确认的交易总额，未计入当前余额</translation>
+        <translation>未検証で利用可能残高に反映されていないトランザクション数</translation>
     </message>
     <message>
         <source>Immature:</source>
-        <translation>未成熟的：</translation>
+        <translation>未完成：</translation>
     </message>
     <message>
         <source>Mined balance that has not yet matured</source>
-        <translation>尚未成熟的挖矿收入余额</translation>
+        <translation>不完全な状態の残高</translation>
     </message>
     <message>
         <source>Balances</source>
-        <translation>余额</translation>
+        <translation>残高</translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
-        <translation>仅限查看的还未交易确认的地址</translation>
+        <translation>監視限定のアドレスへの未検証トランザクション</translation>
     </message>
     <message>
         <source>Mined balance in watch-only addresses that has not yet matured</source>
-        <translation>仅限查看的地址中尚未成熟的挖矿收入余额</translation>
+        <translation>不完全な状態の監視限定のアドレスの残高</translation>
     </message>
     <message>
         <source>Total:</source>
-        <translation>总额：</translation>
+        <translation>合計：</translation>
     </message>
     <message>
         <source>Your current total balance</source>
-        <translation>您当前的总余额</translation>
+        <translation>あなたの現在の残高の合計</translation>
     </message>
     <message>
         <source>Current total balance in watch-only addresses</source>
-        <translation>仅限查看地址中的当前总余额</translation>
+        <translation>監視限定アドレスの現在の残高の合計</translation>
     </message>
     <message>
         <source>Watch-only:</source>
-        <translation>仅限查看：</translation>
+        <translation>ウォッチオンリー：</translation>
     </message>
     <message>
         <source>Your current balance in watch-only addresses</source>
-        <translation>仅限查看地址中的当前余额</translation>
+        <translation>あなたのウォッチオンリーのアドレスの現在の残高の合計</translation>
     </message>
     <message>
         <source>Spendable:</source>
-        <translation>可花费：</translation>
+        <translation>使用可能：</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation>状态：</translation>
+        <translation>ステータス：</translation>
     </message>
     <message>
         <source>Enabled/Disabled</source>
-        <translation>启用/禁用</translation>
+        <translation>有効/無効</translation>
     </message>
     <message>
         <source>Completion:</source>
-        <translation>完成度：</translation>
+        <translation>完了:</translation>
     </message>
     <message>
         <source>Amount and Rounds:</source>
-        <translation>数量与循环次数：</translation>
+        <translation>金額とラウンド</translation>
     </message>
     <message>
         <source>0 WAGERR / 0 Rounds</source>
-        <translation>0 Wagerr / 0 循环数</translation>
+        <translation>0 WAGERR / 0 ラウンド</translation>
     </message>
     <message>
         <source>Submitted Denom:</source>
-        <translation>提交的面额:</translation>
+        <translation>通貨単位:</translation>
     </message>
     <message>
         <source>n/a</source>
-        <translation>不可用</translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>Recent transactions</source>
-        <translation>最近交易</translation>
+        <translation>直近のトランザクション</translation>
     </message>
     <message>
         <source>Start/Stop Mixing</source>
-        <translation>开始/停止 混合</translation>
+        <translation>ミキシング開始/停止 </translation>
     </message>
     <message>
         <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
-        <translation>您向主节点所提交的用以面额化混合的Wagerr。&lt;br&gt;为了混合，其他用户必须提交完全一样的面额。</translation>
+        <translation>マスターノードに送った通貨単位&lt;br&gt;ミキシングをするには他のユーザーが正確に同じ通貨単位を送る必要があります。</translation>
     </message>
     <message>
         <source>out of sync</source>
-        <translation>未同步</translation>
+        <translation>未同期</translation>
     </message>
     <message>
         <source>Automatic backups are disabled, no mixing available!</source>
-        <translation>自动备份已停用，无法进行混合！</translation>
+        <translation>自動バックアップが無効でミキシングは利用不可能です！</translation>
     </message>
     <message>
         <source>No inputs detected</source>
-        <translation>未检测到输入</translation>
+        <translation>インプットが検知できません</translation>
     </message>
     <message>
         <source>%1 Balance</source>
-        <translation>%1 余额</translation>
+        <translation>%1の残額</translation>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
-        <translation><numerusform>%n 次循环</numerusform></translation>
+        <translation><numerusform>%n ラウンド</numerusform></translation>
     </message>
     <message>
         <source>Found enough compatible inputs to mix %1</source>
-        <translation>找到足够兼容的输入进行混币 %1</translation>
+        <translation>%1をミキシングするのに十分な互換性のある入力が見つかりました。</translation>
     </message>
     <message>
         <source>Not enough compatible inputs to mix &lt;span style='%1'&gt;%2&lt;/span&gt;,&lt;br&gt;will mix &lt;span style='%1'&gt;%3&lt;/span&gt; instead</source>
-        <translation>没有足够兼容的输入进行混币 &lt;span style='%1'&gt;%2&lt;/span&gt;,&lt;br&gt;将混币&lt;span style='%1'&gt;%3&lt;/span&gt;作为代替</translation>
+        <translation>&lt;span style='%1'&gt;%2&lt;/span&gt;をミキシングするのに十分な互換性のある入力がないため、&lt;br&gt;代わりに&lt;span style='%1'&gt;%3&lt;/span&gt;をミキシングします。</translation>
     </message>
     <message>
         <source>Overall progress</source>
-        <translation>总体进度</translation>
+        <translation>すべての進捗</translation>
     </message>
     <message>
         <source>Denominated</source>
-        <translation>已面额化的</translation>
+        <translation>ミキシング準備完了</translation>
     </message>
     <message>
         <source>Partially mixed</source>
-        <translation>部分混币</translation>
+        <translation>ミキシング一部完了</translation>
     </message>
     <message>
         <source>Mixed</source>
-        <translation>混合的</translation>
+        <translation>ミキシング完了</translation>
     </message>
     <message numerus="yes">
         <source>Denominated inputs have %5 of %n rounds on average</source>
-        <translation><numerusform>面额化的输入在%n次循环中平均有%5</numerusform></translation>
+        <translation><numerusform>分割されるインプットは平均的に %5 ／ %n ラウンド です。</numerusform></translation>
     </message>
     <message>
         <source>keys left: %1</source>
-        <translation>剩余密匙：%1</translation>
+        <translation>残されたキー: %1</translation>
     </message>
     <message>
         <source>Start %1</source>
-        <translation>开始%1</translation>
+        <translation>%1を開始する</translation>
     </message>
     <message>
         <source>If you don't want to see internal %1 fees/transactions select "Most Common" as Type on the "Transactions" tab.</source>
-        <translation>如果你不希望看到内部%1费用/交易，请在“交易”选项卡上选择“最常用”。</translation>
+        <translation>内部にある%1の料金や取引を表示しない場合は、「取引」タブでタイプとして「最も一般的なもの」を選択します。</translation>
     </message>
     <message>
         <source>%1 requires at least %2 to use.</source>
-        <translation>%1 要求至少 %2 以使用.</translation>
+        <translation>%1を使用するには、最低%2が必要です。</translation>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling %1.</source>
-        <translation>钱包已锁定需要用户解锁。 正在关闭%1。</translation>
+        <translation>ウォレットがロックされ、ユーザーがロック解除を拒否しました。%1を無効にしています。</translation>
     </message>
     <message>
         <source>Stop %1</source>
-        <translation>停止 %1</translation>
+        <translation>%1を停止する</translation>
     </message>
     <message>
         <source>Disabled</source>
-        <translation>已禁用</translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>Very low number of keys left since last automatic backup!</source>
-        <translation>自上次自动备份后，尚余小量的密钥！</translation>
+        <translation>前回の自動バックアップから残されたキーの数がほとんどありません！</translation>
     </message>
     <message>
         <source>We are about to create a new automatic backup for you, however &lt;span style='%1'&gt; you should always make sure you have backups saved in some safe place&lt;/span&gt;!</source>
-        <translation>我们即将为您创建一个新的自动备份，但&lt;span style='%1'&gt;您应该始终确保您有另外的一些备份保存在安全的位置&lt;/span&gt;！</translation>
+        <translation>今から新しい自動バックアップを作成しますが、&lt;span style='%1'&gt;常に安全な場所にバックアップが保存されていることを確認してください&lt;/span&gt;。</translation>
     </message>
     <message>
         <source>Note: You can turn this message off in options.</source>
-        <translation>注意：您可以在选项中关闭此消息。</translation>
+        <translation>注記: このメッセージはオプションで非表示にできます。</translation>
     </message>
     <message>
         <source>WARNING! Something went wrong on automatic backup</source>
-        <translation>警告！自动备份出现问题</translation>
+        <translation>警告! 自動バックアップに異常が生じています。</translation>
     </message>
     <message>
         <source>ERROR! Failed to create automatic backup</source>
-        <translation>错误！无法创建自动备份</translation>
+        <translation>エラー! 自動バックアップ作成に失敗しました。</translation>
     </message>
     <message>
         <source>Mixing is disabled, please close your wallet and fix the issue!</source>
-        <translation>混合被停用，请关闭您的钱包和解决这个问题！</translation>
+        <translation>ミキシングは無効です。ウォレットを閉じて問題を解決してください。</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation>已启用</translation>
+        <translation>有効</translation>
     </message>
     <message>
         <source>see debug.log for details.</source>
-        <translation>详细信息请参阅debug.log。</translation>
+        <translation>詳細を debug.log で確認</translation>
     </message>
     <message>
         <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
-        <translation>警告！无法补充公钥池，请解锁您的钱包。</translation>
+        <translation>警告! キープールの補充に失敗しました。ウォレットをアンロックしてキープールを補充してください</translation>
     </message>
 </context>
 <context>
     <name>PaymentServer</name>
     <message>
         <source>Payment request error</source>
-        <translation>支付请求出错</translation>
+        <translation>支払いリクエストのエラー</translation>
     </message>
     <message>
         <source>Cannot start wagerr: click-to-pay handler</source>
-        <translation>无法启动Wagerr程序：click-to-pay handler</translation>
+        <translation>Wagerr を起動できません: click-to-pay ハンドラー</translation>
     </message>
     <message>
         <source>URI handling</source>
-        <translation>URI 处理</translation>
+        <translation>URI のハンドリング</translation>
     </message>
     <message>
         <source>'wagerr://' is not a valid URI. Use 'wagerr:' instead.</source>
-        <translation>'wagerr://' 不是一个有效链接. 请使用'wagerr:'</translation>
+        <translation>「wagerr://」は有効なURIではありません。代わりに「wagerr:」を使ってください。</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
-        <translation>付款请求URI链接非法：%1</translation>
+        <translation>支払いリクエストの取得先URLが無効です： %1</translation>
     </message>
     <message>
         <source>Cannot process payment request because BIP70 support was not compiled in.</source>
-        <translation>无法处理付款请求因为未编译BIP70支持.</translation>
+        <translation>BIP70のサポートがコンパイルされていないため、支払いリクエストを処理できません。</translation>
     </message>
     <message>
         <source>Invalid payment address %1</source>
-        <translation>无效的付款地址 %1</translation>
+        <translation>支払いのアドレス　%1　は無効です</translation>
     </message>
     <message>
         <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI不能被解析! 原因可能是无效的Wagerr地址或URI参数格式错误。</translation>
+        <translation>URI を解析できません! これは無効な Wagerr アドレスあるいは不正な形式の URI パラメーターによって引き起こされた可能性があります。</translation>
     </message>
     <message>
         <source>Payment request file handling</source>
-        <translation>付款请求文件处理 </translation>
+        <translation>支払いリクエストファイルを処理しています</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
-        <translation>付款请求文件不能读取！这可能是个无效的付款请求文件。</translation>
+        <translation>支払いリクエストファイルを読み込めませんでした！無効な支払いリクエストファイルが原因である可能性があります。</translation>
     </message>
     <message>
         <source>Payment request rejected</source>
-        <translation>付款请求被拒绝</translation>
+        <translation>支払い要求は拒否されました</translation>
     </message>
     <message>
         <source>Payment request network doesn't match client network.</source>
-        <translation>付款请求网络与客户端网络不符。</translation>
+        <translation>支払いリクエストのネットワークは現在のクライアントのネットワークに一致しません。</translation>
     </message>
     <message>
         <source>Payment request expired.</source>
-        <translation>付款请求已过期。</translation>
+        <translation>支払いリクエストの期限が切れました。</translation>
     </message>
     <message>
         <source>Payment request is not initialized.</source>
-        <translation>付款请求没有完成初始化。</translation>
+        <translation>支払いリクエストは開始されていません。</translation>
     </message>
     <message>
         <source>Unverified payment requests to custom payment scripts are unsupported.</source>
-        <translation>不支持到自定义付款脚本的未验证付款请求。</translation>
+        <translation>カスタム支払いスクリプトに対する未検証の支払いリクエストはサポートされていません。</translation>
     </message>
     <message>
         <source>Invalid payment request.</source>
-        <translation>无效的支付请求。</translation>
+        <translation>無効な支払いリクエスト。</translation>
     </message>
     <message>
         <source>Requested payment amount of %1 is too small (considered dust).</source>
-        <translation>请求支付的金额 %1 太小（会被网络认为是没有必要的零散金额）。</translation>
+        <translation>リクエストされた支払い額 %1 は少なすぎます (ダストとみなされます)。</translation>
     </message>
     <message>
         <source>Refund from %1</source>
-        <translation>来自%1的退款</translation>
+        <translation>%1 からの返金</translation>
     </message>
     <message>
         <source>Payment request %1 is too large (%2 bytes, allowed %3 bytes).</source>
-        <translation>付款请求 %1 过大（%2字节，上限%3字节位）。</translation>
+        <translation>支払リクエスト %1 は大きすぎます（%2bytesですが、上限%3bytesまで許されます）。</translation>
     </message>
     <message>
         <source>Error communicating with %1: %2</source>
-        <translation>跟%1通信时发生错误：%2</translation>
+        <translation>%1: %2とコミュニケーションエラー</translation>
     </message>
     <message>
         <source>Payment request cannot be parsed!</source>
-        <translation>支付请求不能被解析！</translation>
+        <translation>支払いリクエストを読み込めませんでした！</translation>
     </message>
     <message>
         <source>Bad response from server %1</source>
-        <translation>来自 %1 服务器的错误响应</translation>
+        <translation>サーバー %1のレスポンスは無効</translation>
     </message>
     <message>
         <source>Network request error</source>
-        <translation>网络请求出错</translation>
+        <translation>ネットワークリクエストのエラー</translation>
     </message>
     <message>
         <source>Payment acknowledged</source>
-        <translation>支付已到账</translation>
+        <translation>支払いを確認しました</translation>
     </message>
 </context>
 <context>
     <name>PeerTableModel</name>
     <message>
         <source>NodeId</source>
-        <translation>节点ID</translation>
+        <translation>ノードID</translation>
     </message>
     <message>
         <source>Node/Service</source>
-        <translation>节点/服务</translation>
+        <translation>ノード/サービス</translation>
     </message>
     <message>
         <source>User Agent</source>
-        <translation>用户代理</translation>
+        <translation>ユーザーエージェント</translation>
     </message>
     <message>
         <source>Ping</source>
-        <translation> Ping</translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>发送</translation>
+        <translation>送金しました</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>已接收</translation>
+        <translation>受け取りました</translation>
     </message>
 </context>
 <context>
     <name>Proposal</name>
     <message>
         <source>Passing +%1</source>
-        <translation>通过 +%1</translation>
+        <translation>+%1のパッシング</translation>
     </message>
     <message>
         <source>Needs additional %1 votes</source>
-        <translation>需要额外的 %1 票</translation>
+        <translation>%1の追加投票が必要です</translation>
     </message>
 </context>
 <context>
     <name>ProposalModel</name>
     <message>
         <source>Yes</source>
-        <translation>赞成</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>反对</translation>
+        <translation>いいえ</translation>
     </message>
     <message>
         <source>Hash</source>
-        <translation>哈希值</translation>
+        <translation>ハッシュ</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>标题</translation>
+        <translation>タイトル</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation>开始</translation>
+        <translation>起動</translation>
     </message>
     <message>
         <source>End</source>
-        <translation>结束</translation>
+        <translation>終了</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金额</translation>
+        <translation>金額</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation>活跃的</translation>
+        <translation>アクティブ</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>状态</translation>
+        <translation>ステータス</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Choose data directory on startup (default: %u)</source>
-        <translation>选择启动时的数据路径 (默认: %u)</translation>
+        <translation>起動時にデータディレクトリを選択する（デフォルト：%u）</translation>
     </message>
     <message>
         <source>Set the font family. Possible values: %1. (default: %2)</source>
-        <translation>设置字体系列. 可能的值: %1. (默认: %2)</translation>
+        <translation>フォントファミリを設定する。設定可能な値：%1。(デフォルト：%2)</translation>
     </message>
     <message>
         <source>Set a scale factor which gets applied to the base font size. Possible range %1 (smallest fonts) to %2 (largest fonts). (default: %3)</source>
-        <translation>设置比例因子, 该比例因子将应用于基本字体的大小. 可能的范围是 %1 (最小字体) 至 %2 (最大字体). (默认: %3)</translation>
+        <translation>基本の文字サイズに適用されるスケールファクターを設定します。設定可能な範囲は、%1（最小の文字）〜%2（最大の文字）です。（デフォルト：%3）</translation>
     </message>
     <message>
         <source>Set the font weight for bold texts. Possible range %1 to %2 (default: %3)</source>
-        <translation>设置粗体文本的字体粗细. 可能的范围 %1 至 %2 (默认: %3)</translation>
+        <translation>太字の文字の太さを設定します。設定可能範囲：%1〜%2（デフォルト：%3）</translation>
     </message>
     <message>
         <source>Set the font weight for normal texts. Possible range %1 to %2 (default: %3)</source>
-        <translation>设置正常文本的字体粗细. 可能的范围 %1 至 %2 (默认: %3)</translation>
+        <translation>通常の文字に対する文字の太さを設定します。設定可能範囲：%1〜%2（デフォルト：%3）</translation>
     </message>
     <message>
         <source>Set language, for example "de_DE" (default: system locale)</source>
-        <translation>设置语言, 例如“zh-TW”（默认为系统语言）</translation>
+        <translation>言語を設定します。例：「de_DE」（デフォルト：システムロケール）</translation>
     </message>
     <message>
         <source>Start minimized</source>
-        <translation>启动时最小化</translation>
+        <translation>最小化を開始する</translation>
     </message>
     <message>
         <source>Reset all settings changed in the GUI</source>
-        <translation>重置图形界面所有的变更设置</translation>
+        <translation>GUIで変更した設定をすべてリセットする</translation>
     </message>
     <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
-        <translation>设置SSL根证书的付款请求(默认：-系统-)</translation>
+        <translation>支払いリクエストのSSLルート証明書を設定する（デフォルト：-system-）</translation>
     </message>
     <message>
         <source>Show splash screen on startup (default: %u)</source>
-        <translation>显示启动画面（默认：%u）</translation>
+        <translation>起動時にスプラッシュ・スクリーンを表示（デフォルト：%u）</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
-        <translation>错误: 指定的数据目录 "%1" 不存在.</translation>
+        <translation>エラー：指定されたデータ・ディレクトリ「%1」は存在しません。</translation>
     </message>
     <message>
         <source>Error: Cannot parse configuration file: %1.</source>
-        <translation>错误: 无法解析配置文件: %1.</translation>
+        <translation>エラー：%1の構成ファイルを解析できません。</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>错误: %1</translation>
+        <translation>エラー：%1</translation>
     </message>
     <message>
         <source>Error: Failed to load application fonts.</source>
-        <translation>错误: 无法加载应用程序字体.</translation>
+        <translation>エラー：アプリケーションフォントの読み込みに失敗しました。</translation>
     </message>
     <message>
         <source>Error: Specified font-family invalid. Valid values: %1.</source>
-        <translation>错误: 指定的字体系列无效. 有效值: %1.</translation>
+        <translation>エラー：指定されたフォントファミリが無効です。有効値：%1。</translation>
     </message>
     <message>
         <source>Error: Specified font-weight-normal invalid. Valid range %1 to %2.</source>
-        <translation>错误: 指定的字体粗细正常无效. 有效范围 %1 到%2.</translation>
+        <translation>エラー：指定された文字の太さ（通常）は無効です。有効範囲は、%1～%2です。</translation>
     </message>
     <message>
         <source>Error: Specified font-weight-bold invalid. Valid range %1 to %2.</source>
-        <translation>错误: 指定的字体粗体无效. 有效范围 %1 到 %2.</translation>
+        <translation>エラー：指定された文字の太さ（太字）は無効です。有効範囲は、%1～%2です。</translation>
     </message>
     <message>
         <source>Error: Specified font-scale invalid. Valid range %1 to %2.</source>
-        <translation>错误: 指定的字体大小无效. 有效范围%1 至 %2.</translation>
+        <translation>エラー：指定された文字の大きさは無効です。有効範囲は、%1～%2です。</translation>
     </message>
     <message>
         <source>Error: Invalid -custom-css-dir path.</source>
-        <translation>错误: 无效的 -custom-css-dir 路径.</translation>
+        <translation>エラー：無効な-custom-css-dirパスです。</translation>
     </message>
     <message>
         <source>Error: %1 CSS file(s) missing in -custom-css-dir path.</source>
-        <translation>错误: -custom-css-dir 路径下%1 CSS file(s)丢失.</translation>
+        <translation>エラー：%1のCSSファイルが-custom-css-dirパスにありません。</translation>
     </message>
     <message>
         <source>%1 didn't yet exit safely...</source>
-        <translation>%1 尚未安全退出</translation>
+        <translation>%1 はまだ安全に終了していません</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金额</translation>
+        <translation>総額</translation>
     </message>
     <message>
         <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>输入一个Wagerr地址(例如 %1)</translation>
+        <translation>Wagerrアドレスを入力してください (例 %1)</translation>
     </message>
     <message>
         <source>Appearance Setup</source>
-        <translation>外观设置</translation>
+        <translation>アピアランスのセットアップ</translation>
     </message>
     <message>
         <source>Please choose your preferred settings for the appearance of %1</source>
-        <translation>请为%1的外观选择首选设置</translation>
+        <translation>%1の表示に関して、お好みの設定をお選びください。</translation>
     </message>
     <message>
         <source>This can also be adjusted later in the "Appearance" tab of the preferences.</source>
-        <translation>这也可以在随后的"外观"选项中进行调整.</translation>
+        <translation>これは、初期設定の「表示」タブで後で調整することも可能です。</translation>
     </message>
     <message>
         <source>%1 d</source>
-        <translation>%1 天</translation>
+        <translation>%1日</translation>
     </message>
     <message>
         <source>%1 h</source>
-        <translation>%1 小时</translation>
+        <translation>%1時</translation>
     </message>
     <message>
         <source>%1 m</source>
-        <translation>%1 分钟</translation>
+        <translation>%1分</translation>
     </message>
     <message>
         <source>%1 s</source>
-        <translation>%1 秒</translation>
+        <translation>%1秒</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>无</translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation>不可用</translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>%1 ms</source>
-        <translation>%1 毫秒</translation>
+        <translation>%1ミリ秒</translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
@@ -2344,19 +2344,19 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation><numerusform>%n 分钟</numerusform></translation>
+        <translation><numerusform>%n 分</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation><numerusform>%n 小时</numerusform></translation>
+        <translation><numerusform>%n 時間</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation><numerusform>%n 天</numerusform></translation>
+        <translation><numerusform>%n 日</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
-        <translation><numerusform>%n 周</numerusform></translation>
+        <translation><numerusform>%n 週</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
@@ -2364,7 +2364,7 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>%1 and %2</source>
-        <translation>%1 和 %2</translation>
+        <translation>%1 と %2</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -2384,617 +2384,617 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>未知</translation>
+        <translation>不明</translation>
     </message>
 </context>
 <context>
     <name>QRDialog</name>
     <message>
         <source>QR-Code Title</source>
-        <translation>二维码标题</translation>
+        <translation>QRコードタイトル</translation>
     </message>
     <message>
         <source>QR Code</source>
-        <translation>二维码</translation>
+        <translation>QRコード</translation>
     </message>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>保存图片(&amp;S)...</translation>
+        <translation>画像を保存...(&amp;S)</translation>
     </message>
     <message>
         <source>Error creating QR Code.</source>
-        <translation>生成二维码错误</translation>
+        <translation>QRコード生成エラー</translation>
     </message>
 </context>
 <context>
     <name>QRGeneralImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>保存图片(&amp;S)...</translation>
+        <translation>画像を保存...(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Copy Image</source>
-        <translation>复制图片</translation>
+        <translation>画像をコピー(&amp;C)</translation>
     </message>
     <message>
         <source>Save QR Code</source>
-        <translation>保存QR二维码</translation>
+        <translation>QR コードの保存</translation>
     </message>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>PNG 图像(*.png)</translation>
+        <translation>PNG画像ファイル(*.png)</translation>
     </message>
 </context>
 <context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>保存图片(&amp;S)...</translation>
+        <translation>画像を保存… (&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Copy Image</source>
-        <translation>复制图片(&amp;C)</translation>
+        <translation>画像をコピー(&amp;C)</translation>
     </message>
     <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation>生成的URI 太长, 请试着精简标签或消息文本.</translation>
+        <translation>結果のURIが長すぎるため、ラベル/メッセージのテキストを減らしてみてください。</translation>
     </message>
     <message>
         <source>Error encoding URI into QR Code.</source>
-        <translation>将 URI转为二维码失败.</translation>
+        <translation>URIをQRコードにエンコードする際にエラーが発生しました。</translation>
     </message>
     <message>
         <source>QR code support not available.</source>
-        <translation>二维码支持不可用.</translation>
+        <translation>QRコードには対応していません。</translation>
     </message>
     <message>
         <source>Save QR Code</source>
-        <translation>保存二维码</translation>
+        <translation>QR コードの保存</translation>
     </message>
     <message>
         <source>PNG Image (*.png)</source>
-        <translation>PNG图片(*.png)</translation>
+        <translation>PNG画像ファイル(*.png)</translation>
     </message>
 </context>
 <context>
     <name>RPCConsole</name>
     <message>
         <source>Tools window</source>
-        <translation>工具窗口</translation>
+        <translation>ツールウィンドウ</translation>
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>信息(&amp;I)</translation>
+        <translation>インフォメーション (&amp;I)</translation>
     </message>
     <message>
         <source>General</source>
-        <translation>常规</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation>姓名</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation>不可用</translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>Number of connections</source>
-        <translation>连接数</translation>
+        <translation>接続数</translation>
     </message>
     <message>
         <source>&amp;Open</source>
-        <translation>打开(&amp;O)</translation>
+        <translation>開く (&amp;O)</translation>
     </message>
     <message>
         <source>Startup time</source>
-        <translation>启动时间</translation>
+        <translation>起動した日時</translation>
     </message>
     <message>
         <source>Network</source>
-        <translation>网络</translation>
+        <translation>ネットワーク</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation>上一数据块时间</translation>
+        <translation>最終ブロックの日時</translation>
     </message>
     <message>
         <source>Debug log file</source>
-        <translation>调试日志文件</translation>
+        <translation>デバッグ用ログファイル</translation>
     </message>
     <message>
         <source>Client version</source>
-        <translation>客户端版本</translation>
+        <translation>クライアントのバージョン</translation>
     </message>
     <message>
         <source>Block chain</source>
-        <translation>区块链</translation>
+        <translation>ブロックチェーン</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
-        <translation>主节点数量</translation>
+        <translation>マスターノードの数</translation>
     </message>
     <message>
         <source>Memory Pool</source>
-        <translation>内存池</translation>
+        <translation>メモリープール</translation>
     </message>
     <message>
         <source>Current number of transactions</source>
-        <translation>当前交易数量</translation>
+        <translation>現在のトランザクション数</translation>
     </message>
     <message>
         <source>Memory usage</source>
-        <translation>内存使用</translation>
+        <translation>メモリ使用量</translation>
     </message>
     <message>
         <source>&amp;Console</source>
-        <translation>控制台(&amp;C)</translation>
+        <translation>コンソール (&amp;C)</translation>
     </message>
     <message>
         <source>Clear console</source>
-        <translation>清空控制台</translation>
+        <translation>コンソールをクリア</translation>
     </message>
     <message>
         <source>&amp;Network Traffic</source>
-        <translation>网络流量(&amp;N)</translation>
+        <translation>ネットワークトラフィック (&amp;N)</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>接收</translation>
+        <translation>受取完了</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>发送</translation>
+        <translation>送金完了</translation>
     </message>
     <message>
         <source>&amp;Peers</source>
-        <translation>&amp;节点</translation>
+        <translation>ピア (&amp;P)</translation>
     </message>
     <message>
         <source>Wallet:</source>
-        <translation>钱包:</translation>
+        <translation>ウォレット：</translation>
     </message>
     <message>
         <source>Banned peers</source>
-        <translation>节点黑名单</translation>
+        <translation>Banされたピア</translation>
     </message>
     <message>
         <source>Select a peer to view detailed information.</source>
-        <translation>选择一个节点查看详细信息.</translation>
+        <translation>詳細を確認したいピアを選択してください。</translation>
     </message>
     <message>
         <source>Whitelisted</source>
-        <translation>白名单</translation>
+        <translation>ホワイトリスト</translation>
     </message>
     <message>
         <source>Direction</source>
-        <translation>方向</translation>
+        <translation>ディレクション</translation>
     </message>
     <message>
         <source>Version</source>
-        <translation>版本</translation>
+        <translation>バージョン</translation>
     </message>
     <message>
         <source>Starting Block</source>
-        <translation>起始高度</translation>
+        <translation>開始ブロック</translation>
     </message>
     <message>
         <source>Synced Headers</source>
-        <translation>已同步的区块头部</translation>
+        <translation>同期済みヘッダ</translation>
     </message>
     <message>
         <source>Synced Blocks</source>
-        <translation>已同步的区块</translation>
+        <translation>同期済みブロック</translation>
     </message>
     <message>
         <source>Rescan blockchain files 1</source>
-        <translation>重新扫描区块链文件 1</translation>
+        <translation>ブロックチェーンファイル1の再スキャンをする</translation>
     </message>
     <message>
         <source>Rescan blockchain files 2</source>
-        <translation>重新扫描区块链文件 2</translation>
+        <translation>ブロックチェーンファイル2の再スキャンをする</translation>
     </message>
     <message>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockchain files or missing/obsolete transactions.</source>
-        <translation>下面的按钮将使用命令行选项重新启动钱包, 以修复钱包, 修复损坏的区块链文件或丢失/超时的交易问题.</translation>
+        <translation>下記のボタンは、ウォレットを修復し、破損したブロックチェーンファイルや欠落または削除された取引の問題を修正するためのコマンドラインオプションを使用してウォレットを再起動します。</translation>
     </message>
     <message>
         <source>-rescan=1: Rescan the block chain for missing wallet transactions starting from wallet creation time.</source>
-        <translation>-rescan=1: 从钱包创建时开始重新扫描区块链以查找遗漏的钱包交易。</translation>
+        <translation>-rescan=1：ウォレット作成時から始まるウォレット取引の欠落のために、ブロックチェーンを再スキャンします。</translation>
     </message>
     <message>
         <source>-rescan=2: Rescan the block chain for missing wallet transactions starting from genesis block.</source>
-        <translation>-rescan=2: 从初始块开始重新扫描区块链以查找遗漏的钱包交易。</translation>
+        <translation>-rescan=2：ジェネシスブロックから始まるウォレット取引の欠落のために、ブロックチェーンを再スキャンします。</translation>
     </message>
     <message>
         <source>Wallet Path</source>
-        <translation>钱包路径</translation>
+        <translation>ウォレットパス</translation>
     </message>
     <message>
         <source>User Agent</source>
-        <translation>用户代理</translation>
+        <translation>ユーザーエージェント</translation>
     </message>
     <message>
         <source>Datadir</source>
-        <translation>数据目录</translation>
+        <translation>データディレクトリ</translation>
     </message>
     <message>
         <source>To specify a non-default location of the data directory use the '%1' option.</source>
-        <translation>要指定的数据目录不是默认路径, 请使用 '%1' 选项.</translation>
+        <translation>データディレクトリのデフォルトでない場所を指定するには、「%1」のオプションを使用します。</translation>
     </message>
     <message>
         <source>Blocksdir</source>
-        <translation>区块目录</translation>
+        <translation>ブロックディレクトリ</translation>
     </message>
     <message>
         <source>To specify a non-default location of the blocks directory use the '%1' option.</source>
-        <translation>要指定的区块目录不是默认路径, 请使用 '%1' 选项.</translation>
+        <translation>ブロックディレクトリのデフォルトでない場所を指定するには、「%1」のオプションを使用します。</translation>
     </message>
     <message>
         <source>Current block height</source>
-        <translation>当前区块高度</translation>
+        <translation>現在のブロックの高さ</translation>
     </message>
     <message>
         <source>Last block hash</source>
-        <translation>最后区块的哈希值</translation>
+        <translation>直近のブロックハッシュ</translation>
     </message>
     <message>
         <source>Latest ChainLocked block hash</source>
-        <translation>最新链锁区块的哈希值</translation>
+        <translation>最新のチェーンロックされたブロックハッシュ</translation>
     </message>
     <message>
         <source>Latest ChainLocked block height</source>
-        <translation>最新链锁区块的高度</translation>
+        <translation>最新のチェーンロックされたブロックの高さ</translation>
     </message>
     <message>
         <source>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>打开当前目录中的%1调试日志文件。日志文件大的话可能要等上几秒钟。</translation>
+        <translation>現在のデータディレクトリから %1 デバッグ用ログファイルを開きます。ログファイルが巨大な場合数秒かかることがあります。</translation>
     </message>
     <message>
         <source>InstantSend locks</source>
-        <translation>即时发送锁</translation>
+        <translation>インスタントセンドロック</translation>
     </message>
     <message>
         <source>(none)</source>
-        <translation>(无)</translation>
+        <translation>(なし)</translation>
     </message>
     <message>
         <source>Decrease font size</source>
-        <translation>缩小文字</translation>
+        <translation>文字サイズを縮小</translation>
     </message>
     <message>
         <source>Increase font size</source>
-        <translation>放大文字</translation>
+        <translation>文字サイズを拡大</translation>
     </message>
     <message>
         <source>&amp;Reset</source>
-        <translation>&amp;重置</translation>
+        <translation>&amp;リセット</translation>
     </message>
     <message>
         <source>Node Type</source>
-        <translation>节点类型</translation>
+        <translation>ノードの種類</translation>
     </message>
     <message>
         <source>PoSe Score</source>
-        <translation>PoSe 扣分</translation>
+        <translation>PoSeスコア</translation>
     </message>
     <message>
         <source>Services</source>
-        <translation>服务</translation>
+        <translation>サービス</translation>
     </message>
     <message>
         <source>Ban Score</source>
-        <translation>禁止 扣分</translation>
+        <translation>Banスコア</translation>
     </message>
     <message>
         <source>Connection Time</source>
-        <translation>连接时间</translation>
+        <translation>接続時間</translation>
     </message>
     <message>
         <source>Last Send</source>
-        <translation>最近发送</translation>
+        <translation>最終送信</translation>
     </message>
     <message>
         <source>Last Receive</source>
-        <translation>最近接收</translation>
+        <translation>最終受信</translation>
     </message>
     <message>
         <source>Ping Time</source>
-        <translation>Ping 时间</translation>
+        <translation>Ping時間</translation>
     </message>
     <message>
         <source>The duration of a currently outstanding ping.</source>
-        <translation>目前这一次 ping 已经过去的时间。</translation>
+        <translation>現在実行中のpingにかかっている時間</translation>
     </message>
     <message>
         <source>Ping Wait</source>
-        <translation>Ping等待</translation>
+        <translation>Ping待ち</translation>
     </message>
     <message>
         <source>Min Ping</source>
-        <translation>最小Ping值</translation>
+        <translation>最小Ping</translation>
     </message>
     <message>
         <source>Time Offset</source>
-        <translation>时间抵消</translation>
+        <translation>時間オフセット</translation>
     </message>
     <message>
         <source>&amp;Wallet Repair</source>
-        <translation>钱包修复(&amp;W)</translation>
+        <translation>ウォレット修復（&amp;W)</translation>
     </message>
     <message>
         <source>Recover transactions 1</source>
-        <translation>恢复交易 1</translation>
+        <translation>トランザクション1のリカバー</translation>
     </message>
     <message>
         <source>Recover transactions 2</source>
-        <translation>恢复交易 2</translation>
+        <translation>トランザクション2のリカバー</translation>
     </message>
     <message>
         <source>Upgrade wallet format</source>
-        <translation>升级钱包格式</translation>
+        <translation>ウォレットフォーマットのアップグレード</translation>
     </message>
     <message>
         <source>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation>-zapwallettxes=1：从区块链恢复交易（保留交易描述信息，例如账户拥有者）。</translation>
+        <translation>-zapwallettxes=1: ブロックチェーンからトランザクションをリカバーします(メタデータは保持します　例　アカウントオーナー)</translation>
     </message>
     <message>
         <source>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</source>
-        <translation>-zapwallettxes=2：从区块链恢复交易（删除交易描述信息）。</translation>
+        <translation>-zapwallettxes=2: ブロックチェーンからトランザクションをリカバーします (メタデータは保持しません)</translation>
     </message>
     <message>
         <source>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation>-upgradewallet：在启动时升级钱包到最新格式。（注：这并不是钱包软件本身的更新！）</translation>
+        <translation>-upgradewallet: 起動時にウォレットを最新のフォーマットにアップグレードします(注意: これはウォレット自体のアップグレードではありません！)</translation>
     </message>
     <message>
         <source>Wallet repair options.</source>
-        <translation>钱包修复选项。</translation>
+        <translation>ウォレット修復オプション</translation>
     </message>
     <message>
         <source>Rebuild index</source>
-        <translation>重建索引</translation>
+        <translation>インデックスのリビルド</translation>
     </message>
     <message>
         <source>-reindex: Rebuild block chain index from current blk000??.dat files.</source>
-        <translation>-reindex：从现在的blk000??.dat文件重新建立区块链索引。</translation>
+        <translation>-reindex: 現在の blk000??.dat ファイルからブロックチェーンインデックスをリビルドします</translation>
     </message>
     <message>
         <source>&amp;Disconnect</source>
-        <translation>断开(&amp;D)</translation>
+        <translation>切断 (&amp;D)</translation>
     </message>
     <message>
         <source>Ban for</source>
-        <translation>禁止</translation>
+        <translation>Banする:</translation>
     </message>
     <message>
         <source>1 &amp;hour</source>
-        <translation>1 小时(&amp;H)</translation>
+        <translation>1時間 (&amp;H)</translation>
     </message>
     <message>
         <source>1 &amp;day</source>
-        <translation>1 天(&amp;D)</translation>
+        <translation>1日 (&amp;D)</translation>
     </message>
     <message>
         <source>1 &amp;week</source>
-        <translation>1 周(&amp;W)</translation>
+        <translation>1週間 (&amp;W)</translation>
     </message>
     <message>
         <source>1 &amp;year</source>
-        <translation>1 年(&amp;Y)</translation>
+        <translation>1年 (&amp;Y)</translation>
     </message>
     <message>
         <source>&amp;Unban</source>
-        <translation>解禁(&amp;U)</translation>
+        <translation>Banを解除する (&amp;U)</translation>
     </message>
     <message>
         <source>Welcome to the %1 RPC console.</source>
-        <translation>欢迎使用 %1 的 RPC 控制台。</translation>
+        <translation>%1 RPCコンソールへようこそ。</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
-        <translation>使用上下方向键浏览历史,  %1清除屏幕。</translation>
+        <translation>上下の矢印を使用して履歴をナビゲートし、 %1 を使用して画面をクリアします。</translation>
     </message>
     <message>
         <source>Type %1 for an overview of available commands.</source>
-        <translation>输入 %1 以获得可用命令描述.</translation>
+        <translation>利用可能なコマンドの概要については、%1と入力してください。</translation>
     </message>
     <message>
         <source>For more information on using this console type %1.</source>
-        <translation>关于使用此控制台的更多信息, 请输入 %1.</translation>
+        <translation>このコンソールの使用に関する詳細は、%1と入力してください。</translation>
     </message>
     <message>
         <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
-        <translation>警告: 骗子总是积极地劝说用户在此输入指令, 以窃取用户钱包中的资金. 在没有完全理解各命令行作用前, 请不要使用控制台。</translation>
+        <translation>警告：詐欺師は常にアクティブであり、ユーザーにここへのコマンドを入力させ、ウォレットの中身を盗みます。 コマンドの影響を完全に理解せずにこのコンソールを使用しないでください。</translation>
     </message>
     <message>
         <source>In:</source>
-        <translation>输入：</translation>
+        <translation>入力：</translation>
     </message>
     <message>
         <source>Out:</source>
-        <translation>输出：</translation>
+        <translation>出力：</translation>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation>网络活动已禁用</translation>
+        <translation>ネットワーク活動は無効化されました</translation>
     </message>
     <message>
         <source>Total: %1 (Enabled: %2)</source>
-        <translation>总计: %1 (已激活的: %2)</translation>
+        <translation>合計: %1 (有効: %2)</translation>
     </message>
     <message>
         <source>Executing command without any wallet</source>
-        <translation>不通过任何钱包执行命令</translation>
+        <translation>ウォレットなしでコマンドを実行する</translation>
     </message>
     <message>
         <source>Executing command using "%1" wallet</source>
-        <translation>使用 "%1" 钱包执行命令</translation>
+        <translation>「%1」のウォレットを使用してコマンドを実行する</translation>
     </message>
     <message>
         <source>(node id: %1)</source>
-        <translation>(节点ID：%1)</translation>
+        <translation>(ノードID: %1)</translation>
     </message>
     <message>
         <source>via %1</source>
-        <translation>经由 %1</translation>
+        <translation>%1経由</translation>
     </message>
     <message>
         <source>never</source>
-        <translation>永不</translation>
+        <translation>一度もなし</translation>
     </message>
     <message>
         <source>Inbound</source>
-        <translation>导入</translation>
+        <translation>インバウンド</translation>
     </message>
     <message>
         <source>Outbound</source>
-        <translation>导出</translation>
+        <translation>アウトバウンド</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation>是</translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>否</translation>
+        <translation>いいえ</translation>
     </message>
     <message>
         <source>Regular</source>
-        <translation>常规</translation>
+        <translation>通常</translation>
     </message>
     <message>
         <source>Masternode</source>
-        <translation>主节点</translation>
+        <translation>マスターノード</translation>
     </message>
     <message>
         <source>Verified Masternode</source>
-        <translation>已验证的主节点</translation>
+        <translation>認証済のマスターノード</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation>未知</translation>
+        <translation>不明</translation>
     </message>
 </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>附加在付款要求中的讯息，可以不填，打开要求内容时会显示。注意：这个讯息不会随着付款送到Wagerr网路上。</translation>
+        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはWagerrネットワークを通じて支払いと共に送信されるわけではありません。</translation>
     </message>
     <message>
         <source>&amp;Message:</source>
-        <translation>消息(&amp;M)：</translation>
+        <translation>メッセージ: (&amp;M)</translation>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address.</source>
-        <translation>可为新建的收款地址添加一个可选标签。</translation>
+        <translation>新しい受け取り用アドレスに紐づく任意のラベル。</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>附加在付款要求中的讯息，可以不填，打开要求内容时会显示。&lt;br&gt;注意：这个讯息不会随着付款送到Wagerr网路上。</translation>
+        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはWagerrネットワークを通じて支払いと共に送信されるわけではありません。</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
-        <translation>使用此表单要求付款。所有字段都是&lt;b&gt;可选&lt;/b&gt;的。</translation>
+        <translation>このフォームを使用して支払いのリクエストを行いましょう。すべての項目は&lt;b&gt;任意入力&lt;/b&gt;です。</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>标签(&amp;L)：</translation>
+        <translation>ラベル (&amp;L)</translation>
     </message>
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
-        <translation>可选的请求金额。留空或填零为不要求具体金额。</translation>
+        <translation>リクエストする任意の金額。特定の金額をリクエストしない場合にはこの欄は空白のままかゼロにしてください。</translation>
     </message>
     <message>
         <source>&amp;Amount:</source>
-        <translation>总额(&amp;A)：</translation>
+        <translation>総額 (&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Create new receiving address</source>
-        <translation>&amp;创建新的收款地址</translation>
+        <translation>新しい受取アドレスを作成(&amp;C)</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation>清空此表单的所有字段。</translation>
+        <translation>このフォームの全ての入力項目をクリア</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation>清除</translation>
+        <translation>クリア</translation>
     </message>
     <message>
         <source>Requested payments history</source>
-        <translation>请求付款的历史</translation>
+        <translation>支払いリクエスト履歴</translation>
     </message>
     <message>
         <source>Show the selected request (does the same as double clicking an entry)</source>
-        <translation>显示选中的请求 (双击也可以显示)</translation>
+        <translation>選択されたリクエストを表示（項目をダブルクリックでも表示）</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation>显示</translation>
+        <translation>表示</translation>
     </message>
     <message>
         <source>Remove the selected entries from the list</source>
-        <translation>从列表中移除选中的条目</translation>
+        <translation>リストから選択項目を削除</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>移除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Enter a label to associate with the new receiving address</source>
-        <translation>输入标签以关联一个新的接收地址</translation>
+        <translation>新しい受信アドレスと関連付けるラベルを入力します。</translation>
     </message>
     <message>
         <source>Enter a message to attach to the payment request</source>
-        <translation>输入消息以添加到支付请求中</translation>
+        <translation>支払いリクエストに添付するメッセージを入力します</translation>
     </message>
     <message>
         <source>Copy URI</source>
-        <translation>复制URI</translation>
+        <translation>URI をコピー</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>复制地址</translation>
+        <translation>アドレスをコピー</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>复制标签</translation>
+        <translation>ラベルをコピーする</translation>
     </message>
     <message>
         <source>Copy message</source>
-        <translation>复制消息 </translation>
+        <translation>メッセージをコピー</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>复制金额</translation>
+        <translation>総額のコピー</translation>
     </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
     <message>
         <source>QR Code</source>
-        <translation>二维码</translation>
+        <translation>QRコード</translation>
     </message>
     <message>
         <source>Copy &amp;URI</source>
-        <translation>复制 URI(&amp;U)</translation>
+        <translation>URI をコピー (&amp;U)</translation>
     </message>
     <message>
         <source>Copy &amp;Address</source>
-        <translation>复制地址(&amp;A)</translation>
+        <translation>アドレスをコピー(&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>保存图片(&amp;S)...</translation>
+        <translation>画像を保存… (&amp;S)</translation>
     </message>
     <message>
         <source>Request payment to %1</source>
-        <translation>请求付款到 %1</translation>
+        <translation>%1 へ支払いリクエストを行う</translation>
     </message>
     <message>
         <source>Payment information</source>
-        <translation>付款信息</translation>
+        <translation>支払い情報</translation>
     </message>
     <message>
         <source>URI</source>
@@ -3002,380 +3002,380 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>地址</translation>
+        <translation>アドレス</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金额</translation>
+        <translation>総額</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>标签</translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>消息</translation>
+        <translation>メッセージ</translation>
     </message>
     <message>
         <source>Wallet</source>
-        <translation>钱包</translation>
+        <translation>ウォレット</translation>
     </message>
 </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
         <source>Date</source>
-        <translation>日期</translation>
+        <translation>日付</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>标签</translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>消息</translation>
+        <translation>メッセージ</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(无标签)</translation>
+        <translation>（ラベル無し）</translation>
     </message>
     <message>
         <source>(no message)</source>
-        <translation>(无消息)</translation>
+        <translation>（メッセージなし）</translation>
     </message>
     <message>
         <source>(no amount requested)</source>
-        <translation>（无请求金额）</translation>
+        <translation>(金額指定なし)</translation>
     </message>
     <message>
         <source>Requested</source>
-        <translation>总额</translation>
+        <translation>リクエスト完了</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <source>Send Coins</source>
-        <translation>发送货币</translation>
+        <translation>送金</translation>
     </message>
     <message>
         <source>Coin Control Features</source>
-        <translation>交易源地址控制功能</translation>
+        <translation>コインコントロール機能</translation>
     </message>
     <message>
         <source>Inputs...</source>
-        <translation>输入...</translation>
+        <translation>インプット…</translation>
     </message>
     <message>
         <source>automatically selected</source>
-        <translation>自动选择</translation>
+        <translation>自動選択</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
-        <translation>余额不足！</translation>
+        <translation>残高不足です！</translation>
     </message>
     <message>
         <source>Quantity:</source>
-        <translation>总量：</translation>
+        <translation>数量：</translation>
     </message>
     <message>
         <source>Bytes:</source>
-        <translation>字节：</translation>
+        <translation>バイト：</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>金额：</translation>
+        <translation>総額：</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>费用：</translation>
+        <translation>手数料：</translation>
     </message>
     <message>
         <source>Dust:</source>
-        <translation>零散金额：</translation>
+        <translation>ダスト：</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>加上交易费用后:</translation>
+        <translation>手数料差引後：</translation>
     </message>
     <message>
         <source>Change:</source>
-        <translation>找零金额：</translation>
+        <translation>チェンジ：</translation>
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>如果激活该选项，但是找零地址用光或者非法，将会生成新的找零地址，转入找零金额。</translation>
+        <translation>これが有効にもかかわらずチェンジアドレスが空欄であったり無効な場合には、チェンジは新しく生成されたアドレスへ送金されます。</translation>
     </message>
     <message>
         <source>Custom change address</source>
-        <translation>自定义找零地址</translation>
+        <translation>カスタマイズされたチェンジアドレス</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>
-        <translation>交易手续费：</translation>
+        <translation>トランザクション手数料：</translation>
     </message>
     <message>
         <source>Choose...</source>
-        <translation>选择...</translation>
+        <translation>選択…</translation>
     </message>
     <message>
         <source>Confirmation time target:</source>
-        <translation>确认时间目标：</translation>
+        <translation>検証時間ターゲット:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 duffs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 duffs in fee,&lt;br /&gt;while "at least" pays 1000 duffs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>如果自定手续费设定为1000 duffs，而交易信息只有250字节的话，那么选择"每千字节"就只会支付250 duffs的手续费，&lt;br /&gt;而"至少"会支付1000 duffs。但如果交易信息大于一千字节,那么两者都要按每千字节付费。</translation>
+        <source>If the custom fee is set to 1000 sats and the transaction is only 250 bytes, then "per kilobyte" only pays 250 sats in fee,&lt;br /&gt;while "at least" pays 1000 sats. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>カスタマイズされた手数料が1000satsに設定され、トランザクションが250 bytesしかなかった場合、キロバイトあたりでは250 satsしか手数料を支払いませんが&lt;br /&gt;最低でも1000 sats支払います。1キロバイト以上のトランザクションに対しては、1キロバイトあたり1000sats支払います。</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for wagerr transactions than the network can process.</source>
-        <translation>当交易量少于区块可容纳的空间时，只需支付最低手续费。&lt;br /&gt;但当交易量的需求增长到超过总体网络可处理的量时，可能会造成一笔一直不被确认的交易。</translation>
+        <translation>最低限の手数料しか支払わなくても、トランザクション量以上のスペースが対象ブロックにあれば問題ありません。&lt;br /&gt;しかし、ネットワークが処理できる以上のWagerrのトランザクション需要があれば、処理されないトランザクションになり得ることに注意してください。</translation>
     </message>
     <message>
         <source>per kilobyte</source>
-        <translation>每千字节</translation>
+        <translation>1キロバイトあたり手数料</translation>
     </message>
     <message>
         <source>Using the fallbackfee can result in sending a transaction that will take several hours or days (or never) to confirm. Consider choosing your fee manually or wait until you have validated the complete chain.</source>
-        <translation>使用fallbackfee可能会导致发送一笔需要几个小时或几天(或永远不会)确认的交易. 建议手动选择手续费, 或者等待您完全验证整个区块链后.</translation>
+        <translation>フォールバックフィーを使用すると、承認に数時間から数日かかる（あるいは承認されない）トランザクションが送信される可能性があります。手数料を手動で選択するか、ブロックチェーン全体の検証が完了するまで待ってください。</translation>
     </message>
     <message>
         <source>Note: Not enough data for fee estimation, using the fallback fee instead.</source>
-        <translation>注意: 没有足够数据用于费用测算, 将使用备选费用代替.</translation>
+        <translation>注：フォールバックフィーを代わりに使用しているので、手数料の見積もりに十分なデータがありません。</translation>
     </message>
     <message>
         <source>Hide transaction fee settings</source>
-        <translation>隐藏交易手续费设置</translation>
+        <translation>取引手数料設定の非表示</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation>隐藏</translation>
+        <translation>非表示</translation>
     </message>
     <message>
         <source>(read the tooltip)</source>
-        <translation>(请看提示)</translation>
+        <translation>（ツールチップをお読みください）</translation>
     </message>
     <message>
         <source>Recommended:</source>
-        <translation>推荐：</translation>
+        <translation>推奨：</translation>
     </message>
     <message>
         <source>Custom:</source>
-        <translation>自定义：</translation>
+        <translation>カスタム：</translation>
     </message>
     <message>
         <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
-        <translation>(手续费演算法还没有准备好。通常都要等几个块才可以...)</translation>
+        <translation>（スマート手数料はまだ初期化されていません。これには約数ブロックほどかかります…）</translation>
     </message>
     <message>
         <source>Confirm the send action</source>
-        <translation>确认并发送货币</translation>
+        <translation>送金確認</translation>
     </message>
     <message>
         <source>S&amp;end</source>
-        <translation>发送(&amp;E)</translation>
+        <translation>送金 (&amp;E)</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation>清除此表单的所有字段。</translation>
+        <translation>全ての入力項目をクリア</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>清除所有(&amp;A)</translation>
+        <translation>すべてクリア (&amp;A)</translation>
     </message>
     <message>
         <source>Send to multiple recipients at once</source>
-        <translation>一次发送给多个接收者</translation>
+        <translation>一度に複数のアドレスに送金</translation>
     </message>
     <message>
         <source>Add &amp;Recipient</source>
-        <translation>添加收款人(&amp;R)</translation>
+        <translation>受取人を追加 (&amp;R)</translation>
     </message>
     <message>
         <source>Balance:</source>
-        <translation>余额：</translation>
+        <translation>残高：</translation>
     </message>
     <message>
         <source>Copy quantity</source>
-        <translation>复制数量</translation>
+        <translation>数量をコピー</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>复制金额</translation>
+        <translation>総額のコピー</translation>
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>复制交易费</translation>
+        <translation>手数料をコピーす</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>复制含交易费的金额</translation>
+        <translation>手数料差引後の金額をコピー</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation>复制字节</translation>
+        <translation>バイト数をコピー</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation>复制零散金额</translation>
+        <translation>ダストをコピー</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation>复制找零金额</translation>
+        <translation>チェンジをコピー</translation>
     </message>
     <message>
         <source>%1 (%2 blocks)</source>
-        <translation>%1 (%2 区块)</translation>
+        <translation>%1 (%2 ブロック)</translation>
     </message>
     <message>
         <source>from wallet %1</source>
-        <translation>来自%1钱包</translation>
+        <translation>%1のウォレットから</translation>
     </message>
     <message>
         <source>using</source>
-        <translation>使用</translation>
+        <translation>使用中</translation>
     </message>
     <message>
         <source>%1 to %2</source>
-        <translation>%1 到 %2</translation>
+        <translation>%1 から %2</translation>
     </message>
     <message>
         <source>Are you sure you want to send?</source>
-        <translation>您确定要发出吗？</translation>
+        <translation>送ってよろしいですか？</translation>
     </message>
     <message>
         <source>&lt;b&gt;(%1 of %2 entries displayed)&lt;/b&gt;</source>
-        <translation>&lt;b&gt;（在%2中%1个项目显示出来）&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;(%1 ／%2 項目を表示)&lt;/b&gt;</translation>
     </message>
     <message>
         <source>S&amp;end mixed funds</source>
-        <translation>S&amp;end 混币资金</translation>
+        <translation>ミックスファンドを送金する</translation>
     </message>
     <message>
         <source>Confirm the %1 send action</source>
-        <translation>确认%1发送行为</translation>
+        <translation>%1の送金処理を確認</translation>
     </message>
     <message>
         <source>%1 funds only</source>
-        <translation>仅支持%1资金</translation>
+        <translation>%1の資金のみ</translation>
     </message>
     <message>
         <source>any available funds</source>
-        <translation>全部有效金额</translation>
+        <translation>利用可能なファンド </translation>
     </message>
     <message>
         <source>Transaction fee</source>
-        <translation>交易手续费</translation>
+        <translation>取引手数料</translation>
     </message>
     <message>
         <source>(%1 transactions have higher fees usually due to no change output being allowed)</source>
-        <translation>(%1交易的手续费更高通常由于输出不允许更改)</translation>
+        <translation>（%1の取引は、通常変更出力が許可されていないため、手数料が高くなります）</translation>
     </message>
     <message>
         <source>Transaction size: %1</source>
-        <translation>交易大小: %1</translation>
+        <translation>取引額：%1</translation>
     </message>
     <message>
         <source>Fee rate: %1</source>
-        <translation>交易手续费比率: %1</translation>
+        <translation>料金レート：%1</translation>
     </message>
     <message numerus="yes">
         <source>This transaction will consume %n input(s)</source>
-        <translation><numerusform>此交易将消耗 %n 个输入</numerusform></translation>
+        <translation><numerusform>この取引は、%n個の入力を消費します。</numerusform></translation>
     </message>
     <message>
         <source>Warning: Using %1 with %2 or more inputs can harm your privacy and is not recommended</source>
-        <translation>提醒: 使用 %1与%2或更多输入不利于您的隐私保护，并不推荐</translation>
+        <translation>警告：%1を%2以上の入力で使用すると、プライバシーが侵害される可能性があり、推奨できません。</translation>
     </message>
     <message>
         <source>Click to learn more</source>
-        <translation>点击了解更多</translation>
+        <translation>クリックしてさらに詳しく</translation>
     </message>
     <message>
         <source>Total Amount</source>
-        <translation>总金额</translation>
+        <translation>総額</translation>
     </message>
     <message>
         <source>or</source>
-        <translation>或</translation>
+        <translation>または</translation>
     </message>
     <message>
         <source>Confirm send coins</source>
-        <translation>确认发送货币</translation>
+        <translation>送金確認</translation>
     </message>
     <message>
         <source>The recipient address is not valid. Please recheck.</source>
-        <translation>接收人地址无效。请重新检查。</translation>
+        <translation>受取アドレスが正しくありません。再チェックしてください。</translation>
     </message>
     <message>
         <source>The amount to pay must be larger than 0.</source>
-        <translation>支付金额必须大于0。</translation>
+        <translation>支払い額は0より大きくないといけません。</translation>
     </message>
     <message>
         <source>The amount exceeds your balance.</source>
-        <translation>金额超出您的账上余额。</translation>
+        <translation>総額が残高を超えています。</translation>
     </message>
     <message>
         <source>The total exceeds your balance when the %1 transaction fee is included.</source>
-        <translation>计入 %1 交易费后的金额超出您的账上余额。</translation>
+        <translation>%1 の取引手数料を含めると総額が残高を超えています。</translation>
     </message>
     <message>
         <source>Duplicate address found: addresses should only be used once each.</source>
-        <translation>发现重复地址：每个地址应该只使用一次。</translation>
+        <translation>重複したアドレスが見つかりました: アドレスは一度のみ使用することができます。</translation>
     </message>
     <message>
         <source>Transaction creation failed!</source>
-        <translation>交易创建失败！</translation>
+        <translation>トラザクションの作成に失敗しました!</translation>
     </message>
     <message>
         <source>A fee higher than %1 is considered an absurdly high fee.</source>
-        <translation>交易费一般不应超过 %1。</translation>
+        <translation>%1 よりも高い手数料の場合手数料が異常に高すぎると判断されます。</translation>
     </message>
     <message>
         <source>Payment request expired.</source>
-        <translation>付款请求已过期。</translation>
+        <translation>支払いリクエストの期限が切れました。</translation>
     </message>
     <message>
         <source>Pay only the required fee of %1</source>
-        <translation>只支付必要费用 %1</translation>
+        <translation>リクエストされた手数料 %1 のみを支払う</translation>
     </message>
     <message numerus="yes">
         <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>预计在%n 个区块内开始确认。</numerusform></translation>
+        <translation><numerusform>%n ブロック以内に検証が開始されると予想されます</numerusform></translation>
     </message>
     <message>
         <source>Warning: Invalid Wagerr address</source>
-        <translation>警告：无效的Wagerr地址</translation>
+        <translation>警告：Wagerrアドレスが無効です</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
-        <translation>警告：未知的更改地址</translation>
+        <translation>警告：未知のチェンジアドレスです</translation>
     </message>
     <message>
         <source>Confirm custom change address</source>
-        <translation>确认用户找零地址</translation>
+        <translation>カスタムチェンジアドレスを確認</translation>
     </message>
     <message>
         <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
-        <translation>您选择的找零地址未被包含在本钱包中，您钱包中的部分或全部金额将被发送至该地址。您确定要这样做吗？</translation>
+        <translation>チェンジとして指定されたアドレスはこのウォレットに属していません。このウォレットの一部またはすべてのファンドがこのアドレスへ送金されます。よろしいですか？</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(无标签)</translation>
+        <translation>（ラベル無し）</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
         <source>Pay &amp;To:</source>
-        <translation>付给(&amp;T)：</translation>
+        <translation>送り先: (&amp;T)</translation>
     </message>
     <message>
         <source>The Wagerr address to send the payment to</source>
-        <translation>选择发款地址</translation>
+        <translation>送金先Wagerrアドレス</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>选择以前用过的地址</translation>
+        <translation>以前に使用したアドレスを選択</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -3383,7 +3383,7 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>从剪贴板粘贴地址</translation>
+        <translation>クリップボードからアドレスをペースト</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -3391,104 +3391,104 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Remove this entry</source>
-        <translation>移除此项</translation>
+        <translation>この項目を削除</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>标签(&amp;L)：</translation>
+        <translation>ラベル (&amp;L)</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to the list of used addresses</source>
-        <translation>请为此地址输入一个标签以将它加入用过的地址列表</translation>
+        <translation>このアドレスに対するラベルを入力することで使用済みアドレスの一覧に追加することができます</translation>
     </message>
     <message>
         <source>A&amp;mount:</source>
-        <translation>金额(&amp;M)</translation>
+        <translation>金額： (&amp;M)</translation>
     </message>
     <message>
         <source>The amount to send in the selected unit</source>
-        <translation>在所选单位中发送的金额</translation>
+        <translation>選択した単位で送金する金額</translation>
     </message>
     <message>
         <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of Wagerr than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>手续费将从发送金额中扣除。接收者将收到的Wagerr金额将会比您在金额字段中输入的金额为少。如果选择了多个收款人，该费用将会被平均摊分。</translation>
+        <translation>手数料は総額から差し引かれます。受取人は入力した金額より少ないWagerrを受け取ります。複数の受取人を選択した場合、手数料は等しく分割されます。</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
-        <translation>从金额中减去交易费(&amp;U)</translation>
+        <translation>総額から手数料を差し引いて送金(&amp;U)</translation>
     </message>
     <message>
         <source>Use available balance</source>
-        <translation>使用可用余额</translation>
+        <translation>利用可能な残高を使用する</translation>
     </message>
     <message>
         <source>Message:</source>
-        <translation>消息：</translation>
+        <translation>メッセージ：</translation>
     </message>
     <message>
         <source>A message that was attached to the wagerr: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>附加在Wagerr付款协议URI中的信息，会和交易内容一并存储，可供您参考。提示：此信息不会发送到Wagerr网络上。</translation>
+        <translation>Wagerr: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはWagerrネットワークを経由して送信されるわけではありません。</translation>
     </message>
     <message>
         <source>This is an unauthenticated payment request.</source>
-        <translation>这是一个未经验证的支付请求。</translation>
+        <translation>これは未認証の支払いリクエストです。</translation>
     </message>
     <message>
         <source>This is an authenticated payment request.</source>
-        <translation>这是一个已经验证的支付请求。</translation>
+        <translation>これは認証済みの支払いリクエストです。</translation>
     </message>
     <message>
         <source>Pay To:</source>
-        <translation>支付给：</translation>
+        <translation>支払い先：</translation>
     </message>
     <message>
         <source>Memo:</source>
-        <translation>便条：</translation>
+        <translation>メモ：</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to your address book</source>
-        <translation>为这个地址输入一个标签，以便将它添加到您的地址簿</translation>
+        <translation>アドレス帳に追加するにはこのアドレスのラベルを入力します</translation>
     </message>
 </context>
 <context>
     <name>SendConfirmationDialog</name>
     <message>
         <source>Send</source>
-        <translation>发送</translation>
+        <translation>送金</translation>
     </message>
 </context>
 <context>
     <name>ShutdownWindow</name>
     <message>
         <source>%1 is shutting down...</source>
-        <translation>正在关闭 %1 ...</translation>
+        <translation>%1 をシャットダウンしています...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
-        <translation>在此窗口消失前不要关闭计算机。</translation>
+        <translation>このウィンドウが消えるまでコンピュータをシャットダウンしないで下さい。</translation>
     </message>
 </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
         <source>Signatures - Sign / Verify a Message</source>
-        <translation>签名 - 签署/验证消息</translation>
+        <translation>署名 - メッセージの署名/検証</translation>
     </message>
     <message>
         <source>&amp;Sign Message</source>
-        <translation>签名消息(&amp;S)</translation>
+        <translation>メッセージの署名 (&amp;S)</translation>
     </message>
     <message>
         <source>You can sign messages/agreements with your addresses to prove you can receive Wagerr sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>您可以用自己的地址签署信息/协议，来证明您对地址的所有权。但是请小心，不要签署语意含糊不清的内容，因为钓鱼式诈骗可能会用骗您签署的手法来冒充是您。只有在语句中的细节您都同意时才签署。</translation>
+        <translation>あなたのアドレスを使用してあなたがWagerrを受け取ることができるようにメッセージやアグリーメントに署名できます。充分に詳細が判明していてあなたが確認しているものだけに署名してください。フィッシングによってあなたの署名を読み取られないように注意してください。</translation>
     </message>
     <message>
         <source>The Wagerr address to sign the message with</source>
-        <translation>对此地址进行签名</translation>
+        <translation>メッセージを署名する際に使用するWagerrアドレス</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>选择以前用过的地址</translation>
+        <translation>前に使用したアドレスを選ぶ</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -3496,7 +3496,7 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>从剪贴板粘贴地址</translation>
+        <translation>クリップボードからアドレスをペースト</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -3504,127 +3504,127 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Enter the message you want to sign here</source>
-        <translation>请输入您要发送的签名消息</translation>
+        <translation>ここにあなたが署名するメッセージを入力</translation>
     </message>
     <message>
         <source>Signature</source>
-        <translation>签名</translation>
+        <translation>署名</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
-        <translation>复制当前签名至剪切板</translation>
+        <translation>現在の署名をシステムのクリップボードにコピー</translation>
     </message>
     <message>
         <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>签署信息证明您拥有此Wagerr地址</translation>
+        <translation>この Wagerr アドレスを所有していることを証明するためにメッセージに署名</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
-        <translation>消息签名(&amp;M)</translation>
+        <translation>メッセージの署名 (&amp;M)</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
-        <translation>清空所有签名消息栏</translation>
+        <translation>入力項目の内容をすべて消去</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>清除所有(&amp;A)</translation>
+        <translation>すべてクリア (&amp;A)</translation>
     </message>
     <message>
         <source>&amp;Verify Message</source>
-        <translation>验证消息(&amp;V)</translation>
+        <translation>メッセージの検証 (&amp;V)</translation>
     </message>
     <message>
         <source>Enter the receiver's address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack. Note that this only proves the signing party receives with the address, it cannot prove sendership of any transaction!</source>
-        <translation>请在下面输入接收者地址、消息（确保换行符、空格符、制表符等完全相同）和签名以验证消息。请仔细核对签名信息，以提防中间人攻击。请注意，这只是证明接收方签名的地址，它不能证明任何交易！</translation>
+        <translation>受取人のアドレスとメッセージ（改行やスペース、タブなども完全に一致するよう注意してください）および署名を以下に入力し、メッセージを検証してください。中間者攻撃により騙されるのを防ぐため、署名対象のメッセージに書かれていること以上の意味を署名から読み取ろうとしないよう注意してください。これは署名作成者がこのアドレスで受け取ることを証明するだけであり、トランザクションの送信者を証明するものではないことに注意してください！</translation>
     </message>
     <message>
         <source>The Wagerr address the message was signed with</source>
-        <translation>已签名的地址</translation>
+        <translation>メッセージの署名に使用されたWagerrアドレス</translation>
     </message>
     <message>
         <source>The signed message to verify</source>
-        <translation>要验证的签名消息</translation>
+        <translation>検証する署名付きメッセージ</translation>
     </message>
     <message>
         <source>The signature given when the message was signed</source>
-        <translation>签名消息时所用的签名</translation>
+        <translation>メッセージの署名時に付与された署名</translation>
     </message>
     <message>
         <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>验证信息用来确保此被签署信息对应相对的Wagerr地址</translation>
+        <translation>指定されたWagerrアドレスで署名されたことを確認するためメッセージを検証</translation>
     </message>
     <message>
         <source>Verify &amp;Message</source>
-        <translation>验证消息签名(&amp;M)</translation>
+        <translation>メッセージの検証 (&amp;M)</translation>
     </message>
     <message>
         <source>Reset all verify message fields</source>
-        <translation>清空所有验证消息栏</translation>
+        <translation>入力項目の内容をすべて消去</translation>
     </message>
     <message>
         <source>Enter a message to be signed</source>
-        <translation>输入要签名的信息</translation>
+        <translation>署名するメッセージを入力する</translation>
     </message>
     <message>
         <source>Click "Sign Message" to generate signature</source>
-        <translation>单击“签名消息“产生签名。</translation>
+        <translation>署名を作成するには"メッセージの署名"をクリックしてください</translation>
     </message>
     <message>
         <source>Enter a message to be verified</source>
-        <translation>输入要验证的信息</translation>
+        <translation>検証するメッセージを入力する</translation>
     </message>
     <message>
         <source>Enter a signature for the message to be verified</source>
-        <translation>输入要验证的消息的签名</translation>
+        <translation>検証するメッセージに署名を入力する</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
-        <translation>输入的地址非法。</translation>
+        <translation>無効なアドレスが入力されました。</translation>
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>请检查地址后重试。</translation>
+        <translation>アドレスを確かめてからもう一度試してください。</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>输入的地址没有关联的密匙。</translation>
+        <translation>入力されたアドレスに関連するキーがありません。</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>钱包解锁已取消。</translation>
+        <translation>ウォレットのアンロックはキャンセルされました。</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>找不到输入地址关联的私钥。</translation>
+        <translation>入力されたアドレスのプライベートキーは利用できません。</translation>
     </message>
     <message>
         <source>Message signing failed.</source>
-        <translation>消息签名失败。</translation>
+        <translation>メッセージの署名に失敗しました。</translation>
     </message>
     <message>
         <source>Message signed.</source>
-        <translation>消息已签名。</translation>
+        <translation>メッセージに署名しました。</translation>
     </message>
     <message>
         <source>The signature could not be decoded.</source>
-        <translation>签名无法解码。</translation>
+        <translation>署名はデコードできません。</translation>
     </message>
     <message>
         <source>Please check the signature and try again.</source>
-        <translation>请检查签名后重试。</translation>
+        <translation>署名を確認してからもう一度試してください。</translation>
     </message>
     <message>
         <source>The signature did not match the message digest.</source>
-        <translation>签名与消息摘要不匹配。</translation>
+        <translation>署名はメッセージダイジェストと一致しませんでした。</translation>
     </message>
     <message>
         <source>Message verification failed.</source>
-        <translation>消息验证失败。</translation>
+        <translation>メッセージの検証に失敗しました。</translation>
     </message>
     <message>
         <source>Message verified.</source>
-        <translation>消息验证成功。</translation>
+        <translation>メッセージは検証されました。</translation>
     </message>
 </context>
 <context>
@@ -3638,367 +3638,367 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     <name>TrafficGraphWidget</name>
     <message>
         <source>KB/s</source>
-        <translation>KB/s</translation>
+        <translation>KB/秒</translation>
     </message>
     <message>
         <source>Total</source>
-        <translation>总额</translation>
+        <translation>合計</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation>已接收</translation>
+        <translation>受取済</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation>已发送</translation>
+        <translation>送金済</translation>
     </message>
 </context>
 <context>
     <name>TransactionDesc</name>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>到下%n个区块产生前可修改</numerusform></translation>
+        <translation><numerusform>%n 以上のブロックをオープン</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
-        <translation>至 %1 个区块时开启</translation>
+        <translation> %1 までオープン</translation>
     </message>
     <message>
         <source>conflicted</source>
-        <translation>发现冲突</translation>
+        <translation>コンフリクト発生</translation>
     </message>
     <message>
         <source>0/unconfirmed, %1</source>
-        <translation>0/未确认，%1</translation>
+        <translation>0/未確認、%1</translation>
     </message>
     <message>
         <source>in memory pool</source>
-        <translation>在内存池中</translation>
+        <translation>メモリプール内</translation>
     </message>
     <message>
         <source>not in memory pool</source>
-        <translation>不在内存池中</translation>
+        <translation>メモリプール外</translation>
     </message>
     <message>
         <source>abandoned</source>
-        <translation>已丢弃</translation>
+        <translation>中止</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
-        <translation>%1/未确认</translation>
+        <translation>%1/未確認</translation>
     </message>
     <message>
         <source>%1 confirmations</source>
-        <translation>确认%1次</translation>
+        <translation>%1の確認</translation>
     </message>
     <message>
         <source>locked via ChainLocks</source>
-        <translation>经链锁锁定</translation>
+        <translation>チェーンロックでロック中</translation>
     </message>
     <message>
         <source>verified via InstantSend</source>
-        <translation>经即时支付验证</translation>
+        <translation>InstantSendで検証済み</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>状态</translation>
+        <translation>ステータス</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日期</translation>
+        <translation>日付</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation>源</translation>
+        <translation>ソース</translation>
     </message>
     <message>
         <source>Generated</source>
-        <translation>生成</translation>
+        <translation>生成済</translation>
     </message>
     <message>
         <source>From</source>
-        <translation>来自</translation>
+        <translation>送信元</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>未知</translation>
+        <translation>未確認</translation>
     </message>
     <message>
         <source>To</source>
-        <translation>到</translation>
+        <translation>送信先</translation>
     </message>
     <message>
         <source>own address</source>
-        <translation>自己的地址</translation>
+        <translation>自分のアドレス</translation>
     </message>
     <message>
         <source>watch-only</source>
-        <translation>仅限查看</translation>
+        <translation>監視のみ</translation>
     </message>
     <message>
         <source>label</source>
-        <translation>标签</translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Credit</source>
-        <translation>收入</translation>
+        <translation>クレジット</translation>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>再过%n个区块产生后成熟</numerusform></translation>
+        <translation><numerusform>%n 以上のブロックがマチュア</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
-        <translation>未被接受</translation>
+        <translation>未承認</translation>
     </message>
     <message>
         <source>Debit</source>
-        <translation>支出</translation>
+        <translation>引き落とし額</translation>
     </message>
     <message>
         <source>Total debit</source>
-        <translation>支出总额</translation>
+        <translation>総出金額</translation>
     </message>
     <message>
         <source>Total credit</source>
-        <translation>入账总额</translation>
+        <translation>総入金額</translation>
     </message>
     <message>
         <source>Transaction fee</source>
-        <translation>交易费</translation>
+        <translation>トランザクション手数料</translation>
     </message>
     <message>
         <source>Net amount</source>
-        <translation>净额</translation>
+        <translation>正味金額</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>消息</translation>
+        <translation>メッセージ</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation>备注</translation>
+        <translation>コメント</translation>
     </message>
     <message>
         <source>Transaction ID</source>
-        <translation>交易ID</translation>
+        <translation>トランザクションID</translation>
     </message>
     <message>
         <source>Output index</source>
-        <translation>输出索引</translation>
+        <translation>出力インデックス</translation>
     </message>
     <message>
         <source>Transaction total size</source>
-        <translation>交易总大小</translation>
+        <translation>トランザクションの全体サイズ</translation>
     </message>
     <message>
         <source> (Certificate was not verified)</source>
-        <translation> (证书未验证)</translation>
+        <translation>（証明書は未確認です）</translation>
     </message>
     <message>
         <source>Merchant</source>
-        <translation>商店</translation>
+        <translation>マーチャント</translation>
     </message>
     <message>
         <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>生成的Wagerr在可以使用前必须有 %1 个成熟的区块。当您生成了此区块后，它将被广播到网络中以加入区块链。如果它未成功进入区块链，其状态将变更为“不接受”并且不可使用。这可能偶尔会发生，如果另一个节点比您早几秒钟成功生成一个区块。</translation>
+        <translation>生成されたコインは使う前に%1のブロックを完成させる必要があります。あなたがこのブロックを生成した時、このブロックはブロックチェーンに追加されるためにネットワークにブロードキャストされました。ブロックチェーンの追加に失敗した場合、状態が"不承認"に変更されて生成されたコインは使えなくなります。これは別のノードがあなたの数秒前にブロックを生成する場合に時々起こります。</translation>
     </message>
     <message>
         <source>Debug information</source>
-        <translation>调试信息</translation>
+        <translation>デバッグ情報</translation>
     </message>
     <message>
         <source>Transaction</source>
-        <translation>交易</translation>
+        <translation>取引</translation>
     </message>
     <message>
         <source>Inputs</source>
-        <translation>输入</translation>
+        <translation>入力</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>金额</translation>
+        <translation>総額</translation>
     </message>
     <message>
         <source>true</source>
-        <translation>正确</translation>
+        <translation>正しい</translation>
     </message>
     <message>
         <source>false</source>
-        <translation>错误</translation>
+        <translation>正しくない</translation>
     </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
     <message>
         <source>This pane shows a detailed description of the transaction</source>
-        <translation>当前面板显示了交易的详细信息</translation>
+        <translation>ここでは取引の詳細を表示しています</translation>
     </message>
     <message>
         <source>Details for %1</source>
-        <translation>%1 详情</translation>
+        <translation>%1 の詳細</translation>
     </message>
 </context>
 <context>
     <name>TransactionTableModel</name>
     <message>
         <source>Date</source>
-        <translation>日期</translation>
+        <translation>日付</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>类型</translation>
+        <translation>タイプ</translation>
     </message>
     <message>
         <source>Address / Label</source>
-        <translation>地址/标签</translation>
+        <translation>アドレス / ラベル</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>到下%n个区块产生前可修改</numerusform></translation>
+        <translation><numerusform>%n 以上のブロックをオープン</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
-        <translation>至 %1 个区块时开启</translation>
+        <translation> %1 までオープン</translation>
     </message>
     <message>
         <source>Unconfirmed</source>
-        <translation>未确认的 </translation>
+        <translation>未検証</translation>
     </message>
     <message>
         <source>Abandoned</source>
-        <translation>已丢弃</translation>
+        <translation>中止</translation>
     </message>
     <message>
         <source>Confirming (%1 of %2 recommended confirmations)</source>
-        <translation>确认中 (推荐 %2个确认，已经有 %1个确认)</translation>
+        <translation>検証中（%2の推奨検証数のうち、%1検証が完了）</translation>
     </message>
     <message>
         <source>Confirmed (%1 confirmations)</source>
-        <translation>已确认 (%1 次)</translation>
+        <translation>検証されました (%1 検証済み)</translation>
     </message>
     <message>
         <source>Conflicted</source>
-        <translation>冲突的</translation>
+        <translation>コンフリクト発生</translation>
     </message>
     <message>
         <source>Immature (%1 confirmations, will be available after %2)</source>
-        <translation>未成熟 (%1 个确认，将在 %2 个后可用)</translation>
+        <translation>マチュアでない状態（%1検証。%2検証完了後に使用可能となります）</translation>
     </message>
     <message>
         <source>Generated but not accepted</source>
-        <translation>已生成但未被接受</translation>
+        <translation>生成されましたが承認されませんでした</translation>
     </message>
     <message>
         <source>verified via InstantSend</source>
-        <translation>经即时支付验证</translation>
+        <translation>InstantSendで検証済み</translation>
     </message>
     <message>
         <source>locked via ChainLocks</source>
-        <translation>经链锁锁定</translation>
+        <translation>チェーンロックでロック中</translation>
     </message>
     <message>
         <source>Received with</source>
-        <translation>接收于</translation>
+        <translation>受信元</translation>
     </message>
     <message>
         <source>Received from</source>
-        <translation>收款来自</translation>
+        <translation>送信元</translation>
     </message>
     <message>
         <source>Received via %1</source>
-        <translation>已通过%1接收</translation>
+        <translation>%1から受取済</translation>
     </message>
     <message>
         <source>Sent to</source>
-        <translation>发送给</translation>
+        <translation>送金先</translation>
     </message>
     <message>
         <source>Payment to yourself</source>
-        <translation>付款给自己</translation>
+        <translation>自分自身への支払い</translation>
     </message>
     <message>
         <source>Mined</source>
-        <translation>挖矿所得</translation>
+        <translation>マイニング済</translation>
     </message>
     <message>
         <source>%1 Mixing</source>
-        <translation>%1 混币</translation>
+        <translation>%1 ミキシング</translation>
     </message>
     <message>
         <source>%1 Collateral Payment</source>
-        <translation>%1抵押付款</translation>
+        <translation>%1 担保の支払い</translation>
     </message>
     <message>
         <source>%1 Make Collateral Inputs</source>
-        <translation>%1进行抵押输入</translation>
+        <translation>%1 担保の情報を入力する</translation>
     </message>
     <message>
         <source>%1 Create Denominations</source>
-        <translation>%1 创建面额</translation>
+        <translation>%1 デノミネーションを作成する</translation>
     </message>
     <message>
         <source>%1 Send</source>
-        <translation>%1 发送</translation>
+        <translation>%1 送金する</translation>
     </message>
     <message>
         <source>watch-only</source>
-        <translation>仅限查看</translation>
+        <translation>ウォッチオンリー</translation>
     </message>
     <message>
         <source>(n/a)</source>
-        <translation>(不可用)</translation>
+        <translation>(n/a)</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(无标签)</translation>
+        <translation>（ラベル無し）</translation>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation>交易状态。 鼠标移到此区域可显示确认项数量。</translation>
+        <translation>トランザクションステータス。このフィールドの上にカーソルを置くと検証数を表示します。</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
-        <translation>接收到交易的时间</translation>
+        <translation>トランザクションを受信した日時</translation>
     </message>
     <message>
         <source>Type of transaction.</source>
-        <translation>交易类别。</translation>
+        <translation>トランザクションの種類</translation>
     </message>
     <message>
         <source>Whether or not a watch-only address is involved in this transaction.</source>
-        <translation>决定是否有一个仅限查看的地址参与这次交易.</translation>
+        <translation>ウォッチオンリーのアドレスがこのトランザクションに含まれているかどうか</translation>
     </message>
     <message>
         <source>User-defined intent/purpose of the transaction.</source>
-        <translation>用户定义的该交易的意图/目的。</translation>
+        <translation>ユーザー定義のトランザクションの意図／目的</translation>
     </message>
     <message>
         <source>Amount removed from or added to balance.</source>
-        <translation>从余额添加或移除的金额。</translation>
+        <translation>残高に追加または削除された総額</translation>
     </message>
 </context>
 <context>
     <name>TransactionView</name>
     <message>
         <source>All</source>
-        <translation>全部</translation>
+        <translation>すべて</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>今天</translation>
+        <translation>今日</translation>
     </message>
     <message>
         <source>This week</source>
-        <translation>本周</translation>
+        <translation>今週</translation>
     </message>
     <message>
         <source>This month</source>
-        <translation>本月</translation>
+        <translation>今月</translation>
     </message>
     <message>
         <source>Last month</source>
-        <translation>上月</translation>
+        <translation>先月</translation>
     </message>
     <message>
         <source>This year</source>
@@ -4006,131 +4006,131 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Range...</source>
-        <translation>范围...</translation>
+        <translation>期間…</translation>
     </message>
     <message>
         <source>Most Common</source>
-        <translation>最常用的</translation>
+        <translation>通常</translation>
     </message>
     <message>
         <source>Received with</source>
-        <translation>接收于</translation>
+        <translation>受信元</translation>
     </message>
     <message>
         <source>Sent to</source>
-        <translation>发送给</translation>
+        <translation>送金先</translation>
     </message>
     <message>
         <source>%1 Send</source>
-        <translation>%1 发送</translation>
+        <translation>%1 送金する</translation>
     </message>
     <message>
         <source>%1 Make Collateral Inputs</source>
-        <translation>%1进行抵押输入</translation>
+        <translation>%1 担保の情報を入力する</translation>
     </message>
     <message>
         <source>%1 Create Denominations</source>
-        <translation>%1 创建面额</translation>
+        <translation>%1 デノミネーションを作成する</translation>
     </message>
     <message>
         <source>%1 Mixing</source>
-        <translation>%1 混币</translation>
+        <translation>%1 ミキシング</translation>
     </message>
     <message>
         <source>%1 Collateral Payment</source>
-        <translation>%1抵押付款</translation>
+        <translation>%1 担保の支払い</translation>
     </message>
     <message>
         <source>To yourself</source>
-        <translation>付款给自己</translation>
+        <translation>自分自身へ</translation>
     </message>
     <message>
         <source>Mined</source>
-        <translation>挖矿所得</translation>
+        <translation>採掘済</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation>其他</translation>
+        <translation>その他</translation>
     </message>
     <message>
         <source>Enter address, transaction id, or label to search</source>
-        <translation>输入地址, 交易id, 或标签来搜索</translation>
+        <translation>アドレス、取引ID、ラベルを入力して検索する</translation>
     </message>
     <message>
         <source>Min amount</source>
-        <translation>最小金额</translation>
+        <translation>最小の額</translation>
     </message>
     <message>
         <source>Abandon transaction</source>
-        <translation>放弃交易</translation>
+        <translation>トランザクション中止</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>复制地址</translation>
+        <translation>アドレスをコピー</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>复制标签</translation>
+        <translation>ラベルをコピー</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>复制金额</translation>
+        <translation>総額のコピー</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>复制交易编号</translation>
+        <translation>トランザクションIDをコピー</translation>
     </message>
     <message>
         <source>Copy raw transaction</source>
-        <translation>复制原始交易</translation>
+        <translation>原トランザクションをコピー</translation>
     </message>
     <message>
         <source>Copy full transaction details</source>
-        <translation>复制完整交易详情</translation>
+        <translation>トランザクションの詳細すべてをコピー</translation>
     </message>
     <message>
         <source>Edit address label</source>
-        <translation>编辑地址标签</translation>
+        <translation>アドレスのラベルを編集</translation>
     </message>
     <message>
         <source>Show transaction details</source>
-        <translation>显示交易详情</translation>
+        <translation>トランザクションの詳細を表示</translation>
     </message>
     <message>
         <source>Show address QR code</source>
-        <translation>显示地址二维码</translation>
+        <translation>アドレスのQRコードを表示</translation>
     </message>
     <message>
         <source>Export Transaction History</source>
-        <translation>导出交易历史</translation>
+        <translation>トランザクション履歴をエクスポート</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>逗号分隔文件 (*.csv)</translation>
+        <translation>CSVファイル (*.csv)</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>已确认</translation>
+        <translation>検証済</translation>
     </message>
     <message>
         <source>Watch-only</source>
-        <translation>仅限查看</translation>
+        <translation>ウォッチオンリー</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>日期</translation>
+        <translation>日付</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>类别</translation>
+        <translation>タイプ</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>标签</translation>
+        <translation>ラベル</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>地址</translation>
+        <translation>アドレス</translation>
     </message>
     <message>
         <source>ID</source>
@@ -4138,1043 +4138,1042 @@ https://www.transifex.com/projects/p/wagerr/</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>导出失败</translation>
+        <translation>エクスポート失敗</translation>
     </message>
     <message>
         <source>There was an error trying to save the transaction history to %1.</source>
-        <translation>导出交易历史到 %1 时发生错误。</translation>
+        <translation>トランザクション履歴を %1 へ保存する際にエラーが発生しました</translation>
     </message>
     <message>
         <source>Exporting Successful</source>
-        <translation>导出成功</translation>
+        <translation>エクスポート成功</translation>
     </message>
     <message>
         <source>The transaction history was successfully saved to %1.</source>
-        <translation>交易历史已成功保存到 %1。</translation>
+        <translation>トランザクション履歴は正常に%1に保存されました</translation>
     </message>
     <message>
         <source>QR code</source>
-        <translation>二维码</translation>
+        <translation>QRコード</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation>范围：</translation>
+        <translation>期間：</translation>
     </message>
     <message>
         <source>to</source>
-        <translation>到</translation>
+        <translation>から</translation>
     </message>
 </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
         <source>Unit to show amounts in. Click to select another unit.</source>
-        <translation>金额显示单位。单击选择其他单位。</translation>
+        <translation>金額を表示する際の単位。クリックすることで他の単位を選択します。</translation>
     </message>
 </context>
 <context>
     <name>WalletController</name>
     <message>
         <source>Close wallet</source>
-        <translation>关闭钱包</translation>
+        <translation>ウォレットを閉じる</translation>
     </message>
     <message>
         <source>Are you sure you wish to close the wallet &lt;i&gt;%1&lt;/i&gt;?</source>
-        <translation>您确定要关闭钱包吗&lt;i&gt;%1&lt;/i&gt; ?</translation>
+        <translation>&lt;i&gt;%1&lt;/i&gt;のウォレットを本当に閉じますか。</translation>
     </message>
     <message>
         <source>Closing the wallet for too long can result in having to resync the entire chain if pruning is enabled.</source>
-        <translation>如果启用修剪后, 关闭钱包太久可能会导致必须重新同步整个区块链.</translation>
+        <translation>ウォレットを長時間閉じると、プルーニングが有効な場合、チェーン全体を再同期しなければならないことがあります。</translation>
     </message>
 </context>
 <context>
     <name>WalletFrame</name>
     <message>
         <source>No wallet has been loaded.</source>
-        <translation>没有载入钱包。</translation>
+        <translation>ウォレットがロードされていません</translation>
     </message>
 </context>
 <context>
     <name>WalletModel</name>
     <message>
         <source>Send Coins</source>
-        <translation>发送Wagerr</translation>
+        <translation>送金</translation>
     </message>
     <message>
         <source>default wallet</source>
-        <translation>默认钱包</translation>
+        <translation>デフォルトのウォレット</translation>
     </message>
 </context>
 <context>
     <name>WalletView</name>
     <message>
         <source>&amp;Export</source>
-        <translation>导出(&amp;E)</translation>
+        <translation>エクスポート (&amp;E)</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>导出当前数据到文件</translation>
+        <translation>ファイルに現在のタブのデータをエクスポート</translation>
     </message>
     <message>
         <source>Selected amount:</source>
-        <translation>选择总额:</translation>
+        <translation>選択した額:</translation>
     </message>
     <message>
         <source>Backup Wallet</source>
-        <translation>备份钱包</translation>
+        <translation>ウォレットのバックアップ</translation>
     </message>
     <message>
         <source>Wallet Data (*.dat)</source>
-        <translation>钱包文件(*.dat)</translation>
+        <translation>ウォレットデータ (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>
-        <translation>备份失败</translation>
+        <translation>バックアップ失敗</translation>
     </message>
     <message>
         <source>There was an error trying to save the wallet data to %1.</source>
-        <translation>尝试保存钱包数据至 %1 时发生错误。</translation>
+        <translation>ウォレットデータを%1へ保存する際にエラーが発生しました</translation>
     </message>
     <message>
         <source>Backup Successful</source>
-        <translation>备份成功</translation>
+        <translation>バックアップ成功</translation>
     </message>
     <message>
         <source>The wallet data was successfully saved to %1.</source>
-        <translation>钱包数据成功保存至 %1 。</translation>
+        <translation>ウォレットデータは正常に%1に保存されました</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>wagerr-core</name>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
-        <translation>错误：监听外来连接失败(监听回馈错误 %s)</translation>
+        <translation>エラー： 受信中の接続をリッスンするのに失敗しました (エラー %s )</translation>
     </message>
     <message>
         <source>Fee estimation failed. Fallbackfee is disabled. Wait a few blocks or enable -fallbackfee.</source>
-        <translation>费用估算失败. 备用费用已禁用. 请等待几个区块或启用-fallbackfee。</translation>
+        <translation>料金の見積もりに失敗しました。フォールバックフィーは無効です。数ブロック待つか、-fallbackfeeを有効にしてください。</translation>
     </message>
     <message>
         <source>This error could occur if this wallet was not shutdown cleanly and was last loaded using a build with a newer version of Berkeley DB. If so, please use the software that last loaded this wallet</source>
-        <translation>如果此前包未完全关闭并且上次使用较新版本的Berkeley DB的构建加载, 则可能发生此错误. 如果是这样, 请使用上次加载此钱包的软件.</translation>
+        <translation>このエラーは、このウォレットが正常にシャットダウンされず、Berkeley DBの新しいバージョンを含むビルドを使用して直前にロードされた場合に発生する可能性があります。その場合は、このウォレットを直前にロードしたソフトウェアを使用してください。</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
-        <translation>这是一个预发布测试版本 - 您自己承担风险使用 - 采矿商或交易商不要使用本应用程序</translation>
+        <translation>これはリリース前のテストビルドです - 各自の責任で利用すること - 採掘や商取引に使用しないでください</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
-        <translation>警告: Wagerr网路对于区块链结的决定目前有分歧！看来有些矿工会有问题。</translation>
+        <translation>警告： ネットワークは完全に同意しないようです。マイナーは何らかの問題を経験しているようです。</translation>
     </message>
     <message>
         <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
-        <translation>警告: 我们和某些连线的节点对于区块链结的决定不同！您可能需要升级，或是需要等其它的节点升级。</translation>
+        <translation>警告： ピアと完全に同意しないようです！あなたはアップグレードする必要があるかもしれません。または他のノードがアップグレードする必要があるかもしれません。</translation>
     </message>
     <message>
         <source>Already have that input.</source>
-        <translation>输入已存在。</translation>
+        <translation>常時そのインプットを保持</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
-        <translation>不能降级钱包</translation>
+        <translation>ウォレットのダウングレードはできません</translation>
     </message>
     <message>
         <source>Collateral not valid.</source>
-        <translation>并行无效。</translation>
+        <translation>コラテラルが無効です</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
-        <translation>区块数据库已损坏</translation>
+        <translation>破損したブロックデータベースが検知されました</translation>
     </message>
     <message>
         <source>Do you want to rebuild the block database now?</source>
-        <translation>您想要现在重建区块数据库吗？</translation>
+        <translation>ブロックデータベースを今すぐ再構築しますか?</translation>
     </message>
     <message>
         <source>Done loading</source>
-        <translation>读取完成</translation>
+        <translation>読み込み完了</translation>
     </message>
     <message>
         <source>Entries are full.</source>
-        <translation>词条已满。</translation>
+        <translation>エントリーがいっぱいです</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
-        <translation>初始化区块数据库错误</translation>
+        <translation>ブロックデータベースの初期化中にエラー</translation>
     </message>
     <message>
         <source>Error initializing wallet database environment %s!</source>
-        <translation>初始化钱包数据库环境错误 %s！</translation>
+        <translation>ウォレットのデータベース環境 %s 初期化エラー!</translation>
     </message>
     <message>
         <source>Error loading block database</source>
-        <translation>读取区块数据库错误</translation>
+        <translation>ブロックデータベースの読み込みエラー</translation>
     </message>
     <message>
         <source>Error opening block database</source>
-        <translation>打开区块数据库错误</translation>
+        <translation>ブロックデータベースの開始エラー</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
-        <translation>读取数据库错误，正在关闭。</translation>
+        <translation>データベースの読み込みエラー。シャットダウンします。</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
-        <translation>监听端口失败。如果想使用此项，可设定-listen=0。</translation>
+        <translation>ポートのリッスンに失敗しました。必要であれば -listen=0 を使用してください。</translation>
     </message>
     <message>
         <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation>-maxtxfee 设定了很高的金额！这是您一次交易就有可能付出的手续费。</translation>
+        <translation>-maxtxfee が非常に高く設定されています！ひとつのトランザクションでこの量の手数料が支払われてしまうことがあります。</translation>
     </message>
     <message>
         <source>Cannot provide specific connections and have addrman find outgoing connections at the same.</source>
-        <translation>无法提供特定的连接, 并同时让addrman找到传出的连接.</translation>
+        <translation>特定の接続を提供し、同時にアドルマンに発信接続を探させることができません。</translation>
     </message>
     <message>
         <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>未确认的面额化输出，将等待他们确认后继续。</translation>
+        <translation>未確認の分割されたアウトプットを検出しました。継続を確認するまで待機します。</translation>
     </message>
     <message>
         <source>Invalid -socketevents ('%s') specified. Only these modes are supported: %s</source>
-        <translation>指定的 -socketevents ('%s') 无效. 仅支持以下模式: %s</translation>
+        <translation>無効な-socketevents（「%s」）が指定されました。これらのモード（%s）のみサポートされています。</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
-        <translation>设定 -maxtxfee=&lt;金额&gt;  的金额无效&lt;amount&gt;：'%s' (必须大于等于最低转发手续费%s 以避免交易无法被确认)</translation>
+        <translation>-maxtxfee=&lt;amount&gt; の数量の指定が無効です: '%s' (トランザクションが詰まってしまうのを防ぐため、少なくとも %s の最小中継手数料を指定しなければいけません)</translation>
     </message>
     <message>
         <source>Transaction index can't be disabled with governance validation enabled. Either start with -disablegovernance command line switch or enable transaction index.</source>
-        <translation>管理验证启动后不能禁用交易索引. 可以使用-disablegovernance命令行选项进行关闭, 或者启用交易索引.</translation>
+        <translation>ガバナンス検証を有効にした状態で、取引インデックスを無効化することはできません。-disablegovernanceのコマンドラインスイッチで開始するか、取引インデックスを有効にしてください。</translation>
     </message>
     <message>
         <source>Can't mix: no compatible inputs found!</source>
-        <translation>无法混合：没有找到兼容的输入！</translation>
+        <translation>ミキシング不可: 互換性のあるインプットが見つかりません</translation>
     </message>
     <message>
         <source>Entry exceeds maximum size.</source>
-        <translation>条目超过最大值。</translation>
+        <translation>エントリーが最大サイズを超えました。</translation>
     </message>
     <message>
         <source>Found enough users, signing ( waiting %s )</source>
-        <translation>用户数已满足，开始签名 (等待 %s)</translation>
+        <translation>充分なユーザーを発見しました、サインしています ( 待機中 %s )</translation>
     </message>
     <message>
         <source>Found enough users, signing ...</source>
-        <translation>用户数已满足，开始签名 ... </translation>
+        <translation>充分なユーザーを発見しました、サインしています </translation>
     </message>
     <message>
         <source>Importing...</source>
-        <translation>正在导入...</translation>
+        <translation>インポートしています…</translation>
     </message>
     <message>
         <source>Incompatible mode.</source>
-        <translation>不兼容模式。</translation>
+        <translation>非互換性モード</translation>
     </message>
     <message>
         <source>Incompatible version.</source>
-        <translation>不兼容版本。</translation>
+        <translation>非互換性バージョン</translation>
     </message>
     <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
-        <translation>不正确或没有找到创世区块。错误的数据目录？</translation>
+        <translation>不正なブロックが発見されたか、またはジェネシスブロックが発見されませんでした。ネットワークの datadir が間違っていませんか?</translation>
     </message>
     <message>
         <source>Input is not valid.</source>
-        <translation>输入是无效的。</translation>
+        <translation>インプットが無効です</translation>
     </message>
     <message>
         <source>Insufficient funds.</source>
-        <translation>余额不足。</translation>
+        <translation>残高が不足しています</translation>
     </message>
     <message>
         <source>Invalid amount for -discardfee=&lt;amount&gt;: '%s'</source>
-        <translation>设定 -discardfee=&lt;金额&gt; 的金额无效：'%s'</translation>
+        <translation>-ディスカードフィー=&lt;amount&gt;の額: '%s' が無効です</translation>
     </message>
     <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
-        <translation>设定 -paytxfee=&lt;金额&gt;  的金额无效：'%s' (至少要有%s)</translation>
+        <translation>-paytxfee=&lt;amount&gt; に対する無効な数量です： '%s' (少なくとも %s でなければいけません)</translation>
     </message>
     <message>
         <source>Invalid minimum number of spork signers specified with -minsporkkeys</source>
-        <translation>无效的最少数叉勺签名人以  -minsporkkeys 标识</translation>
+        <translation>-minsporkkeysで指定されたスポーク署名者の最小数が無効です</translation>
     </message>
     <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
-        <translation>Keypool用完了，请先调用keypoolrefill</translation>
+        <translation>キープールが枯渇しました。まずはじめに keypoolrefill を呼び出してください。</translation>
     </message>
     <message>
         <source>Loading banlist...</source>
-        <translation>正在加载黑名单...</translation>
+        <translation>banリストを読み込んでいます...</translation>
     </message>
     <message>
         <source>Loading fulfilled requests cache...</source>
-        <translation>正在加载己完成请求的缓存…</translation>
+        <translation>承認されたリクエストキャッシュを読み込んでいます...</translation>
     </message>
     <message>
         <source>Loading masternode cache...</source>
-        <translation>正在读取主节点缓存...</translation>
+        <translation>マスターノードキャッシュを読み込んでいます...</translation>
     </message>
     <message>
         <source>Lock is already in place.</source>
-        <translation>已锁定。</translation>
+        <translation>すでにロックされています</translation>
     </message>
     <message>
         <source>Mixing in progress...</source>
-        <translation>正在混合...</translation>
+        <translation>ミキシング中...</translation>
     </message>
     <message>
         <source>Need to specify a port with -whitebind: '%s'</source>
-        <translation>指定-whitebind时必须包含通信端口： '%s'</translation>
+        <translation>-whitebind を用いてポートを指定する必要があります： '%s'</translation>
     </message>
     <message>
         <source>No Masternodes detected.</source>
-        <translation>没有检测到任何主节点。</translation>
+        <translation>マスターノードが検出されません</translation>
     </message>
     <message>
         <source>No compatible Masternode found.</source>
-        <translation>没有找到任何兼容的主节点。</translation>
+        <translation>互換性のあるマスターノードが検出されません</translation>
     </message>
     <message>
         <source>Not enough funds to mix.</source>
-        <translation>没有足够的资金进行混币。</translation>
+        <translation>ミキシングの資金が足りません</translation>
     </message>
     <message>
         <source>Not in the Masternode list.</source>
-        <translation>在主节点列表中不存在。</translation>
+        <translation>マスターノードリストにありません</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>提交到主节点，在队列 %s 中等待</translation>
+        <translation>マスターノードにサブミット、待機中 %s</translation>
     </message>
     <message>
         <source>Synchronization finished</source>
-        <translation>同步完成</translation>
+        <translation>同期完了</translation>
     </message>
     <message>
         <source>Unable to start HTTP server. See debug log for details.</source>
-        <translation>无法启动HTTP服务，查看日志获取更多信息。</translation>
+        <translation>HTTPサーバを開始できませんでした。詳細はデバッグログをご確認ください。</translation>
     </message>
     <message>
         <source>Unknown response.</source>
-        <translation>未知响应。</translation>
+        <translation>不明なレスポンス</translation>
     </message>
     <message>
         <source>User Agent comment (%s) contains unsafe characters.</source>
-        <translation>用户代理评论(%s)包含不安全的字符。</translation>
+        <translation>ユーザーエージェントのコメント (%s) には安全でない文字が含まれています。</translation>
     </message>
     <message>
         <source>Verifying wallet(s)...</source>
-        <translation>验证(多个)钱包中...</translation>
+        <translation>ウォレットを検証中…</translation>
     </message>
     <message>
         <source>Will retry...</source>
-        <translation>即将重试...</translation>
+        <translation>再試行...</translation>
     </message>
     <message>
         <source>Can't find random Masternode.</source>
-        <translation>无法找到随机主节点。</translation>
+        <translation>ランダムなマスターノードを発見できません</translation>
     </message>
     <message>
         <source>%s can't be lower than %s</source>
-        <translation>%s不能低于%s</translation>
+        <translation>%sは%sより低くできません。</translation>
     </message>
     <message>
         <source>%s is idle.</source>
-        <translation>%s处于空闲状态.</translation>
+        <translation>%sはアイドル状態です。</translation>
     </message>
     <message>
         <source>Can't mix while sync in progress.</source>
-        <translation>无法在同步过程中进行混合。</translation>
+        <translation>同期中はミキシングできません</translation>
     </message>
     <message>
         <source>Invalid netmask specified in -whitelist: '%s'</source>
-        <translation>在 -whitelist中指定了无效的子网掩码：'%s'</translation>
+        <translation>-whitelist で指定された無効なネットマスク： '%s'</translation>
     </message>
     <message>
         <source>Invalid script detected.</source>
-        <translation>检测到无效脚本。</translation>
+        <translation>無効なスクリプトが検出されました</translation>
     </message>
     <message>
         <source>%s file contains all private keys from this wallet. Do not share it with anyone!</source>
-        <translation>%s 文件包含此钱包中的所有私钥。不要与任何人分享！</translation>
+        <translation>%s ファイルはこのウォレットのプライベートキーをすべて保有しています。誰ともシェアしないでください。</translation>
     </message>
     <message>
         <source>Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.</source>
-        <translation>无法创建备份，文件已经存在！如果您在60秒内重新启动钱包，则可能发生这种情况。如果您觉得这样没问题的话，您可以继续。</translation>
+        <translation>バックアップ作成失敗、ファイルは既に存在します！これはウォレットを60秒以内にリスタートしたときに発生することがあります。これで問題なければ先に進むことができます。</translation>
     </message>
     <message>
         <source>Make sure to encrypt your wallet and delete all non-encrypted backups after you have verified that the wallet works!</source>
-        <translation>请确保加密您的钱包，并在验证您的钱包能够运作后删除所有未加密的备份！</translation>
+        <translation>ウォレットが動作することを確認したら、必ずウォレットを暗号化し、暗号化されていないバックアップをすべて削除してください！</translation>
     </message>
     <message>
         <source>Prune configured below the minimum of %d MiB.  Please use a higher number.</source>
-        <translation>修剪值被设置为低于最小值%d MiB。请使用更大的数值。</translation>
+        <translation>剪定が最小値の %d MiB以下に設定されています。もっと大きな値を使用してください。</translation>
     </message>
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
-        <translation>修剪：最后的钱包同步超过了修剪的数据。您需要通过 -reindex (重新下载整个区块链以防止节点被修剪)</translation>
+        <translation>剪定: 最後のウォレット同期ポイントは、剪定されたデータよりも過去のものとなっています。-reindexをする必要があります (剪定されたノードの場合、ブロックチェイン全体をダウンロードしてください)</translation>
     </message>
     <message>
         <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
-        <translation>无法在开启修剪的状态下重扫描。请使用 -reindex重新下载完整的区块链。</translation>
+        <translation>剪定モードでは再スキャンを行うことはできません。-reindexを使用し、ブロックチェーン全体を再ダウンロードする必要があります。</translation>
     </message>
     <message>
         <source>The block database contains a block which appears to be from the future. This may be due to your computer's date and time being set incorrectly. Only rebuild the block database if you are sure that your computer's date and time are correct</source>
-        <translation>区块数据库包含未来的交易，这可能是由本机错误的日期时间引起。若确认本机日期时间正确，请重新建立区块数据库。</translation>
+        <translation>ブロックのデータベースに未来の時刻のブロックが含まれています。これはおそらくお使いのコンピュータに設定されている日時が間違っていることを示しています。お使いのコンピュータの日時が本当に正しい場合にのみ、ブロックのデータベースの再構築を行ってください。</translation>
     </message>
     <message>
         <source>The transaction amount is too small to send after the fee has been deducted</source>
-        <translation>在交易费被扣除后发送的交易金额太小</translation>
+        <translation>手数料差引後のトランザクションの金額が小さすぎるため、送金できません。</translation>
     </message>
     <message>
         <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
-        <translation>网络版本字符串的总长度 (%i) 超过最大长度 (%i) 了。请减少 uacomment 参数的数量或大小。</translation>
+        <translation>ネットワークバージョン文字 (%i) の長さが最大の長さ (%i) を超えています。UAコメントの数や長さを削減してください。</translation>
     </message>
     <message>
         <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
-        <translation>警告！无法补充公钥池，请解锁您的钱包。</translation>
+        <translation>警告! キープールの補充に失敗しました、ウォレットをアンロックしてキープールを補充してください</translation>
     </message>
     <message>
         <source>Wallet is locked, can't replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.</source>
-        <translation>钱包被锁定，无法补充keypool！自动备份和混合功能被禁用，请解锁您的钱包以补充keypool。</translation>
+        <translation>ウォレットがロックされているのでキープールを補充できません!自動バックアップとミキシングが無効なので、ウォレットをアンロックしてキープールを補充してください。</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -timestampindex</source>
-        <translation>您需要通过使用-reindex改变-timestampindex来重新建立数据库</translation>
+        <translation>-timestampindexを変更するには、-reindexを使用してデータベースを再構築する必要があります。</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation>您需要使用 -reindex 重新构建数据库以返回未修剪的模式。这将重新下载整个区块链</translation>
+        <translation>非剪定モードに戻るためには-reindexオプションを使用してデータベースを再構築する必要があります。これによりブロックチェーン全体の再ダウンロードが行われます。</translation>
     </message>
     <message>
         <source>%s failed</source>
-        <translation>%s 失败</translation>
+        <translation>%sは失敗しました</translation>
     </message>
     <message>
         <source>-maxmempool must be at least %d MB</source>
-        <translation>-maxmempool 最小为%d MB</translation>
+        <translation>-maxmempoolは最低でも %d MB必要です</translation>
     </message>
     <message>
         <source>Automatic backups disabled</source>
-        <translation>自动备份已停用</translation>
+        <translation>自動バックアップ無効</translation>
     </message>
     <message>
         <source>Cannot set -peerblockfilters without -blockfilterindex.</source>
-        <translation>不能在没有  -blockfilterindex的情况下设置  -peerblockfilters.</translation>
+        <translation>-peerblockfiltersを-blockfilterindexなしで設定することはできません。</translation>
     </message>
     <message>
         <source>Config setting for %s only applied on %s network when in [%s] section.</source>
-        <translation>%s的配置设置仅在 [%s] 部分中应用于 %s网络.</translation>
+        <translation>%sの構成設定は、[%s]セクションにある場合、%sネットワークにのみ適用されます。</translation>
     </message>
     <message>
         <source>Could not find asmap file %s</source>
-        <translation>无法找到asmap文件 %s</translation>
+        <translation>%sのasmapファイルが見つかりませんでした</translation>
     </message>
     <message>
         <source>Could not parse asmap file %s</source>
-        <translation>无法解析asmap文件 %s</translation>
+        <translation>%sのasmapファイルを解析できませんでした</translation>
     </message>
     <message>
         <source>ERROR! Failed to create automatic backup</source>
-        <translation>错误！无法创建自动备份</translation>
+        <translation>エラー! 自動バックアップ作成失敗</translation>
     </message>
     <message>
         <source>Error loading %s: Private keys can only be disabled during creation</source>
-        <translation>加载 %s时出错: 私钥只能在创建期间禁用</translation>
+        <translation>%sの読み込みエラー：プライベートキーは作成時にのみ無効化できます。</translation>
     </message>
     <message>
         <source>Error upgrading evo database</source>
-        <translation>升级evo数据库出错</translation>
+        <translation>Evoデータベースのアップグレードエラー</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occurred, see debug.log for details</source>
-        <translation>错误：发生了致命的内部错误，详情见 debug.log 文件</translation>
+        <translation>エラー：致命的な内部エラーが発生しました。詳細はdebug.logを参照してください</translation>
     </message>
     <message>
         <source>Error: Disk space is low for %s</source>
-        <translation>错误: %s 磁盘空间不足</translation>
+        <translation>エラー：%sのディスク容量が不足しています</translation>
     </message>
     <message>
         <source>Error: failed to add socket to epollfd (epoll_ctl returned error %s)</source>
-        <translation>错误: 无法添加socket到epollfd (epoll_ctl 返回错误 %s)</translation>
+        <translation>エラー：epollfdへのソケットの追加に失敗しました（epoll_ctlは、%sのエラーを返しました）</translation>
     </message>
     <message>
         <source>Exceeded max tries.</source>
-        <translation>超过最大尝试次数.</translation>
+        <translation>最大試行回数を超えました。</translation>
     </message>
     <message>
         <source>Failed to commit EvoDB</source>
-        <translation>无法提交EvoDB</translation>
+        <translation>EvoDBのコミットに失敗しました</translation>
     </message>
     <message>
         <source>Failed to create backup %s!</source>
-        <translation>无法创建备份%s！</translation>
+        <translation>バックアップ作成 %s失敗!</translation>
     </message>
     <message>
         <source>Failed to create backup, error: %s</source>
-        <translation>无法创建备份，错误：%s</translation>
+        <translation>バックアップ作成失敗、エラー: %s</translation>
     </message>
     <message>
         <source>Failed to delete backup, error: %s</source>
-        <translation>无法删除备份，错误：%s</translation>
+        <translation>バックアップ削除失敗、エラー: %s</translation>
     </message>
     <message>
         <source>Failed to rescan the wallet during initialization</source>
-        <translation>在初始化时无法重新扫描钱包</translation>
+        <translation>初期化中にウォレットの再スキャンに失敗しました</translation>
     </message>
     <message>
         <source>Invalid P2P permission: '%s'</source>
-        <translation>无效的 P2P 权限: '%s'</translation>
+        <translation>無効なP2P許可：「%s」</translation>
     </message>
     <message>
         <source>Invalid amount for -fallbackfee=&lt;amount&gt;: '%s'</source>
-        <translation>设定-fallbackfee=&lt;amount&gt;的金额无效：'%s'</translation>
+        <translation>無効な額 -fallbackfee=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
         <source>Invalid masternodeblsprivkey. Please see documentation.</source>
-        <translation>无效的 masternodeblsprivkey。请阅读文档。</translation>
+        <translation>マスターノードBLS秘密鍵が無効です。ドキュメントをお読み下さい。</translation>
     </message>
     <message>
         <source>Loading block index...</source>
-        <translation>正在读取区块索引...</translation>
+        <translation>ブロックインデックスを読み込んでいます…</translation>
     </message>
     <message>
         <source>Loading governance cache...</source>
-        <translation>正在加载治理缓存…</translation>
+        <translation>ガバナンスキャッシュを読み込み中...</translation>
     </message>
     <message>
         <source>Loading sporks cache...</source>
-        <translation>正在读取叉勺缓存...</translation>
+        <translation>スポークキャッシュを読み込み中...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
-        <translation>正在读取钱包...(%3.2f%%)</translation>
+        <translation>ウォレットを読み込んでいます… (%3.2f %%)</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation>正在读取钱包...</translation>
+        <translation>ウォレットを読み込んでいます…</translation>
     </message>
     <message>
         <source>Masternode queue is full.</source>
-        <translation>主节点列队已满。</translation>
+        <translation>マスターノードキューがいっぱいです</translation>
     </message>
     <message>
         <source>Masternode:</source>
-        <translation>主节点：</translation>
+        <translation>マスターノード:</translation>
     </message>
     <message>
         <source>Missing input transaction information.</source>
-        <translation>缺少交易信息的输入数据。</translation>
+        <translation>不明なインプットトランザクション情報</translation>
     </message>
     <message>
         <source>No errors detected.</source>
-        <translation>未检测到错误。</translation>
+        <translation>エラーは検出されていません。</translation>
     </message>
     <message>
         <source>No matching denominations found for mixing.</source>
-        <translation>没有找到匹配的金额用作资金混合。</translation>
+        <translation>ミキシング用の分割がマッチしていません。</translation>
     </message>
     <message>
         <source>Not compatible with existing transactions.</source>
-        <translation>与已存在交易不匹配。</translation>
+        <translation>既存のトランザクションと互換性がありません。</translation>
     </message>
     <message>
         <source>Not enough file descriptors available.</source>
-        <translation>文件说明符不足</translation>
+        <translation>使用可能なファイルディスクリプタが不足しています。</translation>
     </message>
     <message>
         <source>Prune cannot be configured with a negative value.</source>
-        <translation>修剪不能设置为负数。</translation>
+        <translation>剪定値は負の値に設定できません。</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -blockfilterindex.</source>
-        <translation>修剪模式与 -blockfilterindex不兼容.</translation>
+        <translation>プルーンモードは、-blockfilterindexと互換性がありません。</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -disablegovernance=false.</source>
-        <translation>修剪模式与 -disablegovernance=false 不兼容.</translation>
+        <translation>プルーンモードは、-disablegovernance=falseと互換性がありません。</translation>
     </message>
     <message>
         <source>Prune mode is incompatible with -txindex.</source>
-        <translation>修剪模式与 -txindex 不兼容。</translation>
+        <translation>剪定モードは-txindexと互換性がありません。</translation>
     </message>
     <message>
         <source>Pruning blockstore...</source>
-        <translation>正在修剪区块存储...</translation>
+        <translation>ブロックストアを剪定しています…</translation>
     </message>
     <message>
         <source>Section [%s] is not recognized.</source>
-        <translation>片段 [%s]无法被识别.</translation>
+        <translation>[%s]のセクションは認識されません。</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" does not exist</source>
-        <translation>指定的 -walletdir "%s" 不存在</translation>
+        <translation>指定された-walletdirの「%s」は存在しません</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" is a relative path</source>
-        <translation>指定的 -walletdir "%s" 是一个相关路径</translation>
+        <translation>指定された-walletdirの「%s」は相対パスです</translation>
     </message>
     <message>
         <source>Specified -walletdir "%s" is not a directory</source>
-        <translation>指定的  -walletdir "%s" 不是一个目录</translation>
+        <translation>指定された-walletdirの「%s」はディレクトリではありません</translation>
     </message>
     <message>
         <source>Synchronizing blockchain...</source>
-        <translation>正在同步区块链...</translation>
+        <translation>ブロックチェーンの同期中…</translation>
     </message>
     <message>
         <source>The specified config file %s does not exist
 </source>
-        <translation>指定的配置文件 %s 不存在
-</translation>
+        <translation>指定された構成ファイルの%sは存在しません</translation>
     </message>
     <message>
         <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation>钱包避免低于最小交易费的支付</translation>
+        <translation>ウォレットは最小中継手数料を下回る額の支払を拒否します。</translation>
     </message>
     <message>
         <source>This is expected because you are running a pruned node.</source>
-        <translation>这在意料之中, 因为您正在运行的是删减版的节点.</translation>
+        <translation>これは、プルーニングされたノードを実行しているため、予想されます。</translation>
     </message>
     <message>
         <source>This is the minimum transaction fee you pay on every transaction.</source>
-        <translation>这是您每次交易付款时最少要付的手续费。</translation>
+        <translation>これはすべてのトランザクションに対して最低限支払うべき手数料です。</translation>
     </message>
     <message>
         <source>This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>如果发送交易，这将是您要支付的交易费。</translation>
+        <translation>これは取引を送信する場合に支払う取引手数料です。</translation>
     </message>
     <message>
         <source>Transaction amounts must not be negative</source>
-        <translation>交易金额不不可为负数</translation>
+        <translation>トランザクションの総額はマイナスではあってはいけません。。</translation>
     </message>
     <message>
         <source>Transaction has too long of a mempool chain</source>
-        <translation>交易造成内存池中的交易链太长</translation>
+        <translation>トランザクションのmempoolチェーンが長過ぎます。</translation>
     </message>
     <message>
         <source>Transaction must have at least one recipient</source>
-        <translation>交易必须包含至少一个接收人</translation>
+        <translation>トランザクションは最低ひとつの受取先が必要です。</translation>
     </message>
     <message>
         <source>Transaction too large</source>
-        <translation>交易过大</translation>
+        <translation>トランザクション量が大きすぎます。</translation>
     </message>
     <message>
         <source>Trying to connect...</source>
-        <translation>尝试连接中...</translation>
+        <translation>接続中です...</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer. %s is probably already running.</source>
-        <translation>无法在本机绑定 %s 端口。%s 可能已经在运行。</translation>
+        <translation>このコンピュータの %s にバインドすることができません。おそらく %s は既に実行されています。</translation>
     </message>
     <message>
         <source>Unable to create the PID file '%s': %s</source>
-        <translation>无法创建PID文件 '%s': %s</translation>
+        <translation>PIDファイルの「%s」を作成できません：%s</translation>
     </message>
     <message>
         <source>Unable to generate initial keys</source>
-        <translation>无法生成初始密钥</translation>
+        <translation>初期キーが生成できません</translation>
     </message>
     <message>
         <source>Unknown -blockfilterindex value %s.</source>
-        <translation>未知 -blockfilterindex 值 %s.</translation>
+        <translation>%sは、不明な-blockfilterindexの値です。</translation>
     </message>
     <message>
         <source>Upgrading UTXO database</source>
-        <translation>升级UTXO数据库</translation>
+        <translation>UTXOデータベースを更新しています</translation>
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart %s to complete</source>
-        <translation>钱包需要被重写：请重新启动%s来完成</translation>
+        <translation>ウォレットが書き直される必要がありました: 完了するために %s を再起動します</translation>
     </message>
     <message>
         <source>Warning: unknown new rules activated (versionbit %i)</source>
-        <translation>警告：不明的新规则被激活(versionbit %i)</translation>
+        <translation>警告: 未知の新しいルールがアクティベートされました (バージョンビット %i)</translation>
     </message>
     <message>
         <source>Wasn't able to create wallet backup folder %s!</source>
-        <translation>无法创建钱包备份文件夹%s！</translation>
+        <translation>ウォレットバックアップフォルダー作成不可 %s!</translation>
     </message>
     <message>
         <source>You can not start a masternode with wallet enabled.</source>
-        <translation>您无法在开启钱包时启动主节点.</translation>
+        <translation>ウォレットを有効にした状態でマスターノードを起動することはできません。</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -addressindex</source>
-        <translation>您需要通过使用-reindex改变-addressindex来重新建立数据库</translation>
+        <translation>-addressindexを変更するために、-reindexを使用してデータベースを再構築する必要があります</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -spentindex</source>
-        <translation>您需要通过使用-reindex改变-spentindex来重新建立数据库</translation>
+        <translation>-spentindexを変更するために、-reindexを使用してデータベースを再構築する必要があります</translation>
     </message>
     <message>
         <source>no mixing available.</source>
-        <translation>无法进行混合。</translation>
+        <translation>ミキシングは利用できません。</translation>
     </message>
     <message>
         <source>see debug.log for details.</source>
-        <translation>详细信息请参阅debug.log。</translation>
+        <translation>詳細はdebug.logを参照してください。</translation>
     </message>
     <message>
         <source>The %s developers</source>
-        <translation>%s 开发人员</translation>
+        <translation>%s の開発者</translation>
     </message>
     <message>
         <source>%s uses exact denominated amounts to send funds, you might simply need to mix some more coins.</source>
-        <translation>%s要求使用准确的已面额化资金来发送，您可能需要再混币处理一些资金。</translation>
+        <translation>%sは正確に換算した金額を送金するため、単純にいくらかのコインをミキシングする必要があるかもしれません。</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
-        <translation>无法锁定数据目录 %s。%s 可能已经在运行。</translation>
+        <translation>データディレクトリ %s のロックを取得することができません。おそらく %s は実行中です。</translation>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
-        <translation>在MIT协议下分发，参见附带的 %s 文件或 %s</translation>
+        <translation>MITソフトウェアライセンスのもとで配布されています。付属のファイル %s または %s を参照してください</translation>
     </message>
     <message>
         <source>Error loading %s: You can't enable HD on an already existing non-HD wallet</source>
-        <translation>加载%s时出错：您不能够在非HD钱包上启用HD功能</translation>
+        <translation>%s読み込みエラー: 既存の非HDウォレット上でHDを有効化できません</translation>
     </message>
     <message>
         <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation>读取 %s 时发生错误！所有的密钥都可以正确读取，但是交易记录或地址簿数据可能已经丢失或出错。</translation>
+        <translation>%s の読み込みエラー! すべてのキーは正しく読み取れますが、トランザクションデータやアドレス帳のエントリが失われたか、正しくない可能性があります。</translation>
     </message>
     <message>
         <source>Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?</source>
-        <translation>devnet的创世区块错误或未找到. devnet的数据目录错误?</translation>
+        <translation>無効なdevnetジェネシスブロックが発見されたか、またはdevnetジェネシスブロックが発見されません。 特定のdevnet用のデータディレクトリが間違ってませんか?</translation>
     </message>
     <message>
         <source>Please check that your computer's date and time are correct! If your clock is wrong, %s will not work properly.</source>
-        <translation>请检查电脑的日期时间设置是否正确！时间错误可能会导致 %s 运行异常。</translation>
+        <translation>あなたのPCの日付と時刻が正しいことを確認して下さい！ もしあなたの時計が正しくなければ %s が正確に動作しません。</translation>
     </message>
     <message>
         <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
-        <translation>如果您认为%s对您比较有用的话，请对我们进行一些捐赠支持。请访问%s网站来获取有关这个软件的更多信息。</translation>
+        <translation>%s が有用だと感じられた方はぜひプロジェクトへの貢献をお願いします。ソフトウェアのより詳細な情報については %s をご覧ください。</translation>
     </message>
     <message>
         <source>This is the transaction fee you may discard if change is smaller than dust at this level</source>
-        <translation>如果更改小于粉尘级别, 这可能是您会丢弃的交易手续费</translation>
+        <translation>これはこのレベルでお釣りがダストよりも少額の場合に破棄できる取引手数料です</translation>
     </message>
     <message>
         <source>This is the transaction fee you may pay when fee estimates are not available.</source>
-        <translation>这是在费用估计不可用时您可能会支付的交易费。</translation>
+        <translation>これは手数料の推定機能が利用できない場合に支払うトランザクション手数料です。</translation>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation>此产品包含了由OpenSSL Project所开发的OpenSSL Toolkit软件%s，由Eric Young撰写的加解密软件，以及由Thomas Bernard所撰写的UPnP软件。</translation>
+        <translation>この製品はOpenSSLプロジェクトにより開発されたソフトウェアをOpenSSLツールキット %s として利用しています &lt;https://www.openssl.org/&gt;。また、Eric Young氏により開発された暗号ソフトウェア、Thomas Bernard氏により書かれたUPnPソフトウェアを用いています。</translation>
     </message>
     <message>
         <source>Unable to replay blocks. You will need to rebuild the database using -reindex-chainstate.</source>
-        <translation>无法重播区块. 您需要使用 -reindex-chainstate命令来重建数据库.</translation>
+        <translation>ブロックを再生できません。 -reindex-chainstateを使用してデータベースを再構築する必要があります。</translation>
     </message>
     <message>
         <source>Warning: Private keys detected in wallet {%s} with disabled private keys</source>
-        <translation>警告: 钱包 {%s}中检测到已禁用私钥的私钥</translation>
+        <translation>警告：プライベートキーが、無効化されたものと一緒にウォレット{%s}で検出されました</translation>
     </message>
     <message>
         <source>%d of last 100 blocks have unexpected version</source>
-        <translation>最近100个区块中的 %d 个区块有意外版本</translation>
+        <translation>最新の100ブロックの %d で予期しないバージョンがあります。</translation>
     </message>
     <message>
         <source>%s is not a valid backup folder!</source>
-        <translation>%s 不是一个有效的备份文件夹!</translation>
+        <translation>%s は無効なバックアップフォルダーです!</translation>
     </message>
     <message>
         <source>%s is only allowed with a single wallet file</source>
-        <translation>%s 仅允许用于单个钱包文件</translation>
+        <translation>%sは、単一のウォレットファイルでのみ許可されます</translation>
     </message>
     <message>
         <source>%s is set very high!</source>
-        <translation>%s非常高！</translation>
+        <translation>%s の設定値は高すぎます！</translation>
     </message>
     <message>
         <source>%s request incomplete:</source>
-        <translation>%s 请求不完整:</translation>
+        <translation>%sのリクエストが未完了です。</translation>
     </message>
     <message>
         <source>-devnet can only be specified once</source>
-        <translation>-devnet 只能被指定一次</translation>
+        <translation>-devnet は一度だけ指定できます</translation>
     </message>
     <message>
         <source>-port must be specified when -devnet and -listen are specified</source>
-        <translation>当 -devnet 和 -listen 被指定时, 必须指定 -port</translation>
+        <translation>-port は、 -devnet と -listen が指定されたときに指定しなければなりません。</translation>
     </message>
     <message>
         <source>-rpcport must be specified when -devnet and -server are specified</source>
-        <translation>当 -devnet 和 -server 被指定时, 必须指定 -rpcport</translation>
+        <translation>-rpcport は、 -devnet と -server が指定されたとき指定しなければなりません。</translation>
     </message>
     <message>
         <source>A fatal internal error occurred, see debug.log for details</source>
-        <translation>发生了严重的内部错误, 请参阅debug.log了解详细信息</translation>
+        <translation>致命的な内部エラーが発生しました。詳細は、debug.logを参照してください。</translation>
     </message>
     <message>
         <source>Cannot resolve -%s address: '%s'</source>
-        <translation>无法解析 - %s 地址： '%s'</translation>
+        <translation>-%s アドレス '%s' を解決できません</translation>
     </message>
     <message>
         <source>Cannot write to data directory '%s'; check permissions.</source>
-        <translation>无法写入数据目录 '%s'; 请检查权限.</translation>
+        <translation>「%s」のデータディレクトリに書き込めません。権限を確認してください。</translation>
     </message>
     <message>
         <source>Change index out of range</source>
-        <translation>修改索引超过范围</translation>
+        <translation>チェンジインデックスが範囲外です</translation>
     </message>
     <message>
         <source>Copyright (C)</source>
-        <translation>版权 (C)</translation>
+        <translation>Copyright (C)</translation>
     </message>
     <message>
         <source>Disk space is too low!</source>
-        <translation>磁盘空间太小!</translation>
+        <translation>ディスク容量が少なすぎます。</translation>
     </message>
     <message>
         <source>Error loading %s</source>
-        <translation>载入 %s 时发生错误</translation>
+        <translation>%s 読み込みエラー</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet corrupted</source>
-        <translation>%s 加载出错：钱包损坏</translation>
+        <translation>%s 読み込みエラー: ウォレットが壊れました</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet requires newer version of %s</source>
-        <translation>%s 加载错误：请升级到最新版 %s</translation>
+        <translation>%s の読み込みに失敗しました: ウォレットにはより新しいバージョンの %s が必要です。</translation>
     </message>
     <message>
         <source>Error loading %s: You can't disable HD on an already existing HD wallet</source>
-        <translation>加载%s时出错：您不能在HD钱包上禁用HD功能</translation>
+        <translation>読み込みエラー %s: 既存のHDウォレット上のHDを無効化できません</translation>
     </message>
     <message>
         <source>Error loading wallet %s. Duplicate -wallet filename specified.</source>
-        <translation>加载钱包 %s 时出错. 指定了重复的 -wallet 文件名.</translation>
+        <translation>ウォレットの読み込みエラー %s。重複する -walletファイル名が指定されました。</translation>
     </message>
     <message>
         <source>Error upgrading chainstate database</source>
-        <translation>升级链状态数据库出错</translation>
+        <translation>チェーンステートデータベースのアップグレードエラー</translation>
     </message>
     <message>
         <source>Error: failed to add socket to kqueuefd (kevent returned error %s)</source>
-        <translation>错误: 无法添加socket到kqueuefd (kevent 返回错误 %s)</translation>
+        <translation>エラー：kqueuefdへのソケットの追加に失敗しました (keventが、%sのエラーを返しました）</translation>
     </message>
     <message>
         <source>Failed to clear fulfilled requests cache at %s</source>
-        <translation>未能在 %s 清除已完成的请求缓存</translation>
+        <translation>%sで、完了したリクエストのキャッシュの削除に失敗しました</translation>
     </message>
     <message>
         <source>Failed to clear governance cache at %s</source>
-        <translation>无法清除 %s 的治理缓存</translation>
+        <translation>%sで、ガバナンスのキャッシュの削除に失敗しました</translation>
     </message>
     <message>
         <source>Failed to clear masternode cache at %s</source>
-        <translation>在 %s 清除主节点缓存失败</translation>
+        <translation>%sで、マスタノードのキャッシュの削除に失敗しました</translation>
     </message>
     <message>
         <source>Failed to find mixing queue to join</source>
-        <translation>无法找到混币队列并加入</translation>
+        <translation>ミキシングキューの検出に失敗</translation>
     </message>
     <message>
         <source>Failed to load fulfilled requests cache from %s</source>
-        <translation>无法从 %s 加载已完成的请求缓存</translation>
+        <translation>%sから完了したリクエストのキャッシュをロードするのに失敗しました</translation>
     </message>
     <message>
         <source>Failed to load governance cache from %s</source>
-        <translation>无法从 %s 加载治理缓存</translation>
+        <translation>%sからガバナンスのキャッシュをロードするのに失敗しました</translation>
     </message>
     <message>
         <source>Failed to load masternode cache from %s</source>
-        <translation>无法从 %s 加载主节点缓存</translation>
+        <translation>%sからマスターノードのキャッシュをロードするのに失敗しました</translation>
     </message>
     <message>
         <source>Failed to load sporks cache from %s</source>
-        <translation>无法从 %s 加载叉勺缓存</translation>
+        <translation>%sからスポークのキャッシュをロードするのに失敗しました</translation>
     </message>
     <message>
         <source>Failed to start a new mixing queue</source>
-        <translation>无法开始一个新的混币队列</translation>
+        <translation>新しいミキシングキューの開始に失敗</translation>
     </message>
     <message>
         <source>Incorrect -rescan mode, falling back to default value</source>
-        <translation>错误的-rescan模式，恢复到默认值</translation>
+        <translation>再スキャンモードが正しくないため、デフォルト値に戻ります</translation>
     </message>
     <message>
         <source>Initialization sanity check failed. %s is shutting down.</source>
-        <translation>初始化完整性检查失败。%s即将关闭。</translation>
+        <translation>初期化時の健全性チェックに失敗しました。%s を終了します。</translation>
     </message>
     <message>
         <source>Inputs vs outputs size mismatch.</source>
-        <translation>输入对输出大小不匹配.</translation>
+        <translation>インプットとアウトプットのサイズがミスマッチです。</translation>
     </message>
     <message>
         <source>Invalid -onion address or hostname: '%s'</source>
-        <translation>无效的 -onion 地址: '%s'</translation>
+        <translation>無効な -onion アドレスまたはホスト名: '%s'</translation>
     </message>
     <message>
         <source>Invalid -proxy address or hostname: '%s'</source>
-        <translation>无效的 -proxy 地址: '%s'</translation>
+        <translation>無効な -proxy アドレスまたはホスト名: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -%s=&lt;amount&gt;: '%s'</source>
-        <translation>无效的金额 -%s=&lt;amount&gt;: '%s'</translation>
+        <translation>無効な額 -%s=&lt;amount&gt;: '%s'</translation>
     </message>
     <message>
         <source>Invalid spork address specified with -sporkaddr</source>
-        <translation>使用 -sporkaddr 指定的spork地址无效</translation>
+        <translation>-sporkaddrに指定された無効なスポークアドレスI</translation>
     </message>
     <message>
         <source>Loading P2P addresses...</source>
-        <translation>正在加载P2P地址...</translation>
+        <translation>P2Pアドレスを読み込んでいます...</translation>
     </message>
     <message>
         <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
-        <translation>因为系统的限制，将 -maxconnections 参数从 %d 降到了 %d</translation>
+        <translation>システム上の制約から、-maxconnections を %d から %d に削減します。</translation>
     </message>
     <message>
         <source>Replaying blocks...</source>
-        <translation>重播区块中...</translation>
+        <translation>ブロックをリプレイ中…</translation>
     </message>
     <message>
         <source>Rescanning...</source>
-        <translation>正在重新扫描...</translation>
+        <translation>再スキャン中…</translation>
     </message>
     <message>
         <source>Session not complete!</source>
-        <translation>会话未完成！</translation>
+        <translation>セッション未完了！</translation>
     </message>
     <message>
         <source>Session timed out.</source>
-        <translation>会话超时。</translation>
+        <translation>セッションタイムアウト</translation>
     </message>
     <message>
         <source>Signing transaction failed</source>
-        <translation>交易签名失败</translation>
+        <translation>トランザクションの署名に失敗</translation>
     </message>
     <message>
         <source>Specified blocks directory "%s" does not exist.</source>
-        <translation>指定的区块目录“%s”不存在。</translation>
+        <translation>指定されたブロックディレクトリの「%s」は存在しません。</translation>
     </message>
     <message>
         <source>Last queue was created too recently.</source>
-        <translation>上一次队列才被创建.</translation>
+        <translation>直近のキューがかなり最近に作成されました。</translation>
     </message>
     <message>
         <source>%s corrupt. Try using the wallet tool wagerr-wallet to salvage or restoring a backup.</source>
-        <translation>%s 已损坏. 请尝试使用钱包工具 wagerr-wallet 来挽救或恢复备份.</translation>
+        <translation>%sが破損しています。ウォレットツールのwagerr-walletを使用してサルベージするか、バックアップを復元してみてください。</translation>
     </message>
     <message>
         <source>Can't generate a change-address key. No keys in the internal keypool and can't generate any keys.</source>
-        <translation>无法生成找零地址密钥. 内部密钥池中没有密钥, 也无法生成任何密钥.</translation>
+        <translation>change-addressキーを生成できません。内部キープールにキーがなく、キーを生成できません。</translation>
     </message>
     <message>
         <source>Last successful action was too recent.</source>
-        <translation>上一次成功操作才完成。</translation>
+        <translation>直近の成功したアクションが最新過ぎでした。</translation>
     </message>
     <message>
         <source>Starting network threads...</source>
-        <translation>正在启动网络线程...</translation>
+        <translation>ネットワークのスレッドを起動しています...</translation>
     </message>
     <message>
         <source>Synchronizing governance objects...</source>
-        <translation>正在同步治理对象…</translation>
+        <translation>ガバナンスオブジェクトを同期中...</translation>
     </message>
     <message>
         <source>The source code is available from %s.</source>
-        <translation>源代码可以在 %s 获得。</translation>
+        <translation>ソースコードは %s より入手可能です。</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>
-        <translation>交易金额太小，不足以支付交易费</translation>
+        <translation>トランザクションの金額が小さすぎて手数料を支払えません</translation>
     </message>
     <message>
         <source>This is experimental software.</source>
-        <translation>这是一款实验软件。</translation>
+        <translation>これは実験的なソフトウェアです。</translation>
     </message>
     <message>
         <source>Transaction amount too small</source>
-        <translation>交易额过小</translation>
+        <translation>トランザクションの額が少な過ぎます</translation>
     </message>
     <message>
         <source>Transaction created successfully.</source>
-        <translation>交易创建成功。</translation>
+        <translation>トランザクション作成に成功</translation>
     </message>
     <message>
         <source>Transaction fees are too high.</source>
-        <translation>交易费用过高。</translation>
+        <translation>トランザクション手数料が高すぎます</translation>
     </message>
     <message>
         <source>Transaction not valid.</source>
-        <translation>交易无效。</translation>
+        <translation>トランザクションが無効です</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
-        <translation>无法绑定此计算机上的%s (绑定返回错误 %s)</translation>
+        <translation>このコンピュータの %s にバインドすることができません (バインドが返したエラーは %s)</translation>
     </message>
     <message>
         <source>Unable to locate enough mixed funds for this transaction.</source>
-        <translation>无法找到足够的混币资金来完成本次交易.</translation>
+        <translation>この取引に十分なミキシング資金を確保できません。</translation>
     </message>
     <message>
         <source>Unable to locate enough non-denominated funds for this transaction.</source>
-        <translation>无法找到足够的未面额化资金来完成本次交易.</translation>
+        <translation>この取引に十分な外貨建ての資金を確保できません。</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
-        <translation>无法签署交叉信息，错误的密钥？</translation>
+        <translation>スポークメッセージに署名できません、キーが間違ってませんか?</translation>
     </message>
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
-        <translation>在 -onlynet 指定了不明的网路：'%s'</translation>
+        <translation>-onlynet で指定された '%s' は未知のネットワークです</translation>
     </message>
     <message>
         <source>Unknown state: id = %u</source>
-        <translation>未知状态：id = %u</translation>
+        <translation>未知の状態: id = %u</translation>
     </message>
     <message>
         <source>Unsupported logging category %s=%s.</source>
-        <translation>不支持的日志记录类别 %s=%s.</translation>
+        <translation>サポートされていないロギングカテゴリ %s=%s.</translation>
     </message>
     <message>
         <source>Upgrading txindex database</source>
-        <translation>正在升级交易指数数据库</translation>
+        <translation>txindexデータベースのアップグレード</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
-        <translation>验证区块中...</translation>
+        <translation>ブロックの検証中…</translation>
     </message>
     <message>
         <source>Very low number of keys left: %d</source>
-        <translation>尚余少量的密匙：%d</translation>
+        <translation>非常に少ない数のキー: %d</translation>
     </message>
     <message>
         <source>Wallet is locked.</source>
-        <translation>钱包被锁定。</translation>
+        <translation>ウォレットはロックされています。</translation>
     </message>
     <message>
         <source>Warning: can't use %s and %s together, will prefer %s</source>
-        <translation>警告: 无法同时使用%s和%s, 将优先使用%s</translation>
+        <translation>警告：%sと%sを一緒に使うことはできません。%sを優先します。</translation>
     </message>
     <message>
         <source>Warning: incorrect parameter %s, path must exist! Using default path.</source>
-        <translation>警告：不正确的参数 %s，路径必须存在！请使用预设路径。</translation>
+        <translation>警告：パラメータの%sが正しくありません。パスは必須となります。デフォルトのパスを使用しています。</translation>
     </message>
     <message>
         <source>You are starting with governance validation disabled.</source>
-        <translation>您在禁用治理验证的情况下启动了程序.</translation>
+        <translation>お客様はガバナンスの検証を無効にした状態で開始しています。</translation>
     </message>
     <message>
         <source>You can not disable governance validation on a masternode.</source>
-        <translation>您不能在主节点上禁用治理验证.</translation>
+        <translation>マスターノードでガバナンスの検証を無効化することはできません。</translation>
     </message>
     <message>
         <source>Your entries added successfully.</source>
-        <translation>您的词条已添加成功.</translation>
+        <translation>あなたの追加エントリーは成功しました。</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
-        <translation>正在清除钱包中的所有交易...</translation>
+        <translation>ウォレットからすべてのトランザクションを消去しています…</translation>
     </message>
 </context>
 </TS>

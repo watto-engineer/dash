@@ -44,7 +44,7 @@ public:
         WAGERR,
         mWAGERR,
         uWAGERR,
-        duffs
+        sats
     };
 
     enum SeparatorStyle
