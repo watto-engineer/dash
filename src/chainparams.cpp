@@ -181,10 +181,10 @@ static Consensus::LLMQParams llmq_test = {
         .minSize = 2,
         .threshold = 2,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
+        .dkgInterval = 30, // one DKG every 30 minutes
+        .dkgPhaseBlocks = 3,
+        .dkgMiningWindowStart = 15, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 27,
         .dkgBadVotesThreshold = 2,
 
         .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
@@ -201,10 +201,10 @@ static Consensus::LLMQParams llmq_test_v17 = {
         .minSize = 2,
         .threshold = 2,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
+        .dkgInterval = 30, // one DKG per 30 minutes
+        .dkgPhaseBlocks = 3,
+        .dkgMiningWindowStart = 15, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 27,
         .dkgBadVotesThreshold = 2,
 
         .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
@@ -221,10 +221,10 @@ static Consensus::LLMQParams llmq_devnet = {
         .minSize = 7,
         .threshold = 6,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
+        .dkgInterval = 30, // one DKG per thirty minutes
+        .dkgPhaseBlocks = 3,
+        .dkgMiningWindowStart = 15, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 27,
         .dkgBadVotesThreshold = 7,
 
         .signingActiveQuorumCount = 3, // just a few ones to allow easier testing
@@ -233,77 +233,77 @@ static Consensus::LLMQParams llmq_devnet = {
         .recoveryMembers = 6,
 };
 
-static Consensus::LLMQParams llmq50_60 = {
-        .type = Consensus::LLMQ_50_60,
-        .name = "llmq_50_60",
-        .size = 50,
-        .minSize = 40,
-        .threshold = 30,
+static Consensus::LLMQParams llmq20_60 = {
+        .type = Consensus::LLMQ_20_60,
+        .name = "llmq_20_60",
+        .size = 20,
+        .minSize = 16,
+        .threshold = 12,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
-        .dkgBadVotesThreshold = 40,
+        .dkgInterval = 60, // one DKG per hour
+        .dkgPhaseBlocks = 4,
+        .dkgMiningWindowStart = 20, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 32,
+        .dkgBadVotesThreshold = 14,
 
         .signingActiveQuorumCount = 24, // a full day worth of LLMQs
 
         .keepOldConnections = 25,
-        .recoveryMembers = 25,
+        .recoveryMembers = 12,
 };
 
-static Consensus::LLMQParams llmq400_60 = {
-        .type = Consensus::LLMQ_400_60,
-        .name = "llmq_400_60",
-        .size = 400,
-        .minSize = 300,
-        .threshold = 240,
+static Consensus::LLMQParams llmq40_60 = {
+        .type = Consensus::LLMQ_40_60,
+        .name = "llmq_40_60",
+        .size = 40,
+        .minSize = 30,
+        .threshold = 24,
 
-        .dkgInterval = 24 * 12, // one DKG every 12 hours
-        .dkgPhaseBlocks = 4,
-        .dkgMiningWindowStart = 20, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 28,
-        .dkgBadVotesThreshold = 300,
+        .dkgInterval = 60 * 12, // one DKG every 12 hours
+        .dkgPhaseBlocks = 6,
+        .dkgMiningWindowStart = 30, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 42,
+        .dkgBadVotesThreshold = 30,
 
         .signingActiveQuorumCount = 4, // two days worth of LLMQs
 
         .keepOldConnections = 5,
-        .recoveryMembers = 100,
+        .recoveryMembers = 20,
 };
 
 // Used for deployment and min-proto-version signalling, so it needs a higher threshold
-static Consensus::LLMQParams llmq400_85 = {
-        .type = Consensus::LLMQ_400_85,
-        .name = "llmq_400_85",
-        .size = 400,
-        .minSize = 350,
-        .threshold = 340,
+static Consensus::LLMQParams llmq40_85 = {
+        .type = Consensus::LLMQ_40_85,
+        .name = "llmq_40_85",
+        .size = 40,
+        .minSize = 35,
+        .threshold = 34,
 
-        .dkgInterval = 24 * 24, // one DKG every 24 hours
-        .dkgPhaseBlocks = 4,
-        .dkgMiningWindowStart = 20, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 48, // give it a larger mining window to make sure it is mined
-        .dkgBadVotesThreshold = 300,
+        .dkgInterval = 60 * 24, // one DKG every 24 hours
+        .dkgPhaseBlocks = 6,
+        .dkgMiningWindowStart = 30, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 60, // give it a larger mining window to make sure it is mined
+        .dkgBadVotesThreshold = 30,
 
         .signingActiveQuorumCount = 4, // four days worth of LLMQs
 
         .keepOldConnections = 5,
-        .recoveryMembers = 100,
+        .recoveryMembers = 20,
 };
 
 // Used for Platform
-static Consensus::LLMQParams llmq100_67 = {
-        .type = Consensus::LLMQ_100_67,
-        .name = "llmq_100_67",
-        .size = 100,
-        .minSize = 80,
-        .threshold = 67,
+static Consensus::LLMQParams llmq20_70 = {
+        .type = Consensus::LLMQ_20_70,
+        .name = "llmq_20_70",
+        .size = 20,
+        .minSize = 16,
+        .threshold = 14,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
-        .dkgBadVotesThreshold = 80,
+        .dkgInterval = 60, // one DKG per hour
+        .dkgPhaseBlocks = 4,
+        .dkgMiningWindowStart = 20, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 32,
+        .dkgBadVotesThreshold = 14,
 
         .signingActiveQuorumCount = 24, // a full day worth of LLMQs
 
@@ -422,7 +422,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1625097600; // July 1st, 2021
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1656633600; // July 1st, 2022
@@ -486,13 +486,13 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // long living quorum params
-        consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
-        consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
-        consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqs[Consensus::LLMQ_100_67] = llmq100_67;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_400_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_50_60;
-        consensus.llmqTypePlatform = Consensus::LLMQ_100_67;
+        consensus.llmqs[Consensus::LLMQ_20_60] = llmq20_60;
+        consensus.llmqs[Consensus::LLMQ_40_60] = llmq40_60;
+        consensus.llmqs[Consensus::LLMQ_40_85] = llmq40_85;
+        consensus.llmqs[Consensus::LLMQ_20_70] = llmq20_70;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_40_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_20_60;
+        consensus.llmqTypePlatform = Consensus::LLMQ_20_70;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
@@ -617,7 +617,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1606780800; // December 1st, 2020
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1638316800; // December 1st, 2021
@@ -670,13 +670,13 @@ public:
 
         // long living quorum params
         consensus.llmqs[Consensus::LLMQ_TEST_V17] = llmq_test_v17;
-        consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
-        consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
-        consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqs[Consensus::LLMQ_100_67] = llmq100_67;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_50_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_50_60;
-        consensus.llmqTypePlatform = Consensus::LLMQ_100_67;
+        consensus.llmqs[Consensus::LLMQ_20_60] = llmq20_60;
+        consensus.llmqs[Consensus::LLMQ_40_60] = llmq40_60;
+        consensus.llmqs[Consensus::LLMQ_40_85] = llmq40_85;
+        consensus.llmqs[Consensus::LLMQ_20_70] = llmq20_70;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_20_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_20_60;
+        consensus.llmqTypePlatform = Consensus::LLMQ_20_70;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -792,7 +792,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1604188800; // November 1st, 2020
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1635724800; // November 1st, 2021
@@ -844,13 +844,13 @@ public:
 
         // long living quorum params
         consensus.llmqs[Consensus::LLMQ_DEVNET] = llmq_devnet;
-        consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
-        consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
-        consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqs[Consensus::LLMQ_100_67] = llmq100_67;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_50_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_50_60;
-        consensus.llmqTypePlatform = Consensus::LLMQ_100_67;
+        consensus.llmqs[Consensus::LLMQ_20_60] = llmq20_60;
+        consensus.llmqs[Consensus::LLMQ_40_60] = llmq40_60;
+        consensus.llmqs[Consensus::LLMQ_40_85] = llmq40_85;
+        consensus.llmqs[Consensus::LLMQ_20_70] = llmq20_70;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_20_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_20_60;
+        consensus.llmqTypePlatform = Consensus::LLMQ_20_70;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
