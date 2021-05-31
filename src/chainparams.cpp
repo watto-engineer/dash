@@ -184,16 +184,16 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.V16DeploymentHeight = 1600000;
+        consensus.V17DeploymentHeight = 99999999;
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b");
-        consensus.BIP65Height = consensus.V16DeploymentHeight;
+        consensus.BIP65Height = consensus.V17DeploymentHeight;
         consensus.BIP66Height = 1; // 000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e
-        consensus.DIP0001Height = consensus.V16DeploymentHeight;
-        consensus.DIP0003Height = consensus.V16DeploymentHeight;
+        consensus.DIP0001Height = consensus.V17DeploymentHeight;
+        consensus.DIP0003Height = consensus.V17DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
-        consensus.DIP0008Height = consensus.V16DeploymentHeight;
+        consensus.DIP0008Height = consensus.V17DeploymentHeight;
         consensus.BRRHeight = 1374912; // 000000000000000c5a124f3eccfbe6e17876dca79cec9e63dfa70d269113c926
         consensus.MinBIP9WarningHeight = 1090656; // dip8 activation height + miner confirmation window
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
@@ -210,9 +210,9 @@ public:
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nStakeMinDepth = 600;
         consensus.nBlockStakeModifierV1A = 1000;
-        consensus.nBlockStakeModifierV2 = std::numeric_limits<int>::max();
+        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         // ATP parameters
-        consensus.ATPStartHeight = std::numeric_limits<int64_t>::max();
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerr";
         consensus.strTokenManagementKey = "WdFESJpjnXBjq4xahEsbHYeD8yoHfSHLCh"; // 04d449cc1ac45d327c34d8b116797ad9ed287980a9199ea48dc4c8beab90ae2ded738e826ba0b27b5571d63884d985e2a50afbe8eef2925fc280af51a2a2d5e0e0
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -240,24 +240,6 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1625097600; // July 1st, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1656633600; // July 1st, 2022
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nWindowSize = 4032;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdStart = 3226; // 80% of 4032
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdMin = 2420; // 60% of 4032
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nFalloffCoeff = 5; // this corresponds to 10 periods
-
-        // Deployment of Quorum Rotation DIP and decreased proposal fee (Values to be determined)
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].bit = 7;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nStartTime = 1660521600; // Tuesday, August 15, 2022 12:00:00 AM
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nTimeout = 1692057600;   // Tuesday, August 15, 2023 12:00:00 AM
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nWindowSize = 4032;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdStart = 3226; // 80% of 4032
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdMin = 2420;   // 60% of 4032
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nFalloffCoeff = 5;      // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000549cd3ccb81a55892330"); // 1450000
@@ -390,16 +372,16 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V16DeploymentHeight = 99999999;
+        consensus.V17DeploymentHeight = 826130;
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12");
-        consensus.BIP65Height = consensus.V16DeploymentHeight;
+        consensus.BIP65Height = consensus.V167eploymentHeight;
         consensus.BIP66Height = 1; // 0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12
-        consensus.DIP0001Height = consensus.V16DeploymentHeight;
-        consensus.DIP0003Height = consensus.V16DeploymentHeight;
+        consensus.DIP0001Height = consensus.V17DeploymentHeight;
+        consensus.DIP0003Height = consensus.V17DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
-        consensus.DIP0008Height = consensus.V16DeploymentHeight;
+        consensus.DIP0008Height = consensus.V17DeploymentHeight;
         consensus.BRRHeight = 387500; // 0000001537dbfd09dea69f61c1f8b2afa27c8dc91c934e144797761c9f10367b
         consensus.MinBIP9WarningHeight = 80816;  // dip8 activation height + miner confirmation window
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
@@ -411,7 +393,7 @@ public:
         // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
-        consensus.nBlockTimeProtocolV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nTimeSlotLength = 15;
@@ -421,9 +403,9 @@ public:
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 0;
         consensus.nBlockStakeModifierV1A = 51197;
-        consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 826130;
         // ATP parameters
-        consensus.ATPStartHeight = consensus.V16DeploymentHeight;
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TNPPuVRwCbBtNtWG9dBtv1fYDC8PFEeQ6y";
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -451,24 +433,6 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1606780800; // December 1st, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1638316800; // December 1st, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdStart = 80; // 80% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdMin = 60; // 60% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nFalloffCoeff = 5; // this corresponds to 10 periods
-
-        // Deployment of Quorum Rotation DIP and decreased proposal fee
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].bit = 7;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nStartTime = 1649980800; // Friday, April 15, 2022 0:00:00
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdStart = 80; // 80% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdMin = 60;   // 60% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nFalloffCoeff = 5;      // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000d582cb44b331457f3f0"); // 1515952
@@ -589,7 +553,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V16DeploymentHeight = std::numeric_limits<int>::max();
+        consensus.V17DeploymentHeight = 1;
         consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
         consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
         consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
@@ -609,7 +573,7 @@ public:
         // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
-        consensus.nBlockTimeProtocolV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nTimeSlotLength = 15;
@@ -619,9 +583,9 @@ public:
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
-        consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         // ATP parameters
-        consensus.ATPStartHeight = consensus.V16DeploymentHeight;
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -648,23 +612,6 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1604188800; // November 1st, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdStart = 80; // 80% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdMin = 60; // 60% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nFalloffCoeff = 5; // this corresponds to 10 periods
-
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].bit = 7;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nStartTime = 1625097600; // July 1st, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdStart = 80; // 80% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdMin = 60;   // 60% of 100
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nFalloffCoeff = 5;    // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
@@ -844,10 +791,10 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 100;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V16DeploymentHeight = 300;
+        consensus.V17DeploymentHeight = 300;
         consensus.BIP34Height = 500; // BIP34 activated on regtest (Used in functional tests)
         consensus.BIP34Hash = uint256();
-        consensus.BIP65Height = consensus.V16DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
+        consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
         consensus.DIP0001Height = 2000;
         consensus.DIP0003Height = 210;
@@ -865,7 +812,7 @@ public:
         // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
-        consensus.nBlockTimeProtocolV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nTimeSlotLength = 15;
@@ -875,9 +822,9 @@ public:
         consensus.nStakeMinDepth = 1;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = consensus.V16DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         // ATP parameters
-        consensus.ATPStartHeight = consensus.V16DeploymentHeight;
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrreg";
         consensus.strTokenManagementKey = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk";
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -905,22 +852,6 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdStart = 80;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nThresholdMin = 60;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nFalloffCoeff = 5;
-
-        // Deployment of Quorum Rotation DIP and decreased proposal fee
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].bit = 7;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nTimeout = 999999999999ULL;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nWindowSize = 300;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdStart = 240; // 80% of 300
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nThresholdMin = 180;   // 60% of 300
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0024].nFalloffCoeff = 5;     // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
