@@ -1929,7 +1929,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
 
-    if (pindexPrev->nHeight + 1 >= params.V16DeploymentHeight) {
+    if (pindexPrev->nHeight + 1 >= params.V17DeploymentHeight) {
         nVersion |= BlockTypeBits::BLOCKTYPE_STAKING;
     }
 
@@ -2014,7 +2014,7 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
         flags |= SCRIPT_VERIFY_NULLDUMMY;
     }
 
-    if (VersionBitsState(pindex->pprev, consensusparams, Consensus::DEPLOYMENT_DIP0020, versionbitscache) == ThresholdState::ACTIVE) {
+    if (pindex->nHeight >= consensusparams.V17DeploymentHeight) {
         flags |= SCRIPT_ENABLE_DIP0020_OPCODES;
     }
 

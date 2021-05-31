@@ -15,11 +15,11 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
     CAmount nSubsidy = 0;
     int nHeight = nPrevHeight + 1;
 
-    if (nHeight >= consensusParams.V16DeploymentHeight + 4 * 513000) return 260 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 3 * 513000) return 520 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 2 * 513000) return 770 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 513000) return 1000 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight) return 1210 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 4 * 513000) return 260 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 3 * 513000) return 520 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 2 * 513000) return 770 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 513000) return 1000 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight) return 1210 * COIN;
     if (nHeight >= 107624) return 2710 * COIN;
     if (nHeight >= 67004) return 0 * COIN;
     if (nHeight >= 67001) return 2850000000 * COIN;
@@ -31,11 +31,11 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
 }
 
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZBYTZStake, const Consensus::Params& consensusParams) {
-    if (nHeight >= consensusParams.V16DeploymentHeight + 4 * 513000) return 156 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 3 * 513000) return 312 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 2 * 513000) return 462 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight + 513000) return 600 * COIN;
-    if (nHeight >= consensusParams.V16DeploymentHeight) return 726 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 4 * 513000) return 156 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 3 * 513000) return 312 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 2 * 513000) return 462 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight + 513000) return 600 * COIN;
+    if (nHeight >= consensusParams.V17DeploymentHeight) return 726 * COIN;
     if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZBYTZStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
     if (nHeight >= consensusParams.nBlockZerocoinV2 && isZBYTZStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
     if (nHeight >= consensusParams.nPosStartHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;

@@ -188,7 +188,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     bool fDIP0003Active_context = nHeight >= chainparams.GetConsensus().DIP0003Height;
     bool fDIP0008Active_context = nHeight >= chainparams.GetConsensus().DIP0008Height;
 
-    pblock->nVersion = nHeight >= chainparams.GetConsensus().V16DeploymentHeight ?
+    pblock->nVersion = nHeight >= chainparams.GetConsensus().V17DeploymentHeight ?
         ComputeBlockVersion(pindexPrev, chainparams.GetConsensus(), fPos, chainparams.BIP9CheckMasternodesUpgraded())
         : VERSIONBITS_LAST_OLD_BLOCK_VERSION;
     // -regtest only: allow overriding block.nVersion with
@@ -328,7 +328,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
     pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
-    if (nHeight < chainparams.GetConsensus().V16DeploymentHeight)
+    if (nHeight < chainparams.GetConsensus().V17DeploymentHeight)
         pblock->nAccumulatorCheckpoint =  pindexPrev ? pindexPrev->nAccumulatorCheckpoint : uint256();
     pblocktemplate->nPrevBits = pindexPrev->nBits;
     pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(*pblock->vtx[0]);

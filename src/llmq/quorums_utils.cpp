@@ -302,7 +302,7 @@ bool CLLMQUtils::IsQuorumTypeEnabled(Consensus::LLMQType llmqType, const CBlockI
     LOCK(cs_llmq_vbc);
 
     const Consensus::Params& consensusParams = Params().GetConsensus();
-    bool f_dip0020_Active = VersionBitsState(pindex, consensusParams, Consensus::DEPLOYMENT_DIP0020, llmq_versionbitscache) == ThresholdState::ACTIVE;
+    bool f_dip0020_Active = pindex->nHeight >= consensusParams.V17DeploymentHeight;
 
     switch (llmqType)
     {

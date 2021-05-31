@@ -1215,7 +1215,7 @@ void CInstantSendManager::UpdatedBlockTip(const CBlockIndex* pindexNew)
 {
     if (!fUpgradedDB) {
         LOCK(cs_main);
-        if (VersionBitsState(pindexNew, Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0020, versionbitscache) == ThresholdState::ACTIVE) {
+        if (pindexNew->nHeight >= Params().GetConsensus().V17DeploymentHeight) {
             db.Upgrade();
             fUpgradedDB = true;
         }

@@ -11,11 +11,6 @@ const struct VBDeploymentInfo VersionBitsDeploymentInfo[Consensus::MAX_VERSION_B
         /*.gbt_force =*/ true,
         /*.check_mn_protocol =*/ false,
     },
-    {
-        /*.name =*/ "dip0020",
-        /*.gbt_force =*/ true,
-        /*.check_mn_protocol =*/ false,
-    },
 };
 
 ThresholdState AbstractThresholdConditionChecker::GetStateFor(const CBlockIndex* pindexPrev, const Consensus::Params& params, ThresholdConditionCache& cache) const
