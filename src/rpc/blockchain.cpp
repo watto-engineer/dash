@@ -1639,7 +1639,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
     const Consensus::Params& consensusParams = Params().GetConsensus();
     UniValue softforks(UniValue::VARR);
     UniValue bip9_softforks(UniValue::VOBJ);
-    for (int pos = Consensus::DEPLOYMENT_DIP0020; pos != Consensus::MAX_VERSION_BITS_DEPLOYMENTS; ++pos) {
+    for (int pos = Consensus::MAX_VERSION_BITS_DEPLOYMENTS; pos != Consensus::MAX_VERSION_BITS_DEPLOYMENTS; ++pos) {
         BIP9SoftForkDescPushBack(bip9_softforks, consensusParams, static_cast<Consensus::DeploymentPos>(pos));
     }
     obj.pushKV("softforks",             softforks);
