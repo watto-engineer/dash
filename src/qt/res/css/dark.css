@@ -45,7 +45,7 @@ QDialog,
 QMainWindow,
 QMessageBox
 WalletFrame {
-    background-color: #323233;
+    background-color: #11161D;
 }
 
 QWidget { /* override text selection background color for all text widgets */
@@ -608,7 +608,7 @@ QStatusBar
 ******************************************************/
 
 QStatusBar {
-    background-color: #323233;
+    background-color: #11161D;
     color: #c7c7c7;
 }
 
@@ -676,7 +676,7 @@ QToolBar > QToolButton:hover:!checked {
 }
 
 QToolBar > QToolButton:checked {
-    background-color: #323233;
+    background-color: #11161D;
     color: #c7c7c7;
 }
 
@@ -893,7 +893,7 @@ RPCConsole
 ******************************************************/
 
 QWidget#RPCConsole { /* RPC Console Dialog Box */
-    background-color: #323233;
+    background-color: #11161D;
 }
 
 RPCConsole QTableView {
@@ -940,7 +940,7 @@ ShutdownWindow
 ******************************************************/
 
 QWidget#ShutdownWindow {
-    background-color: #323233;
+    background-color: #11161D;
 }
 
 /******************************************************
