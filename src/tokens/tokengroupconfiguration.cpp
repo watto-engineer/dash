@@ -20,20 +20,20 @@ bool CTokenGroupCreation::ValidateDescription() {
 // Such as: max ticker length, no special characters, and sane decimal positions.
 // Validation is performed before data is written to the database
 void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation) {
-    std::regex regexAlpha("^[a-zA-Z]+$");
-    std::regex regexAlphaNum("^[a-zA-Z0-9]+$");
+    std::regex regexTicker("^[a-zA-Z]+$"); // only letters
+    std::regex regexName("^[a-zA-Z0-9][a-zA-Z0-9 ]*[a-zA-Z0-9]$"); // letters, numbers and spaces; at least 2 characters; no space at beginning or end
     std::regex regexUrl(R"((https?|ftp)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
 
     if (tokenGroupCreation.pTokenGroupDescription->strTicker != "" &&
-            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strTicker, matchResult, regexAlpha)) {
+            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strTicker, matchResult, regexTicker)) {
         tokenGroupCreation.status.AddMessage("Token ticker can only contain letters.");
         tokenGroupCreation.pTokenGroupDescription->strTicker = "";
     }
     if (tokenGroupCreation.pTokenGroupDescription->strName != "" &&
-            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strName, matchResult, regexAlpha)) {
-        tokenGroupCreation.status.AddMessage("Token name can only contain letters.");
+            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strName, matchResult, regexName)) {
+        tokenGroupCreation.status.AddMessage("Token name can only contain letters, numbers and spaces. At least 2 characters. No space at beginning or end.");
         tokenGroupCreation.pTokenGroupDescription->strName = "";
     }
     if (tokenGroupCreation.pTokenGroupDescription->strDocumentUrl != "" &&
