@@ -303,6 +303,7 @@ BITCOIN_CORE_H = \
   tokens/tokendb.h \
   tokens/tokengroupconfiguration.h \
   tokens/tokengroupdescription.h \
+  tokens/tokengroupdocument.h \
   tokens/tokengroupmanager.h \
   tokens/tokengroupwallet.h \
   tokens/rpctokenwallet.h \
@@ -792,6 +793,7 @@ libbitcoin_common_a_SOURCES = \
   tokens/rpctokens.cpp \
   tokens/tokengroupconfiguration.cpp \
   tokens/tokengroupdescription.cpp \
+  tokens/tokengroupdocument.cpp \
   tokens/tokengroupmanager.cpp \
   versionbitsinfo.cpp \
   warnings.cpp \
