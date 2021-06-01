@@ -12,6 +12,7 @@
 #include "rpc/protocol.h"
 #include "rpc/server.h"
 #include "script/tokengroup.h"
+#include "tokens/tokengroupdocument.h"
 #include "tokens/tokengroupmanager.h"
 #include "tokens/tokengroupwallet.h"
 #include "utilmoneystr.h"
@@ -654,6 +655,150 @@ UniValue createrawtokentransaction(const JSONRPCRequest& request)
     return EncodeHexTx(rawTx);
 }
 
+UniValue createrawtokendocument(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
+        throw std::runtime_error(
+                "createrawtokendocument \"spec\"\n"
+                "\nCreate a (serialized) raw token document.\n"
+                "\nArguments:\n"
+                "1. \"spec\"           (json, required) The document specification.\n"
+                "2. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the serialized data.\n"
+        );
+    }
+    RPCTypeCheck(request.params, {UniValue::VOBJ, UniValue::VBOOL});
+
+    std::string strTicker;
+    std::string strName;
+    std::string strChain;
+    std::string strSummary;
+    std::string strDescription;
+    std::string strCreator;
+    std::string strContactURL;
+    std::string strContactEmail;
+
+    UniValue spec = request.params[0];
+    RPCTypeCheckObj(spec,
+        {
+            {"ticker", UniValueType(UniValue::VSTR)},
+            {"name", UniValueType(UniValue::VSTR)},
+            {"chain", UniValueType(UniValue::VSTR)},
+            {"summary", UniValueType(UniValue::VSTR)},
+            {"description", UniValueType(UniValue::VSTR)},
+            {"creator", UniValueType(UniValue::VSTR)},
+            {"contact", UniValueType()}, // will be checked below
+        },
+        true, true);
+
+    if (spec.exists("ticker")) {
+        strTicker = spec["ticker"].get_str();
+    }
+    if (spec.exists("name")) {
+        strName = spec["name"].get_str();
+    }
+    if (spec.exists("chain")) {
+        strChain = spec["chain"].get_str();
+    }
+    if (spec.exists("summary")) {
+        strSummary = spec["summary"].get_str();
+    }
+    if (spec.exists("description")) {
+        strDescription = spec["description"].get_str();
+    }
+    if (spec.exists("creator")) {
+        strCreator = spec["creator"].get_str();
+    }
+    if (spec.exists("contact")) {
+        UniValue contact = spec["contact"];
+        RPCTypeCheckObj(contact,
+            {
+                {"url", UniValueType(UniValue::VSTR)},
+                {"email", UniValueType(UniValue::VSTR)},
+            },
+            true, true);
+        if (contact.exists("url")) {
+            strContactURL = contact["url"].get_str();
+        }
+        if (contact.exists("email")) {
+            strContactEmail = contact["email"].get_str();
+        }
+    }
+
+    CTokenGroupDocument tgDocument = CTokenGroupDocument(strTicker, strName, strChain, strSummary, strDescription, strCreator, strContactURL, strContactEmail);
+
+    bool fVerbose = false;
+    if (request.params.size() > 1) {
+        std::string sVerbose;
+        std::string p = request.params[1].get_str();
+        std::transform(p.begin(), p.end(), std::back_inserter(sVerbose), ::tolower);
+        fVerbose = (sVerbose == "true");
+    }
+
+    if (fVerbose) {
+        UniValue ret(UniValue::VOBJ);
+        tgDocument.ToJson(ret);
+        return ret;
+    }
+    CDataStream ssTGDocumentOut(SER_NETWORK, PROTOCOL_VERSION);
+    ssTGDocumentOut << tgDocument;
+    std::string strData = HexStr(ssTGDocumentOut.begin(), ssTGDocumentOut.end());
+
+    return strData;
+}
+
+UniValue decoderawtokendocument(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1) {
+        throw std::runtime_error(
+                "decoderawtokendocument \"data\"\n"
+                "\nArguments:\n"
+                "1. \"data\"           (hex, required) The serialized document specification.\n"
+        );
+    }
+    RPCTypeCheck(request.params, {UniValue::VSTR});
+
+    CDataStream ssTGDocument(ParseHexV(request.params[0], "data"), SER_NETWORK, PROTOCOL_VERSION);
+    CTokenGroupDocument tgDocument;
+    ssTGDocument >> tgDocument;
+
+    UniValue ret(UniValue::VOBJ);
+    tgDocument.ToJson(ret);
+
+    return ret;
+}
+
+UniValue verifyrawtokendocument(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 2) {
+        throw std::runtime_error(
+                "verifyrawtokendocument \"data\" \"address\"\n"
+                "\nCalculates a diff between two deterministic masternode lists. The result also contains proof data.\n"
+                "\nArguments:\n"
+                "1. \"data\"           (hex, required) The starting block height.\n"
+                "2. \"address\"        (string, required) The ending block height.\n"
+        );
+    }
+
+    RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VSTR});
+
+    std::string strHexDescription = request.params[0].get_str();
+    std::string strAddress = request.params[1].get_str();
+    CTxDestination dest = DecodeDestination(strAddress);
+    if (!IsValidDestination(dest)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+    }
+    const CKeyID *keyID = boost::get<CKeyID>(&dest);
+    if (!keyID) {
+        throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
+    }
+
+    CDataStream ssTGDocument(ParseHexV(request.params[0], "data"), SER_NETWORK, PROTOCOL_VERSION);
+    CTokenGroupDocument tgDocument;
+    ssTGDocument >> tgDocument;
+
+    return tgDocument.CheckSignature(*keyID);
+}
+
 static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
@@ -661,6 +806,9 @@ static const CRPCCommand commands[] =
     { "tokens",             "gettokentransaction",      &gettokentransaction,       {} },
     { "tokens",             "getsubgroupid",            &getsubgroupid,             {} },
     { "tokens",             "createrawtokentransaction",&createrawtokentransaction, {} },
+    { "tokens",             "createrawtokendocument",   &createrawtokendocument,    {"options", "verbose"} },
+    { "tokens",             "decoderawtokendocument",   &decoderawtokendocument,    {} },
+    { "tokens",             "verifyrawtokendocument",   &verifyrawtokendocument,    {"hexstring","address"} },
 };
 
 void RegisterTokensRPCCommands(CRPCTable &t)

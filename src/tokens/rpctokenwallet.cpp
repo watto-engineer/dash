@@ -12,6 +12,7 @@
 #include "rpc/protocol.h"
 #include "rpc/server.h"
 #include "script/tokengroup.h"
+#include "tokens/tokengroupdocument.h"
 #include "tokens/tokengroupmanager.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
@@ -1909,6 +1910,73 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
     return results;
 }
 
+UniValue signrawtokendocument(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3) {
+        throw std::runtime_error(
+                "signrawtokendocument \"data\" \"address\" ( \"verbose\" )\n"
+                "\nSigns the raw token document using the supplied address.\n"
+                "\nArguments:\n"
+                "1. \"data\"           (hex, required) The (unsigned) serialized token document.\n"
+                "2. \"address\"        (string, required) The address used to sign the token document.\n"
+                "3. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the serialized data.\n"
+        );
+    }
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+    RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VSTR});
+
+    bool fVerbose = false;
+    if (request.params.size() > 2) {
+        std::string sVerbose;
+        std::string p = request.params[2].get_str();
+        std::transform(p.begin(), p.end(), std::back_inserter(sVerbose), ::tolower);
+        fVerbose = (sVerbose == "true");
+    }
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    std::string strHexDescription = request.params[0].get_str();
+    std::string strAddress = request.params[1].get_str();
+    CTxDestination dest = DecodeDestination(strAddress);
+    if (!IsValidDestination(dest)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+    }
+    const CKeyID *keyID = boost::get<CKeyID>(&dest);
+    if (!keyID) {
+        throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to a key");
+    }
+    CKey vchSecret;
+    if (!pwallet->GetKey(*keyID, vchSecret)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not known");
+    }
+
+    CDataStream ssTGDocument(ParseHexV(request.params[0], "data"), SER_NETWORK, PROTOCOL_VERSION);
+    CTokenGroupDocument tgDocument;
+    ssTGDocument >> tgDocument;
+
+    if (!tgDocument.Sign(vchSecret)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Unable to sign document");
+    }
+
+    if (fVerbose) {
+        UniValue ret(UniValue::VOBJ);
+        tgDocument.ToJson(ret);
+        return ret;
+    }
+    CDataStream ssTGDocumentOut(SER_NETWORK, PROTOCOL_VERSION);
+    ssTGDocumentOut << tgDocument;
+    std::string strData = HexStr(ssTGDocumentOut.begin(), ssTGDocumentOut.end());
+
+    return strData;
+}
+
 static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
@@ -1919,6 +1987,7 @@ static const CRPCCommand commands[] =
     { "tokens",             "sendtoken",                &sendtoken,                 {} },
     { "tokens",             "configuretoken",           &configuretoken,            {} },
     { "tokens",             "configuremanagementtoken", &configuremanagementtoken,  {} },
+    { "tokens",             "signrawtokendocument",     &signrawtokendocument,      {"data","address","verbose"} },
     { "tokens",             "createtokenauthorities",   &createtokenauthorities,    {} },
     { "tokens",             "listtokenauthorities",     &listtokenauthorities,      {} },
     { "tokens",             "droptokenauthorities",     &droptokenauthorities,      {} },
