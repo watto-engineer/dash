@@ -34,6 +34,9 @@ USER bytz
 
 VOLUME ["/bytz"]
 
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
 EXPOSE 37414 37415 47414 47415
 
 WORKDIR /bytz
