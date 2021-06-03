@@ -657,16 +657,59 @@ UniValue createrawtokentransaction(const JSONRPCRequest& request)
 
 UniValue createrawtokendocument(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3) {
         throw std::runtime_error(
-                "createrawtokendocument \"spec\"\n"
-                "\nCreate a (serialized) raw token document.\n"
-                "\nArguments:\n"
-                "1. \"spec\"           (json, required) The document specification.\n"
-                "2. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the serialized data.\n"
+            "createrawtokendocument {\"ticker\":\"ticker\",\"name\":\"token name\",...} ( verbose )\n"
+            "\nCreate a token document that is to be signed and published online.\n"
+            "\nThe document's hash is included when configuring a new token.\n"
+            "Returns either a hex-encoded representation or a json representation.\n"
+            "\n"
+            "Note that the created document is not signed, and that it is not stored in the wallet or transmitted to the network. .\n"
+
+            "\nArguments:\n"
+            "1. \"specification\"                  (json, required) The document specification.\n"
+            "     {\n"
+            "       \"ticker\":\"ticker\",           (string, optional) The ticker\n"
+            "       \"name\":\"name\",               (string, optional) The token name\n"
+            "       \"chain\":\"chain\",             (string, optional) Chain identifier, e.g. \"BYTZ\" (for mainnet) or \"BYTZ.testnet\" or \"BYTZ.regtest\"\n"
+            "       \"summary\":\"summary\",         (string, optional) Short introduction to the token\n"
+            "       \"description\":\"description\", (string, optional) Description of the token\n"
+            "       \"creator\":\"creator\",         (string, optional) Token creator\n"
+            "       \"contact\": {                 (object, optional) Contact information\n"
+            "         \"url\": \"id\",                (string, optional) URL that points to token contact information\n"
+            "         \"email\": \"email\"           (string, optional) Mail address\n"
+            "       }\n"
+            "     }\n"
+            "2. \"signature\"                      (string, optional, default="") Fill out the signature field with a given signature string\n"
+            "3. \"verbose\"                        (bool, optional, default=false) Output the json encoded specification instead of the hex-encoded serialized data\n"
+
+            "\nResult:\n"
+            "\"hex\" : \"value\",           (string) The hex-encoded raw token document\n"
+
+            "\nExamples:\n"
+            "\nCreate the MGT testnet document\n"
+            + HelpExampleCli("createrawtokendocument",
+                "\"{\\\"ticker\\\": \\\"MGT\\\", \\\"name\\\": \\\"Management Token\\\", \\\"chain\\\": \\\"BYTZ.testnet\\\", "
+                "\\\"summary\\\": \\\"The MGT token is a tokenized management key on the BYTZ blockchain with special authorities "
+                "necessary for: (1) the construction of a token system with coherent economic incentives; (2) the inception of "
+                "Nucleus Tokens (special tokens that have interrelated monetary policies); and (3) the distribution of rewards that "
+                "sustain this system of cryptographic tokens on the blockchain.\\\", \\\"description\\\": \\\"The Atomic Token "
+                "Protocol (ATP) introduces cross-coin and cross-token policy. BYTZ utilizes ATP for its reward system and rights "
+                "structure. Management Token (MGT), Guardian Validator Token (GVT), and Guardian Validators all participate in an "
+                "interconnected managent system, and are considered the Nucleus Tokens. The MGT token itself is a tokenized "
+                "management key with special authorities needed for token inception on the blockchain. The MGT token continues "
+                "to play a role in the management of and access to special features.\\\", \\\"creator\\\": \\\"The BYTZ Core "
+                "Developers\\\", \\\"contact\\\":{\\\"url\\\":\\\"https://github.com/bytzcurrency/bytz\\\"}}\"") +
+            "\nCreate a partial document, add a signature, output the json specification\n"
+            + HelpExampleCli("createrawtokendocument",
+                "\"{\\\"ticker\\\": \\\"MGT\\\", \\\"name\\\": \\\"Management Token\\\", \\\"chain\\\": \\\"BYTZ.testnet\\\"}\" "
+                "20fa4cc8f93c6d52ce6690b6997b7ae3c785fe291c5c6e44370ef1557f61aeb1242fddd9aa13941e4b5be53d07998ebb201ce2cfa96c832d5fee743c5600c7277b true") + 
+            "\nCreate a partial document as a json rpc call\n"
+            + HelpExampleRpc("createrawtokendocument",
+                "\"{\\\"ticker\\\": \\\"MGT\\\", \\\"name\\\": \\\"Management Token\\\", \\\"chain\\\": \\\"BYTZ.testnet\\\"}\"")
         );
     }
-    RPCTypeCheck(request.params, {UniValue::VOBJ, UniValue::VBOOL});
+    RPCTypeCheck(request.params, {UniValue::VOBJ, UniValue::VSTR, UniValue::VBOOL});
 
     std::string strTicker;
     std::string strName;
@@ -726,12 +769,14 @@ UniValue createrawtokendocument(const JSONRPCRequest& request)
 
     CTokenGroupDocument tgDocument = CTokenGroupDocument(strTicker, strName, strChain, strSummary, strDescription, strCreator, strContactURL, strContactEmail);
 
-    bool fVerbose = false;
     if (request.params.size() > 1) {
-        std::string sVerbose;
-        std::string p = request.params[1].get_str();
-        std::transform(p.begin(), p.end(), std::back_inserter(sVerbose), ::tolower);
-        fVerbose = (sVerbose == "true");
+        std::string strSignature = request.params[1].get_str();
+        tgDocument.vchSig = ParseHex(strSignature);
+    }
+
+    bool fVerbose = false;
+    if (request.params.size() > 2) {
+        fVerbose = request.params[2].get_bool();
     }
 
     if (fVerbose) {
@@ -751,8 +796,49 @@ UniValue decoderawtokendocument(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 1) {
         throw std::runtime_error(
                 "decoderawtokendocument \"data\"\n"
+
+                "\nDecode a hex-encoded token document to json\n"
+
                 "\nArguments:\n"
-                "1. \"data\"           (hex, required) The serialized document specification.\n"
+                "1. \"data\"           (hex, required) The serialized token document\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"atp\":\"atp\",                   (string) Atomic Token Protocol version number\n"
+            "  \"data\": {                      (object) Data object\n"
+            "    \"ticker\":\"ticker\",           (string) The ticker\n"
+            "    \"name\":\"name\",               (string) The token name\n"
+            "    \"chain\":\"chain\",             (string) Chain identifier, e.g. \"BYTZ\" or \"BYTZ.testnet\"\n"
+            "    \"summary\":\"summary\",         (string) Short introduction to the token\n"
+            "    \"description\":\"description\", (string) Description of the token\n"
+            "    \"creator\":\"creator\",         (string) Token creator\n"
+            "    \"contact\": {                 (object) Contact information\n"
+            "       \"url\": \"id\",              (string) URL that points to token contact information\n"
+            "        \"email\": \"email\"         (string) Mail address\n"
+            "      }\n"
+            "    },\n"
+            "  \"hash\":\"hash\",                 (string) Hash of the serialized document (excluding the signature)\n"
+            "  \"signature\":\"signature\",       (string) Signature of the serialized document\n"
+
+            "\nExamples:\n"
+            "\nDecode the hex-encoded MGT testnet document\n"
+            + HelpExampleCli("decoderawtokendocument",
+                "0100034d4754104d616e6167656d656e7420546f6b656e0c4259545a2e746573746e6574fd7b01546865204d475420746f6b656e206973206120746f6b656e697a6564206d6"
+                "16e6167656d656e74206b6579206f6e20746865204259545a20626c6f636b636861696e2077697468207370656369616c20617574686f726974696573206e65636573736172"
+                "7920666f723a202831292074686520636f6e737472756374696f6e206f66206120746f6b656e2073797374656d207769746820636f686572656e742065636f6e6f6d6963206"
+                "96e63656e74697665733b202832292074686520696e63657074696f6e206f66204e75636c65757320546f6b656e7320287370656369616c20746f6b656e7320746861742068"
+                "61766520696e74657272656c61746564206d6f6e657461727920706f6c6963696573293b20616e64202833292074686520646973747269627574696f6e206f6620726577617"
+                "264732074686174207375737461696e20746869732073797374656d206f662063727970746f6772617068696320746f6b656e73206f6e2074686520626c6f636b636861696e"
+                "2efd0e025468652041746f6d696320546f6b656e2050726f746f636f6c20284154502920696e74726f64756365732063726f73732d636f696e20616e642063726f73732d746"
+                "f6b656e20706f6c6963792e204259545a207574696c697a65732041545020666f7220697473207265776172642073797374656d20616e642072696768747320737472756374"
+                "7572652e204d616e6167656d656e7420546f6b656e20284d4754292c20477561726469616e2056616c696461746f7220546f6b656e2028475654292c20616e6420477561726"
+                "469616e2056616c696461746f727320616c6c20706172746963697061746520696e20616e20696e746572636f6e6e6563746564206d616e6167656e742073797374656d2c20"
+                "616e642061726520636f6e7369646572656420746865204e75636c65757320546f6b656e732e20546865204d475420746f6b656e20697473656c66206973206120746f6b656"
+                "e697a6564206d616e6167656d656e74206b65792077697468207370656369616c20617574686f726974696573206e656564656420666f7220746f6b656e20696e6365707469"
+                "6f6e206f6e2074686520626c6f636b636861696e2e20546865204d475420746f6b656e20636f6e74696e75657320746f20706c6179206120726f6c6520696e20746865206d6"
+                "16e6167656d656e74206f6620616e642061636365737320746f207370656369616c2066656174757265732e18546865204259545a20436f726520446576656c6f7065727324"
+                "68747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f6279747a004120fa4cc8f93c6d52ce6690b6997b7ae3c785fe291c5c6e44370ef1557f61aeb"
+                "1242fddd9aa13941e4b5be53d07998ebb201ce2cfa96c832d5fee743c5600c7277b")
         );
     }
     RPCTypeCheck(request.params, {UniValue::VSTR});
@@ -776,6 +862,29 @@ UniValue verifyrawtokendocument(const JSONRPCRequest& request)
                 "\nArguments:\n"
                 "1. \"data\"           (hex, required) The starting block height.\n"
                 "2. \"address\"        (string, required) The ending block height.\n"
+
+            "\nResult:\n"
+            "true|false    (boolean) If the signature is verified or not\n"
+
+            "\nExamples:\n"
+            "\nVerify the hex-encoded MGT testnet document\n"
+            + HelpExampleCli("verifyrawtokendocument",
+                "0100034d4754104d616e6167656d656e7420546f6b656e0c4259545a2e746573746e6574fd7b01546865204d475420746f6b656e206973206120746f6b656e697a6564206d6"
+                "16e6167656d656e74206b6579206f6e20746865204259545a20626c6f636b636861696e2077697468207370656369616c20617574686f726974696573206e65636573736172"
+                "7920666f723a202831292074686520636f6e737472756374696f6e206f66206120746f6b656e2073797374656d207769746820636f686572656e742065636f6e6f6d6963206"
+                "96e63656e74697665733b202832292074686520696e63657074696f6e206f66204e75636c65757320546f6b656e7320287370656369616c20746f6b656e7320746861742068"
+                "61766520696e74657272656c61746564206d6f6e657461727920706f6c6963696573293b20616e64202833292074686520646973747269627574696f6e206f6620726577617"
+                "264732074686174207375737461696e20746869732073797374656d206f662063727970746f6772617068696320746f6b656e73206f6e2074686520626c6f636b636861696e"
+                "2efd0e025468652041746f6d696320546f6b656e2050726f746f636f6c20284154502920696e74726f64756365732063726f73732d636f696e20616e642063726f73732d746"
+                "f6b656e20706f6c6963792e204259545a207574696c697a65732041545020666f7220697473207265776172642073797374656d20616e642072696768747320737472756374"
+                "7572652e204d616e6167656d656e7420546f6b656e20284d4754292c20477561726469616e2056616c696461746f7220546f6b656e2028475654292c20616e6420477561726"
+                "469616e2056616c696461746f727320616c6c20706172746963697061746520696e20616e20696e746572636f6e6e6563746564206d616e6167656e742073797374656d2c20"
+                "616e642061726520636f6e7369646572656420746865204e75636c65757320546f6b656e732e20546865204d475420746f6b656e20697473656c66206973206120746f6b656"
+                "e697a6564206d616e6167656d656e74206b65792077697468207370656369616c20617574686f726974696573206e656564656420666f7220746f6b656e20696e6365707469"
+                "6f6e206f6e2074686520626c6f636b636861696e2e20546865204d475420746f6b656e20636f6e74696e75657320746f20706c6179206120726f6c6520696e20746865206d6"
+                "16e6167656d656e74206f6620616e642061636365737320746f207370656369616c2066656174757265732e18546865204259545a20436f726520446576656c6f7065727324"
+                "68747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f6279747a004120fa4cc8f93c6d52ce6690b6997b7ae3c785fe291c5c6e44370ef1557f61aeb"
+                "1242fddd9aa13941e4b5be53d07998ebb201ce2cfa96c832d5fee743c5600c7277b Tq15q6NNKDLKsD8uRwLo8Za355afgavuVb")
         );
     }
 

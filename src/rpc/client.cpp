@@ -190,6 +190,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "createrawtokentransaction", 2, "token_outputs" },
     { "createrawtokentransaction", 3, "locktime" },
     { "createrawtokendocument", 0, "spec" },
+    { "createrawtokendocument", 2, "verbose" },
+    { "signrawtokendocument", 2, "verbose" },
     { "listunspenttokens", 0, "groupid" },
     { "listunspenttokens", 1, "minconf" },
     { "listunspenttokens", 2, "maxconf" },

@@ -1923,9 +1923,31 @@ UniValue signrawtokendocument(const JSONRPCRequest& request)
                 "signrawtokendocument \"data\" \"address\" ( \"verbose\" )\n"
                 "\nSigns the raw token document using the supplied address.\n"
                 "\nArguments:\n"
-                "1. \"data\"           (hex, required) The (unsigned) serialized token document.\n"
-                "2. \"address\"        (string, required) The address used to sign the token document.\n"
-                "3. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the serialized data.\n"
+                "1. \"data\"           (hex, required) The (unsigned) serialized token document\n"
+                "2. \"address\"        (string, required) The address used to sign the token document\n"
+                "3. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the hex-encoded serialized data\n"
+
+            "\nResult:\n"
+            "\"hex\" : \"value\"    (string) The hex-encoded signed raw token document\n"
+
+            "\nExamples:\n"
+            "\nSign the hex-encoded MGT testnet document\n"
+            + HelpExampleCli("signrawtokendocument",
+                "0100034d4754104d616e6167656d656e7420546f6b656e0c4259545a2e746573746e6574fd7b01546865204d475420746f6b656e206973206120746f6b656e697a6564206d6"
+                "16e6167656d656e74206b6579206f6e20746865204259545a20626c6f636b636861696e2077697468207370656369616c20617574686f726974696573206e65636573736172"
+                "7920666f723a202831292074686520636f6e737472756374696f6e206f66206120746f6b656e2073797374656d207769746820636f686572656e742065636f6e6f6d6963206"
+                "96e63656e74697665733b202832292074686520696e63657074696f6e206f66204e75636c65757320546f6b656e7320287370656369616c20746f6b656e7320746861742068"
+                "61766520696e74657272656c61746564206d6f6e657461727920706f6c6963696573293b20616e64202833292074686520646973747269627574696f6e206f6620726577617"
+                "264732074686174207375737461696e20746869732073797374656d206f662063727970746f6772617068696320746f6b656e73206f6e2074686520626c6f636b636861696e"
+                "2efd0e025468652041746f6d696320546f6b656e2050726f746f636f6c20284154502920696e74726f64756365732063726f73732d636f696e20616e642063726f73732d746"
+                "f6b656e20706f6c6963792e204259545a207574696c697a65732041545020666f7220697473207265776172642073797374656d20616e642072696768747320737472756374"
+                "7572652e204d616e6167656d656e7420546f6b656e20284d4754292c20477561726469616e2056616c696461746f7220546f6b656e2028475654292c20616e6420477561726"
+                "469616e2056616c696461746f727320616c6c20706172746963697061746520696e20616e20696e746572636f6e6e6563746564206d616e6167656e742073797374656d2c20"
+                "616e642061726520636f6e7369646572656420746865204e75636c65757320546f6b656e732e20546865204d475420746f6b656e20697473656c66206973206120746f6b656"
+                "e697a6564206d616e6167656d656e74206b65792077697468207370656369616c20617574686f726974696573206e656564656420666f7220746f6b656e20696e6365707469"
+                "6f6e206f6e2074686520626c6f636b636861696e2e20546865204d475420746f6b656e20636f6e74696e75657320746f20706c6179206120726f6c6520696e20746865206d6"
+                "16e6167656d656e74206f6620616e642061636365737320746f207370656369616c2066656174757265732e18546865204259545a20436f726520446576656c6f7065727324"
+                "68747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f6279747a0000 Tq15q6NNKDLKsD8uRwLo8Za355afgavuVb")
         );
     }
 
@@ -1934,10 +1956,7 @@ UniValue signrawtokendocument(const JSONRPCRequest& request)
 
     bool fVerbose = false;
     if (request.params.size() > 2) {
-        std::string sVerbose;
-        std::string p = request.params[2].get_str();
-        std::transform(p.begin(), p.end(), std::back_inserter(sVerbose), ::tolower);
-        fVerbose = (sVerbose == "true");
+        fVerbose = request.params[2].get_bool();
     }
 
     EnsureWalletIsUnlocked(pwallet);
