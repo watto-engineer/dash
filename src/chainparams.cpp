@@ -578,7 +578,7 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 51197;
         consensus.nBlockStakeModifierV2 = 826130;
-        consensus.strCarbonOffsetAddress = "4yAq996ZLe5Mzx3DnFJQ9ezxJWBbkqegLL";
+        consensus.strCarbonOffsetAddress = "TqqiV3twXTaD5pL4vrA3nZqT8d8BPbxM3e";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.BytzAddrPrefix = "bytztest";
@@ -672,7 +672,7 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TsdKwqnDKEN3N38QG5hTQBNJe6y1mdECy8"};
+        vSporkAddresses = {"TozWRrxnKYpshJw5PhAaP7gHzTLDFhKCnr"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
