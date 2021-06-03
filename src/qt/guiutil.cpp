@@ -108,7 +108,7 @@ static const std::map<QString, QString> mapThemeToStyle{
 /** loadFonts stores the SystemDefault font in osDefaultFont to be able to reference it later again */
 static std::unique_ptr<QFont> osDefaultFont;
 /** Font related default values. */
-static const FontFamily defaultFontFamily = FontFamily::SystemDefault;
+static const FontFamily defaultFontFamily = FontFamily::Montserrat;
 static const int defaultFontSize = 12;
 static const double fontScaleSteps = 0.01;
 #ifdef Q_OS_MAC
