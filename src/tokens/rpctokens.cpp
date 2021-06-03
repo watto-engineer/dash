@@ -771,7 +771,9 @@ UniValue createrawtokendocument(const JSONRPCRequest& request)
 
     if (request.params.size() > 1) {
         std::string strSignature = request.params[1].get_str();
-        tgDocument.vchSig = ParseHex(strSignature);
+        if (!IsHex(strSignature))
+            throw std::runtime_error("invalid signature data");
+        tgDocument.SetSignature(strSignature);
     }
 
     bool fVerbose = false;
