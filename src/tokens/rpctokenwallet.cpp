@@ -1069,7 +1069,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "8. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"GVT\" \"GuardianValidatorToken\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
+            HelpExampleCli("configuremanagementtoken", "\"MGT\" \"Management Token\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 969d29b4cd99ee7c6c188068c9f6f8f4051daa37f124a327ed86774d760dba74 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
             "\n"
         );
 
