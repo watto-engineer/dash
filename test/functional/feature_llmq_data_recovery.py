@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2021 The Dash Core developers
+# Copyright (c) 2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,7 +25,7 @@ llmq_type_strings = {llmq_test: 'llmq_test', llmq_test_v17: 'llmq_test_v17'}
 
 class QuorumDataRecoveryTest(BytzTestFramework):
     def set_test_params(self):
-        extra_args = [["-vbparams=dip0020:0:999999999999:10:8:6:5"] for _ in range(9)]
+        extra_args = [["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"] for _ in range(9)]
         self.set_bytz_test_params(9, 7, fast_dip3_enforcement=True, extra_args=extra_args)
         self.set_bytz_llmq_test_params(4, 3)
 
@@ -125,44 +126,48 @@ class QuorumDataRecoveryTest(BytzTestFramework):
         node.spork("SPORK_21_QUORUM_ALL_CONNECTED", 0)
         self.wait_for_sporks_same()
         self.activate_dip8()
-
+        height = self.nodes[0].getblockcount()
+        while height < 300:
+            self.nodes[0].generate(1)
+            height = self.nodes[0].getblockcount()
         logger.info("Test automated DGK data recovery")
         # This two nodes will remain the only ones with valid DKG data
         last_resort_test = None
-        last_resort_v17 = None
+        last_resort_dip0020 = None
         while True:
             # Mine the quorums used for the recovery test
             quorum_hash_recover = self.mine_quorum()
             # Get all their member masternodes
             member_mns_recover_test = self.get_member_mns(llmq_test, quorum_hash_recover)
-            member_mns_recover_v17 = self.get_member_mns(llmq_test_v17, quorum_hash_recover)
+            #time.sleep(1000)
+            member_mns_recover_dip0020 = self.get_member_mns(llmq_test_v17, quorum_hash_recover)
             # All members should initially be valid
             self.test_mns(llmq_test, quorum_hash_recover, valid_mns=member_mns_recover_test)
-            self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_v17)
+            self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_dip0020)
             try:
                 # As last resorts find one node which is in llmq_test but not in llmq_test_v17 and one other vice versa
-                last_resort_test = self.get_subset_only_in_left(member_mns_recover_test, member_mns_recover_v17)[0]
-                last_resort_v17 = self.get_subset_only_in_left(member_mns_recover_v17, member_mns_recover_test)[0]
+                last_resort_test = self.get_subset_only_in_left(member_mns_recover_test, member_mns_recover_dip0020)[0]
+                last_resort_dip0020 = self.get_subset_only_in_left(member_mns_recover_dip0020, member_mns_recover_test)[0]
                 break
             except IndexError:
                 continue
-        assert last_resort_test != last_resort_v17
+        assert last_resort_test != last_resort_dip0020
         # Reindex all other nodes the to drop their DKG data, first run with recovery disabled to make sure disabling
         # works as expected
-        recover_members = member_mns_recover_test + member_mns_recover_v17
-        exclude_members = [last_resort_test, last_resort_v17]
+        recover_members = member_mns_recover_test + member_mns_recover_dip0020
+        exclude_members = [last_resort_test, last_resort_dip0020]
         # Reindex all masternodes but exclude the last_resort for both testing quorums
         self.restart_mns(exclude=exclude_members, reindex=True, qdata_recovery_enabled=False)
         # Validate all but one are invalid members now
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=[last_resort_test], all_mns=member_mns_recover_test)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=[last_resort_v17], all_mns=member_mns_recover_v17)
+        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=[last_resort_dip0020], all_mns=member_mns_recover_dip0020)
         # If recovery would be enabled it would trigger after the mocktime bump / mined block
         self.bump_mocktime(self.quorum_data_request_expiration_timeout + 1)
         node.generate(1)
         time.sleep(10)
         # Make sure they are still invalid
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=[last_resort_test], all_mns=member_mns_recover_test)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=[last_resort_v17], all_mns=member_mns_recover_v17)
+        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=[last_resort_dip0020], all_mns=member_mns_recover_dip0020)
         # Mining a block should not result in a chainlock now because the responsible quorum shouldn't have enough
         # valid members.
         self.wait_for_chainlocked_block(node, node.generate(1)[0], False, 5)
@@ -171,7 +176,7 @@ class QuorumDataRecoveryTest(BytzTestFramework):
         # Validate that all invalid members recover. Note: recover=True leads to mocktime bumps and mining while waiting
         # which trigger CQuorumManger::TriggerQuorumDataRecoveryThreads()
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=member_mns_recover_test, recover=True)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_v17, recover=True)
+        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_dip0020, recover=True)
         # Mining a block should result in a chainlock now because the quorum should be healed
         self.wait_for_chainlocked_block(node, node.getbestblockhash())
         logger.info("Test -llmq-qvvec-sync command line parameter")

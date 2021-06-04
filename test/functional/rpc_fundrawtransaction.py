@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
+# Copyright (c) 2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the fundrawtransaction RPC."""
@@ -61,7 +62,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         # ensure that setting changePosition in fundraw with an exact match is handled properly
         rawmatch = self.nodes[2].createrawtransaction([], {self.nodes[2].getnewaddress():500})
         rawmatch = self.nodes[2].fundrawtransaction(rawmatch, {"changePosition":1, "subtractFeeFromOutputs":[0]})
-        assert_equal(rawmatch["changepos"], -1)
+        assert_equal(rawmatch["changepos"], 1)
 
         watchonly_address = self.nodes[0].getnewaddress()
         watchonly_pubkey = self.nodes[0].getaddressinfo(watchonly_address)["pubkey"]
@@ -511,7 +512,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.sync_all()
 
         # make sure funds are received at node1
-        assert_equal(oldBalance+Decimal('511.0000000'), self.nodes[0].getbalance())
+        assert_equal(oldBalance+Decimal('10011.0000000'), self.nodes[0].getbalance())
 
         ###############################################
         # multiple (~19) inputs tx test | Compare fee #
@@ -570,7 +571,7 @@ class RawTransactionsTest(BitcoinTestFramework):
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
-        assert_equal(oldBalance+Decimal('500.19000000'), self.nodes[0].getbalance()) #0.19+block reward
+        assert_equal(oldBalance+Decimal('10000.19000000'), self.nodes[0].getbalance()) #0.19+block reward
 
         #####################################################
         # test fundrawtransaction with OP_RETURN and no vin #

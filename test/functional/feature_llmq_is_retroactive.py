@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2021 The Dash Core developers
+# Copyright (c) 2018-2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -85,18 +86,19 @@ class LLMQ_IS_RetroactiveSigning(BytzTestFramework):
         # and this should be enough to complete an IS lock
         self.wait_for_instantlock(txid, self.nodes[0])
 
-        self.log.info("testing retroactive signing with unknown TX")
-        isolate_node(self.nodes[3])
-        rawtx = self.nodes[0].createrawtransaction([], {self.nodes[0].getnewaddress(): 1})
-        rawtx = self.nodes[0].fundrawtransaction(rawtx)['hex']
-        rawtx = self.nodes[0].signrawtransactionwithwallet(rawtx)['hex']
-        txid = self.nodes[3].sendrawtransaction(rawtx)
+        # generatetoaddress does not work in POS
+        #self.log.info("testing retroactive signing with unknown TX")
+        #isolate_node(self.nodes[3])
+        #rawtx = self.nodes[0].createrawtransaction([], {self.nodes[0].getnewaddress(): 1})
+        #rawtx = self.nodes[0].fundrawtransaction(rawtx)['hex']
+        #rawtx = self.nodes[0].signrawtransactionwithwallet(rawtx)['hex']
+        #txid = self.nodes[3].sendrawtransaction(rawtx)
         # Make node 3 consider the TX as safe
-        self.bump_mocktime(10 * 60 + 1)
-        block = self.nodes[3].generatetoaddress(1, self.nodes[0].getnewaddress())[0]
-        reconnect_isolated_node(self.nodes[3], 0)
-        self.wait_for_chainlocked_block_all_nodes(block)
-        self.nodes[0].setmocktime(self.mocktime)
+        #self.bump_mocktime(10 * 60 + 1)
+        #block = self.nodes[0].generatetoaddress(1, self.nodes[0].getnewaddress())[0]
+        #reconnect_isolated_node(self.nodes[3], 0)
+        #self.wait_for_chainlocked_block_all_nodes(block)
+        #self.nodes[0].setmocktime(self.mocktime)
 
         self.log.info("testing retroactive signing with partially known TX")
         isolate_node(self.nodes[3])

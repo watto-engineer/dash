@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
-# Copyright (c) 2014-2021 The Dash Core developers
+# Copyright (c) 2014-2020 The Dash Core developers
+# Copyright (c) 2014-2020 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Base class for RPC testing."""
@@ -21,8 +22,10 @@ from concurrent.futures import ThreadPoolExecutor
 from .authproxy import JSONRPCException
 from . import coverage
 from .messages import (
+    BlockTransactions,
     CTransaction,
     FromHex,
+    ToHex,
     hash256,
     msg_islock,
     ser_compact_size,
@@ -61,7 +64,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1524496461
+GENESISTIME = 1524496462
 
 class BitcoinTestFramework():
     """Base class for a bitcoin test script.
@@ -461,7 +464,7 @@ class BitcoinTestFramework():
                 node.wait_for_rpc_connection()
 
             # Create a 200-block-long chain; each of the 4 first nodes
-            # gets 25 mature blocks and 25 immature.
+            # gets 25 mature blocks and 74 immature.
             # Note: To preserve compatibility with older versions of
             # initialize_chain, only 4 nodes will generate coins.
             #
@@ -473,7 +476,7 @@ class BitcoinTestFramework():
                     for j in range(25):
                         set_node_times(self.nodes, block_time)
                         self.nodes[peer].generate(1)
-                        block_time += 156
+                        block_time += 62
                     # Must sync before next peer starts generating blocks
                     self.sync_blocks()
 
@@ -579,7 +582,34 @@ class BytzTestFramework(BitcoinTestFramework):
         for i in range(0, idx):
             connect_nodes(self.nodes[i], idx)
 
+    def create_management_tokens(self):
+        self.log.info("Generating Management Tokens...")
+        self.nodes[0].generate(280)
+        BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+        global creditsubgroupID
+        MGTAddr=self.nodes[0].getnewaddress()
+        GVTAddr=self.nodes[0].getnewaddress()
+        self.nodes[0].importprivkey("5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        MGTBLS=self.nodes[0].bls("generate")
+        GVTBLS=self.nodes[0].bls("generate")
+        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "https://www.google.com", "0", "4", MGTBLS["public"], "false", "true")
+        self.nodes[0].generate(1)
+        MGTGroup_ID=MGT['groupID']
+        self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '25')
+        GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "https://www.google.com", "0", "0", GVTBLS["public"], "true", "true")
+        self.nodes[0].generate(1)
+        GVTGroup_ID=GVT['groupID']
+        self.nodes[0].minttoken(GVTGroup_ID, GVTAddr, '25')
+        self.nodes[0].generate(1)
+        self.log.info("Creating GVT.credits")
+        creditsubgroupID=self.nodes[0].getsubgroupid(GVTGroup_ID,"credit")
+        creditaddr=self.nodes[0].getnewaddress()
+        self.nodes[0].minttoken(creditsubgroupID, creditaddr, 100)
+        self.nodes[0].generate(1)
+
     def prepare_masternodes(self):
+        
         self.log.info("Preparing %d masternodes" % self.mn_count)
         for idx in range(0, self.mn_count):
             self.prepare_masternode(idx)
@@ -587,7 +617,9 @@ class BytzTestFramework(BitcoinTestFramework):
     def prepare_masternode(self, idx):
         bls = self.nodes[0].bls('generate')
         address = self.nodes[0].getnewaddress()
+        self.nodes[0].sendtoken(creditsubgroupID, address, 1)
         txid = self.nodes[0].sendtoaddress(address, MASTERNODE_COLLATERAL)
+        self.nodes[0].generate(1)
 
         txraw = self.nodes[0].getrawtransaction(txid, True)
         collateral_vout = 0
@@ -598,7 +630,17 @@ class BytzTestFramework(BitcoinTestFramework):
         self.nodes[0].lockunspent(False, [{'txid': txid, 'vout': collateral_vout}])
 
         # send to same address to reserve some funds for fees
-        self.nodes[0].sendtoaddress(address, 0.001)
+        self.nodes[0].sendtoken(creditsubgroupID, address, 1)
+
+        txid_fee = self.nodes[0].sendtoaddress(address, 0.001)
+        self.nodes[0].generate(1)
+
+        txraw_fee = self.nodes[0].getrawtransaction(txid_fee, True)
+        collateral_vout_fee = 0
+        for vout_idx_fee in range(0, len(txraw_fee["vout"])):
+            vout_fee = txraw_fee["vout"][vout_idx_fee]
+            if vout_fee["value"] == 0.001 and vout_fee["addresses"][0] == address:
+                collateral_vout_fee = vout_idx_fee
 
         ownerAddr = self.nodes[0].getnewaddress()
         votingAddr = self.nodes[0].getnewaddress()
@@ -610,12 +652,13 @@ class BytzTestFramework(BitcoinTestFramework):
         operatorPayoutAddress = self.nodes[0].getnewaddress()
 
         submit = (idx % 4) < 2
-
         if (idx % 2) == 0 :
             self.nodes[0].lockunspent(True, [{'txid': txid, 'vout': collateral_vout}])
             protx_result = self.nodes[0].protx('register_fund', address, ipAndPort, ownerAddr, bls['public'], votingAddr, operatorReward, rewardsAddr, address, submit)
         else:
+            self.nodes[0].lockunspent(False, [{'txid': txid_fee, 'vout': collateral_vout_fee}])
             self.nodes[0].generate(1)
+            self.nodes[0].lockunspent(True, [{'txid': txid_fee, 'vout': collateral_vout_fee}])
             protx_result = self.nodes[0].protx('register', txid, collateral_vout, ipAndPort, ownerAddr, bls['public'], votingAddr, operatorReward, rewardsAddr, address, submit)
 
         if submit:
@@ -703,6 +746,16 @@ class BytzTestFramework(BitcoinTestFramework):
         self.log.info("Creating and starting controller node")
         self.add_nodes(1, extra_args=[self.extra_args[0]])
         self.start_node(0)
+        self.nodes[0].generate(16)
+        inputs  = [ ]
+        outputs = { self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000, self.nodes[0].getnewaddress() : 15000000 }
+        rawtx = self.nodes[0].createrawtransaction(inputs, outputs)
+        rawtxfund = self.nodes[0].fundrawtransaction(rawtx)['hex']
+        tx = FromHex(CTransaction(), rawtxfund)
+        tx_signed = self.nodes[0].signrawtransactionwithwallet(ToHex(tx))["hex"]
+        self.nodes[0].sendrawtransaction(tx_signed)
+        self.nodes[0].generate(4)
+
         required_balance = MASTERNODE_COLLATERAL * self.mn_count + 1
         self.log.info("Generating %d coins" % required_balance)
         while self.nodes[0].getbalance() < required_balance:
@@ -714,16 +767,23 @@ class BytzTestFramework(BitcoinTestFramework):
             self.create_simple_node()
 
         self.log.info("Activating DIP3")
-        self.nodes[0].generate(90)
+ 
+        spork4height=500
         if not self.fast_dip3_enforcement:
-            while self.nodes[0].getblockcount() < 500:
+            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", spork4height)
+            self.wait_for_sporks_same()
+            while self.nodes[0].getblockcount() < spork4height:
                 self.nodes[0].generate(10)
         else:
-            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 50)
+            spork4height = self.nodes[0].getblockcount() + 1
+            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", spork4height)
             self.wait_for_sporks_same()
+            self.nodes[0].generate(1)
+
         self.sync_all()
 
         # create masternodes
+        self.create_management_tokens()
         self.prepare_masternodes()
         self.prepare_datadirs()
         self.start_masternodes()
@@ -738,8 +798,7 @@ class BytzTestFramework(BitcoinTestFramework):
         # sync nodes
         self.sync_all()
         # Enable InstantSend (including block filtering) and ChainLocks by default
-        if self.fast_dip3_enforcement:
-            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 50)
+        self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", spork4height)
         self.nodes[0].spork("SPORK_2_INSTANTSEND_ENABLED", 0)
         self.nodes[0].spork("SPORK_3_INSTANTSEND_BLOCK_FILTERING", 0)
         self.nodes[0].spork("SPORK_19_CHAINLOCKS_ENABLED", 0)
@@ -970,7 +1029,8 @@ class BytzTestFramework(BitcoinTestFramework):
             return all_ok
         wait_until(check_dkg_comitments, timeout=timeout, sleep=0.1)
 
-    def wait_for_quorum_list(self, quorum_hash, nodes, timeout=15, sleep=2):
+    def wait_for_quorum_list(self, quorum_hash, nodes, timeout=15, sleep=0.1):
+        self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 10)
         def wait_func():
             if quorum_hash in self.nodes[0].quorum("list")["llmq_test"]:
                 return True
@@ -1002,14 +1062,17 @@ class BytzTestFramework(BitcoinTestFramework):
                                                    expected_justifications, expected_commitments))
 
         nodes = [self.nodes[0]] + [mn.node for mn in mninfos_online]
-
         # move forward to next DKG
-        skip_count = 24 - (self.nodes[0].getblockcount() % 24)
+        skip_count = 60 - (self.nodes[0].getblockcount() % 60)
         if skip_count != 0:
             self.bump_mocktime(1, nodes=nodes)
             self.nodes[0].generate(skip_count)
         sync_blocks(nodes)
-
+        #newQuorum = self.nodes[1].quorum("dkgstatus")["session"]
+        #newQuorum = newQuorum["llmq_test"]
+        #newQuorum = newQuorum["quorumHeight"]
+        #self.log.info("Quorum Heght %s" % newQuorum)
+        #q = self.nodes[0].getblockhash(newQuorum)
         q = self.nodes[0].getbestblockhash()
 
         self.log.info("Waiting for phase 1 (init)")
@@ -1018,31 +1081,31 @@ class BytzTestFramework(BitcoinTestFramework):
         if spork23_active:
             self.wait_for_masternode_probes(mninfos_valid, wait_proc=lambda: self.bump_mocktime(1, nodes=nodes))
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].generate(2)
+        self.nodes[0].generate(3)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 2 (contribute)")
         self.wait_for_quorum_phase(q, 2, expected_members, "receivedContributions", expected_contributions, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].generate(2)
+        self.nodes[0].generate(3)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 3 (complain)")
         self.wait_for_quorum_phase(q, 3, expected_members, "receivedComplaints", expected_complaints, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].generate(2)
+        self.nodes[0].generate(3)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 4 (justify)")
         self.wait_for_quorum_phase(q, 4, expected_members, "receivedJustifications", expected_justifications, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].generate(2)
+        self.nodes[0].generate(3)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 5 (commit)")
         self.wait_for_quorum_phase(q, 5, expected_members, "receivedPrematureCommitments", expected_commitments, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].generate(2)
+        self.nodes[0].generate(3)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 6 (mining)")
@@ -1053,19 +1116,17 @@ class BytzTestFramework(BitcoinTestFramework):
 
         self.log.info("Mining final commitment")
         self.bump_mocktime(1, nodes=nodes)
-        self.nodes[0].getblocktemplate() # this calls CreateNewBlock
         self.nodes[0].generate(1)
         sync_blocks(nodes)
 
         self.log.info("Waiting for quorum to appear in the list")
         self.wait_for_quorum_list(q, nodes)
-
         new_quorum = self.nodes[0].quorum("list", 1)["llmq_test"][0]
         assert_equal(q, new_quorum)
         quorum_info = self.nodes[0].quorum("info", 100, new_quorum)
 
         # Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
-        self.nodes[0].generate(8)
+        self.nodes[0].generate(12)
 
         sync_blocks(nodes)
 

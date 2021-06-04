@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
+# Copyright (c) 2020-2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test fee estimation code."""
@@ -171,7 +172,7 @@ class EstimateFeeTest(BitcoinTestFramework):
         self.log.info("Splitting inputs so we can generate tx's")
 
         # Start node0
-        self.start_node(0)
+        self.start_node(0, ["-minrelaytxfee=0.00002"])
         self.txouts = []
         self.txouts2 = []
         # Split a coinbase into two transaction puzzle outputs

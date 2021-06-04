@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2021 The Dash Core developers
+# Copyright (c) 2018-2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.mininode import *
 from test_framework.test_framework import BytzTestFramework
 from test_framework.util import *
+
+BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 '''
 feature_llmq_signing.py

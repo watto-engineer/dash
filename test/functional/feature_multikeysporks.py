@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2018-2021 The Dash Core developers
+# Copyright (c) 2018-2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 import time
@@ -26,43 +27,43 @@ class MultiKeySporkTest(BitcoinTestFramework):
         self.is_network_split = False
 
     def setup_network(self):
-        # secret(base58): 931wyuRNVYvhg18Uu9bky5Qg1z4QbxaJ7fefNBzjBPiLRqcd33F
+        # secret(base58): NNaCsaiaNDc5GFEp8bXVngvxeKazj7HVPXH8n6ywHWrDRomj4yor
         # keyid(hex): 60f0f57f71f0081f1aacdd8432340a33a526f91b
-        # address(base58): yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa
+        # address(base58): TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt
 
-        # secret(base58): 91vbXGMSWKGHom62986XtL1q2mQDA12ngcuUNNe5NfMSj44j7g3
+        # secret(base58): NQhNc5UpCiPRrwE6HvnYuHz7i8aNwUm6QoMv5xUPk7HWsfSupVjq
         # keyid(hex): 43dff2b09de2f904f688ec14ee6899087b889ad0
-        # address(base58): yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h
+        # address(base58): TxWap683gHnERvK86W4DNZUHPeaR8XvSXx
 
-        # secret(base58): 92bxUjPT5AhgXuXJwfGGXqhomY2SdQ55MYjXyx9DZNxCABCSsRH
+        # secret(base58): NRzqHHPT5NHy4NZhfNqGj3w4JLyU7KGGFKTja6vx5KoTsaCVZvwZ
         # keyid(hex): d9aa5fa00cce99101a4044e65dc544d1579890de
-        # address(base58): ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7
+        # address(base58): TxSr9mDxoC4u4Q1UqqzWvnQzvMWYyiYeeQ
 
-        # secret(base58): 934yPXiVGf4RCY2qTs2Bt5k3TEtAiAg12sMxCt8yVWbSU7p3fuD
+        # secret(base58): NPo1astJDM7LEDkUVViqScS2oXmxGGGxpKTQjDanYRqYyXV6jcPE
         # keyid(hex): 0b23935ce0bea3b997a334f6fa276c9fa17687b2
-        # address(base58): ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn
+        # address(base58): TxCQxNd4qmJJjREV8cf6GgRDWd69KGh5G9
 
-        # secret(base58): 92Cxwia363Wg2qGF1fE5z4GKi8u7r1nrWQXdtsj2ACZqaDPSihD
+        # secret(base58): NJeFmk3hhB8PKoYSE9R5RKqcEyqFiKmjPtQmHitxgifAJtRdUZ7M
         # keyid(hex): 1d1098b2b1f759b678a0a7a098637a9b898adcac
-        # address(base58): yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui
+        # address(base58): Tx2n9FNwoNCKdCUtfbnqLcLgPao3bpGjCp
 
         self.add_nodes(5)
 
-        spork_chain_params =   ["-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                                "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                                "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                                "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                                "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        spork_chain_params =   ["-sporkaddr=TxSr9mDxoC4u4Q1UqqzWvnQzvMWYyiYeeQ",
+                                "-sporkaddr=TxWap683gHnERvK86W4DNZUHPeaR8XvSXx",
+                                "-sporkaddr=TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt",
+                                "-sporkaddr=TxCQxNd4qmJJjREV8cf6GgRDWd69KGh5G9",
+                                "-sporkaddr=Tx2n9FNwoNCKdCUtfbnqLcLgPao3bpGjCp",
                                 "-minsporkkeys=3"]
 
         # Node0 extra args to use on normal node restarts
-        self.node0_extra_args = ["-sporkkey=931wyuRNVYvhg18Uu9bky5Qg1z4QbxaJ7fefNBzjBPiLRqcd33F"] + spork_chain_params
+        self.node0_extra_args = ["-sporkkey=NNaCsaiaNDc5GFEp8bXVngvxeKazj7HVPXH8n6ywHWrDRomj4yor"] + spork_chain_params
 
         self.start_node(0, self.node0_extra_args)
-        self.start_node(1, ["-sporkkey=91vbXGMSWKGHom62986XtL1q2mQDA12ngcuUNNe5NfMSj44j7g3"] + spork_chain_params)
-        self.start_node(2, ["-sporkkey=92bxUjPT5AhgXuXJwfGGXqhomY2SdQ55MYjXyx9DZNxCABCSsRH"] + spork_chain_params)
-        self.start_node(3, ["-sporkkey=934yPXiVGf4RCY2qTs2Bt5k3TEtAiAg12sMxCt8yVWbSU7p3fuD"] + spork_chain_params)
-        self.start_node(4, ["-sporkkey=92Cxwia363Wg2qGF1fE5z4GKi8u7r1nrWQXdtsj2ACZqaDPSihD"] + spork_chain_params)
+        self.start_node(1, ["-sporkkey=NQhNc5UpCiPRrwE6HvnYuHz7i8aNwUm6QoMv5xUPk7HWsfSupVjq"] + spork_chain_params)
+        self.start_node(2, ["-sporkkey=NRzqHHPT5NHy4NZhfNqGj3w4JLyU7KGGFKTja6vx5KoTsaCVZvwZ"] + spork_chain_params)
+        self.start_node(3, ["-sporkkey=NPo1astJDM7LEDkUVViqScS2oXmxGGGxpKTQjDanYRqYyXV6jcPE"] + spork_chain_params)
+        self.start_node(4, ["-sporkkey=NJeFmk3hhB8PKoYSE9R5RKqcEyqFiKmjPtQmHitxgifAJtRdUZ7M"] + spork_chain_params)
 
         # connect nodes at start
         for i in range(0, 5):

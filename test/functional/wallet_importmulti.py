@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
+# Copyright (c) 2020-2021 The Bytz Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the importmulti RPC."""
@@ -282,7 +283,7 @@ class ImportMultiTest (BitcoinTestFramework):
         sig_address_2 = self.nodes[0].getaddressinfo(self.nodes[0].getnewaddress())
         sig_address_3 = self.nodes[0].getaddressinfo(self.nodes[0].getnewaddress())
         multi_sig_script = self.nodes[0].createmultisig(2, [sig_address_1['pubkey'], sig_address_2['pubkey'], sig_address_3['pubkey']])
-        self.nodes[1].generate(100)
+        self.nodes[1].generate(10)
         self.nodes[1].sendtoaddress(multi_sig_script['address'], 10.00)
         self.nodes[1].generate(1)
         timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
@@ -309,7 +310,7 @@ class ImportMultiTest (BitcoinTestFramework):
         sig_address_2 = self.nodes[0].getaddressinfo(self.nodes[0].getnewaddress())
         sig_address_3 = self.nodes[0].getaddressinfo(self.nodes[0].getnewaddress())
         multi_sig_script = self.nodes[0].createmultisig(2, [sig_address_1['pubkey'], sig_address_2['pubkey'], sig_address_3['pubkey']])
-        self.nodes[1].generate(100)
+        self.nodes[1].generate(10)
         self.nodes[1].sendtoaddress(multi_sig_script['address'], 10.00)
         self.nodes[1].generate(1)
         timestamp = self.nodes[1].getblock(self.nodes[1].getbestblockhash())['mediantime']
