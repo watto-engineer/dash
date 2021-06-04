@@ -76,6 +76,7 @@ TEST_FRAMEWORK_MODULES = [
 EXTENDED_SCRIPTS = [
     # These tests are not run by default.
     # Longest test should go first, to favor running tests in parallel
+    'rpc_token_test_pt1.py',
     'feature_pruning.py', # NOTE: Prune mode is incompatible with -txindex, should work with governance validation disabled though.
     'feature_dbcrash.py',
 ]
@@ -88,6 +89,7 @@ BASE_SCRIPTS = [
     'feature_fee_estimation.py',
     'wallet_hd.py',
     'wallet_backup.py',
+    'feature_startmn.py',
     # vv Tests less than 5m vv
     'mining_getblocktemplate_longpoll.py', # FIXME: "socket.error: [Errno 54] Connection reset by peer" on my Mac, same as https://github.com/bitcoin/bitcoin/issues/6651
     'feature_maxuploadtarget.py',

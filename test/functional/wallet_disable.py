@@ -22,12 +22,12 @@ class DisableWalletTest (WagerrTestFramework):
         assert_raises_rpc_error(-32601, 'Method not found', self.nodes[0].getwalletinfo)
         x = self.nodes[0].validateaddress('7TSBtVu959hGEGPKyHjJz9k55RpWrPffXz')
         assert x['isvalid'] == False
-        x = self.nodes[0].validateaddress('ycwedq2f3sz2Yf9JqZsBCQPxp18WU3Hp4J')
+        x = self.nodes[0].validateaddress('TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt')
         assert x['isvalid'] == True
 
         # Checking mining to an address without a wallet. Generating to a valid address should succeed
         # but generating to an invalid address will fail.
-        self.nodes[0].generatetoaddress(1, 'ycwedq2f3sz2Yf9JqZsBCQPxp18WU3Hp4J')
+        self.nodes[0].generatetoaddress(1, 'TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt')
         assert_raises_rpc_error(-5, "Invalid address", self.nodes[0].generatetoaddress, 1, '7TSBtVu959hGEGPKyHjJz9k55RpWrPffXz')
 
 if __name__ == '__main__':

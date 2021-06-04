@@ -226,7 +226,7 @@ class DIP3Test(WagerrTestFramework):
 
     def create_mn_collateral(self, node, mn):
         mn.collateral_address = node.getnewaddress()
-        mn.collateral_txid = node.sendtoaddress(mn.collateral_address, 1000)
+        mn.collateral_txid = node.sendtoaddress(mn.collateral_address, 25000)
         mn.collateral_vout = None
         node.generate(1)
 
@@ -239,7 +239,7 @@ class DIP3Test(WagerrTestFramework):
 
     # register a protx MN and also fund it (using collateral inside ProRegTx)
     def register_fund_mn(self, node, mn):
-        node.sendtoaddress(mn.fundsAddr, 1000.001)
+        node.sendtoaddress(mn.fundsAddr, 25000.001)
         mn.collateral_address = node.getnewaddress()
         mn.rewards_address = node.getnewaddress()
 

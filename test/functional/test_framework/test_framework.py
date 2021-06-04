@@ -23,8 +23,10 @@ from .authproxy import JSONRPCException
 from test_framework.blocktools import TIME_GENESIS_BLOCK
 from . import coverage
 from .messages import (
+    BlockTransactions,
     CTransaction,
     FromHex,
+    ToHex,
     hash256,
     msg_islock,
     msg_isdlock,
@@ -63,7 +65,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1524496461
+GENESISTIME = 1524496462
 
 TMPDIR_PREFIX = "wagerr_func_test_"
 

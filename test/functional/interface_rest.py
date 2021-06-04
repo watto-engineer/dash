@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the REST API."""
@@ -85,7 +86,7 @@ class RESTTest (WagerrTestFramework):
         self.nodes[1].generatetoaddress(100, not_related_address)
         self.sync_all()
 
-        assert_equal(self.nodes[0].getbalance(), 500)
+        assert_equal(self.nodes[0].getbalance(), 947000000)
 
         txid = self.nodes[0].sendtoaddress(self.nodes[1].getnewaddress(), 0.1)
         self.sync_all()
@@ -226,9 +227,9 @@ class RESTTest (WagerrTestFramework):
 
         # Compare with block header
         response_header = self.test_rest_request("/headers/1/{}".format(bb_hash), req_type=ReqType.BIN, ret_type=RetType.OBJ)
-        assert_equal(int(response_header.getheader('content-length')), 80)
+        assert_equal(int(response_header.getheader('content-length')), 112)
         response_header_bytes = response_header.read()
-        assert_equal(response_bytes[:80], response_header_bytes)
+        assert_equal(response_bytes[:112], response_header_bytes)
 
         # Check block hex format
         response_hex = self.test_rest_request("/block/{}".format(bb_hash), req_type=ReqType.HEX, ret_type=RetType.OBJ)
