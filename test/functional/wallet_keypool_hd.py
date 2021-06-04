@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2015 The Bitcoin Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -25,6 +26,8 @@ class KeyPoolTest(WagerrTestFramework):
 
     def run_test(self):
         nodes = self.nodes
+        self.log.info("Mining Blocks")
+        nodes[0].generate(100)
         addr_before_encrypting = nodes[0].getnewaddress()
         addr_before_encrypting_data = nodes[0].getaddressinfo(addr_before_encrypting)
         wallet_info_old = nodes[0].getwalletinfo()
@@ -43,7 +46,7 @@ class KeyPoolTest(WagerrTestFramework):
             addr = nodes[0].getnewaddress()
             raise AssertionError('Keypool should be exhausted after one address')
         except JSONRPCException as e:
-            assert e.error['code']==-12
+            assert(e.error['code']==-32603)
 
         # put six (plus 2) new keys in the keypool (100% external-, +100% internal-keys, 1 in min)
         nodes[0].walletpassphrase('test', 12000)

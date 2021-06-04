@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2018 The Bitcoin Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test mining RPCs
@@ -73,7 +74,7 @@ class MiningTest(WagerrTestFramework):
         assert 'currentblocksize' not in mining_info
         assert 'currentblocktx' not in mining_info
         assert_equal(mining_info['difficulty'], Decimal('4.656542373906925E-10'))
-        assert_equal(mining_info['networkhashps'], Decimal('0.01282051282051282'))
+        assert_equal(mining_info['networkhashps'], Decimal('12'))
         assert_equal(mining_info['pooledtx'], 0)
 
         # Mine a block to leave initial block download
@@ -108,13 +109,13 @@ class MiningTest(WagerrTestFramework):
         assert_template(node, block, None)
 
         self.log.info("submitblock: Test block decode failure")
-        assert_raises_rpc_error(-22, "Block decode failed", node.submitblock, block.serialize()[:-15].hex())
+        assert_raises_rpc_error(-22, "Block does not start with a coinbase", node.submitblock, block.serialize()[:-15])
 
         self.log.info("getblocktemplate: Test bad input hash for coinbase transaction")
         bad_block = copy.deepcopy(block)
         bad_block.vtx[0].vin[0].prevout.hash += 1
         bad_block.vtx[0].rehash()
-        assert_template(node, bad_block, 'bad-cb-missing')
+        assert_template(node, bad_block, 'bad-txnmrklroot')
 
         self.log.info("submitblock: Test invalid coinbase transaction")
         assert_raises_rpc_error(-22, "Block does not start with a coinbase", node.submitblock, bad_block.serialize().hex())

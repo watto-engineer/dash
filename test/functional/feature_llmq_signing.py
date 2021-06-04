@@ -15,6 +15,7 @@ from test_framework.mininode import P2PInterface
 from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, connect_nodes, force_finish_mnsync, hex_str_to_bytes, wait_until
 
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class LLMQSigningTest(WagerrTestFramework):
     def set_test_params(self):

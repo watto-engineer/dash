@@ -8,7 +8,7 @@ from test_framework.util import assert_equal, get_bip9_status
 '''
 feature_new_quorum_type_activation.py
 
-Tests the activation of a new quorum type in v17 via a bip9-like hardfork
+Tests the activation of a new quorum type in dip0020 via a bip9-like hardfork
 
 '''
 
@@ -26,7 +26,7 @@ class NewQuorumTypeActivationTest(WagerrTestFramework):
         ql = self.nodes[0].quorum("list")
         assert_equal(len(ql), 2)
         assert "llmq_test_v17" not in ql
-        self.nodes[0].generate(10)
+        self.nodes[0].generate(300)
         assert_equal(get_bip9_status(self.nodes[0], 'dip0020')['status'], 'locked_in')
         ql = self.nodes[0].quorum("list")
         assert_equal(len(ql), 2)
