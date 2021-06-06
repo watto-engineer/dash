@@ -16,7 +16,7 @@
 std::shared_ptr<CRewardManager> rewardManager;
 
 CRewardManager::CRewardManager() :
-        fEnableRewardManager(false), fEnableAutoCombineRewards(false), nAutoCombineAmountThreshold(0), nAutoCombineNThreshold(10) {
+        fEnableRewardManager(false), nAutoCombineNThreshold(10) {
 }
 
 bool CRewardManager::IsReady() {
@@ -36,15 +36,25 @@ bool CRewardManager::IsReady() {
     return true;
 }
 
+bool CRewardManager::IsAutoCombineEnabled()
+{
+    bool fEnable;
+    CAmount nAutoCombineAmountThreshold;
+    pwallet->GetAutoCombineSettings(fEnable, nAutoCombineAmountThreshold);
+    return fEnable;
+}
+
+CAmount CRewardManager::GetAutoCombineThresholdAmount()
+{
+    bool fEnable;
+    CAmount nAutoCombineAmountThreshold;
+    pwallet->GetAutoCombineSettings(fEnable, nAutoCombineAmountThreshold);
+    return nAutoCombineAmountThreshold;
+}
+
 bool CRewardManager::IsCombining()
 {
     return IsReady() && IsAutoCombineEnabled();
-}
-
-void CRewardManager::AutoCombineSettings(bool fEnable, CAmount nAutoCombineAmountThresholdIn) {
-    LOCK(cs);
-    fEnableAutoCombineRewards = fEnable;
-    nAutoCombineAmountThreshold = nAutoCombineAmountThresholdIn;
 }
 
 // TODO: replace with pwallet->FilterCoins()
@@ -67,7 +77,12 @@ std::map<CTxDestination, std::vector<COutput> > CRewardManager::AvailableCoinsBy
     return mapCoins;
 }
 
-void CRewardManager::AutoCombineRewards() {
+void CRewardManager::AutocombineDust() {
+    bool fEnable;
+    CAmount nAutoCombineAmountThreshold;
+    pwallet->GetAutoCombineSettings(fEnable, nAutoCombineAmountThreshold);
+    if (!fEnable) return;
+
     std::map<CTxDestination, std::vector<COutput> > mapCoinsByAddress = AvailableCoinsByAddress(true, nAutoCombineAmountThreshold * COIN);
 
     //coins are sectioned by address. This combination code only wants to combine inputs that belong to the same address
@@ -123,8 +138,8 @@ void CRewardManager::AutoCombineRewards() {
         std::vector<CRecipient> vecSend;
         int nChangePosRet = -1;
         CScript scriptPubKey = GetScriptForDestination(it->first);
-        // 10% safety margin to avoid "Insufficient funds" errors
-        CRecipient recipient = {scriptPubKey, nTotalRewardsValue - (nTotalRewardsValue / 10), false};
+        // Subtract fee from amount
+        CRecipient recipient = {scriptPubKey, nTotalRewardsValue, true};
         vecSend.push_back(recipient);
 
         //Send change to same address
@@ -169,7 +184,7 @@ void CRewardManager::DoMaintenance(CConnman& connman) {
     }
 
     if (IsAutoCombineEnabled()) {
-        AutoCombineRewards();
+        AutocombineDust();
         int randsleep = GetRandInt(5 * 60 * 1000);
         MilliSleep(randsleep); // Sleep between 3 and 8 minutes
     }

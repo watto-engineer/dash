@@ -506,7 +506,10 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             std::pair<bool, CAmount> pSettings;
             ssValue >> pSettings;
-            rewardManager->AutoCombineSettings(pSettings.first, pSettings.second);
+            pwallet->LoadAutoCombineSettings(pSettings.first, pSettings.second);
+        }
+        else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
+            wss.m_unknown_records++;
         }
     } catch (const std::exception& e) {
         if (strErr.empty()) {

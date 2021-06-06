@@ -23,6 +23,7 @@ public:
     // Wagerr Specific WalletInitInterface
     virtual void AutoLockMasternodeCollaterals() const = 0;
     void InitStaking() const override {}
+    virtual void InitRewardsManagement() const = 0;
     virtual void InitCoinJoinSettings() const = 0;
     virtual bool InitAutoBackup() const = 0;
 
