@@ -4000,7 +4000,7 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue autocombinerewards(const JSONRPCRequest& request)
+UniValue autocombinedust(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     CWallet* const pwallet = wallet.get();
@@ -4016,16 +4016,16 @@ UniValue autocombinerewards(const JSONRPCRequest& request)
 
     if (request.fHelp || nParamsSize < 1 || (!fEnable && nParamsSize > 1) || nParamsSize > 2)
         throw std::runtime_error(
-            "autocombinerewards enable ( threshold )\n"
+            "autocombinedust enable ( threshold )\n"
             "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Bytz address\n"
-            "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
+            "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees.\n"
 
             "\nArguments:\n"
             "1. enable                  (boolean, required) Enable auto combine (true) or disable (false)\n"
             "2. threshold amount        (numeric, optional) Coins with an aggregated value of this amount will be combined (default: 0)\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("autocombinerewards", "true 500") + HelpExampleRpc("autocombinerewards", "true 500"));
+            HelpExampleCli("autocombinedust", "true 500") + HelpExampleRpc("autocombinedust", "true 500"));
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -4043,8 +4043,6 @@ UniValue autocombinerewards(const JSONRPCRequest& request)
     if (!pwallet->SetAutoCombineSettings(fEnable, nThresholdAmount)) {
         throw std::runtime_error("Changed settings in wallet but failed to save to database\n");
     }
-
-    rewardManager->AutoCombineSettings(fEnable, nThresholdAmount);
 
     result.push_back(Pair("threshold", int(rewardManager->GetAutoCombineThresholdAmount())));
     result.push_back(Pair("enabled", rewardManager->IsAutoCombineEnabled()));
@@ -4618,6 +4616,7 @@ static const CRPCCommand commands[] =
 
     { "wallet",             "getstakingstatus",         &getstakingstatus,         {} },
     { "wallet",             "setstakesplitthreshold",   &setstakesplitthreshold,   {"value"} },
+    { "wallet",             "autocombinedust",       &autocombinedust,       {"enable", "threshold"} },
 };
 
 void RegisterWalletRPCCommands(CRPCTable &t)

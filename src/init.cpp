@@ -32,7 +32,6 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <pos/staking-manager.h>
-#include <reward-manager.h>
 #include <rpc/server.h>
 #include <rpc/register.h>
 #include <rpc/blockchain.h>
@@ -125,6 +124,7 @@ public:
     // Bytz Specific WalletInitInterface InitCoinJoinSettings
     void AutoLockMasternodeCollaterals() const override {}
     void InitStaking() const override {}
+    void InitRewardsManagement() const override {}
     void InitCoinJoinSettings() const override {}
     void InitKeePass() const override {}
     bool InitAutoBackup() const override {return true;}
@@ -342,7 +342,6 @@ void PrepareShutdown()
         evoDb.reset();
         zerocoinDB.reset();
         pTokenDB.reset();
-        rewardManager.reset();
         tokenGroupManager.reset();
     }
     g_wallet_init_interface.Stop();
@@ -1991,8 +1990,6 @@ bool AppInitMain()
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
                 tokenGroupManager.reset();
                 tokenGroupManager.reset(new CTokenGroupManager());
-                rewardManager.reset();
-                rewardManager.reset(new CRewardManager());
 
                 llmq::InitLLMQSystem(*evoDb, false, fReset || fReindexChainState);
 
@@ -2282,6 +2279,7 @@ bool AppInitMain()
     // ********************************************************* Step 10b: setup Staking
 
     g_wallet_init_interface.InitStaking();
+    g_wallet_init_interface.InitRewardsManagement();
 
     // ********************************************************* Step 10b: Load cache data
 

@@ -1789,7 +1789,10 @@ CAmount CWallet::GetChange(const CTxOut& txout) const
 bool CWallet::SetStakeSplitThreshold(uint64_t newThreshold)
 {
     WalletBatch batch(*database);
-    return batch.WriteStakeSplitThreshold(newThreshold);
+    if (!batch.WriteStakeSplitThreshold(newThreshold))
+        return false;
+    LoadStakeSplitThreshold(newThreshold);
+    return true;
 }
 
 void CWallet::LoadStakeSplitThreshold(uint64_t newThreshold)
@@ -1805,7 +1808,22 @@ uint64_t CWallet::GetStakeSplitThreshold()
 bool CWallet::SetAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
 {
     WalletBatch batch(*database);
-    return batch.WriteAutoCombineSettings(fEnable, nCombineThreshold);
+    if (!batch.WriteAutoCombineSettings(fEnable, nCombineThreshold))
+        return false;
+    LoadAutoCombineSettings(fEnable, nCombineThreshold);
+    return true;
+}
+
+void CWallet::LoadAutoCombineSettings(bool fEnableIn, CAmount nCombineThresholdIn)
+{
+    fCombineEnable = fEnableIn;
+    nCombineThreshold = nCombineThresholdIn;
+}
+
+void CWallet::GetAutoCombineSettings(bool& fEnableRet, CAmount& nCombineThresholdRet) const
+{
+    fEnableRet = fCombineEnable;
+    nCombineThresholdRet = nCombineThreshold;
 }
 
 void CWallet::GenerateNewHDChain(const SecureString& secureMnemonic, const SecureString& secureMnemonicPassphrase)

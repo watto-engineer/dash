@@ -59,6 +59,7 @@ public:
     void AutoLockMasternodeCollaterals() const override;
     void InitCoinJoinSettings() const override;
     void InitStaking() const override;
+    void InitRewardsManagement() const override;
     void InitKeePass() const override;
     bool InitAutoBackup() const override;
 };
@@ -436,10 +437,10 @@ void WalletInit::Start(CScheduler& scheduler) const
     }
 
     if (stakingManager->fEnableStaking) {
-        scheduler.scheduleEvery(boost::bind(&CStakingManager::DoMaintenance, boost::ref(stakingManager), boost::ref(*g_connman)), 5 * 1000);
+        scheduler.scheduleEvery(std::bind(&CStakingManager::DoMaintenance, std::ref(*stakingManager), std::ref(*g_connman)), 5 * 1000);
     }
     if (rewardManager->fEnableRewardManager) {
-        scheduler.scheduleEvery(boost::bind(&CRewardManager::DoMaintenance, boost::ref(rewardManager), boost::ref(*g_connman)), 3 * 60 * 1000);
+        scheduler.scheduleEvery(std::bind(&CRewardManager::DoMaintenance, std::ref(*rewardManager), std::ref(*g_connman)), 3 * 60 * 1000);
     }
 }
 
@@ -511,9 +512,6 @@ void WalletInit::InitStaking() const
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
-
-        rewardManager->BindWallet(wallets[0].get());
-        rewardManager->fEnableRewardManager = true;
     }
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
         stakingManager->fEnableStaking = false;
@@ -525,6 +523,16 @@ void WalletInit::InitStaking() const
     }
 
     stakingManager->nReserveBalance = nReserveBalance;
+}
+
+void WalletInit::InitRewardsManagement() const
+{
+    rewardManager = std::shared_ptr<CRewardManager>(new CRewardManager());
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    if (HasWallets() && wallets.size() >= 1) {
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
+    }
 }
 
 void WalletInit::InitKeePass() const

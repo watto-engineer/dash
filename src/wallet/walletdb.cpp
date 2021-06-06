@@ -595,9 +595,6 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                 return false;
             }
         }
-        else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
-            wss.m_unknown_records++;
-        }
         else if (strType == "stakeSplitThreshold")
         {
             uint64_t nStakeSplitThreshold;
@@ -608,7 +605,10 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             std::pair<bool, CAmount> pSettings;
             ssValue >> pSettings;
-            rewardManager->AutoCombineSettings(pSettings.first, pSettings.second);
+            pwallet->LoadAutoCombineSettings(pSettings.first, pSettings.second);
+        }
+        else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
+            wss.m_unknown_records++;
         }
     } catch (...)
     {
