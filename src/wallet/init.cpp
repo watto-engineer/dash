@@ -12,7 +12,6 @@
 #include <univalue.h>
 
 #include <pos/staking-manager.h>
-#include <reward-manager.h>
 #include <scheduler.h>
 #include <tokens/rpctokenwallet.h>
 #include <util/check.h>
@@ -46,6 +45,7 @@ public:
     void AutoLockMasternodeCollaterals() const override;
     void InitCoinJoinSettings() const override;
     void InitStaking() const override;
+    void InitRewardsManagement() const override;
     bool InitAutoBackup() const override;
 };
 
@@ -236,9 +236,6 @@ void WalletInit::InitStaking() const
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
         stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
-
-        rewardManager->BindWallet(wallets[0].get());
-        rewardManager->fEnableRewardManager = true;
     }
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
         stakingManager->fEnableStaking = false;
@@ -250,6 +247,16 @@ void WalletInit::InitStaking() const
     }
 
     stakingManager->nReserveBalance = nReserveBalance;
+}
+
+void WalletInit::InitRewardsManagement() const
+{
+    rewardManager = std::shared_ptr<CRewardManager>(new CRewardManager());
+    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
+    if (HasWallets() && wallets.size() >= 1) {
+        rewardManager->BindWallet(wallets[0].get());
+        rewardManager->fEnableRewardManager = true;
+    }
 }
 
 bool WalletInit::InitAutoBackup() const

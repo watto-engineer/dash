@@ -818,6 +818,8 @@ private:
 
     // Staking and POS
     uint64_t nStakeSplitThreshold = 2000;
+    CAmount nCombineThreshold = 500;
+    bool fCombineEnable = false;
 
     /* Height of last block processed is used by wallet to know depth of transactions
      * without relying on Chain interface beyond asynchronous updates. For safety, we
@@ -1273,6 +1275,8 @@ public:
     void LoadStakeSplitThreshold(uint64_t newThreshold);
     uint64_t GetStakeSplitThreshold();
     bool SetAutoCombineSettings(bool fEnable, CAmount nCombineThreshold);
+    void LoadAutoCombineSettings(bool fEnableIn, CAmount nCombineThresholdIn);
+    void GetAutoCombineSettings(bool& fEnableRet, CAmount& nCombineThresholdRet) const;
 
     /**
      * HD Wallet Functions

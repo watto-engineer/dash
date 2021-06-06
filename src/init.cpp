@@ -41,7 +41,6 @@
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <pos/staking-manager.h>
-#include <reward-manager.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
 #include <rpc/server.h>
@@ -359,7 +358,6 @@ void PrepareShutdown(NodeContext& node)
         evoDb.reset();
         zerocoinDB.reset();
         pTokenDB.reset();
-        rewardManager.reset();
         tokenGroupManager.reset();
     }
     for (const auto& client : node.chain_clients) {
@@ -2062,8 +2060,6 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 pTokenDB.reset(new CTokenDB(0, false, fReset || fReindexChainState));
                 tokenGroupManager.reset();
                 tokenGroupManager.reset(new CTokenGroupManager());
-                rewardManager.reset();
-                rewardManager.reset(new CRewardManager());
                 llmq::quorumSnapshotManager.reset();
                 llmq::quorumSnapshotManager.reset(new llmq::CQuorumSnapshotManager(*evoDb));
 
@@ -2382,6 +2378,7 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
     // ********************************************************* Step 10b: setup Staking
 
     g_wallet_init_interface.InitStaking();
+    g_wallet_init_interface.InitRewardsManagement();
 
     // ********************************************************* Step 10c: Load cache data
 
