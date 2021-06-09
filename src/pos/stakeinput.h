@@ -106,5 +106,6 @@ public:
     uint64_t getStakeModifierHeight() const override { return nStakeModifierHeight; }
 };
 
+bool IsValidStakeInput(const CTxOut& txOut);
 
 #endif //POS_STAKEINPUT_H

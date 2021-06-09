@@ -238,8 +238,10 @@ bool CStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>&
         return false;
     }
 
-    if (whichType != TX_PUBKEY && whichType != TX_PUBKEYHASH)
+    if (whichType != TX_PUBKEY && whichType != TX_PUBKEYHASH) {
+        LogPrintf("CreateCoinStake : wrong type\n");
         return false; // only support pay to public key and pay to address
+    }
 
     CScript scriptPubKey;
     if (whichType == TX_PUBKEYHASH) // pay to address type
@@ -247,8 +249,10 @@ bool CStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>&
         //convert to pay to public key type
         CKey key;
         CKeyID keyID = CKeyID(uint160(vSolutions[0]));
-        if (!pwallet->GetKey(keyID, key))
+        if (!pwallet->GetKey(keyID, key)) {
+            LogPrintf("CreateCoinStake : key not found\n");
             return false;
+        }
 
         scriptPubKey << ToByteVector(key.GetPubKey()) << OP_CHECKSIG;
     } else
@@ -303,4 +307,18 @@ CBlockIndex* CStake::GetIndexFrom()
     }
 
     return pindexFrom;
+}
+
+bool IsValidStakeInput(const CTxOut& txOut) {
+    std::vector<valtype> vSolutions;
+    txnouttype whichType;
+    CScript scriptPubKeyKernel = txOut.scriptPubKey;
+    if (!Solver(scriptPubKeyKernel, whichType, vSolutions)) {
+        return false;
+    }
+
+    if (whichType != TX_PUBKEY && whichType != TX_PUBKEYHASH) {
+        return false; // only support pay to public key and pay to address
+    }
+    return true;
 }
