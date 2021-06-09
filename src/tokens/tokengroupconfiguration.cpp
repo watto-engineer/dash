@@ -9,51 +9,73 @@
 #include <evo/specialtx.h>
 #include <regex>
 
-bool CTokenGroupCreation::ValidateDescription() {
-    for (std::function<void (CTokenGroupCreation&)> tgFilters : tokenGroupManager.get()->vTokenGroupFilters) {
-        tgFilters(*this);
+#include <boost/variant.hpp>
+
+class TokenGroupDescriptionFilterVisitor : public boost::static_visitor<bool>
+{
+private:
+    const CTokenGroupCreation* tgCreation;
+public:
+    TokenGroupDescriptionFilterVisitor(CTokenGroupCreation* tgCreation) : tgCreation(tgCreation) {};
+
+    bool operator()(CTokenGroupDescriptionRegular& tgDesc) const {
+        TGFilterCharacters(tgDesc);
+        TGFilterUniqueness(tgDesc, tgCreation->tokenGroupInfo.associatedGroup);
+        TGFilterUpperCaseTicker(tgDesc);
+        return true;
     }
-    return true;
+    bool operator()(CTokenGroupDescriptionMGT& tgDesc) const {
+        TGFilterCharacters(tgDesc);
+        TGFilterUniqueness(tgDesc, tgCreation->tokenGroupInfo.associatedGroup);
+        TGFilterUpperCaseTicker(tgDesc);
+        return true;
+    }
+};
+
+bool CTokenGroupCreation::ValidateDescription() {
+    return boost::apply_visitor(TokenGroupDescriptionFilterVisitor(this), *pTokenGroupDescription.get());
 }
 
 // Checks that the token description data fulfills basic criteria
 // Such as: max ticker length, no special characters, and sane decimal positions.
 // Validation is performed before data is written to the database
-void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation) {
+template <typename T>
+void TGFilterCharacters(T& tgDesc) {
     std::regex regexTicker("^[a-zA-Z]+$"); // only letters
     std::regex regexName("^[a-zA-Z0-9][a-zA-Z0-9 ]*[a-zA-Z0-9]$"); // letters, numbers and spaces; at least 2 characters; no space at beginning or end
     std::regex regexUrl(R"((https?|ftp)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
 
-    if (tokenGroupCreation.pTokenGroupDescription->strTicker != "" &&
-            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strTicker, matchResult, regexTicker)) {
-        tokenGroupCreation.status.AddMessage("Token ticker can only contain letters.");
-        tokenGroupCreation.pTokenGroupDescription->strTicker = "";
+    if (tgDesc.strTicker != "" &&
+            !std::regex_match(tgDesc.strTicker, matchResult, regexTicker)) {
+        // Token ticker can only contain letters
+        tgDesc.strTicker = "";
     }
-    if (tokenGroupCreation.pTokenGroupDescription->strName != "" &&
-            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strName, matchResult, regexName)) {
-        tokenGroupCreation.status.AddMessage("Token name can only contain letters, numbers and spaces. At least 2 characters. No space at beginning or end.");
-        tokenGroupCreation.pTokenGroupDescription->strName = "";
+    if (tgDesc.strName != "" &&
+            !std::regex_match(tgDesc.strName, matchResult, regexName)) {
+        // Token name can only contain letters, numbers and spaces. At least 2 characters. No space at beginning or end
+        tgDesc.strName = "";
     }
-    if (tokenGroupCreation.pTokenGroupDescription->strDocumentUrl != "" &&
-            !std::regex_match(tokenGroupCreation.pTokenGroupDescription->strDocumentUrl, matchResult, regexUrl)) {
-        tokenGroupCreation.status.AddMessage("Token description document URL cannot be parsed.");
-        tokenGroupCreation.pTokenGroupDescription->strDocumentUrl = "";
+    if (tgDesc.strDocumentUrl != "" &&
+            !std::regex_match(tgDesc.strDocumentUrl, matchResult, regexUrl)) {
+        // Token description document URL cannot be parsed
+        tgDesc.strDocumentUrl = "";
     }
 }
+template void TGFilterCharacters(CTokenGroupDescriptionRegular& tgDesc);
+template void TGFilterCharacters(CTokenGroupDescriptionMGT& tgDesc);
 
 // Checks that the token description data fulfils context dependent criteria
 // Such as: no reserved names, no double names
 // Validation is performed after data is written to the database and before it is written to the map
-void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
+template <typename T>
+void TGFilterUniqueness(T& tgDesc, const CTokenGroupID& tgID) {
     // Iterate existing token groups and verify that the new group has an unique ticker and name
     std::string strLowerTicker;
     std::string strLowerName;
-    std::transform(tokenGroupCreation.pTokenGroupDescription->strTicker.begin(), tokenGroupCreation.pTokenGroupDescription->strTicker.end(), std::back_inserter(strLowerTicker), ::tolower);
-    std::transform(tokenGroupCreation.pTokenGroupDescription->strName.begin(), tokenGroupCreation.pTokenGroupDescription->strName.end(), std::back_inserter(strLowerName), ::tolower);
-
-    CTokenGroupID tgID = tokenGroupCreation.tokenGroupInfo.associatedGroup;
+    std::transform(tgDesc.strTicker.begin(), tgDesc.strTicker.end(), std::back_inserter(strLowerTicker), ::tolower);
+    std::transform(tgDesc.strName.begin(), tgDesc.strName.end(), std::back_inserter(strLowerName), ::tolower);
 
     std::map<CTokenGroupID, CTokenGroupCreation> mapTGs = tokenGroupManager.get()->GetMapTokenGroups();
 
@@ -61,7 +83,7 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
         std::find_if(
             mapTGs.begin(),
             mapTGs.end(),
-            [strLowerTicker, tgID, &tokenGroupCreation](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
+            [strLowerTicker, tgID, &tgDesc](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
                     // Only try to match with valid token groups
                     if (tokenGroup.second.tokenGroupInfo.invalid) return false;
 
@@ -69,13 +91,12 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
                     if (tokenGroup.second.tokenGroupInfo.associatedGroup == tgID) return false;
 
                     // Compare lower case
-                    std::string strHeapTicker;
-                    std::transform(tokenGroup.second.pTokenGroupDescription->strTicker.begin(),
-                        tokenGroup.second.pTokenGroupDescription->strTicker.end(),
-                        std::back_inserter(strHeapTicker), ::tolower);
-                    if (strLowerTicker == strHeapTicker){
-                        tokenGroupCreation.status.AddMessage("Token ticker already exists.");
-                        tokenGroupCreation.pTokenGroupDescription->strTicker = "";
+                    std::string strHeapTicker = tgDescGetTicker(*tokenGroup.second.pTokenGroupDescription);
+                    std::string strHeapTickerLower;
+                    std::transform(strHeapTicker.begin(), strHeapTicker.end(), std::back_inserter(strHeapTickerLower), ::tolower);
+                    if (strLowerTicker == strHeapTickerLower){
+                        // Token ticker already exists
+                        tgDesc.strTicker = "";
                         return true;
                     }
 
@@ -87,20 +108,19 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
         std::find_if(
             mapTGs.begin(),
             mapTGs.end(),
-            [strLowerName, tgID, &tokenGroupCreation](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
+            [strLowerName, tgID, &tgDesc](const std::pair<CTokenGroupID, CTokenGroupCreation>& tokenGroup) {
                     // Only try to match with valid token groups
                     if (tokenGroup.second.tokenGroupInfo.invalid) return false;
 
                     // If the ID is the same, the token group is the same
                     if (tokenGroup.second.tokenGroupInfo.associatedGroup == tgID) return false;
 
-                    std::string strHeapName;
-                    std::transform(tokenGroup.second.pTokenGroupDescription->strName.begin(),
-                        tokenGroup.second.pTokenGroupDescription->strName.end(),
-                        std::back_inserter(strHeapName), ::tolower);
-                    if (strLowerName == strHeapName){
-                        tokenGroupCreation.status.AddMessage("Token name already exists.");
-                        tokenGroupCreation.pTokenGroupDescription->strName = "";
+                    std::string strHeapName = tgDescGetName(*tokenGroup.second.pTokenGroupDescription);
+                    std::string strHeapNameLower;
+                    std::transform(strHeapName.begin(), strHeapName.end(), std::back_inserter(strHeapNameLower), ::tolower);
+                    if (strLowerName == strHeapNameLower){
+                        // Token name already exists
+                        tgDesc.strName = "";
                         return true;
                     }
 
@@ -108,18 +128,23 @@ void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation) {
                 });
     }
 }
+template void TGFilterUniqueness(CTokenGroupDescriptionRegular& tgDesc, const CTokenGroupID& tgID);
+template void TGFilterUniqueness(CTokenGroupDescriptionMGT& tgDesc, const CTokenGroupID& tgID);
 
 // Transforms tickers into upper case
 // Returns true
-void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation) {
+template <typename T>
+void TGFilterUpperCaseTicker(T& tgDesc) {
     std::string strUpperTicker;
-    std::transform(tokenGroupCreation.pTokenGroupDescription->strTicker.begin(), tokenGroupCreation.pTokenGroupDescription->strTicker.end(), std::back_inserter(strUpperTicker), ::toupper);
+    std::transform(tgDesc.strTicker.begin(), tgDesc.strTicker.end(), std::back_inserter(strUpperTicker), ::toupper);
 
-    tokenGroupCreation.pTokenGroupDescription->strTicker = strUpperTicker;
+    tgDesc.strTicker = strUpperTicker;
 }
+template void TGFilterUpperCaseTicker(CTokenGroupDescriptionRegular& tgDesc);
+template void TGFilterUpperCaseTicker(CTokenGroupDescriptionMGT& tgDesc);
 
 template <typename TokenGroupDescription>
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<TokenGroupDescription>& tgDesc) {
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, TokenGroupDescription& tgDesc) {
     bool hasNewTokenGroup = false;
     for (const auto &txout : tx.vout) {
         const CScript &scriptPubKey = txout.scriptPubKey;
@@ -132,25 +157,25 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
         }
     }
     if (hasNewTokenGroup) {
-        return GetTxPayload(tx, *tgDesc);
+        return GetTxPayload(tx, tgDesc);
     }
     return false;
 }
-template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc);
-template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc);
+template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc);
+template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionMGT& tgDesc);
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
     CTokenGroupInfo tokenGroupInfo;
     CTokenGroupStatus tokenGroupStatus;
 
     if (tx->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-        std::shared_ptr<CTokenGroupDescriptionRegular> pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionRegular>();
-        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, pTokenGroupDescription)) return false;
-        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, pTokenGroupDescription, tokenGroupStatus);
+        CTokenGroupDescriptionRegular tokenGroupDescription;
+        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
+        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tokenGroupDescription), tokenGroupStatus);
     } else if (tx->nType == TRANSACTION_GROUP_CREATION_MGT) {
-        std::shared_ptr<CTokenGroupDescriptionMGT> pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionMGT>();
-        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, pTokenGroupDescription)) return false;
-        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, pTokenGroupDescription, tokenGroupStatus);
+        CTokenGroupDescriptionMGT tokenGroupDescription;
+        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
+        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tokenGroupDescription), tokenGroupStatus);
     }
     return true;
 }
