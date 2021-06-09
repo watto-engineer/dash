@@ -60,6 +60,10 @@ public:
                 CTokenGroupDescriptionMGT tgDesc;
                 READWRITE(tgDesc);
                 pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
+            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
+                CTokenGroupDescriptionNFT tgDesc;
+                READWRITE(tgDesc);
+                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
             }
         } else {
             if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
@@ -67,6 +71,9 @@ public:
                 READWRITE(*tgDesc);
             } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT *tgDesc = boost::get<CTokenGroupDescriptionMGT>(pTokenGroupDescription.get());
+                READWRITE(*tgDesc);
+            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
+                CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             }
         }
@@ -80,11 +87,17 @@ public:
 };
 
 template <typename T>
-void TGFilterCharacters(T &tgDesc);
+void TGFilterTickerCharacters(T& tgDesc);
 template <typename T>
-void TGFilterUniqueness(T &tgDesc, const CTokenGroupID& tgID);
+void TGFilterNameCharacters(T& tgDesc);
 template <typename T>
-void TGFilterUpperCaseTicker(T &tgDesc);
+void TGFilterURLCharacters(T& tgDesc);
+template <typename T>
+void TGFilterTickerUniqueness(T& tgDesc, const CTokenGroupID& tgID);
+template <typename T>
+void TGFilterNameUniqueness(T& tgDesc, const CTokenGroupID& tgID);
+template <typename T>
+void TGFilterUpperCaseTicker(T& tgDesc);
 
 template <typename TokenGroupDescription>
 bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, TokenGroupDescription& tgDesc);
@@ -93,5 +106,6 @@ bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CToken
 
 bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
+bool CheckGroupConfigurationTxNFT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view);
 
 #endif

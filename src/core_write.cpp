@@ -311,6 +311,13 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
             tgDesc.ToJson(obj);
             entry.pushKV("tgDesc", obj);
         }
+    } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+        CTokenGroupDescriptionNFT tgDesc;
+        if (GetTxPayload(tx, tgDesc)) {
+            UniValue obj;
+            tgDesc.ToJson(obj);
+            entry.pushKV("tgDesc", obj);
+        }
     } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
         CTokenGroupDescriptionMGT tgDesc;
         if (GetTxPayload(tx, tgDesc)) {

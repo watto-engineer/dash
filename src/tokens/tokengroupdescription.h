@@ -150,8 +150,64 @@ public:
     }
 };
 
-typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT> CTokenGroupDescriptionVariant;
+class CTokenGroupDescriptionNFT
+{
+public:
+    static const uint16_t CURRENT_VERSION = 1;
+    static const int SPECIALTX_TYPE = TRANSACTION_GROUP_CREATION_NFT;
 
+    uint16_t nVersion{CURRENT_VERSION};
+
+    std::string strName; // Token name
+    std::string strDocumentUrl; // Extended token description document URL
+    uint256 documentHash;
+
+    std::vector<unsigned char> vchData;
+
+    CTokenGroupDescriptionNFT() {
+        SetNull();
+    };
+    CTokenGroupDescriptionNFT(std::string strName, std::string strDocumentUrl, uint256 documentHash, std::vector<unsigned char> vchData) :
+        strName(strName), strDocumentUrl(strDocumentUrl), documentHash(documentHash), vchData(vchData) { };
+
+    void SetNull() {
+        strName = "";
+        strDocumentUrl = "";
+        documentHash = uint256();
+        vchData.clear();
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        READWRITE(nVersion);
+        READWRITE(strName);
+        READWRITE(strDocumentUrl);
+        READWRITE(documentHash);
+        READWRITE(vchData);
+    }
+    void ToJson(UniValue& obj) const;
+
+    void WriteHashable(CHashWriter& ss) const {
+        ss << nVersion;
+        ss << strName;
+        ss << strDocumentUrl;
+        ss << documentHash;
+        ss << vchData;
+    }
+
+    bool operator==(const CTokenGroupDescriptionNFT &c)
+    {
+        return (strName == c.strName &&
+                strDocumentUrl == c.strDocumentUrl &&
+                documentHash == c.documentHash &&
+                vchData == c.vchData);
+    }
+};
+
+typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT, CTokenGroupDescriptionNFT> CTokenGroupDescriptionVariant;
 class tgdesc_get_ticker : public boost::static_visitor<std::string>
 {
 public:
@@ -160,7 +216,10 @@ public:
     }
     std::string operator()(CTokenGroupDescriptionMGT& tgDesc) const {
         return tgDesc.strTicker;
-     }
+    }
+    std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return "";
+    }
 };
 inline std::string tgDescGetTicker(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_ticker(), tgDesc);
@@ -190,6 +249,9 @@ public:
     std::string operator()(CTokenGroupDescriptionMGT& tgDesc) const {
         return tgDesc.strDocumentUrl;
     }
+    std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return tgDesc.strDocumentUrl;
+    }
 };
 inline std::string tgDescGetDocumentURL(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_document_url(), tgDesc);
@@ -217,7 +279,10 @@ public:
     }
     uint8_t operator()(CTokenGroupDescriptionMGT& tgDesc) const {
         return tgDesc.nDecimalPos;
-     }
+    }
+    uint8_t operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return 0;
+    }
  };
 inline uint8_t tgDescGetDecimalPos(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_decimal_pos(), tgDesc);
@@ -235,6 +300,9 @@ public:
     CAmount operator()(CTokenGroupDescriptionMGT& tgDesc) const {
         return COINFromDecimalPos(tgDesc.nDecimalPos);
     }
+    CAmount operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return COINFromDecimalPos(0);
+    }
 };
 inline CAmount tgDescGetCoinAmount(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_coin_amount(), tgDesc);
@@ -246,5 +314,6 @@ inline std::string GetStringFromChars(const std::vector<unsigned char> chars, co
 
 bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed);
 bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, bool &stickyMelt, bool &confirmed);
+bool ParseGroupDescParamsNFT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, bool &confirmed);
 
 #endif

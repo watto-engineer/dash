@@ -47,6 +47,8 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
             return CheckGroupConfigurationTxRegular(tx, pindexPrev, state, view);
         case TRANSACTION_GROUP_CREATION_MGT:
             return CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
+        case TRANSACTION_GROUP_CREATION_NFT:
+            return CheckGroupConfigurationTxNFT(tx, pindexPrev, state, view);
         case TRANSACTION_MNHF_SIGNAL:
             return VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE && CheckMNHFTx(tx, pindexPrev, state);
         }

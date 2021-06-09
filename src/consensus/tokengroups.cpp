@@ -203,13 +203,13 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
                 CTokenGroupDescriptionRegular tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
-                    return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 tgDesc.WriteHashable(mintGrp);
             } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
-                    return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 tgDesc.WriteHashable(mintGrp);
             }
@@ -222,14 +222,36 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-create",
                         "Multiple grouped outputs created during group creation transaction");
 
-                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN))
-                {
+                // Regular token
+                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a regular token group");
+                    }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
+                }
+                // Management token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a management token group");
+                    }
                     if (anyInputsGroupManagement) {
                         LogPrint(BCLog::TOKEN, "%s - Group management creation transaction. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
                     } else {
                         return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
                             "No group management capability at any input address - unable to create management token");
                     }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
+                }
+                // Invalid combination token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
+                }
+                // NFT token
+                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not an NFT token group");
+                    }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL_NFT;
                 }
                 if (newGrpId.hasFlag(TokenGroupIdFlags::STICKY_MELT))
                 {
@@ -240,8 +262,6 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                             "No group management capability at any input address - unable to set stick_melt");
                     }
                 }
-
-                bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
             else
             {
                 if (((uint64_t)bal.ctrlOutputPerms & (uint64_t)~GroupAuthorityFlags::ALL_BITS) != 0)
@@ -283,7 +303,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
         LogPrintf("%s - COutpoint prevout[%s]\n", __func__, prevout.ToString());
         const Coin &coin = view.AccessCoin(prevout);
         if (coin.IsSpent()) {
-            return state.DoS(100, false, REJECT_INVALID, "bad-protx-inputs-spent");
+            return state.Invalid(false, REJECT_INVALID, "bad-protx-inputs-spent");
         }
 
         const CScript &script = coin.out.scriptPubKey;
@@ -311,7 +331,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
         CTokenGroupInfo tokenGrp(scriptPubKey);
 
         if (tokenGrp.invalid)
-            return state.DoS(100, false, REJECT_INVALID, "bad-protx-grouped-outputs");
+            return state.Invalid(false, REJECT_INVALID, "bad-protx-grouped-outputs");
 
         if (tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
             continue;
