@@ -19,6 +19,7 @@
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <pos/rewards.h>
+#include <pos/stakeinput.h>
 #include <policy/settings.h>
 #include <primitives/block.h>
 #include <primitives/transaction.h>
@@ -2833,6 +2834,8 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
                 if (IsOutputGrouped(pcoin->tx->vout[i]))
                     continue;
                 if (pcoin->tx->vout[i].nValue == 10000000 * COIN)
+                    continue;
+                if (!IsValidStakeInput(pcoin->tx->vout[i]))
                     continue;
             }
 
