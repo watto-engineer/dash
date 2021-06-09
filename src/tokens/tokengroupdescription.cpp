@@ -31,6 +31,95 @@ void CTokenGroupDescriptionMGT::ToJson(UniValue& obj) const
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
 }
 
+std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
+    }
+    std::string strTicker = request.params[curparam].get_str();
+    if (strTicker.size() > 10) {
+        std::string strError = strprintf("Ticker %s has too many characters (10 max)", strTicker);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return strTicker;
+}
+
+std::string ConsumeParamName(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
+    }
+    std::string strName = request.params[curparam].get_str();
+    if (strName.size() > 30) {
+        std::string strError = strprintf("Name %s has too many characters (30 max)", strName);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return strName;
+}
+
+std::string ConsumeParamDocumentURL(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strDocumentUrl = request.params[curparam].get_str();
+    if (strDocumentUrl.size() > 98) {
+        std::string strError = strprintf("URL %s has too many characters (98 max)", strDocumentUrl);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return strDocumentUrl;
+}
+
+uint256 ConsumeParamDocumentHash(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        // If you have a URL to the TDD, you need to have a hash or the token creator
+        // could change the document without holders knowing about it.
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    uint256 documentHash;
+    documentHash.SetHex(strCurparamValue);
+    curparam++;
+    return documentHash;
+}
+
+uint8_t ConsumeParamDecimalPos(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    int32_t nDecimalPos32;
+    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
+        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return (uint8_t)nDecimalPos32;
+}
+
+CBLSPublicKey ConsumeParamBLSPublicKey(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    CBLSPublicKey blsPubKey;
+    blsPubKey.Reset();
+    if (!blsPubKey.SetHexStr(strCurparamValue)) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("bls_pubkey must be a valid BLS public key, not %s", strCurparamValue));
+    }
+    curparam++;
+    return blsPubKey;
+}
+
 bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed)
 {
     std::string strCurparamValue;
@@ -44,61 +133,14 @@ bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &cu
 
     confirmed = false;
 
-    strTicker = request.params[curparam].get_str();
-    if (strName.size() > 10) {
-        std::string strError = strprintf("Ticker %s has too many characters (10 max)", strName);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
+    strTicker = ConsumeParamTicker(request, curparam);
+    strName = ConsumeParamName(request, curparam);
+    strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
+    documentHash = ConsumeParamDocumentHash(request, curparam);
+    nDecimalPos = ConsumeParamDecimalPos(request, curparam);
 
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
-    }
-    strName = request.params[curparam].get_str();
-    if (strName.size() > 30) {
-        std::string strError = strprintf("Name %s has too many characters (30 max)", strName);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
+    tgDesc = std::make_shared<CTokenGroupDescriptionRegular>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    strDocumentUrl = request.params[curparam].get_str();
-    if (strDocumentUrl.size() > 98) {
-        std::string strError = strprintf("URL %s has too many characters (98 max)", strDocumentUrl);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        // If you have a URL to the TDD, you need to have a hash or the token creator
-        // could change the document without holders knowing about it.
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
-    }
-    strCurparamValue = request.params[curparam].get_str();
-    documentHash.SetHex(strCurparamValue);
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    strCurparamValue = request.params[curparam].get_str();
-    int32_t nDecimalPos32;
-    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
-        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-
-    tgDesc = std::make_shared<CTokenGroupDescriptionRegular>(strTicker, strName, nDecimalPos32, strDocumentUrl, documentHash);
-
-    curparam++;
     if (curparam >= request.params.size())
     {
         return true;
@@ -119,77 +161,21 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
     std::string strDocumentUrl;
     uint256 documentHash;
 
+    uint8_t nDecimalPos;
+    CBLSPublicKey blsPubKey;
+
     confirmed = false;
     stickyMelt = false;
 
-    strTicker = request.params[curparam].get_str();
-    if (strName.size() > 10) {
-        std::string strError = strprintf("Ticker %s has too many characters (10 max)", strName);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
+    strTicker = ConsumeParamTicker(request, curparam);
+    strName = ConsumeParamName(request, curparam);
+    strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
+    documentHash = ConsumeParamDocumentHash(request, curparam);
+    nDecimalPos = ConsumeParamDecimalPos(request, curparam);
+    blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
 
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
-    }
-    strName = request.params[curparam].get_str();
-    if (strName.size() > 30) {
-        std::string strError = strprintf("Name %s has too many characters (30 max)", strName);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
+    tgDesc = std::make_shared<CTokenGroupDescriptionMGT>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash, blsPubKey);
 
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    strDocumentUrl = request.params[curparam].get_str();
-    if (strDocumentUrl.size() > 98) {
-        std::string strError = strprintf("URL %s has too many characters (98 max)", strDocumentUrl);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        // If you have a URL to the TDD, you need to have a hash or the token creator
-        // could change the document without holders knowing about it.
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
-    }
-    strCurparamValue = request.params[curparam].get_str();
-    documentHash.SetHex(strCurparamValue);
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    strCurparamValue = request.params[curparam].get_str();
-    int32_t nDecimalPos32;
-    if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
-        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-
-    curparam++;
-    if (curparam >= request.params.size())
-    {
-        std::string strError = strprintf("Not enough paramaters");
-        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
-    }
-    strCurparamValue = request.params[curparam].get_str();
-    CBLSPublicKey blsPubKey;
-    blsPubKey.Reset();
-    if (!blsPubKey.SetHexStr(strCurparamValue)) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("bls_pubkey must be a valid BLS public key, not %s", strCurparamValue));
-    }
-
-    tgDesc = std::make_shared<CTokenGroupDescriptionMGT>(strTicker, strName, nDecimalPos32, strDocumentUrl, documentHash, blsPubKey);
-
-    curparam++;
     if (curparam >= request.params.size())
     {
         std::string strError = strprintf("Not enough paramaters");
@@ -199,8 +185,8 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
     if (strCurparamValue == "true") {
         stickyMelt = true;
     }
-
     curparam++;
+
     if (curparam >= request.params.size())
     {
         return true;
