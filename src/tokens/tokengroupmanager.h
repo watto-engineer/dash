@@ -29,8 +29,6 @@ private:
 public:
     CTokenGroupManager();
 
-    std::vector<std::function<void (CTokenGroupCreation&)>> vTokenGroupFilters;
-
     bool AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups);
     bool RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID);
     void ResetTokenGroups();

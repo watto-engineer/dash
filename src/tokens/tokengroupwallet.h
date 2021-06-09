@@ -10,9 +10,6 @@
 #include "wallet/wallet.h"
 #include <unordered_map>
 
-class CTokenGroupDescriptionRegular;
-class CTokenGroupDescriptionMGT;
-
 // Number of satoshis we will put into a grouped output
 static const CAmount GROUPED_SATOSHI_AMT = 1;
 

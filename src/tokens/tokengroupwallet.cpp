@@ -379,7 +379,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
             tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
-            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgDescGetName(*tgCreation.pTokenGroupDescription), tgInfo.quantity);
         }
     }
 
@@ -467,7 +467,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
             tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
-            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgDescGetName(*tgCreation.pTokenGroupDescription), tgInfo.quantity);
         }
     }
 
@@ -627,7 +627,7 @@ void GroupSend(CTransactionRef &txNew,
         if (!tgInfo.isInvalid()) {
             CTokenGroupCreation tgCreation;
             tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
-            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgCreation.pTokenGroupDescription->strName, tgInfo.quantity);
+            LogPrint(BCLog::TOKEN, "%s - name[%s] amount[%d]\n", __func__, tgDescGetName(*tgCreation.pTokenGroupDescription), tgInfo.quantity);
         }
     }
 
