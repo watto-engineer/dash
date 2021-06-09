@@ -33,12 +33,12 @@ public:
     CTransactionRef creationTransaction;
     uint256 creationBlockHash;
     CTokenGroupInfo tokenGroupInfo;
-    std::shared_ptr<CTokenGroupDescriptionBase> pTokenGroupDescription;
+    std::shared_ptr<CTokenGroupDescriptionVariant> pTokenGroupDescription;
     CTokenGroupStatus status;
 
-    CTokenGroupCreation() : creationTransaction(MakeTransactionRef()), pTokenGroupDescription(std::make_shared<CTokenGroupDescriptionBase>()) {};
+    CTokenGroupCreation() : creationTransaction(MakeTransactionRef()), pTokenGroupDescription(std::make_shared<CTokenGroupDescriptionVariant>()) {};
 
-    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionBase> pTokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
+    CTokenGroupCreation(CTransactionRef creationTransaction, uint256 creationBlockHash, CTokenGroupInfo tokenGroupInfo, std::shared_ptr<CTokenGroupDescriptionVariant> pTokenGroupDescription, CTokenGroupStatus tokenGroupStatus)
         : creationTransaction(creationTransaction), creationBlockHash(creationBlockHash), tokenGroupInfo(tokenGroupInfo), pTokenGroupDescription(pTokenGroupDescription), status(tokenGroupStatus) {}
 
     bool ValidateDescription();
@@ -55,18 +55,18 @@ public:
             if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
                 CTokenGroupDescriptionRegular tgDesc;
                 READWRITE(tgDesc);
-                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionRegular>(tgDesc);
+                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
             } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
                 READWRITE(tgDesc);
-                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionMGT>(tgDesc);
+                pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
             }
         } else {
             if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-                CTokenGroupDescriptionRegular* tgDesc = static_cast<CTokenGroupDescriptionRegular*>(pTokenGroupDescription.get());
+                CTokenGroupDescriptionRegular *tgDesc = boost::get<CTokenGroupDescriptionRegular>(pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
-                CTokenGroupDescriptionMGT* tgDesc = static_cast<CTokenGroupDescriptionMGT*>(pTokenGroupDescription.get());
+                CTokenGroupDescriptionMGT *tgDesc = boost::get<CTokenGroupDescriptionMGT>(pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             }
         }
@@ -79,12 +79,15 @@ public:
     }
 };
 
-void TGFilterCharacters(CTokenGroupCreation &tokenGroupCreation);
-void TGFilterUniqueness(CTokenGroupCreation &tokenGroupCreation);
-void TGFilterUpperCaseTicker(CTokenGroupCreation &tokenGroupCreation);
+template <typename T>
+void TGFilterCharacters(T &tgDesc);
+template <typename T>
+void TGFilterUniqueness(T &tgDesc, const CTokenGroupID& tgID);
+template <typename T>
+void TGFilterUpperCaseTicker(T &tgDesc);
 
 template <typename TokenGroupDescription>
-bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, std::shared_ptr<TokenGroupDescription>& tgDesc);
+bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, TokenGroupDescription& tgDesc);
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation);
 

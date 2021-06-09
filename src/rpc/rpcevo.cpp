@@ -1085,7 +1085,8 @@ UniValue protx_revoke_authorize(const JSONRPCRequest& request)
         if (!tokenGroupManager->GetTokenGroupCreation(tokenGroupManager->GetGVTID(), gvtCreation)) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "unable to find GVT creation");
         }
-        CTokenGroupDescriptionMGT* gvtDesc = static_cast<CTokenGroupDescriptionMGT*>(gvtCreation.pTokenGroupDescription.get());
+        const CTokenGroupDescriptionMGT *gvtDesc = boost::get<CTokenGroupDescriptionMGT>(gvtCreation.pTokenGroupDescription.get());
+
         if (keyOperator.GetPublicKey() != gvtDesc->blsPubKey) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("the operator key does not belong to the registered GVT bls public key"));
         }
