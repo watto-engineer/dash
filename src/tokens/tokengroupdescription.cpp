@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "tokens/tokengroupdescription.h"
+
+#include <consensus/consensus.h>
 #include "util.h"
 #include <rpc/protocol.h>
 #include <rpc/server.h>
@@ -29,6 +31,16 @@ void CTokenGroupDescriptionMGT::ToJson(UniValue& obj) const
     obj.pushKV("documentHash", documentHash.ToString());
     obj.pushKV("decimal_pos", (int)nDecimalPos);
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
+}
+
+void CTokenGroupDescriptionNFT::ToJson(UniValue& obj) const
+{
+    obj.clear();
+    obj.setObject();
+    obj.pushKV("name", strName);
+    obj.pushKV("document_URL", strDocumentUrl);
+    obj.pushKV("documentHash", documentHash.ToString());
+    obj.pushKV("vchData", "TODO");
 }
 
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
@@ -120,24 +132,36 @@ CBLSPublicKey ConsumeParamBLSPublicKey(const JSONRPCRequest& request, unsigned i
     return blsPubKey;
 }
 
+std::vector<unsigned char> ConsumeParamNFTData(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strData = request.params[curparam].get_str();
+    bool fInvalid = false;
+    std::vector<unsigned char> vchData = DecodeBase64(strData.c_str(), &fInvalid);
+    if (fInvalid) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Malformed base64 encoding");
+    }
+    if (vchData.size() > MAX_TX_NFT_DATA) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Too much data");
+    }
+    curparam++;
+    return vchData;
+}
+
 bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed)
 {
     std::string strCurparamValue;
 
-    std::string strTicker;
-    std::string strName;
-    std::string strDocumentUrl;
-    uint256 documentHash;
-
-    uint8_t nDecimalPos;
-
     confirmed = false;
 
-    strTicker = ConsumeParamTicker(request, curparam);
-    strName = ConsumeParamName(request, curparam);
-    strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
-    documentHash = ConsumeParamDocumentHash(request, curparam);
-    nDecimalPos = ConsumeParamDecimalPos(request, curparam);
+    std::string strTicker = ConsumeParamTicker(request, curparam);
+    std::string strName = ConsumeParamName(request, curparam);
+    std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
+    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionRegular>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
@@ -156,23 +180,15 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
 {
     std::string strCurparamValue;
 
-    std::string strTicker;
-    std::string strName;
-    std::string strDocumentUrl;
-    uint256 documentHash;
-
-    uint8_t nDecimalPos;
-    CBLSPublicKey blsPubKey;
-
     confirmed = false;
     stickyMelt = false;
 
-    strTicker = ConsumeParamTicker(request, curparam);
-    strName = ConsumeParamName(request, curparam);
-    strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
-    documentHash = ConsumeParamDocumentHash(request, curparam);
-    nDecimalPos = ConsumeParamDecimalPos(request, curparam);
-    blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
+    std::string strTicker = ConsumeParamTicker(request, curparam);
+    std::string strName = ConsumeParamName(request, curparam);
+    std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
+    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
+    CBLSPublicKey blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionMGT>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash, blsPubKey);
 
@@ -186,6 +202,30 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
         stickyMelt = true;
     }
     curparam++;
+
+    if (curparam >= request.params.size())
+    {
+        return true;
+    }
+    if (request.params[curparam].get_str() == "true") {
+        confirmed = true;
+        return true;
+    }
+    return true;
+}
+
+bool ParseGroupDescParamsNFT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, bool &confirmed)
+{
+    std::string strCurparamValue;
+
+    confirmed = false;
+
+    std::string strName = ConsumeParamName(request, curparam);
+    std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
+    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    std::vector<unsigned char> vchData = ConsumeParamNFTData(request, curparam);
+
+    tgDesc = std::make_shared<CTokenGroupDescriptionNFT>(strName, strDocumentUrl, documentHash, vchData);
 
     if (curparam >= request.params.size())
     {

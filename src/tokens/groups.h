@@ -17,6 +17,7 @@ enum class TokenGroupIdFlags : uint8_t
     BALANCE_BCH = 1U << 1, // group inputs and outputs must balance both tokens and BCH
     STICKY_MELT = 1U << 2, // group can always melt tokens
     MGT_TOKEN = 1U << 3, // management tokens are created from management outputs
+    NFT_TOKEN = 1U << 4, // NFT tokens have limited capabilities
 
     DEFAULT = 0
 };
@@ -139,6 +140,7 @@ enum class GroupAuthorityFlags : uint64_t
 
     NONE = 0,
     ALL = CTRL | MINT | MELT | CCHILD | RESCRIPT | SUBGROUP | CONFIGURE,
+    ALL_NFT = CTRL | MINT,
     ALL_BITS = 0xffffULL << (64 - 16)
 };
 
