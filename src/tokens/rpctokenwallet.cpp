@@ -789,8 +789,9 @@ extern UniValue configuretokendryrun(const JSONRPCRequest& request)
 
     ret.push_back(Pair("ticker", tgDescGetTicker(*tokenGroupCreation.pTokenGroupDescription)));
     ret.push_back(Pair("name", tgDescGetName(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("documenturl", tgDescGetDocumentURL(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("documenthash", tgDescGetDocumentHash(*tokenGroupCreation.pTokenGroupDescription).ToString()));
+    ret.push_back(Pair("decimalPos", tgDescGetDecimalPos(*tokenGroupCreation.pTokenGroupDescription)));
+    ret.push_back(Pair("URL", tgDescGetDocumentURL(*tokenGroupCreation.pTokenGroupDescription)));
+    ret.push_back(Pair("documentHash", tgDescGetDocumentHash(*tokenGroupCreation.pTokenGroupDescription).ToString()));
     ret.push_back(Pair("status", tokenGroupCreation.status.messages));
 
     return ret;
