@@ -1,6 +1,6 @@
 {
-    "txid": "6e07a7cc075e0703f32ee8c4e5373fe654bfbc315148fda364e1be286ff290d0",
-    "version": 1,
+    "txid": "922c1a3673f31d033b2f18da4990127f212056d60c421ec4a70c02ec73e4c973",
+    "version": 2,
     "type": 0,
     "size": 42,
     "locktime": 0,
@@ -17,10 +17,10 @@
                 "reqSigs": 1,
                 "type": "scripthash",
                 "addresses": [
-                    "7co3R3WSW8mHKMkFK2FrzQY2fLCBWsg56D"
+                    "8RUFPG71vVh2xE2RMrvVxf5bvLi4ztZ5b1"
                 ]
             }
         }
     ],
-    "hex": "010000000001000000000000000017a91471ed53322d470bb96657deb786b94f97dd46fb158700000000"
+    "hex": "020000000001000000000000000017a91471ed53322d470bb96657deb786b94f97dd46fb158700000000"
 }
