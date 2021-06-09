@@ -210,6 +210,12 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 tgDesc.WriteHashable(mintGrp);
+            } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+                CTokenGroupDescriptionNFT tgDesc;
+                if (!GetTxPayload(tx, tgDesc)) {
+                    return state.DoS(100, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                }
+                tgDesc.WriteHashable(mintGrp);
             }
             mintGrp << (((uint64_t)bal.ctrlOutputPerms) & ~((uint64_t)GroupAuthorityFlags::ALL_BITS));
             CTokenGroupID newGrpId(mintGrp.GetHash());
@@ -220,15 +226,38 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-create",
                          "Multiple grouped outputs created during group creation transaction");
 
-                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN))
-                {
+                // Regular token
+                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a regular token group");
+                    }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
+                }
+                // Management token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a management token group");
+                    }
                     if (anyInputsGroupManagement) {
                         LogPrint(BCLog::TOKEN, "%s - Group management creation transaction. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
                     } else {
                         return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
                             "No group management capability at any input address - unable to create management token");
                     }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
+                // NFT token
+                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
+                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not an NFT token group");
+                    }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL_NFT;
+                }
+                // Invalid combination token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
+                }
+
                 if (newGrpId.hasFlag(TokenGroupIdFlags::STICKY_MELT))
                 {
                     if (anyInputsGroupManagement) {
@@ -238,8 +267,6 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                             "No group management capability at any input address - unable to set stick_melt");
                     }
                 }
-
-                bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
             }
             else
             {

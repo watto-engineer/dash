@@ -1046,6 +1046,99 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     return ret;
 }
 
+extern UniValue configurenft(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+     if (request.fHelp || request.params.size() < 5)
+        throw std::runtime_error(
+            "configurenft \"name\" \"description_url\" description_hash data ( confirm_send ) \n"
+            "\n"
+            "Configures a new token type.\n"
+            "\nArguments:\n"
+            "1. \"name\"                (string, required) the token name\n"
+            "2. \"description_url\"     (string, required) the URL of the token's description document\n"
+            "3. \"description_hash\"    (hex, required) the hash of the token description document\n"
+            "4. \"data\"                (base64, required) Base64 encoded data\n"
+            "5. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
+            "\n"
+            "\nExamples:\n" +
+            HelpExampleCli("configureNFT", "\"UniquelyFun\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-UniquelyFun.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 VGhpcyB0b2tlbiBpcyB1bmlxdWUgYW5kIGZ1bi4= true") +
+            "\n"
+        );
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
+    unsigned int curparam = 0;
+    bool confirmed = false;
+
+    COutput coin(nullptr, 0, 0, false, false, false);
+
+    {
+        std::vector<COutput> coins;
+        CAmount lowest = MAX_MONEY;
+        pwallet->FilterCoins(coins, [&lowest](const CWalletTx *tx, const CTxOut *out) {
+            CTokenGroupInfo tg(out->scriptPubKey);
+            // although its possible to spend a grouped input to produce
+            // a single mint group, I won't allow it to make the tx construction easier.
+            if ((tg.associatedGroup == NoGroup) && (out->nValue < lowest))
+            {
+                lowest = out->nValue;
+                return true;
+            }
+            return false;
+        });
+
+        if (0 == coins.size())
+        {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "No coins available in the wallet");
+        }
+        coin = coins[coins.size() - 1];
+    }
+
+    uint64_t grpNonce = 0;
+
+    std::vector<COutput> chosenCoins;
+    chosenCoins.push_back(coin);
+
+    std::vector<CRecipient> outputs;
+
+    CReserveKey authKeyReservation(pwallet);
+    CTxDestination authDest;
+    CScript opretScript;
+
+    std::shared_ptr<CTokenGroupDescriptionNFT> tgDesc;
+    if (!ParseGroupDescParamsNFT(request, curparam, tgDesc, confirmed)) {
+        return false;
+    }
+    CPubKey authKey;
+    authKeyReservation.GetReservedKey(authKey, true);
+    authDest = authKey.GetID();
+
+    TokenGroupIdFlags tgFlags = TokenGroupIdFlags::NFT_TOKEN;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
+
+    CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL_NFT | grpNonce);
+    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+    outputs.push_back(recipient);
+
+    CTransactionRef tx;
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
+
+    authKeyReservation.KeepKey();
+    UniValue ret(UniValue::VOBJ);
+    ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
+    ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
+    return ret;
+}
+
 extern UniValue createtokenauthorities(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
@@ -1857,6 +1950,7 @@ static const CRPCCommand commands[] =
     { "tokens",             "sendtoken",                &sendtoken,                 {} },
     { "tokens",             "configuretoken",           &configuretoken,            {} },
     { "tokens",             "configuremanagementtoken", &configuremanagementtoken,  {} },
+    { "tokens",             "configurenft",             &configurenft,              {} },
     { "tokens",             "signrawtokendocument",     &signrawtokendocument,      {"data","address","verbose"} },
     { "tokens",             "createtokenauthorities",   &createtokenauthorities,    {} },
     { "tokens",             "listtokenauthorities",     &listtokenauthorities,      {} },

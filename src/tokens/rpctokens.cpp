@@ -315,9 +315,15 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
             tgDesc.ToJson(creation);
             entry.pushKV("token_creation", creation);
         }
-    }
-    if (tx->nType == TRANSACTION_GROUP_CREATION_MGT) {
+    } else if (tx->nType == TRANSACTION_GROUP_CREATION_MGT) {
         CTokenGroupDescriptionMGT tgDesc;
+        if (GetTxPayload(*tx, tgDesc)) {
+            UniValue creation(UniValue::VOBJ);
+            tgDesc.ToJson(creation);
+            entry.pushKV("token_creation", creation);
+        }
+    } else if (tx->nType == TRANSACTION_GROUP_CREATION_NFT) {
+        CTokenGroupDescriptionNFT tgDesc;
         if (GetTxPayload(*tx, tgDesc)) {
             UniValue creation(UniValue::VOBJ);
             tgDesc.ToJson(creation);

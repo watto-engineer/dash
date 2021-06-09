@@ -398,6 +398,8 @@ template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &ch
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionRegular>& ptgDesc);
 template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionMGT>& ptgDesc);
+template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionNFT>& ptgDesc);
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet)
@@ -653,3 +655,4 @@ CTokenGroupID findGroupId(const COutPoint &input, const TokenGroupDescription& t
 }
 template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
 template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
+template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);

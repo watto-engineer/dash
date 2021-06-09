@@ -95,6 +95,9 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
     } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
         CTokenGroupDescriptionMGT tgDesc;
         hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+    } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+        CTokenGroupDescriptionNFT tgDesc;
+        hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
     }
 
     if (hasNewTokenGroup) {
