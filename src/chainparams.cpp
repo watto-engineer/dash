@@ -365,6 +365,8 @@ public:
         consensus.BIP34Hash = uint256S("000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e");
         consensus.BIP65Height = consensus.V17DeploymentHeight;
         consensus.BIP66Height = 1; // 000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e
+        consensus.CSVHeight = consensus.V17DeploymentHeight;
+        consensus.BIP147Height = consensus.V17DeploymentHeight;
         consensus.DIP0001Height = consensus.V17DeploymentHeight;
         consensus.DIP0003Height = consensus.V17DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
@@ -553,6 +555,8 @@ public:
         consensus.BIP34Hash = uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12");
         consensus.BIP65Height = consensus.V17DeploymentHeight;
         consensus.BIP66Height = 1; // 0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12
+        consensus.CSVHeight = consensus.V17DeploymentHeight;
+        consensus.BIP147Height = consensus.V17DeploymentHeight;
         consensus.DIP0001Height = consensus.V17DeploymentHeight;
         consensus.DIP0003Height = consensus.V17DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
@@ -718,6 +722,8 @@ public:
         consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
         consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
         consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
+        consensus.CSVHeight = consensus.V17DeploymentHeight;
+        consensus.BIP147Height = consensus.V17DeploymentHeight;
         consensus.DIP0001Height = 2; // DIP0001 activated immediately on devnet
         consensus.DIP0003Height = 2; // DIP0003 activated immediately on devnet
 //        consensus.DIP0003EnforcementHeight = 2; // DIP0003 activated immediately on devnet
@@ -884,6 +890,8 @@ public:
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
+        consensus.CSVHeight = consensus.V17DeploymentHeight;
+        consensus.BIP147Height = consensus.V17DeploymentHeight;
         consensus.DIP0001Height = 2000;
         consensus.DIP0003Height = 210;
 //        consensus.DIP0003EnforcementHeight = 500;
