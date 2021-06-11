@@ -1063,7 +1063,7 @@ class BytzTestFramework(BitcoinTestFramework):
 
         nodes = [self.nodes[0]] + [mn.node for mn in mninfos_online]
         # move forward to next DKG
-        skip_count = 60 - (self.nodes[0].getblockcount() % 60)
+        skip_count = 30 - (self.nodes[0].getblockcount() % 30)
         if skip_count != 0:
             self.bump_mocktime(1, nodes=nodes)
             self.nodes[0].generate(skip_count)
