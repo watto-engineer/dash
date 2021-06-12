@@ -27,6 +27,7 @@ class DIP3Test(BytzTestFramework):
         self.extra_args = ["-budgetparams=10:10:10"]
         self.extra_args += ["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"]
         self.extra_args += ["-dip3params=135:150"]
+        self.extra_args += ["-reservebalance=12000000"]
 
 
     def setup_network(self):

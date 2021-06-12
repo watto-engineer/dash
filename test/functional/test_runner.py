@@ -84,7 +84,7 @@ BASE_SCRIPTS= [
     #'feature_llmq_simplepose.py', # NOTE: needs bytz_hash to pass
     #'feature_llmq_is_cl_conflicts.py', # NOTE: needs bytz_hash to pass
     'feature_llmq_is_retroactive.py', # NOTE: needs bytz_hash to pass
-    #'feature_llmq_dkgerrors.py', # NOTE: needs bytz_hash to pass
+    'feature_llmq_dkgerrors.py',
     #'feature_dip4_coinbasemerkleroots.py', # NOTE: needs bytz_hash to pass
     # vv Tests less than 60s vv
     #'p2p_sendheaders.py', # NOTE: needs bytz_hash to pass
@@ -112,7 +112,7 @@ BASE_SCRIPTS= [
     'wallet_multiwallet.py',
     'interface_http.py',
     'rpc_users.py',
-    #'feature_proxy.py',
+    'feature_proxy.py',
     #'rpc_signrawtransaction.py',
     'p2p_disconnect_ban.py',
     #'feature_addressindex.py',
@@ -136,9 +136,9 @@ BASE_SCRIPTS= [
     'rpc_signmessage.py',
     #'feature_nulldummy.py',
     'wallet_import_rescan.py',
-    #'rpc_bind.py --ipv4',
-    #'rpc_bind.py --ipv6',
-    #'rpc_bind.py --nonloopback',
+    'rpc_bind.py --ipv4',
+    'rpc_bind.py --ipv6',
+    'rpc_bind.py --nonloopback',
     'mining_basic.py',
     'rpc_named_arguments.py',
     #'bytzlib.py',
@@ -181,8 +181,8 @@ EXTENDED_SCRIPTS = [
     # Longest test should go first, to favor running tests in parallel
     #'feature_pruning.py', # NOTE: Prune mode is incompatible with -txindex, should work with governance validation disabled though.
     # vv Tests less than 20m vv
-    'feature_fee_estimation.py',
-    'feature_llmq_data_recovery.py',
+    #'feature_fee_estimation.py',
+    #'feature_llmq_data_recovery.py',
     # vv Tests less than 5m vv
     'rpc_token_test_pt1.py',
     #'feature_maxuploadtarget.py',

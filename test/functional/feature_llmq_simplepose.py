@@ -80,7 +80,7 @@ class LLMQSimplePoSeTest(BytzTestFramework):
 
     def force_old_mn_proto(self, mn):
         self.stop_node(mn.node.index)
-        self.start_masternode(mn, ["-pushversion=70216"])
+        self.start_masternode(mn, ["-pushversion=70915"])
         connect_nodes(mn.node, 0)
         self.reset_probe_timeouts()
         return False
@@ -143,7 +143,7 @@ class LLMQSimplePoSeTest(BytzTestFramework):
 
     def reset_probe_timeouts(self):
         # Make sure all masternodes will reconnect/re-probe
-        self.bump_mocktime(50 * 60 + 1)
+        self.bump_mocktime(62 * 60 + 1)
         # Sleep a couple of seconds to let mn sync tick to happen
         time.sleep(2)
 
