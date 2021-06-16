@@ -16,8 +16,8 @@ void CTokenGroupDescriptionRegular::ToJson(UniValue& obj) const
     obj.setObject();
     obj.pushKV("ticker", strTicker);
     obj.pushKV("name", strName);
-    obj.pushKV("document_URL", strDocumentUrl);
-    obj.pushKV("documentHash", documentHash.ToString());
+    obj.pushKV("metadata_url", strDocumentUrl);
+    obj.pushKV("metadata_hash", documentHash.ToString());
     obj.pushKV("decimal_pos", (int)nDecimalPos);
 }
 
@@ -27,8 +27,8 @@ void CTokenGroupDescriptionMGT::ToJson(UniValue& obj) const
     obj.setObject();
     obj.pushKV("ticker", strTicker);
     obj.pushKV("name", strName);
-    obj.pushKV("document_URL", strDocumentUrl);
-    obj.pushKV("documentHash", documentHash.ToString());
+    obj.pushKV("metadata_url", strDocumentUrl);
+    obj.pushKV("metadata_hash", documentHash.ToString());
     obj.pushKV("decimal_pos", (int)nDecimalPos);
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
 }
@@ -38,9 +38,9 @@ void CTokenGroupDescriptionNFT::ToJson(UniValue& obj) const
     obj.clear();
     obj.setObject();
     obj.pushKV("name", strName);
-    obj.pushKV("document_URL", strDocumentUrl);
-    obj.pushKV("documentHash", documentHash.ToString());
-    obj.pushKV("vchData", "TODO");
+    obj.pushKV("metadata_url", strDocumentUrl);
+    obj.pushKV("metadata_hash", documentHash.ToString());
+    obj.pushKV("data", EncodeBase64(vchData.data(), vchData.size()));
 }
 
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
@@ -63,8 +63,8 @@ std::string ConsumeParamName(const JSONRPCRequest& request, unsigned int &curpar
         throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token name");
     }
     std::string strName = request.params[curparam].get_str();
-    if (strName.size() > 30) {
-        std::string strError = strprintf("Name %s has too many characters (30 max)", strName);
+    if (strName.size() > 80) {
+        std::string strError = strprintf("Name %s has too many characters (80 max)", strName);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
     curparam++;
@@ -109,7 +109,7 @@ uint8_t ConsumeParamDecimalPos(const JSONRPCRequest& request, unsigned int &curp
     std::string strCurparamValue = request.params[curparam].get_str();
     int32_t nDecimalPos32;
     if (!ParseInt32(strCurparamValue, &nDecimalPos32) || nDecimalPos32 > 16 || nDecimalPos32 < 0) {
-        std::string strError = strprintf("Parameter %d is invalid - valid values are between 0 and 16", nDecimalPos32);
+        std::string strError = strprintf("Parameter %s is invalid - valid values are between 0 and 16", strCurparamValue);
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
     curparam++;
@@ -151,6 +151,37 @@ std::vector<unsigned char> ConsumeParamNFTData(const JSONRPCRequest& request, un
     return vchData;
 }
 
+uint64_t ConsumeParamMintAmount(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    uint64_t nMintAmount;
+    if (!ParseUInt64(strCurparamValue, &nMintAmount) || !MoneyRange(nMintAmount)) {
+        std::string strError = strprintf("Parameter %s is invalid", strCurparamValue);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return nMintAmount;
+}
+
+std::string ConsumeParamFilename(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strFilename = request.params[curparam].get_str();
+    if (strFilename.size() > 98) {
+        std::string strError = strprintf("Filename %s has too many characters (98 max)", strFilename);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return strFilename;
+}
+
 bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed)
 {
     std::string strCurparamValue;
@@ -159,9 +190,9 @@ bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &cu
 
     std::string strTicker = ConsumeParamTicker(request, curparam);
     std::string strName = ConsumeParamName(request, curparam);
+    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
     uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
-    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionRegular>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
@@ -185,9 +216,9 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
 
     std::string strTicker = ConsumeParamTicker(request, curparam);
     std::string strName = ConsumeParamName(request, curparam);
+    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
     uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
-    uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
     CBLSPublicKey blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionMGT>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash, blsPubKey);
@@ -221,11 +252,13 @@ bool ParseGroupDescParamsNFT(const JSONRPCRequest& request, unsigned int &curpar
     confirmed = false;
 
     std::string strName = ConsumeParamName(request, curparam);
+    uint64_t nMintAmount = ConsumeParamMintAmount(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
     uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
     std::vector<unsigned char> vchData = ConsumeParamNFTData(request, curparam);
+    std::string strDataFilename = ConsumeParamFilename(request, curparam);
 
-    tgDesc = std::make_shared<CTokenGroupDescriptionNFT>(strName, strDocumentUrl, documentHash, vchData);
+    tgDesc = std::make_shared<CTokenGroupDescriptionNFT>(strName, nMintAmount, strDocumentUrl, documentHash, vchData, strDataFilename);
 
     if (curparam >= request.params.size())
     {
