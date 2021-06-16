@@ -49,12 +49,12 @@ class TokenTest (BitcoinTestFramework):
         PARTAddr=self.nodes[0].getnewaddress()
         LIVEAddr=self.nodes[0].getnewaddress()
         HulkAddr=self.nodes[0].getnewaddress()
-        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "https://www.google.com", "0", "4", MGTBLS["public"], "false", "true")
+        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0", MGTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
-        GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "https://www.google.com", "0", "0", GVTBLS["public"], "false", "true")
+        GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator","0",  "https://www.google.com", "0", GVTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         self.log.info("GVT %s" % GVT)
         GVTGroup_ID=GVT['groupID']
@@ -62,11 +62,11 @@ class TokenTest (BitcoinTestFramework):
         mintaddr=self.nodes[0].getnewaddress()
         self.nodes[0].minttoken(MGTGroup_ID, mintaddr, 500)
         self.nodes[0].generate(1)
-        XBYTZTok=self.nodes[0].configuremanagementtoken("XBYTZ", "ExtraBytz", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-XBYTZ.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd","0", XBYTZBLS["public"], "true", "true")
+        XBYTZTok=self.nodes[0].configuremanagementtoken("XBYTZ", "ExtraBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-XBYTZ.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd",XBYTZBLS["public"], "true", "true")
         XBYTZGroup_ID=XBYTZTok['groupID']
-        PARTTok=self.nodes[0].configuremanagementtoken("PART", "PartBytz", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-PART.json", "b0425ee4ba234099970c53c28288da749e2a1afc0f49856f4cab82b37f72f6a5","0", PARTBLS["public"], "true", "true")
+        PARTTok=self.nodes[0].configuremanagementtoken("PART", "PartBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-PART.json", "b0425ee4ba234099970c53c28288da749e2a1afc0f49856f4cab82b37f72f6a5",PARTBLS["public"], "true", "true")
         PARTGroup_ID=PARTTok['groupID']
-        LIVETok=self.nodes[0].configuremanagementtoken("LIVE", "LiveBytz", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-LIVE.json", "6de2409add060ec4ef03d61c0966dc46508ed3498e202e9459e492a372ddccf5", "13", LiveBLS["public"], "true", "true")
+        LIVETok=self.nodes[0].configuremanagementtoken("LIVE", "LiveBytz", "13", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-LIVE.json", "6de2409add060ec4ef03d61c0966dc46508ed3498e202e9459e492a372ddccf5", LiveBLS["public"], "true", "true")
         LIVEGroup_ID=LIVETok['groupID']
         self.nodes[0].generate(1)
         self.log.info("Token Info %s" % json.dumps(self.nodes[0].tokeninfo("all"), indent=4))
@@ -78,7 +78,7 @@ class TokenTest (BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.nodes[0].minttoken(LIVEGroup_ID, LIVEAddr, '1')
         self.nodes[0].generate(1)
-        HULKTok=self.nodes[0].configuretoken("HULK", "HulkToken", "https://raw.githubusercontent.com/CeForce/hulktoken/master/hulk.json", "367750e31cb276f5218c013473449c9e6a4019fed603d045b51e25f5db29283a", "10", "true")
+        HULKTok=self.nodes[0].configuretoken("HULK", "HulkToken", "10", "https://raw.githubusercontent.com/CeForce/hulktoken/master/hulk.json", "367750e31cb276f5218c013473449c9e6a4019fed603d045b51e25f5db29283a", "true")
         HulkGroup_ID=HULKTok['groupID']
         self.nodes[0].generate(1)
         self.nodes[0].minttoken(HulkGroup_ID, HulkAddr, '15')

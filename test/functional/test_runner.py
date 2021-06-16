@@ -186,7 +186,7 @@ EXTENDED_SCRIPTS = [
     # vv Tests less than 5m vv
     'rpc_token_test_pt1.py',
     #'feature_maxuploadtarget.py',
-    'wallet_listsinceblock.py',
+    #'wallet_listsinceblock.py',
     'wallet_listreceivedby.py',
     #'mempool_packages.py',
     #'feature_dbcrash.py',

@@ -593,11 +593,11 @@ class BytzTestFramework(BitcoinTestFramework):
         self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")
-        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "https://www.google.com", "0", "4", MGTBLS["public"], "false", "true")
+        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", MGTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '25')
-        GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "https://www.google.com", "0", "0", GVTBLS["public"], "true", "true")
+        GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "0", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", GVTBLS["public"], "true", "true")
         self.nodes[0].generate(1)
         GVTGroup_ID=GVT['groupID']
         self.nodes[0].minttoken(GVTGroup_ID, GVTAddr, '25')
