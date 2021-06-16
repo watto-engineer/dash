@@ -6,8 +6,7 @@
 #define TOKEN_GROUP_DOCUMENT
 
 #include <key.h>
-
-class UniValue;
+#include <univalue.h>
 
 class CTokenGroupDocument
 {
@@ -16,49 +15,79 @@ public:
 
 private:
     uint16_t nVersion{CURRENT_VERSION};
+    int nSpecialTxType;
 
     // data
-    std::string strTicker;
-    std::string strName;
-    std::string strChain;
-    std::string strSummary;
-    std::string strDescription;
-    std::string strCreator;
-    std::string strContactURL;
-    std::string strContactEmail;
+    UniValue data;
+    std::vector<unsigned char> vchData;
 
+    // signature data
     std::vector<unsigned char> vchSig;
 
+    /// Failed to parse object data
+    bool fUnparsable;
+    bool fJsonLoaded;
+    bool fRawLoaded;
+    bool fParsed;
+    bool fValidated;
+
 public:
-    CTokenGroupDocument() {
-        SetNull();
+    CTokenGroupDocument() : nVersion(CURRENT_VERSION), nSpecialTxType(), vchData(), vchSig(), fUnparsable(false), fJsonLoaded(false), fRawLoaded(false), fParsed(false), fValidated(false) {
+        data = UniValue(UniValue::VOBJ);
     };
-    CTokenGroupDocument(std::string strTicker, std::string strName, std::string strChain, std::string strSummary,
-        std::string strDescription, std::string strCreator, std::string strContactURL, std::string strContactEmail) :
-        strTicker(strTicker), strName(strName), strChain(strChain), strSummary(strSummary), strDescription(strDescription),
-        strCreator(strCreator), strContactURL(strContactURL), strContactEmail(strContactEmail) {};
+
+    CTokenGroupDocument(const std::vector<unsigned char>& vchDataIn) :
+            nVersion(CURRENT_VERSION), nSpecialTxType(nSpecialTxType), vchData(vchDataIn), vchSig(), fUnparsable(false), fJsonLoaded(false), fRawLoaded(true), fParsed(false), fValidated(false) {
+        fJsonLoaded = LoadJSONData();
+        if (!fJsonLoaded) {
+            fUnparsable = true;
+        }
+        if (!ParseATPParams()) {
+            fUnparsable = true;
+            return;
+        }
+        fParsed = true;
+        vchData = GetRawDataFromJson();
+        fRawLoaded = true;
+
+        if (!ValidateData()) {
+            return;
+        }
+        fValidated = true;
+    };
+
+    CTokenGroupDocument(const UniValue& data) :
+            nVersion(CURRENT_VERSION), nSpecialTxType(), data(data), vchData(), vchSig(), fUnparsable(false), fJsonLoaded(true), fRawLoaded(false), fParsed(false) {
+        if (!ParseATPParams()) {
+            fUnparsable = true;
+            return;
+        }
+        fParsed = true;
+        vchData = GetRawDataFromJson();
+        fRawLoaded = true;
+
+        if (!ValidateData()) {
+            return;
+        }
+        fValidated = true;
+    };
 
     void SetNull() {
-        strTicker = "";
-        strName = "";
-        strChain = "";
-        strSummary = "";
-        strDescription = "";
-        strCreator = "";
-        strContactURL = "";
-        strContactEmail = "";
+        data = UniValue(UniValue::VOBJ);
+        vchData.clear();
         vchSig.clear();
+        fUnparsable = false;
+        nSpecialTxType = 0;
     }
 
     /**
-     * GetHash returns the double-sha256 hash of the serialized item.
+     * ValidateData will ensure that the json data matches the required format
      */
-    uint256 GetHash() const;
+    bool ValidateData() const;
 
     /**
-     * GetSignatureHash returns the hash of the serialized item
-     * without the signature included. The intent of this method is to get the
-     * hash to be signed.
+     * GetSignatureHash returns the hash of the data's text representation.
+     * The intent of this method is to get the hash to be signed.
      */
     uint256 GetSignatureHash() const;
 
@@ -84,39 +113,23 @@ public:
      */
     void SetSignature(const std::string& strSignature);
 
+    /**
+     * GetSignature is used to get the signature data as a string
+     */
+    std::string GetSignature();
+
     // FUNCTIONS FOR DEALING WITH DATA STRING
 
     std::string GetDataAsHexString() const;
     std::string GetDataAsPlainString() const;
+    std::vector<unsigned char> GetRawDataFromJson() const;
 
-    // SERIALIZER
+    bool LoadJSONData();
+    bool GetJSONFromRawData(UniValue& objResult);
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
-    {
-        if (!(s.GetType() & SER_GETHASH)) {
-            READWRITE(nVersion);
-        }
-        READWRITE(strTicker);
-        READWRITE(strName);
-        READWRITE(strChain);
-        READWRITE(strSummary);
-        READWRITE(strDescription);
-        READWRITE(strCreator);
-        READWRITE(strContactURL);
-        READWRITE(strContactEmail);
-        if (!(s.GetType() & SER_GETHASH)) {
-            READWRITE(vchSig);
-        }
-    }
+    bool ParseATPParams();
 
     void ToJson(UniValue& obj) const;
-
-    // FUNCTIONS FOR DEALING WITH DATA STRING
-    void LoadData();
-    void GetData(UniValue& objResult);
 };
 
 #endif
