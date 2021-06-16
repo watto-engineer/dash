@@ -162,22 +162,26 @@ public:
     uint16_t nVersion{CURRENT_VERSION};
 
     std::string strName; // Token name
+    uint64_t nMintAmount; // Fixed token mint amount
     std::string strDocumentUrl; // Extended token description document URL
     uint256 documentHash;
 
     std::vector<unsigned char> vchData;
+    std::string strDataFilename; // File name for the data
 
     CTokenGroupDescriptionNFT() {
         SetNull();
     };
-    CTokenGroupDescriptionNFT(std::string strName, std::string strDocumentUrl, uint256 documentHash, std::vector<unsigned char> vchData) :
-        strName(strName), strDocumentUrl(strDocumentUrl), documentHash(documentHash), vchData(vchData) { };
+    CTokenGroupDescriptionNFT(std::string strName, uint64_t nMintAmount, std::string strDocumentUrl, uint256 documentHash, std::vector<unsigned char> vchData, std::string strDataFilename) :
+        strName(strName), nMintAmount(nMintAmount), strDocumentUrl(strDocumentUrl), documentHash(documentHash), vchData(vchData), strDataFilename(strDataFilename) { };
 
     void SetNull() {
         strName = "";
+        nMintAmount = 0;
         strDocumentUrl = "";
         documentHash = uint256();
         vchData.clear();
+        strDataFilename = "";
     }
 
     ADD_SERIALIZE_METHODS;
@@ -187,26 +191,32 @@ public:
     {
         READWRITE(nVersion);
         READWRITE(strName);
+        READWRITE(nMintAmount);
         READWRITE(strDocumentUrl);
         READWRITE(documentHash);
         READWRITE(vchData);
+        READWRITE(strDataFilename);
     }
     void ToJson(UniValue& obj) const;
 
     void WriteHashable(CHashWriter& ss) const {
         ss << nVersion;
         ss << strName;
+        ss << nMintAmount;
         ss << strDocumentUrl;
         ss << documentHash;
         ss << vchData;
+        ss << strDataFilename;
     }
 
     bool operator==(const CTokenGroupDescriptionNFT &c)
     {
         return (strName == c.strName &&
+                nMintAmount == c.nMintAmount &&
                 strDocumentUrl == c.strDocumentUrl &&
                 documentHash == c.documentHash &&
-                vchData == c.vchData);
+                vchData == c.vchData &&
+                strDataFilename == c.strDataFilename);
     }
 };
 
@@ -298,7 +308,7 @@ inline uint8_t tgDescGetDecimalPos(CTokenGroupDescriptionVariant& tgDesc) {
 }
 
 // Tokens with no fractional quantities have nDecimalPos=0
-// Bytz has has decimalpos=8 (1 BYTZ is 100000000 satoshi)
+// Bytz has has decimalPos=8 (1 BYTZ is 100000000 satoshi)
 // Maximum value is 10^16
 class tgdesc_get_coin_amount : public boost::static_visitor<CAmount>
 {

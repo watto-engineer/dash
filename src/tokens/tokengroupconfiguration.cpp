@@ -70,7 +70,7 @@ template void TGFilterTickerCharacters(CTokenGroupDescriptionMGT& tgDesc);
 
 template <typename T>
 void TGFilterNameCharacters(T& tgDesc) {
-    std::regex regexName("^[a-zA-Z0-9][a-zA-Z0-9 ]*[a-zA-Z0-9]$"); // letters, numbers and spaces; at least 2 characters; no space at beginning or end
+    std::regex regexName("^[a-zA-Z0-9][a-zA-Z0-9- ]*[a-zA-Z0-9]$"); // letters, numbers and spaces; at least 2 characters; no space or dash at beginning or end
 
     std::smatch matchResult;
 

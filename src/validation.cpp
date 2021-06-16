@@ -12,6 +12,7 @@
 #include <validation.h>
 
 #include <arith_uint256.h>
+#include <bytzaddrenc.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <checkpoints.h>
@@ -1452,6 +1453,19 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                         if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
                             return state.DoS(0, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
                         }
+                    }
+                }
+            }
+            for (std::pair<CTokenGroupID, CTokenGroupBalance> mintMeltItem : tgMintMeltBalance) {
+                if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && mintMeltItem.second.output > 0) {
+                    CTokenGroupCreation tgCreation;
+                    if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
+                        return state.DoS(0, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
+                    }
+                    CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(tgCreation.pTokenGroupDescription.get());
+                    if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
+                        return state.DoS(0, error("NFT mints the wrong amount (%d instead of %d)",
+                                    (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
                     }
                 }
             }

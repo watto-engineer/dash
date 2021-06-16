@@ -283,10 +283,18 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-melt",
                 "Group input exceeds output, but no melt permission");
         }
-        if ((bal.input < bal.output) && !hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT))
+        if (bal.input < bal.output)
         {
-            return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
-                "Group output exceeds input, but no mint permission");
+            if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT))
+            {
+                return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
+                    "Group output exceeds input, but no mint permission");
+            }
+            if (txo.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && hasCapability(bal.allowedCtrlOutputPerms, GroupAuthorityFlags::MINT)) {
+                // Redundant
+                return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
+                    "NFT mint cannot have mint authority output");
+            }
         }
         // Some output permissions are set that are not in the inputs
         if (((uint64_t)(bal.ctrlOutputPerms & GroupAuthorityFlags::ALL)) &

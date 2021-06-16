@@ -316,8 +316,8 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
                 CTokenGroupID parentgrp = grpID.parentGroup();
                 std::vector<unsigned char> subgroupData = grpID.GetSubGroupData();
                 tokenGroupManager.get()->GetTokenGroupCreation(parentgrp, tgCreation);
-                retobj.push_back(Pair("parentGroupID", EncodeTokenGroup(parentgrp)));
-                retobj.push_back(Pair("subgroupData", std::string(subgroupData.begin(), subgroupData.end())));
+                retobj.push_back(Pair("parent_groupID", EncodeTokenGroup(parentgrp)));
+                retobj.push_back(Pair("subgroup_data", std::string(subgroupData.begin(), subgroupData.end())));
             } else {
                 tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
             }
@@ -711,92 +711,6 @@ extern UniValue sendtoken(const JSONRPCRequest& request)
     return tx->GetHash().GetHex();
 }
 
-extern UniValue configuretokendryrun(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
-    LOCK2(cs_main, pwallet->cs_wallet);
-
-    unsigned int curparam = 0;
-    bool confirmed = false;
-
-    COutput coin(nullptr, 0, 0, false, false, false);
-
-    {
-        std::vector<COutput> coins;
-        CAmount lowest = MAX_MONEY;
-        pwallet->FilterCoins(coins, [&lowest](const CWalletTx *tx, const CTxOut *out) {
-            CTokenGroupInfo tg(out->scriptPubKey);
-            // although its possible to spend a grouped input to produce
-            // a single mint group, I won't allow it to make the tx construction easier.
-            if ((tg.associatedGroup == NoGroup) && (out->nValue < lowest))
-            {
-                lowest = out->nValue;
-                return true;
-            }
-            return false;
-        });
-
-        if (0 == coins.size())
-        {
-            throw JSONRPCError(RPC_INVALID_PARAMS, "No coins available in the wallet");
-        }
-        coin = coins[coins.size() - 1];
-    }
-
-    uint64_t grpNonce = 0;
-
-    std::vector<COutput> chosenCoins;
-    chosenCoins.push_back(coin);
-
-    std::vector<CRecipient> outputs;
-
-    CReserveKey authKeyReservation(pwallet);
-    CTxDestination authDest;
-    std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc;
-
-    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed)) {
-        return false;
-    }
-
-    CPubKey authKey;
-    authKeyReservation.GetReservedKey(authKey, true);
-    authDest = authKey.GetID();
-    curparam++;
-
-    TokenGroupIdFlags tgFlags = TokenGroupIdFlags::NONE;
-    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
-
-    CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
-    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
-    outputs.push_back(recipient);
-
-    UniValue ret(UniValue::VOBJ);
-
-    ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-
-    CTokenGroupInfo tokenGroupInfo(script);
-    CTokenGroupStatus tokenGroupStatus;
-    CTokenGroupDescriptionVariant tgDescVariant = *tgDesc.get();
-    CTransaction dummyTransaction;
-    CTokenGroupCreation tokenGroupCreation(MakeTransactionRef(dummyTransaction), uint256(), tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tgDescVariant), tokenGroupStatus);
-    tokenGroupCreation.ValidateDescription();
-
-    ret.push_back(Pair("ticker", tgDescGetTicker(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("name", tgDescGetName(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("decimalPos", tgDescGetDecimalPos(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("URL", tgDescGetDocumentURL(*tokenGroupCreation.pTokenGroupDescription)));
-    ret.push_back(Pair("documentHash", tgDescGetDocumentHash(*tokenGroupCreation.pTokenGroupDescription).ToString()));
-    ret.push_back(Pair("status", tokenGroupCreation.status.messages));
-
-    return ret;
-}
-
 extern UniValue configuretoken(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
@@ -808,25 +722,21 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configuretoken \"ticker\" \"name\" \"description_url\" description_hash decimalpos ( confirm_send ) \n"
+            "configuretoken \"ticker\" \"name\" decimal_pos \"metadata_url\" metadata_hash ( confirm_send ) \n"
             "\n"
             "Configures a new token type.\n"
             "\nArguments:\n"
             "1. \"ticker\"              (string, required) the token ticker\n"
             "2. \"name\"                (string, required) the token name\n"
-            "3. \"description_url\"     (string, required) the URL of the token's description document\n"
-            "4. \"description_hash\"    (hex, required) the hash of the token description document\n"
-            "5. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
+            "3. \"decimal_pos\"          (numeric, required) the number of decimals after the decimal separator\n"
+            "4. \"metadata_url\"     (string, required) the URL of the token's description document\n"
+            "5. \"metadata_hash\"    (hex, required) the hash of the token description document\n"
             "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
             HelpExampleCli("configuretoken", "\"FUN\" \"FunToken\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-mainnet-FUN.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 6 true") +
             "\n"
         );
-
-    if (request.params.size() < 6 || request.params[5].get_str() != "true") {
-        return configuretokendryrun(request);
-    }
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -871,7 +781,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CScript opretScript;
 
     std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc;
-    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed)) {
+    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed) || !confirmed) {
         return false;
     }
     CPubKey authKey;
@@ -906,16 +816,16 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configuremanagementtoken \"ticker\" \"name\" \"description_url\" description_hash decimalpos \"blsPubKey\" sticky_melt ( confirm_send ) \n"
+            "configuremanagementtoken \"ticker\" \"name\" decimal_pos \"metadata_url\" metadata_hash \"bls_pubkey\" sticky_melt ( confirm_send ) \n"
             "\n"
             "Configures a new management token type. Currelty the only management tokens are MGT and GVN.\n"
             "\nArguments:\n"
             "1. \"ticker\"              (string, required) the token ticker\n"
             "2. \"name\"                (string, required) the token name\n"
-            "3. \"description_url\"     (string, required) the URL of the token's description document\n"
-            "4. \"description_hash\"    (hex) the hash of the token description document\n"
-            "5. \"decimalpos\"          (numeric, required) the number of decimals after the decimal separator\n"
-            "6. \"blsPubKey\"           (string, required) the BLS public key. The BLS private key does not have to be known.\n"
+            "3. \"decimal_pos\"          (numeric, required) the number of decimals after the decimal separator\n"
+            "4. \"metadata_url\"     (string, required) the URL of the token's description document\n"
+            "5. \"metadata_hash\"    (hex) the hash of the token description document\n"
+            "6. \"bls_pubkey\"           (string, required) the BLS public key. The BLS private key does not have to be known.\n"
             "7. \"sticky_melt\"         (boolean, required) the token can be melted, also without a token melt authority\n"
             "8. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
@@ -937,7 +847,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     std::vector<CRecipient> outputs;
 
     std::shared_ptr<CTokenGroupDescriptionMGT> tgDesc;
-    if (!ParseGroupDescParamsMGT(request, curparam, tgDesc, fStickyMelt, confirmed)) {
+    if (!ParseGroupDescParamsMGT(request, curparam, tgDesc, fStickyMelt, confirmed) || !confirmed) {
         return false;
     }
     CPubKey authKey;
@@ -1057,18 +967,21 @@ extern UniValue configurenft(const JSONRPCRequest& request)
 
      if (request.fHelp || request.params.size() < 5)
         throw std::runtime_error(
-            "configurenft \"name\" \"description_url\" description_hash data ( confirm_send ) \n"
+            "configurenft \"name\" \"mint_amount\" \"metadata_url\" metadata_hash data data_filename ( confirm_send ) \n"
             "\n"
             "Configures a new token type.\n"
             "\nArguments:\n"
-            "1. \"name\"                (string, required) the token name\n"
-            "2. \"description_url\"     (string, required) the URL of the token's description document\n"
-            "3. \"description_hash\"    (hex, required) the hash of the token description document\n"
-            "4. \"data\"                (base64, required) Base64 encoded data\n"
-            "5. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
+            "1. \"name\"             (string, required) the token name\n"
+            "2. \"mint_amount\"      (number, required) the fixed mint amount\n"
+            "                           This amount MUST be minted in the token's first and only mint action\n"
+            "3. \"metadata_url\"     (string, required) the URL of the token's description document\n"
+            "4. \"metadata_hash\"    (hex, required) the hash of the token description document\n"
+            "5. \"data\"             (base64, required) Base64 encoded data\n"
+            "6. \"data_filename\"    (string, required) Filename for the base64 encoded data\n"
+            "7. \"confirm_send\"     (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configureNFT", "\"UniquelyFun\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-UniquelyFun.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 VGhpcyB0b2tlbiBpcyB1bmlxdWUgYW5kIGZ1bi4= true") +
+            HelpExampleCli("configurenft", "\"John Doe concert tickets - Garden of Eden tour\" 300 \"https://yourtickettomusic.com/nft/{id}.json\" d49f449afe7548d428c1c317a79e3411b2dcf932d7a4880c832333b3f7c7fd24 \"WW91ciB0aWNrZXQ=\" \"file.txt\" true") +
             "\n"
         );
 
@@ -1115,7 +1028,7 @@ extern UniValue configurenft(const JSONRPCRequest& request)
     CScript opretScript;
 
     std::shared_ptr<CTokenGroupDescriptionNFT> tgDesc;
-    if (!ParseGroupDescParamsNFT(request, curparam, tgDesc, confirmed)) {
+    if (!ParseGroupDescParamsNFT(request, curparam, tgDesc, confirmed) || !confirmed) {
         return false;
     }
     CPubKey authKey;
@@ -1854,7 +1767,7 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
     return results;
 }
 
-UniValue signrawtokendocument(const JSONRPCRequest& request)
+UniValue signtokenmetadata(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     CWallet* const pwallet = wallet.get();
@@ -1862,36 +1775,40 @@ UniValue signrawtokendocument(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3) {
+    if (request.fHelp || request.params.size() != 2) {
         throw std::runtime_error(
-                "signrawtokendocument \"data\" \"address\" ( \"verbose\" )\n"
+                "signtokenmetadata \"hex_data\" \"creation_address\"\n"
                 "\nSigns the raw token document using the supplied address.\n"
                 "\nArguments:\n"
-                "1. \"data\"           (hex, required) The (unsigned) serialized token document\n"
-                "2. \"address\"        (string, required) The address used to sign the token document\n"
-                "3. \"verbose\"        (bool, optional,default=false) Output the json encoded specification instead of the hex-encoded serialized data\n"
+                "1. \"hex_data\"           (hex, required) The hex-encoded token metadata document as returned by encodetokenmetadata\n"
+                "2. \"creation_address\"   (string, required) The token creation address, which will be used to sign the token document\n"
 
             "\nResult:\n"
-            "\"hex\" : \"value\"    (string) The hex-encoded signed raw token document\n"
+            "\"signature\" : \"value\"    (string) The signature of the token metadata document\n"
 
             "\nExamples:\n"
             "\nSign the hex-encoded MGT testnet document\n"
-            + HelpExampleCli("signrawtokendocument",
-                "0100034d4754104d616e6167656d656e7420546f6b656e0c4259545a2e746573746e6574fd7b01546865204d475420746f6b656e206973206120746f6b656e697a6564206d6"
-                "16e6167656d656e74206b6579206f6e20746865204259545a20626c6f636b636861696e2077697468207370656369616c20617574686f726974696573206e65636573736172"
-                "7920666f723a202831292074686520636f6e737472756374696f6e206f66206120746f6b656e2073797374656d207769746820636f686572656e742065636f6e6f6d6963206"
-                "96e63656e74697665733b202832292074686520696e63657074696f6e206f66204e75636c65757320546f6b656e7320287370656369616c20746f6b656e7320746861742068"
-                "61766520696e74657272656c61746564206d6f6e657461727920706f6c6963696573293b20616e64202833292074686520646973747269627574696f6e206f6620726577617"
-                "264732074686174207375737461696e20746869732073797374656d206f662063727970746f6772617068696320746f6b656e73206f6e2074686520626c6f636b636861696e"
-                "2efd0e025468652041746f6d696320546f6b656e2050726f746f636f6c20284154502920696e74726f64756365732063726f73732d636f696e20616e642063726f73732d746"
-                "f6b656e20706f6c6963792e204259545a207574696c697a65732041545020666f7220697473207265776172642073797374656d20616e642072696768747320737472756374"
-                "7572652e204d616e6167656d656e7420546f6b656e20284d4754292c20477561726469616e2056616c696461746f7220546f6b656e2028475654292c20616e6420477561726"
-                "469616e2056616c696461746f727320616c6c20706172746963697061746520696e20616e20696e746572636f6e6e6563746564206d616e6167656e742073797374656d2c20"
-                "616e642061726520636f6e7369646572656420746865204e75636c65757320546f6b656e732e20546865204d475420746f6b656e20697473656c66206973206120746f6b656"
-                "e697a6564206d616e6167656d656e74206b65792077697468207370656369616c20617574686f726974696573206e656564656420666f7220746f6b656e20696e6365707469"
-                "6f6e206f6e2074686520626c6f636b636861696e2e20546865204d475420746f6b656e20636f6e74696e75657320746f20706c6179206120726f6c6520696e20746865206d6"
-                "16e6167656d656e74206f6620616e642061636365737320746f207370656369616c2066656174757265732e18546865204259545a20436f726520446576656c6f7065727324"
-                "68747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f6279747a0000 Tq15q6NNKDLKsD8uRwLo8Za355afgavuVb")
+            + HelpExampleCli("signtokenmetadata",
+                "7b0a202022617470223a207b0a2020202276657273696f6e223a20312c0a2020202274797065223a20226d616e6167656d656e74220a20207d2c0a2020227469636b6572223"
+                "a20224d4754222c0a2020226e616d65223a20224d616e6167656d656e7420546f6b656e222c0a202022636861696e223a20224259545a2e746573746e6574222c0a20202263"
+                "726561746f72223a2022546865204279747a20436f726520646576656c6f70657273222c0a20202273756d6d617279223a2022546865204d475420746f6b656e20697320612"
+                "0746f6b656e697a6564206d616e6167656d656e74206b6579206f6e20746865204259545a20626c6f636b636861696e2077697468207370656369616c20617574686f726974"
+                "696573206e656365737361727920666f723a202831292074686520636f6e737472756374696f6e206f66206120746f6b656e2073797374656d207769746820636f686572656"
+                "e742065636f6e6f6d696320696e63656e74697665733b202832292074686520696e63657074696f6e206f66204e75636c65757320546f6b656e7320287370656369616c2074"
+                "6f6b656e732074686174206861766520696e74657272656c61746564206d6f6e657461727920706f6c6963696573293b20616e6420283329207468652064697374726962757"
+                "4696f6e206f6620726577617264732074686174207375737461696e20746869732073797374656d206f662063727970746f6772617068696320746f6b656e73206f6e207468"
+                "6520626c6f636b636861696e2e222c0a2020226465736372697074696f6e223a20225468652041746f6d696320546f6b656e2050726f746f636f6c20284154502920696e747"
+                "26f64756365732063726f73732d636f696e20616e642063726f73732d746f6b656e20706f6c6963792e204259545a207574696c697a65732041545020666f72206974732072"
+                "65776172642073797374656d20616e6420726967687473207374727563747572652e204d616e6167656d656e7420546f6b656e20284d4754292c20477561726469616e20566"
+                "16c696461746f7220546f6b656e2028475654292c20616e6420477561726469616e2056616c696461746f727320616c6c20706172746963697061746520696e20616e20696e"
+                "746572636f6e6e6563746564206d616e6167656e742073797374656d2c20616e642061726520636f6e7369646572656420746865204e75636c65757320546f6b656e732e205"
+                "46865204d475420746f6b656e20697473656c66206973206120746f6b656e697a6564206d616e6167656d656e74206b65792077697468207370656369616c20617574686f72"
+                "6974696573206e656564656420666f7220746f6b656e20696e63657074696f6e206f6e2074686520626c6f636b636861696e2e20546865204d475420746f6b656e20636f6e7"
+                "4696e75657320746f20706c6179206120726f6c6520696e20746865206d616e6167656d656e74206f6620616e642061636365737320746f207370656369616c206665617475"
+                "7265732e222c0a20202265787465726e616c5f75726c223a202268747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f6279747a222c0a202022696"
+                "d616765223a202268747470733a2f2f6279747a2e67672f696d616765732f6272616e64696e672f6279747a2d686f72697a6f6e74616c2d6c6f676f2e737667222c0a202022"
+                "617474726962757465735f75726c223a202268747470733a2f2f6769746875622e636f6d2f6279747a63757272656e63792f4154502d6465736372697074696f6e732f74657"
+                "3746e65742f7b69647d5f617474726962757465732e6a736f6e220a207d TwXyY5uJmzU9bMXPDbf5LyqrBczboMdeNL")
         );
     }
 
@@ -1920,24 +1837,13 @@ UniValue signrawtokendocument(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not known");
     }
 
-    CDataStream ssTGDocument(ParseHexV(request.params[0], "data"), SER_NETWORK, PROTOCOL_VERSION);
-    CTokenGroupDocument tgDocument;
-    ssTGDocument >> tgDocument;
+    CTokenGroupDocument tgDocument(ParseHexV(request.params[0], "data"));
 
     if (!tgDocument.Sign(vchSecret)) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Unable to sign document");
     }
 
-    if (fVerbose) {
-        UniValue ret(UniValue::VOBJ);
-        tgDocument.ToJson(ret);
-        return ret;
-    }
-    CDataStream ssTGDocumentOut(SER_NETWORK, PROTOCOL_VERSION);
-    ssTGDocumentOut << tgDocument;
-    std::string strData = HexStr(ssTGDocumentOut.begin(), ssTGDocumentOut.end());
-
-    return strData;
+    return tgDocument.GetSignature();
 }
 
 static const CRPCCommand commands[] =
@@ -1951,7 +1857,7 @@ static const CRPCCommand commands[] =
     { "tokens",             "configuretoken",           &configuretoken,            {} },
     { "tokens",             "configuremanagementtoken", &configuremanagementtoken,  {} },
     { "tokens",             "configurenft",             &configurenft,              {} },
-    { "tokens",             "signrawtokendocument",     &signrawtokendocument,      {"data","address","verbose"} },
+    { "tokens",             "signtokenmetadata",     &signtokenmetadata,      {"data","address","verbose"} },
     { "tokens",             "createtokenauthorities",   &createtokenauthorities,    {} },
     { "tokens",             "listtokenauthorities",     &listtokenauthorities,      {} },
     { "tokens",             "droptokenauthorities",     &droptokenauthorities,      {} },
