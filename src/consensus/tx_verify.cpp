@@ -192,6 +192,14 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
         }
+    // Different size for NFT
+    if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+        if (tx.vExtraPayload.size() > MAX_TX_EXTRA_NFT_PAYLOAD)
+            return state.Invalid(false, REJECT_INVALID, "bad-txns-nft-payload-oversize");
+    } else {
+        if (tx.vExtraPayload.size() > MAX_TX_EXTRA_PAYLOAD)
+            return state.Invalid(false, REJECT_INVALID, "bad-txns-payload-oversize");
++    }
         // Check for negative or overflow input values
         nValueIn += coin.out.nValue;
         if (!MoneyRange(coin.out.nValue) || !MoneyRange(nValueIn)) {
