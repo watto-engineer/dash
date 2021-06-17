@@ -20,8 +20,10 @@ inline unsigned int MaxBlockSigOps(bool fDIP0001Active = true)
 }
 /** The maximum allowed size of version 3 extra payload */
 static const unsigned int MAX_TX_EXTRA_PAYLOAD = 10000;
+/** The maximum allowed size of version 3 NFT extra payload */
+static const unsigned int MAX_TX_EXTRA_NFT_PAYLOAD = 99616;
 /** The maximum size of NFT token data */
-static const unsigned int MAX_TX_NFT_DATA = 8000;
+static const unsigned int MAX_TX_NFT_DATA = 98300;
 
 /** Flags for nSequence and nLockTime locks */
 /** Interpret sequence numbers as relative lock-time constraints. */

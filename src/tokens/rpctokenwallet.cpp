@@ -106,6 +106,13 @@ static unsigned int ParseGroupAddrValue(const JSONRPCRequest& request,
         outputs.push_back(recipient);
         curparam += 2;
     }
+    // If NFT then check if totalValue < desc.maxmint
+    if (tgCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
+        CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(tgCreation.pTokenGroupDescription.get());
+        if (totalValue != tgDesc->nMintAmount) {
+            throw JSONRPCError(RPC_TYPE_ERROR, strprintf("NFT mints the wrong amount (%d instead of %d)", totalValue, tgDesc->nMintAmount));
+        }
+    }
     return curparam;
 }
 

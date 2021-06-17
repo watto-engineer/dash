@@ -167,8 +167,14 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, const boo
     // Size limits
     if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_LEGACY_BLOCK_SIZE)
         return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
-    if (tx.vExtraPayload.size() > MAX_TX_EXTRA_PAYLOAD)
-        return state.DoS(100, false, REJECT_INVALID, "bad-txns-payload-oversize");
+    // Different size for NFT
+    if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+        if (tx.vExtraPayload.size() > MAX_TX_EXTRA_NFT_PAYLOAD)
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-nft-payload-oversize");
+    } else {
+        if (tx.vExtraPayload.size() > MAX_TX_EXTRA_PAYLOAD)
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-payload-oversize");
+    }
 
     // Check for negative or overflow output values
     CAmount nValueOut = 0;
