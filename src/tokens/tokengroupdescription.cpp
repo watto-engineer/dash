@@ -8,7 +8,6 @@
 #include "util.h"
 #include <rpc/protocol.h>
 #include <rpc/server.h>
-#include <univalue.h>
 
 void CTokenGroupDescriptionRegular::ToJson(UniValue& obj) const
 {
@@ -33,14 +32,17 @@ void CTokenGroupDescriptionMGT::ToJson(UniValue& obj) const
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
 }
 
-void CTokenGroupDescriptionNFT::ToJson(UniValue& obj) const
+void CTokenGroupDescriptionNFT::ToJson(UniValue& obj, const bool& fFull) const
 {
     obj.clear();
     obj.setObject();
     obj.pushKV("name", strName);
     obj.pushKV("metadata_url", strDocumentUrl);
     obj.pushKV("metadata_hash", documentHash.ToString());
-    obj.pushKV("data", EncodeBase64(vchData.data(), vchData.size()));
+    if (fFull) {
+        obj.pushKV("data_filename", strDataFilename);
+        obj.pushKV("data_base64", EncodeBase64(vchData.data(), vchData.size()));
+    }
 }
 
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {

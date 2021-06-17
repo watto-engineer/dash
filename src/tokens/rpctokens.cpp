@@ -24,7 +24,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreation& tgCreation, UniValue& entry, const bool extended = false) {
+void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreation& tgCreation, UniValue& entry, const bool fShowCreation = false, const bool fShowNFTData = false) {
     CTxOut creationOutput;
     CTxDestination creationDestination;
     GetGroupedCreationOutput(*tgCreation.creationTransaction, creationOutput);
@@ -36,15 +36,15 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
         entry.push_back(Pair("parent_groupID", EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup)));
         entry.push_back(Pair("subgroup_data", std::string(subgroupData.begin(), subgroupData.end())));
     }
-    entry.push_back(Pair("ticker", tgDescGetTicker(*tgCreation.pTokenGroupDescription)));
-    entry.push_back(Pair("name", tgDescGetName(*tgCreation.pTokenGroupDescription)));
-    entry.push_back(Pair("decimal_pos", tgDescGetDecimalPos(*tgCreation.pTokenGroupDescription)));
-    entry.push_back(Pair("metadata_url", tgDescGetDocumentURL(*tgCreation.pTokenGroupDescription)));
-    entry.push_back(Pair("metadata_hash", tgDescGetDocumentHash(*tgCreation.pTokenGroupDescription).ToString()));
+
     std::string flags = tgID.encodeFlags();
     if (flags != "none")
         entry.push_back(Pair("flags", flags));
-    if (extended) {
+
+    UniValue specification = tgDescToJson(*tgCreation.pTokenGroupDescription, fShowNFTData);
+    entry.push_back(Pair("specification", specification));
+
+    if (fShowCreation) {
         UniValue extendedEntry(UniValue::VOBJ);
         extendedEntry.push_back(Pair("txid", tgCreation.creationTransaction->GetHash().GetHex()));
         extendedEntry.push_back(Pair("blockhash", tgCreation.creationBlockHash.GetHex()));
@@ -64,11 +64,11 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() < 1)
         throw std::runtime_error(
-            "tokeninfo [list, all, stats, groupid, ticker, name] ( \"specifier \" ) ( \"extended_info\" ) \n"
+            "tokeninfo [list, all, stats, groupid, ticker, name] ( \"specifier \" ) ( \"creation_data\" ) ( \"nft_data\" )\n"
             "\nReturns information on all tokens configured on the blockchain.\n"
             "\nArguments:\n"
             "'list'           lists all token groupID's and corresponding token tickers\n"
-            "'all'            shows extended information on all tokens\n"
+            "'all'            shows data for all tokens\n"
             "'stats'          shows statistical information on the management tokens in a specific block.\n"
             "                      Args: block hash (optional)\n"
             "'groupid'        shows information on the token configuration with the specified grouID\n"
@@ -76,7 +76,8 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             "'name'           shows information on the token configuration with the specified name'\n"
             "\n"
             "'specifier'      (string, optional) parameter to couple with the main action'\n"
-            "'extended_info'  (bool, optional) show extended information'\n"
+            "'creation_data'  (bool, optional) show token creation data'\n"
+            "'nft_data'       (bool, optional) show base64 encoded data of NFT tokens'\n"
             "\n" +
             HelpExampleCli("tokeninfo", "ticker \"BYTZ\"") +
             "\n"
@@ -105,17 +106,17 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         if (request.params.size() > 2) {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Too many parameters");
         }
-        bool extended = false;
+        bool fShowCreation = false;
         if (request.params.size() > curparam) {
-            std::string sExtended;
+            std::string strShowCreation;
             std::string p = request.params[curparam].get_str();
-            std::transform(p.begin(), p.end(), std::back_inserter(sExtended), ::tolower);
-            extended = (sExtended == "true");
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowCreation), ::tolower);
+            fShowCreation = (strShowCreation == "true");
         }
 
         for (auto tokenGroupMapping : tokenGroupManager.get()->GetMapTokenGroups()) {
             UniValue entry(UniValue::VOBJ);
-            TokenGroupCreationToJSON(tokenGroupMapping.first, tokenGroupMapping.second, entry, extended);
+            TokenGroupCreationToJSON(tokenGroupMapping.first, tokenGroupMapping.second, entry, fShowCreation);
             ret.push_back(entry);
         }
     } else if (operation == "stats") {
@@ -147,7 +148,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         ret.push_back(entry);
 
     } else if (operation == "groupid") {
-        if (request.params.size() > 3) {
+        if (request.params.size() > 4) {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Too many parameters");
         }
 
@@ -158,20 +159,28 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
         }
         curparam++;
-        bool extended = false;
+        bool fShowCreation = false;
         if (request.params.size() > curparam) {
-            std::string sExtended;
+            std::string strShowCreation;
             std::string p = request.params[curparam].get_str();
-            std::transform(p.begin(), p.end(), std::back_inserter(sExtended), ::tolower);
-            extended = (sExtended == "true");
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowCreation), ::tolower);
+            fShowCreation = (strShowCreation == "true");
+        }
+        curparam++;
+        bool fShowNFTData = false;
+        if (request.params.size() > curparam) {
+            std::string strShowNFTData;
+            std::string p = request.params[curparam].get_str();
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowNFTData), ::tolower);
+            fShowNFTData = (strShowNFTData == "true");
         }
         UniValue entry(UniValue::VOBJ);
         CTokenGroupCreation tgCreation;
         tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
-        TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
+        TokenGroupCreationToJSON(grpID, tgCreation, entry, fShowCreation, fShowNFTData);
         ret.push_back(entry);
     } else if (operation == "ticker") {
-        if (request.params.size() > 3) {
+        if (request.params.size() > 4) {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Too many parameters");
         }
 
@@ -183,12 +192,20 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: could not find token group");
         }
         curparam++;
-        bool extended = false;
+        bool fShowCreation = false;
         if (request.params.size() > curparam) {
-            std::string sExtended;
+            std::string strShowCreation;
             std::string p = request.params[curparam].get_str();
-            std::transform(p.begin(), p.end(), std::back_inserter(sExtended), ::tolower);
-            extended = (sExtended == "true");
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowCreation), ::tolower);
+            fShowCreation = (strShowCreation == "true");
+        }
+        curparam++;
+        bool fShowNFTData = false;
+        if (request.params.size() > curparam) {
+            std::string strShowNFTData;
+            std::string p = request.params[curparam].get_str();
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowNFTData), ::tolower);
+            fShowNFTData = (strShowNFTData == "true");
         }
 
         CTokenGroupCreation tgCreation;
@@ -196,10 +213,10 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgDescGetTicker(*tgCreation.pTokenGroupDescription), EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
-        TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
+        TokenGroupCreationToJSON(grpID, tgCreation, entry, fShowCreation, fShowNFTData);
         ret.push_back(entry);
     } else if (operation == "name") {
-        if (request.params.size() > 3) {
+        if (request.params.size() > 4) {
             throw JSONRPCError(RPC_INVALID_PARAMS, "Too many parameters");
         }
 
@@ -211,12 +228,20 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: Could not find token group");
         }
         curparam++;
-        bool extended = false;
+        bool fShowCreation = false;
         if (request.params.size() > curparam) {
-            std::string sExtended;
+            std::string strShowCreation;
             std::string p = request.params[curparam].get_str();
-            std::transform(p.begin(), p.end(), std::back_inserter(sExtended), ::tolower);
-            extended = (sExtended == "true");
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowCreation), ::tolower);
+            fShowCreation = (strShowCreation == "true");
+        }
+        curparam++;
+        bool fShowNFTData = false;
+        if (request.params.size() > curparam) {
+            std::string strShowNFTData;
+            std::string p = request.params[curparam].get_str();
+            std::transform(p.begin(), p.end(), std::back_inserter(strShowNFTData), ::tolower);
+            fShowNFTData = (strShowNFTData == "true");
         }
 
         CTokenGroupCreation tgCreation;
@@ -224,7 +249,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         LogPrint(BCLog::TOKEN, "%s - tokenGroupCreation has [%s] [%s]\n", __func__, tgDescGetTicker(*tgCreation.pTokenGroupDescription), EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
         UniValue entry(UniValue::VOBJ);
-        TokenGroupCreationToJSON(grpID, tgCreation, entry, extended);
+        TokenGroupCreationToJSON(grpID, tgCreation, entry, fShowCreation, fShowNFTData);
         ret.push_back(entry);
     } else {
         throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: unknown operation");

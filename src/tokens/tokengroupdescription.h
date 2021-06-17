@@ -10,11 +10,11 @@
 #include "script/script.h"
 #include <primitives/transaction.h>
 #include "uint256.h"
+#include <univalue.h>
 
 #include <boost/variant.hpp>
 
 class JSONRPCRequest;
-class UniValue;
 
 static CAmount COINFromDecimalPos(const uint8_t& nDecimalPos) {
     uint8_t n = nDecimalPos <= 16 ? nDecimalPos : 0;
@@ -197,7 +197,7 @@ public:
         READWRITE(vchData);
         READWRITE(strDataFilename);
     }
-    void ToJson(UniValue& obj) const;
+    void ToJson(UniValue& obj, const bool& fFull = false) const;
 
     void WriteHashable(CHashWriter& ss) const {
         ss << nVersion;
@@ -221,6 +221,36 @@ public:
 };
 
 typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT, CTokenGroupDescriptionNFT> CTokenGroupDescriptionVariant;
+
+class tgdesc_to_json : public boost::static_visitor<UniValue>
+{
+private:
+    const bool fFull = false;
+public:
+    tgdesc_to_json(const bool& fFull = false) : fFull(fFull) {}
+
+    UniValue operator()(CTokenGroupDescriptionRegular& tgDesc) const
+    {
+        UniValue obj(UniValue::VOBJ);
+        tgDesc.ToJson(obj);
+        return obj;
+    }
+    UniValue operator()(CTokenGroupDescriptionMGT& tgDesc) const
+    {
+        UniValue obj(UniValue::VOBJ);
+        tgDesc.ToJson(obj);
+        return obj;
+    }
+    UniValue operator()(CTokenGroupDescriptionNFT& tgDesc) const
+    {
+        UniValue obj(UniValue::VOBJ);
+        tgDesc.ToJson(obj, fFull);
+        return obj;
+    }
+};
+inline UniValue tgDescToJson(CTokenGroupDescriptionVariant& tgDesc, const bool& fFull = false) {
+    return boost::apply_visitor(tgdesc_to_json(fFull), tgDesc);
+}
 
 class tgdesc_get_ticker : public boost::static_visitor<std::string>
 {
