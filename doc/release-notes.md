@@ -1,11 +1,14 @@
-Bytz Core version 0.17.0.3
+Bytz Core version 0.2.0.0
 ==========================
 
 Release is now available from:
 
-  <https://www.bytz.gg/downloads/#wallets>
+  <https://www.bytz.gg/wallet/>
 
-This is a new hotfix release.
+This is a new major version release, bringing new features, various bugfixes
+and other improvements.
+
+This release is mandatory for all nodes and clients.
 
 Please report bugs using the issue tracker at github:
 
@@ -34,99 +37,52 @@ possible with a reindex (or reindex-chainstate).
 Downgrade warning
 -----------------
 
-### Downgrade to a version < 0.14.0.3
+### Downgrade to a version < 0.2.0.0
 
-Downgrading to a version older than 0.14.0.3 is no longer supported due to
-changes in the "evodb" database format. If you need to use an older version,
-you must either reindex or re-sync the whole chain.
-
-### Downgrade of masternodes to < 0.17.0.2
-
-Starting with the 0.16 release, masternodes verify the protocol version of other
-masternodes. This results in PoSe punishment/banning for outdated masternodes,
-so downgrading even prior to the activation of the introduced hard-fork changes
-is not recommended.
+Downgrading to a version older than 0.2.0.0 is not supported due to
+changes in the database format.
 
 Notable changes
 ===============
 
-This release adds some missing translations and help strings. It also fixes
-a couple of build issues and a rare crash on some linux systems.
+This release bases the Bytz Currency source code on Dash v0.17.x, offering amongst others secure masternode
+quorums and additional opcodes for building smarter applications.
 
-0.17.0.3 Change log
-===================
+The Dash Proof-of-Work protocol has been replaced with the PIVX Proof-of-Stake protocol.
 
-See detailed [set of changes](https://github.com/bytzcurrency/bytz/compare/v0.17.0.2...bytzcurrency:v0.17.0.3).
+Half of the transaction fees are collected in a Carbon Offset pool in line with Bytz' Carbon Neutral Initiative.
 
-- [`6a54af0df7`](https://github.com/bytzcurrency/bytz/commit/6a54af0df7) Bump to v0.17.0.3
-- [`97e8461234`](https://github.com/bytzcurrency/bytz/commit/97e8461234) doc: Archive v0.17.0.2 release notes
-- [`96c041896b`](https://github.com/bytzcurrency/bytz/commit/96c041896b) feat: add tor entrypoint script for use in dashmate (#4182)
-- [`3661f36bbd`](https://github.com/bytzcurrency/bytz/commit/3661f36bbd) Merge #14416: Fix OSX dmg issue (10.12 to 10.14) (#4177)
-- [`4f4bda0557`](https://github.com/bytzcurrency/bytz/commit/4f4bda0557) depends: Undefine `BLSALLOC_SODIUM` in `bls-dash.mk` (#4176)
-- [`575e0a3070`](https://github.com/bytzcurrency/bytz/commit/575e0a3070) qt: Add `QFont::Normal` as a supported font weight when no other font weights were found (#4175)
-- [`ce4a73b790`](https://github.com/bytzcurrency/bytz/commit/ce4a73b790) rpc: Fix `upgradetohd` help text (#4170)
-- [`2fa8ddf160`](https://github.com/bytzcurrency/bytz/commit/2fa8ddf160) Translations 202105 (add missing) (#4169)
+The Dash CoinJoin (formerly PrivateSend) functionality has been disabled. Part of the Bytz Zerocoin functionality has
+been ported from the old Bytz codebase to be able to validate old transactions, but no functionality to create
+new ZeroCoin transaction is included in the current codebase.
+
+The Atomic Token Protocol (ATP), derived from Andrew Stone/Bitcoin Cash' Token Group proposal, has been extended
+with NFT functionality for creating tokens that are in line with ERC-1155 tokens.
+
+Masternode quorum sizes have been reduced in line with the Guardian Validator Nodes specifications. Additionally, gated
+access to the GVN network is provided through Guardian Validator Tokens.
 
 Credits
 =======
 
 Thanks to everyone who directly contributed to this release:
 
-- dustinface (xdustinface)
-- strophy
-- UdjinM6
+- celbalrai
+- bytzck
+- Matthew
 
-As well as everyone that submitted issues and reviewed pull requests.
+Special thanks to everyone that contributed to the Dash Core development and the
+ATP development.
+As well as everyone that contributed to testing, submitted issues and reviewed pull requests.
 
 Older releases
 ==============
 
-Bytz was previously known as Darkcoin.
+Bytz was previously known as Slate.
 
-Darkcoin tree 0.8.x was a fork of Litecoin tree 0.8, original name was XCoin
-which was first released on Jan/18/2014.
-
-Darkcoin tree 0.9.x was the open source implementation of masternodes based on
-the 0.8.x tree and was first released on Mar/13/2014.
-
-Darkcoin tree 0.10.x used to be the closed source implementation of Darksend
-which was released open source on Sep/25/2014.
-
-Bytz Core tree 0.11.x was a fork of Bitcoin Core tree 0.9,
+Bytz Core tree 0.2.x is a fork of Dash Core tree 0.17.x,
 Darkcoin was rebranded to Bytz.
-
-Bytz Core tree 0.12.0.x was a fork of Bitcoin Core tree 0.10.
-
-Bytz Core tree 0.12.1.x was a fork of Bitcoin Core tree 0.12.
 
 These release are considered obsolete. Old release notes can be found here:
 
-- [v0.17.0.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.17.0.2.md) released May/19/2021
-- [v0.16.1.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.16.1.1.md) released November/17/2020
-- [v0.16.1.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.16.1.0.md) released November/14/2020
-- [v0.16.0.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.16.0.1.md) released September/30/2020
-- [v0.15.0.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.15.0.0.md) released Febrary/18/2020
-- [v0.14.0.5](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.5.md) released December/08/2019
-- [v0.14.0.4](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.4.md) released November/22/2019
-- [v0.14.0.3](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.3.md) released August/15/2019
-- [v0.14.0.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.2.md) released July/4/2019
-- [v0.14.0.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.1.md) released May/31/2019
-- [v0.14.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.14.0.md) released May/22/2019
-- [v0.13.3](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.13.3.md) released Apr/04/2019
-- [v0.13.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.13.2.md) released Mar/15/2019
-- [v0.13.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.13.1.md) released Feb/9/2019
-- [v0.13.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.13.0.md) released Jan/14/2019
-- [v0.12.3.4](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.3.4.md) released Dec/14/2018
-- [v0.12.3.3](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.3.3.md) released Sep/19/2018
-- [v0.12.3.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.3.2.md) released Jul/09/2018
-- [v0.12.3.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.3.1.md) released Jul/03/2018
-- [v0.12.2.3](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.2.3.md) released Jan/12/2018
-- [v0.12.2.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.2.2.md) released Dec/17/2017
-- [v0.12.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.2.md) released Nov/08/2017
-- [v0.12.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.1.md) released Feb/06/2017
-- [v0.12.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.12.0.md) released Aug/15/2015
-- [v0.11.2](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.11.2.md) released Mar/04/2015
-- [v0.11.1](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.11.1.md) released Feb/10/2015
-- [v0.11.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.11.0.md) released Jan/15/2015
-- [v0.10.x](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.10.0.md) released Sep/25/2014
-- [v0.9.x](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.9.0.md) released Mar/13/2014
+- [v0.1.0.0](https://github.com/bytzcurrency/bytz/blob/master/doc/release-notes/bytz/release-notes-0.1.0.md) released June/18/2020
