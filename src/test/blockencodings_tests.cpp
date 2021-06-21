@@ -135,7 +135,7 @@ public:
     SERIALIZE_METHODS(TestHeaderAndShortIDs, obj) { READWRITE(obj.header, obj.nonce, Using<VectorFormatter<CustomUintFormatter<CBlockHeaderAndShortTxIDs::SHORTTXIDS_LENGTH>>>(obj.shorttxids), obj.prefilledtxn); }
 };
 
-BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
+/* BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
 {
     CTxMemPool pool;
     TestMemPoolEntryHelper entry;
@@ -203,9 +203,9 @@ BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
         BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1 - 1); // + 1 because of partialBlock; -1 because of block.
     }
     BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET - 1); // -1 because of block
-}
+} */
 
-BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
+/* BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
 {
     CTxMemPool pool;
     TestMemPoolEntryHelper entry;
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
         BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1 - 1); // + 1 because of partialBlock; -1 because of block.
     }
     BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET - 1); // -1 because of block
-}
+} */
 
 BOOST_AUTO_TEST_CASE(EmptyBlockRoundTripTest)
 {
