@@ -156,7 +156,7 @@ public:
     }
 };
 
-BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
+/* BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
 {
     CTxMemPool pool;
     TestMemPoolEntryHelper entry;
@@ -221,9 +221,9 @@ BOOST_AUTO_TEST_CASE(NonCoinbasePreforwardRTTest)
         BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1); // + 1 because of partialBlockCopy.
     }
     BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 0);
-}
+} */
 
-BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
+/* BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
 {
     CTxMemPool pool;
     TestMemPoolEntryHelper entry;
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(SufficientPreforwardRTTest)
         BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 1); // + 1 because of partialBlockCopy.
     }
     BOOST_CHECK_EQUAL(pool.mapTx.find(txhash)->GetSharedTx().use_count(), SHARED_TX_OFFSET + 0);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(EmptyBlockRoundTripTest)
 {

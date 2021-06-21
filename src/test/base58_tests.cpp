@@ -12,8 +12,18 @@
 
 #include <boost/test/unit_test.hpp>
 
+UniValue
+read_json(const std::string& jsondata)
+{
+    UniValue v;
 
-extern UniValue read_json(const std::string& jsondata);
+    if (!v.read(jsondata) || !v.isArray())
+    {
+        BOOST_ERROR("Parse error.");
+        return UniValue(UniValue::VARR);
+    }
+    return v.get_array();
+}
 
 BOOST_FIXTURE_TEST_SUITE(base58_tests, BasicTestingSetup)
 

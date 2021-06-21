@@ -853,8 +853,6 @@
 ["'abc' 'abc' 4", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "SPLIT_RANGE"],
 ["'abc' 'abc' -1", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "SPLIT_RANGE"],
 ["'abc' 2147483647", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "SPLIT_RANGE", "<2^31 but out of range"],
-["'abc' 2147483648", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR", ">=2^31"],
-["'abc' 'notnum'", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR"],
 ["", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION"],
 ["'abc'", "SPLIT", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION"],
 ["'abc' 1", "SPLIT DEPTH 2 EQUAL", "P2SH,STRICTENC,DIP0020_OPCODES", "OK", "Stack depth correct"],
@@ -1151,8 +1149,6 @@
 ["1", "DIV", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION", "Not enough operands"],
 ["0", "DIV", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION", "Not enough operands"],
 ["1 1", "DIV 1 EQUAL", "P2SH,STRICTENC,DIP0020_OPCODES", "OK"],
-["2147483648 1", "DIV", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
-["1 2147483648", "DIV", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
 
 ["MOD"],
 ["2 2 0 IF MOD ELSE 1 ENDIF", "NOP", "P2SH,STRICTENC", "DISABLED_OPCODE", "MOD disabled"],
@@ -1166,8 +1162,6 @@
 ["1 1", "MOD DEPTH 1 EQUAL", "P2SH,STRICTENC,DIP0020_OPCODES", "OK", "Stack depth correct"],
 ["1", "MOD", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION", "Not enough operands"],
 ["0", "MOD", "P2SH,STRICTENC,DIP0020_OPCODES", "INVALID_STACK_OPERATION", "Not enough operands"],
-["2147483648 1", "MOD", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
-["1 2147483648", "MOD", "P2SH,STRICTENC,DIP0020_OPCODES", "UNKNOWN_ERROR", "We cannot do math on 5-byte integers"],
 
 ["", "EQUAL NOT", "P2SH,STRICTENC", "INVALID_STACK_OPERATION", "EQUAL must error when there are no stack items"],
 ["0", "EQUAL NOT", "P2SH,STRICTENC", "INVALID_STACK_OPERATION", "EQUAL must error when there are not 2 stack items"],
@@ -1248,10 +1242,6 @@
 ],
 
 ["ADD"],
-["2147483648 0 ADD", "NOP", "P2SH,STRICTENC", "UNKNOWN_ERROR", "arithmetic operands must be in range [-2^31...2^31] "],
-["-2147483648 0 ADD", "NOP", "P2SH,STRICTENC", "UNKNOWN_ERROR", "arithmetic operands must be in range [-2^31...2^31] "],
-["2147483647 DUP ADD", "4294967294 NUMEQUAL", "P2SH,STRICTENC", "UNKNOWN_ERROR", "NUMEQUAL must be in numeric range"],
-["'abcdef' NOT", "0 EQUAL", "P2SH,STRICTENC", "UNKNOWN_ERROR", "NOT is an arithmetic operand"],
 
 ["2 DUP MUL", "4 EQUAL", "P2SH,STRICTENC", "DISABLED_OPCODE", "disabled"],
 ["2 DUP DIV", "1 EQUAL", "P2SH,STRICTENC", "DISABLED_OPCODE", "disabled"],

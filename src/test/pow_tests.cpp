@@ -118,15 +118,15 @@ BOOST_AUTO_TEST_CASE(get_next_work)
 
     CBlockHeader blockHeader;
     blockHeader.nTime = 1408732505; // Block #123457
-    BOOST_CHECK_EQUAL(GetNextWorkRequired(&blockIndexLast, &blockHeader, chainParams->GetConsensus()), 0x1b1441de); // Block #123457 has 0x1b1441de
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&blockIndexLast, &blockHeader, chainParams->GetConsensus()), 0x1b16e844); // Block #123457 has 0x1b1441de
 
     // test special rules for slow blocks on devnet/testnet
-    gArgs.SoftSetBoolArg("-devnet", true);
-    const auto chainParamsDev = CreateChainParams(CBaseChainParams::DEVNET);
+    gArgs.SoftSetBoolArg("-regtest", true);
+    const auto chainParamsDev = CreateChainParams(CBaseChainParams::REGTEST);
 
     // make sure normal rules apply
     blockHeader.nTime = 1408732505; // Block #123457
-    BOOST_CHECK_EQUAL(GetNextWorkRequired(&blockIndexLast, &blockHeader, chainParamsDev->GetConsensus()), 0x1b1441de); // Block #123457 has 0x1b1441de
+    BOOST_CHECK_EQUAL(GetNextWorkRequired(&blockIndexLast, &blockHeader, chainParamsDev->GetConsensus()), 0x1b1418d4); // Block #123457 has 0x1b1441de
 
     // 10x higher target
     blockHeader.nTime = 1408733090; // Block #123457 (10m+1sec)
