@@ -888,7 +888,7 @@ UniValue protx_revoke(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("invalid reason %d, must be between 0 and %d", nReason, CProUpRevTx::REASON_LAST));
         }
         if (nReason == CProUpRevTx::REASON_EXPIRED) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("use revoke_prepare/revoke_authorize/revoke_submit for reason %d", nReason));
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("use revoke_prepare/revoke_authorize for reason %d", nReason));
         }
         ptx.nReason = (uint16_t)nReason;
     }
@@ -1081,13 +1081,13 @@ UniValue protx_revoke_authorize(const JSONRPCRequest& request)
         if (nCredit - nDebit != 1) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "unable to find GVT.revoke");
         }
-        CTokenGroupCreation gvtCreation;
-        if (!tokenGroupManager->GetTokenGroupCreation(tokenGroupManager->GetGVTID(), gvtCreation)) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "unable to find GVT creation");
+        CTokenGroupCreation mgtCreation;
+        if (!tokenGroupManager->GetTokenGroupCreation(tokenGroupManager->GetMGTID(), mgtCreation)) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "unable to find MGT creation");
         }
-        const CTokenGroupDescriptionMGT *gvtDesc = boost::get<CTokenGroupDescriptionMGT>(gvtCreation.pTokenGroupDescription.get());
+        const CTokenGroupDescriptionMGT *mgtDesc = boost::get<CTokenGroupDescriptionMGT>(mgtCreation.pTokenGroupDescription.get());
 
-        if (keyOperator.GetPublicKey() != gvtDesc->blsPubKey) {
+        if (keyOperator.GetPublicKey() != mgtDesc->blsPubKey) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("the operator key does not belong to the registered GVT bls public key"));
         }
     } else {
