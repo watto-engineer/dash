@@ -1,5 +1,5 @@
 ---
-name: "bytz-osx-0.17"
+name: "bytz-osx-0.2"
 enable_cache: true
 distro: "ubuntu"
 suites:
