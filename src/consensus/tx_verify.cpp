@@ -253,7 +253,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         // If prev is group authority, check that it's matured
         if (IsOutputGroupedAuthority(coin.out) && nSpendHeight - coin.nHeight < params.nOpGroupNewRequiredConfirmations) {
             return state.Invalid(false,
-                REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
+                REJECT_INVALID, "bad-txns-premature-spend-of-token-authority",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
         }
 

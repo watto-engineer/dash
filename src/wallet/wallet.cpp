@@ -3203,7 +3203,7 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
             if (!CheckFinalTx(*pcoin->tx))
                 continue;
 
-            if (pcoin->IsGenerated() && pcoin->GetBlocksToMaturity() > 0)
+            if (pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain();
