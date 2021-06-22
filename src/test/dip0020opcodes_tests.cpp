@@ -673,22 +673,22 @@ static void CheckDivMod(const valtype& a, const valtype& b,
 
         if (flags & SCRIPT_VERIFY_MINIMALDATA) {
             CheckError(flags, {a, {0x00}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {a, {0x80}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {a, {0x00, 0x00}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {a, {0x00, 0x80}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
 
             CheckError(flags, {b, {0x00}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {b, {0x80}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {b, {0x00, 0x00}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
             CheckError(flags, {b, {0x00, 0x80}}, CScript() << OP_DIV,
-                       ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                       ScriptError::SCRIPT_ERR_NUMBER_BAD_ENCODING);
         } else {
             CheckError(flags, {a, {0x00}}, CScript() << OP_DIV,
                        ScriptError::SCRIPT_ERR_DIV_BY_ZERO);
@@ -745,11 +745,11 @@ BOOST_AUTO_TEST_CASE(div_and_mod_opcode_tests)
     // CheckOps not valid numbers
     CheckDivModError(
         {{0x01, 0x02, 0x03, 0x04, 0x05}, {0x01, 0x02, 0x03, 0x04, 0x05}},
-        ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+        ScriptError::SCRIPT_ERR_NUMBER_OVERFLOW);
     CheckDivModError({{0x01, 0x02, 0x03, 0x04, 0x05}, {0x01}},
-                     ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                     ScriptError::SCRIPT_ERR_NUMBER_OVERFLOW);
     CheckDivModError({{0x01, 0x05}, {0x01, 0x02, 0x03, 0x04, 0x05}},
-                     ScriptError::SCRIPT_ERR_UNKNOWN_ERROR);
+                     ScriptError::SCRIPT_ERR_NUMBER_OVERFLOW);
 
     // 0x185377af / 0x85f41b01 = -4
     // 0x185377af % 0x85f41b01 = 0x00830bab

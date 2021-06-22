@@ -93,6 +93,8 @@ static ScriptErrorDesc script_errors[]={
     {SCRIPT_ERR_INVALID_NUMBER_RANGE, "INVALID_NUMBER_RANGE"},
     {SCRIPT_ERR_DIV_BY_ZERO, "DIV_BY_ZERO"},
     {SCRIPT_ERR_MOD_BY_ZERO, "MOD_BY_ZERO"},
+    {SCRIPT_ERR_NUMBER_OVERFLOW, "NUMBER_OVERFLOW"},
+    {SCRIPT_ERR_NUMBER_BAD_ENCODING, "NUMBER_BAD_ENCODING"},
 };
 
 const char *FormatScriptError(ScriptError_t err)
