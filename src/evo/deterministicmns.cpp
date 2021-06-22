@@ -1565,20 +1565,19 @@ bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
         }
 
         if (ptx.nReason == CProUpRevTx::REASON_EXPIRED) {
-            CAmount nCredit;
-            CAmount nDebit;
-            CTokenGroupID gvtRevokeID(tokenGroupManager->GetGVTID(), "revoke");
-            if (!GetTokenBalance(tx, gvtRevokeID, state, view, nCredit, nDebit)) {
-                return state.DoS(100, false, REJECT_INVALID, "bad-protx-revoke-token");
-            }
-            if (nCredit - nDebit != 1) {
-                return state.DoS(100, false, REJECT_INVALID, "bad-protx-revoke-token");
+            if (!tokenGroupManager->ManagementTokensCreated()) {
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-revoke-token-too-early");
             }
             if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
                 // pass the state returned by the function above
                 return false;
             }
-        } else if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
+            CTokenGroupCreation mgtCreation;
+            if (!tokenGroupManager->GetTokenGroupCreation(tokenGroupManager->GetMGTID(), mgtCreation)) {
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-revoke-bls-key");
+            }
+            const CTokenGroupDescriptionMGT *mgtDesc = boost::get<CTokenGroupDescriptionMGT>(mgtCreation.pTokenGroupDescription.get());
+
                 // pass the state returned by the function above
                 return false;
         }
