@@ -221,7 +221,7 @@ OP_CHECKSEQUENCEVERIFY = CScriptOp(0xb2)
 OP_NOP4 = CScriptOp(0xb3)
 OP_NOP5 = CScriptOp(0xb4)
 OP_NOP6 = CScriptOp(0xb5)
-OP_NOP7 = CScriptOp(0xb6)
+OP_GROUP = CScriptOp(0xb6)
 OP_NOP8 = CScriptOp(0xb7)
 OP_NOP9 = CScriptOp(0xb8)
 OP_NOP10 = CScriptOp(0xb9)
@@ -342,7 +342,7 @@ OPCODE_NAMES.update({
     OP_NOP4 : 'OP_NOP4',
     OP_NOP5 : 'OP_NOP5',
     OP_NOP6 : 'OP_NOP6',
-    OP_NOP7 : 'OP_NOP7',
+    OP_GROUP : 'OP_GROUP',
     OP_NOP8 : 'OP_NOP8',
     OP_NOP9 : 'OP_NOP9',
     OP_NOP10 : 'OP_NOP10',
