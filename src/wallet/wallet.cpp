@@ -5908,13 +5908,15 @@ bool CMerkleTx::IsChainLocked() const
 
 int CMerkleTx::GetBlocksToMaturity() const
 {
-    if (!(IsGenerated() || IsAnyOutputGroupedAuthority(*tx)))
+    const bool& fGenerated = IsGenerated();
+    const bool& fAuthority = IsAnyOutputGroupedAuthority(*tx);
+    if (!(fGenerated || fAuthority))
         return 0;
     int depth = GetDepthInMainChain();
     int minBlocksToMaturity = 0;
-    if (IsAnyOutputGroupedAuthority(*tx))
-        minBlocksToMaturity = std::max(0, (Params().GetConsensus().nOpGroupNewRequiredConfirmations + 1) - depth);
-    return std::max(minBlocksToMaturity, (Params().GetConsensus().nCoinbaseMaturity + 1) - depth);
+    if (fAuthority)
+        minBlocksToMaturity = std::max(0, (Params().GetConsensus().nOpGroupNewRequiredConfirmations) - depth);
+    return fGenerated ? std::max(minBlocksToMaturity, (Params().GetConsensus().nCoinbaseMaturity + 1) - depth) : minBlocksToMaturity;
 }
 
 bool CWalletTx::AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state)
