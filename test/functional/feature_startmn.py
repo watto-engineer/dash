@@ -10,6 +10,7 @@ from test_framework.test_framework import BytzTestFramework
 from test_framework.util import *
 from test_framework.blocktools import *
 
+BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class WalletTest(BytzTestFramework):
     def set_test_params(self):
@@ -67,6 +68,8 @@ class WalletTest(BytzTestFramework):
         gvtBLSKey = self.nodes[0].bls("generate")
         self.log.info("gvtBLSKey:")
         self.log.info(gvtBLSKey)
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         gvtConfig = self.nodes[0].configuremanagementtoken("GVT", "GuardianValidatorToken", "0", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", gvtBLSKey['public'], "true", "true")
         self.nodes[0].generate(1)
         self.log.info("gvtConfig:")

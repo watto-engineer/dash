@@ -55,6 +55,8 @@ from .util import (
     get_chain_folder,
 )
 
+BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+
 class TestStatus(Enum):
     PASSED = 1
     FAILED = 2
@@ -597,6 +599,8 @@ class BytzTestFramework(BitcoinTestFramework):
         self.nodes[0].generate(1)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '25')
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "0", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", GVTBLS["public"], "true", "true")
         self.nodes[0].generate(1)
         GVTGroup_ID=GVT['groupID']

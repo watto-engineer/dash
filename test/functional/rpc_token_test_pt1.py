@@ -54,18 +54,28 @@ class TokenTest (BitcoinTestFramework):
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator","0",  "https://www.google.com", "0", GVTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         self.log.info("GVT %s" % GVT)
         GVTGroup_ID=GVT['groupID']
         self.nodes[0].minttoken(GVTGroup_ID, GVTAddr, '43')
         mintaddr=self.nodes[0].getnewaddress()
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         self.nodes[0].minttoken(MGTGroup_ID, mintaddr, 500)
+        self.nodes[0].generate(1)
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         XBYTZTok=self.nodes[0].configuremanagementtoken("XBYTZ", "ExtraBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-XBYTZ.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd",XBYTZBLS["public"], "true", "true")
         XBYTZGroup_ID=XBYTZTok['groupID']
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         PARTTok=self.nodes[0].configuremanagementtoken("PART", "PartBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-PART.json", "b0425ee4ba234099970c53c28288da749e2a1afc0f49856f4cab82b37f72f6a5",PARTBLS["public"], "true", "true")
         PARTGroup_ID=PARTTok['groupID']
+        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
         LIVETok=self.nodes[0].configuremanagementtoken("LIVE", "LiveBytz", "13", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-LIVE.json", "6de2409add060ec4ef03d61c0966dc46508ed3498e202e9459e492a372ddccf5", LiveBLS["public"], "true", "true")
         LIVEGroup_ID=LIVETok['groupID']
         self.nodes[0].generate(1)
