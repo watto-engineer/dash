@@ -592,7 +592,7 @@ public:
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 15;
-        consensus.AccruedCarbonOffsetStartHeight = 833200;
+        consensus.AccruedCarbonOffsetStartHeight = 831200;
         consensus.AccruedCarbonOffsetWindow = 100;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
