@@ -2478,10 +2478,16 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime5_1 = GetTimeMicros(); nTimeISFilter += nTime5_1 - nTime4;
     LogPrint(BCLog::BENCHMARK, "      - IS filter: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_1 - nTime4), nTimeISFilter * MICRO, nTimeISFilter * MILLI / nBlocksTotal);
 
+    // Aggregate carbon fees
+    CAmount nMinerFees;
+    CAmount nCarbonFeesEscrow;
+    CAmount nCarbonFeesPayable;
+    const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindex->pprev, pindex->nHeight, chainparams.GetConsensus(), nFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
+
+    CBlockReward blockReward(pindex->nHeight, nMinerFees, nCarbonFeesPayable, block.IsProofOfStake(), chainparams.GetConsensus());
+
     // BYTZ : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
 
-    // TODO: resync data (both ways?) and try to reprocess this block later.
-    CBlockReward blockReward(pindex->nHeight, nFees, block.IsProofOfStake(), Params().GetConsensus());
     std::string strError = "";
 
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
@@ -2511,6 +2517,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (!UpdateZBYTZSupply(block, pindex, fJustCheck))
         return state.DoS(100, error("%s: Failed to calculate new zBYTZ supply for block=%s height=%d", __func__,
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
+
+    pindex->nCarbonFeesEscrow = nCarbonFeesEscrow;
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
@@ -2793,9 +2801,9 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
             DoWarning(strWarning);
         }
     }
-    std::string strMessage = strprintf("%s: new best=%s height=%d version=0x%08x log2_work=%.8f tx=%lu date='%s' progress=%f cache=%.1fMiB(%utxo)", __func__,
+    std::string strMessage = strprintf("%s: new best=%s height=%d version=0x%08x log2_work=%.8f tx=%lu fee_escrow='%lu' date='%s' progress=%f cache=%.1fMiB(%utxo)", __func__,
       pindexNew->GetBlockHash().ToString(), pindexNew->nHeight, pindexNew->nVersion,
-      log(pindexNew->nChainWork.getdouble())/log(2.0), (unsigned long)pindexNew->nChainTx,
+      log(pindexNew->nChainWork.getdouble())/log(2.0), (unsigned long)pindexNew->nChainTx, (unsigned long)pindexNew->nCarbonFeesEscrow,
       FormatISO8601DateTime(pindexNew->GetBlockTime()),
       GuessVerificationProgress(chainParams.TxData(), pindexNew), pcoinsTip->DynamicMemoryUsage() * (1.0 / (1<<20)), pcoinsTip->GetCacheSize());
     strMessage += strprintf(" evodb_cache=%.1fMiB", evoDb->GetMemoryUsage() * (1.0 / (1<<20)));
@@ -3597,6 +3605,7 @@ void CChainState::ReceivedBlockTransactions(const CBlock& block, CBlockIndex* pi
     }
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
+    pindexNew->nCarbonFeesEscrow = 0;
     pindexNew->nFile = pos.nFile;
     pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;

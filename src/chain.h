@@ -226,6 +226,10 @@ public:
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
+    //! Carbon Offset related fields
+    //! Amount of accrued carbon offset fees that will be paid in the next carbon payment block
+    uint32_t nCarbonFeesEscrow;
+
     //! block header
     int32_t nVersion;
     uint256 hashMerkleRoot;
@@ -265,6 +269,8 @@ public:
         mapZerocoinSupply.clear();
         vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
+
+        nCarbonFeesEscrow = 0;
 
         nVersion       = 0;
         hashMerkleRoot = uint256();
@@ -529,12 +535,12 @@ public:
             READWRITE(nAccumulatorCheckpoint);
             READWRITE(mapZerocoinSupply);
             READWRITE(vMintDenominationsInBlock);
+            READWRITE(nStakeModifier);
         }
-        // v1/v2 modifier selection.
+
         if (this->nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(nStakeModifierV2);
-        } else {
-            READWRITE(nStakeModifier);
+            READWRITE(nCarbonFeesEscrow);
         }
     }
 

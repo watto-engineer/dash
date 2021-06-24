@@ -692,7 +692,7 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
     result.pushKV("transactions", transactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->GetValueOut());
-    CBlockReward blockReward(chainActive.Height() + 1,  0, false, Params().GetConsensus());
+    CBlockReward blockReward(chainActive.Height() + 1,  0, 0, false, Params().GetConsensus());
     UniValue minerRewardObj(UniValue::VARR);
     CReward minerReward = blockReward.GetCoinbaseReward();
     for (const auto& minerTokenReward : minerReward.tokenAmounts) {

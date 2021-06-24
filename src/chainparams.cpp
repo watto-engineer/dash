@@ -400,6 +400,8 @@ public:
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 100;
+        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight;
+        consensus.AccruedCarbonOffsetWindow = 1000;
 
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
@@ -590,6 +592,8 @@ public:
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 15;
+        consensus.AccruedCarbonOffsetStartHeight = 833200;
+        consensus.AccruedCarbonOffsetWindow = 100;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -752,6 +756,8 @@ public:
         consensus.strCarbonOffsetAddress = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
+        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight;
+        consensus.AccruedCarbonOffsetWindow = 100;
         consensus.BytzAddrPrefix = "bytztest";
         consensus.strTokenManagementKey = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -920,6 +926,8 @@ public:
         consensus.strCarbonOffsetAddress = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
+        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight + 30;
+        consensus.AccruedCarbonOffsetWindow = 10;
         consensus.BytzAddrPrefix = "bytzreg";
         consensus.strTokenManagementKey = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
         consensus.nOpGroupNewRequiredConfirmations = 1;

@@ -11,6 +11,8 @@
 #include "primitives/block.h"
 #include "tokens/groups.h"
 
+class CBlockIndex;
+
 class CReward {
 public:
     typedef enum RewardType_t {
@@ -66,7 +68,7 @@ public:
     };
 
     CBlockReward(const CBlock& block, const bool fLegacy, const CAmount coinstakeValueIn);
-    CBlockReward(const int nHeight, const CAmount nFees, const bool fPos, const Consensus::Params& consensusParams);
+    CBlockReward(const int nHeight, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fPos, const Consensus::Params& consensusParams);
 
     bool operator<(const CBlockReward& rhs) const { return CompareTo(rhs) < 0; }
     bool operator>(const CBlockReward& rhs) const { return CompareTo(rhs) > 0; }
@@ -97,13 +99,14 @@ public:
     void MoveMasternodeRewardToCoinstake();
     void RemoveMasternodeReward();
 
-    void AddFees(const CAmount nFees);
+    void AddFees(const CAmount nMinerFees, const CAmount nCarbonFeesEscrow);
 
-    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS);
+    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fLegacy, const bool fPOS);
 
     CReward GetTotalRewards();
 };
 
 CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams);
+bool GetCarbonPayments(CBlockIndex* pindexPrev, const int nHeight, const Consensus::Params& consensus_params, const CAmount nFees, CAmount& nMinerFees, CAmount& nCarbonFeesEscrow, CAmount& nCarbonFeesPayable);
 
 #endif //POS_REWARDS_H

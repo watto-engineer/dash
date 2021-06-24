@@ -238,7 +238,14 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (!fPos)
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
 
-    CBlockReward blockReward(nHeight, nFees, fPos, Params().GetConsensus());
+    // Aggregate carbon fees
+    CAmount nMinerFees;
+    CAmount nCarbonFeesEscrow;
+    CAmount nCarbonFeesPayable;
+    const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindexPrev, nHeight, chainparams.GetConsensus(), nFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
+
+    CBlockReward blockReward(nHeight, nMinerFees, nCarbonFeesPayable, fPos, chainparams.GetConsensus());
+
     CCbTx cbTx;
 
     // Update coinbase transaction with additional info about masternode and governance payments,

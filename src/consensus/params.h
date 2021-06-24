@@ -143,7 +143,7 @@ struct Params {
     int nGovernanceMinQuorum; // Min absolute vote count to trigger an action
     int nGovernanceFilterElements;
     int nMasternodeMinimumConfirmations;
-    /** Deployment of v16 Hard Fork */
+    /** Deployment of v17 Hard Fork */
     int V17DeploymentHeight;
     /** Block height and hash at which BIP34 becomes active */
     int BIP34Height;
@@ -210,6 +210,10 @@ struct Params {
     std::string BytzAddrPrefix;
     std::string strTokenManagementKey;
     int nOpGroupNewRequiredConfirmations;
+
+    /** Carbon Offset */
+    int AccruedCarbonOffsetStartHeight;
+    int AccruedCarbonOffsetWindow;
 
     /** Zerocoin - retired functionality */
     int64_t nZerocoinStartHeight;

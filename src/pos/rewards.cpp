@@ -6,6 +6,7 @@
 #include "pos/rewards.h"
 
 #include "chainparams.h"
+#include <chain.h>
 #include <evo/cbtx.h>
 #include <evo/specialtx.h>
 #include "tokens/tokengroupmanager.h"
@@ -166,14 +167,14 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
 }
 
 // fSplitCoinstake is not set after calling this constructor
-CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fPosIn, const Consensus::Params& consensusParams) {
+CBlockReward::CBlockReward(const int nHeight, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fPosIn, const Consensus::Params& consensusParams) {
     rewards.clear();
     fBurnUnpaidMasternodeReward = false;
     fPos = fPosIn;
     fSplitCoinstake = false;
     CAmount nBlockValue = GetBlockSubsidyBytz(nHeight - 1, fPos, consensusParams);
     CAmount mnRewardAmount = GetMasternodePayment(nHeight, nBlockValue, false, consensusParams);
-    SetRewards(nBlockValue, mnRewardAmount, 0, nFees, nHeight < consensusParams.DIP0003Height, fPos);
+    SetRewards(nBlockValue, mnRewardAmount, 0, nMinerFees, nCarbonFeesEscrow, nHeight < consensusParams.DIP0003Height, fPos);
 }
 
 int CBlockReward::CompareTo(const CBlockReward& rhs) const {
@@ -327,13 +328,13 @@ void CBlockReward::RemoveMasternodeReward() {
     }
 }
 
-void CBlockReward::AddFees(const CAmount nFees) {
-    CAmount nCarbonFees = nFees * 0.5;
-    AddReward(CReward::RewardType::REWARD_CARBON, nCarbonFees);
-    AddReward(CReward::RewardType::REWARD_BURN, nFees - nCarbonFees);
+void CBlockReward::AddFees(const CAmount nMinerFees, const CAmount nCarbonFeesEscrow) {
+    // Add CarbonFees as a separate parameter
+    AddReward(CReward::RewardType::REWARD_CARBON, nCarbonFeesEscrow);
+    AddReward(CReward::RewardType::REWARD_BURN, nMinerFees);
 }
 
-void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS) {
+void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fLegacy, const bool fPOS) {
     if (!fLegacy) {
         SetMasternodeReward(mnRewardAmount);
         SetOperatorReward(opRewardAmount);
@@ -342,15 +343,36 @@ void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnReward
         } else {
             SetCoinbaseReward(blockSubsidy - mnRewardAmount - opRewardAmount);
         }
-        AddFees(nFees);
+        AddFees(nMinerFees, nCarbonFeesEscrow);
     } else {
         SetMasternodeReward(mnRewardAmount);
         if (fPOS) {
             SetCoinstakeReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nMinerFees);
         } else {
             SetCoinbaseReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nMinerFees);
         }
     }
+}
+
+bool GetCarbonPayments(CBlockIndex* pindexPrev, const int nHeight, const Consensus::Params& consensus_params, const CAmount nFees, CAmount& nMinerFees, CAmount& nCarbonFeesEscrow, CAmount& nCarbonFeesPayable) {
+    const bool fCarbonOffsetting = nHeight >= consensus_params.V17DeploymentHeight;
+
+    nMinerFees = fCarbonOffsetting ? nFees * 0.5 : nFees;
+    const CAmount nCarbonFees = nFees - nMinerFees;
+
+    const bool fAccruedCarbonOffsetting = (nHeight >= consensus_params.AccruedCarbonOffsetStartHeight);
+    const int nAccruedCarbonWindow = fAccruedCarbonOffsetting ? consensus_params.AccruedCarbonOffsetWindow : 1;
+    const bool fIsCarbonPaymentsBlock = (fCarbonOffsetting && (nHeight % nAccruedCarbonWindow) == 0);
+
+    nCarbonFeesEscrow = fCarbonOffsetting ? ((pindexPrev ? pindexPrev->nCarbonFeesEscrow : 0) + nCarbonFees) : 0;
+
+    if (fIsCarbonPaymentsBlock) {
+        nCarbonFeesPayable = nCarbonFeesEscrow;
+        nCarbonFeesEscrow = 0;
+    } else {
+        nCarbonFeesPayable = 0;
+    }
+    return fIsCarbonPaymentsBlock;
 }

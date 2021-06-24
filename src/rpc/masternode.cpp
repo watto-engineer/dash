@@ -439,9 +439,14 @@ UniValue masternode_payments(const JSONRPCRequest& request)
             nBlockFees += nValueIn - tx->GetValueOut();
         }
 
+        CAmount nMinerFees;
+        CAmount nCarbonFeesEscrow;
+        CAmount nCarbonFeesPayable;
+        const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindex->pprev, pindex->nHeight, Params().GetConsensus(), nBlockFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
+
         std::vector<CTxOut> voutMasternodePayments, voutDummy;
         CMutableTransaction dummyTx;
-        CBlockReward blockReward(pindex->nHeight, nBlockFees, block.IsProofOfStake(), Params().GetConsensus());
+        CBlockReward blockReward(pindex->nHeight, nMinerFees, nCarbonFeesEscrow, block.IsProofOfStake(), Params().GetConsensus());
         FillBlockPayments(dummyTx, pindex->nHeight, blockReward, voutMasternodePayments, voutDummy);
 
         UniValue blockObj(UniValue::VOBJ);
