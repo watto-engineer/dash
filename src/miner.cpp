@@ -5,6 +5,8 @@
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2014-2022 The Dash Core developers
+// Copyright (c) 2020-2021 The ION Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 

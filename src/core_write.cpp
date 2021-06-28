@@ -1,4 +1,5 @@
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2022 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
