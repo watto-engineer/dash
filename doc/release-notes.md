@@ -22,17 +22,17 @@ How to Upgrade
 --------------
 
 If you are running an older version, shut it down. Wait until it has completely
-shut down (which might take a few minutes for older versions), then run the
+shut down (which might take a few minutes for older versions), then backup your
+wallet and private keys. The new version needs to resync the blockchain. The
+easiest way to achieve this, is to rename the old data directory and continue
+with a blank data folder. Next, start the new client: run the
 installer (on Windows) or just copy over /Applications/Bytz-Qt (on Mac) or
-bytzd/bytz-qt (on Linux). If you upgrade after DIP0003 activation and you were
-using version < 0.13 you will have to reindex (start with -reindex-chainstate
-or -reindex) to make sure your wallet has all the new data synced. Upgrading
-from version 0.13 should not require any additional actions.
+bytzd/bytz-qt (on Linux) and run it. After the client has finished syncing,
+shut it down, copy the old wallet.dat to the new wallet subfolder located in the
+Bytz data folder, and start the client again.
 
-When upgrading from a version prior to 0.14.0.3, the
-first startup of Bytz Core will run a migration process which can take a few
-minutes to finish. After the migration, a downgrade to an older version is only
-possible with a reindex (or reindex-chainstate).
+See the [Bytz wiki page on upgrading](https://github.com/celbalrai/wiki/wiki/How-to-Upgrade-to-Bytz-2.0) for
+additional information.
 
 Downgrade warning
 -----------------
@@ -62,14 +62,62 @@ with NFT functionality for creating tokens that are in line with ERC-1155 tokens
 Masternode quorum sizes have been reduced in line with the Guardian Validator Nodes specifications. Additionally, gated
 access to the GVN network is provided through Guardian Validator Tokens.
 
+### Added and removed RPC commands
+
+All Bytz 0.1 RPC commands have first been replaced by the Dash 0.17 RPC commands. Subsquently, commands have been added
+to support token activities and Proof-of-Stake functions, and commands have been removed that related to CoinJoin.
+This results in the following changes with respect to the RPC calls present in Dash 0.17:
+
+Added:
+
+|Section|Command|Parameters|
+|-|-|-|
+|Blockchain|scantxoutset| \<action\> ( \<scanobjects\> )|
+|Tokens|configuremanagementtoken|"ticker" "name" decimal_pos "metadata_url" metadata_hash "bls_pubkey" sticky_melt ( confirm_send )|
+||configurenft|"name" "mint_amount" "metadata_url" metadata_hash data data_filename ( confirm_send )|
+||configuretoken|"ticker" "name" decimal_pos "metadata_url" metadata_hash ( confirm_send )|
+||createrawtokentransaction|[{"txid":"id","vout":n},...] {"address":amount,"data":"hex",...} ( locktime )|
+||createtokenauthorities|"groupid" "bytzaddress" authoritylist|
+||decodetokenmetadata|"data"|
+||droptokenauthorities|"groupid" "transactionid" outputnr [ authority1 ( authority2 ... ) ]|
+||encodetokenmetadata|{"ticker":"ticker","name":"token name",...}|
+||getsubgroupid|"groupid" "data"|
+||gettokenbalance|( "groupid" ) ( "address" )|
+||gettokentransaction|"txid" ( "blockhash" )|
+||listtokenauthorities|( "groupid" )|
+||listtokenssinceblock|"groupid" ( "blockhash" target-confirmations includeWatchonly )|
+||listtokentransactions|("groupid" count from includeWatchonly )|
+||listunspenttokens|( minconf maxconf  ["addresses",...] [include_unsafe] [query_options])|
+||melttoken|"groupid" quantity|
+||minttoken|"groupid" "bytzaddress" quantity|
+||scantokens|\<action\> ( \<tokengroupid\> )|
+||sendtoken|"groupid" "address" amount ( "address" amount ) ( .. )|
+||signtokenmetadata|"hex_data" "creation_address"|
+||tokeninfo|[list, all, stats, groupid, ticker, name] ( "specifier " ) ( "creation_data" ) ( "nft_data" )|
+||verifytokenmetadata|"hex_data" "creation_address" "signature"|
+|Wallet|autocombinedust |enable ( threshold )|
+||getstakingstatus||
+||setstakesplitthreshold|value|
+
+Removed:
+
+|Section|Command|Parameters|
+|-|-|-|
+|Bytz|coinjoin|"command"|
+||getcoinjoininfo||
+||getpoolinfo||
+|Wallet|setcoinjoinamount|amount|
+||setcoinjoinrounds|rounds|
+
 Credits
 =======
 
-Thanks to everyone who directly contributed to this release:
+Thanks to everyone who contributed to this release:
 
 - celbalrai
 - bytzck
 - Matthew
+- sackninja
 
 Special thanks to everyone that contributed to the Dash Core development and the
 ATP development.
