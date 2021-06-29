@@ -2969,64 +2969,6 @@ UniValue settxfee(const JSONRPCRequest& request)
     return true;
 }
 
-UniValue setcoinjoinrounds(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
-        return NullUniValue;
-
-    if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "setcoinjoinrounds rounds\n"
-            "\nSet the number of rounds for CoinJoin.\n"
-            "\nArguments:\n"
-            "1. rounds         (numeric, required) The default number of rounds is " + std::to_string(DEFAULT_COINJOIN_ROUNDS) +
-            " Cannot be more than " + std::to_string(MAX_COINJOIN_ROUNDS) + " nor less than " + std::to_string(MIN_COINJOIN_ROUNDS) +
-            "\nExamples:\n"
-            + HelpExampleCli("setcoinjoinrounds", "4")
-            + HelpExampleRpc("setcoinjoinrounds", "16")
-        );
-
-    int nRounds = request.params[0].get_int();
-
-    if (nRounds > MAX_COINJOIN_ROUNDS || nRounds < MIN_COINJOIN_ROUNDS)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid number of rounds");
-
-    CCoinJoinClientOptions::SetRounds(nRounds);
-
-    return NullUniValue;
-}
-
-UniValue setcoinjoinamount(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
-        return NullUniValue;
-
-    if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "setcoinjoinamount amount\n"
-            "\nSet the goal amount in " + CURRENCY_UNIT + " for CoinJoin.\n"
-            "\nArguments:\n"
-            "1. amount         (numeric, required) The default amount is " + std::to_string(DEFAULT_COINJOIN_AMOUNT) +
-            " Cannot be more than " + std::to_string(MAX_COINJOIN_AMOUNT) + " nor less than " + std::to_string(MIN_COINJOIN_AMOUNT) +
-            "\nExamples:\n"
-            + HelpExampleCli("setcoinjoinamount", "500")
-            + HelpExampleRpc("setcoinjoinamount", "208")
-        );
-
-    int nAmount = request.params[0].get_int();
-
-    if (nAmount > MAX_COINJOIN_AMOUNT || nAmount < MIN_COINJOIN_AMOUNT)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount of " + CURRENCY_UNIT + " as mixing goal amount");
-
-    CCoinJoinClientOptions::SetAmount(nAmount);
-
-    return NullUniValue;
-}
-
 UniValue getwalletinfo(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
@@ -4575,8 +4517,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "sendmany",                         &sendmany,                      {"fromaccount|dummy","amounts","minconf","addlocked","comment","subtractfeefrom","use_is","use_cj","conf_target","estimate_mode"} },
     { "wallet",             "sendtoaddress",                    &sendtoaddress,                 {"address","amount","comment","comment_to","subtractfeefromamount","use_is","use_cj","conf_target","estimate_mode"} },
     { "wallet",             "settxfee",                         &settxfee,                      {"amount"} },
-    { "wallet",             "setcoinjoinrounds",     &setcoinjoinrounds,     {"rounds"} },
-    { "wallet",             "setcoinjoinamount",     &setcoinjoinamount,     {"amount"} },
     { "wallet",             "signmessage",                      &signmessage,                   {"address","message"} },
     { "wallet",             "signrawtransactionwithwallet",     &signrawtransactionwithwallet,  {"hexstring","prevtxs","sighashtype"} },
     { "wallet",             "unloadwallet",                     &unloadwallet,                  {"wallet_name"} },
