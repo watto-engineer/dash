@@ -393,11 +393,11 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.strCarbonOffsetAddress = "sYG1qGUtbTdNRYtFsKvnY3GvuauF3eVwhT";
+        consensus.strCarbonOffsetAddress = "8GDeXyYNyc1o34v8BjtS3e1ZzvLDaqXNNK";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.BytzAddrPrefix = "bytz";
-        consensus.strTokenManagementKey = "sYG1qGUtbTdNRYtFsKvnY3GvuauF3eVwhT";
+        consensus.strTokenManagementKey = "sYCxBVHJx3A1tt7B1tFnaCJGnci3hvEf2c"; // 04d449cc1ac45d327c34d8b116797ad9ed287980a9199ea48dc4c8beab90ae2ded738e826ba0b27b5571d63884d985e2a50afbe8eef2925fc280af51a2a2d5e0e0
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 100;
@@ -502,7 +502,7 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
 
-        vSporkAddresses = {"sYG1qGUtbTdNRYtFsKvnY3GvuauF3eVwhT"}; // 04700e916c512d08e658a97c7e76fab398968e4a442415f51d3907aeaa705831792197a9904597445d72a3f99ab200e264a8e767a6a2f8b499ec1684831f95cbc1
+        vSporkAddresses = {"sYJv3DxNMecQx7Z6FuQqqLGRBFjCVVpxmN"}; // 04a555983e950ddde95d4f236a1faa44eaf7399512342b40163afdc078dea8a941eb48834c61f22bd9632cbb2d7971bfdeddb6e476dc28726449eeb867affc5b26
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
