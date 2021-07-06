@@ -23,6 +23,8 @@
 #include <evo/deterministicmns.h>
 #include <evo/cbtx.h>
 #include <llmq/quorums_init.h>
+#include <tokens/tokendb.h>
+#include <zbytz/zerocoindb.h>
 
 void CConnmanTest::AddNode(CNode& node)
 {
@@ -109,6 +111,10 @@ TestingSetup::TestingSetup(const std::string& chainName) : BasicTestingSetup(cha
         pcoinsdbview.reset(new CCoinsViewDB(1 << 23, true));
         llmq::InitLLMQSystem(*evoDb, true);
         pcoinsTip.reset(new CCoinsViewCache(pcoinsdbview.get()));
+        zerocoinDB.reset();
+        zerocoinDB.reset(new CZerocoinDB(0, false, false));
+        pTokenDB.reset();
+        pTokenDB.reset(new CTokenDB(0, false, false));
         if (!LoadGenesisBlock(chainparams)) {
             throw std::runtime_error("LoadGenesisBlock failed.");
         }
@@ -139,6 +145,8 @@ TestingSetup::~TestingSetup()
         llmq::DestroyLLMQSystem();
         pcoinsdbview.reset();
         pblocktree.reset();
+        zerocoinDB.reset();
+        pTokenDB.reset();
 }
 
 TestChainSetup::TestChainSetup(int blockCount) : TestingSetup(CBaseChainParams::REGTEST)
