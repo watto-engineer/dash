@@ -1,0 +1,15 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=Bytz Qt
+Comment=Bytz Digital Currency QT test network
+GenericName=Bytz Digital Currency QT client testnet network
+Exec=bytz.qt-testnet %u
+Terminal=false
+Type=Application
+Icon=${SNAP}/bytz-qt_testnet.png
+MimeType=x-scheme-handler/bytz;
+Categories=X-Office;X-Finance;
+Keywords=internet;bytz;zbytz;bytz;core;wallet;qt;testnet;snap;launchpad;crypto;digital;currency;coin;token;zerocoin;
+Version=0.2.99

@@ -1,0 +1,11 @@
+--- a/share/genbuild.sh	2021-07-02 14:42:34.929275467 +0100
++++ b/share/genbuild.sh	2021-07-02 14:43:24.141157299 +0100
+@@ -36,7 +36,7 @@
+ 
+     # otherwise generate suffix from git, i.e. string like "59887e8-dirty"
+     SUFFIX=$(git rev-parse --short HEAD)
+-    git diff-index --quiet HEAD -- || SUFFIX="$SUFFIX-dirty"
++    git diff-index --quiet HEAD -- || SUFFIX="$SUFFIX-snap"
+ fi
+ 
+ if [ -n "$DESC" ]; then

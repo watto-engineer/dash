@@ -1,0 +1,12 @@
+--- a/src/util.cpp	2021-07-02 14:00:05.384677604 +0100
++++ b/src/util.cpp	2021-07-02 14:02:18.761271092 +0100
+@@ -671,7 +671,7 @@
+     return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytz";
+ #else
+     fs::path pathRet;
+-    char* pszHome = getenv("HOME");
++    char* pszHome = getenv("SNAP_USER_COMMON");
+     if (pszHome == nullptr || strlen(pszHome) == 0)
+         pathRet = fs::path("/");
+     else
+
