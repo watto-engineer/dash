@@ -280,13 +280,13 @@ QHeaderView
 ******************************************************/
 
 QHeaderView::section { /* Table Header Sections */
-    background-color: #ff005b;
-    color: #c7c7c7;
+    background-color: #31353c;
+    color: #000000;
 }
 
 QHeaderView::section:hover { /* Table Header Sections */
-    background-color: #c2064a;
-    color: #c7c7c7;
+    background-color: #31353c;
+    color: #000000;
 }
 
 /******************************************************
@@ -662,22 +662,22 @@ QToolBar / QToolButton
 ******************************************************/
 
 QToolBar {
-    background-color: #ff005b;
+    background-color: #31353c;
 }
 
 QToolBar > QToolButton {
-    background-color: #00000000;
-    color: #c7c7c7;
+    background-color: #31353c;
+    color: #c1c2c4;
 }
 
 QToolBar > QToolButton:hover:!checked {
-    background-color: #c2064a;
-    color: #c7c7c7;
+    background-color: #11161d;
+    color: #ff005b;
 }
 
 QToolBar > QToolButton:checked {
     background-color: #11161D;
-    color: #c7c7c7;
+    color: #ff005b;
 }
 
 QToolBar > QToolButton:disabled {
