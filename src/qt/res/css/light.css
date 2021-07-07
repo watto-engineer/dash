@@ -298,12 +298,12 @@ QMenu
 ******************************************************/
 
 QMenu {
-    background-color: #eaeaec;
-    border-color: #dcdcdc;
+    background-color: #31353c;
+    border-color: #31353c;
 }
 
 QMenu::item {
-    color: #555;
+    color: #000000;
 }
 
 QMenu::item:selected:!disabled {
@@ -647,26 +647,26 @@ QToolBar / QToolButton
 ******************************************************/
 
 QToolBar {
-    background-color: #ff005b;
+    background-color: #31353c;
 }
 
 QToolBar > QToolButton {
-    background-color: #00000000;
-    color: #f2f2f4;
+    background-color: #31353c;
+    color: #c1c2c4;
 }
 
 QToolBar > QToolButton:hover:!checked {
-    background-color: #c2064a;
-    color: #dcdcdc;
+    background-color: #11161d;
+    color: #ff005b;
 }
 
 QToolBar > QToolButton:checked {
-    background-color: #f2f2f4;
-    color: #555;
+    background-color: #11161D;
+    color: #ff005b;
 }
 
 QToolBar > QToolButton:disabled {
-    color: #a7a7a7;
+    color: #4a4a4b;
 }
 
 /******************************************************
