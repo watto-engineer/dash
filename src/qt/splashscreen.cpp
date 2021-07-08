@@ -41,13 +41,13 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
 
     // Geometries of splashscreen
     int width = 380;
-    int height = 460;
-    int logoWidth = 270;
-    int logoHeight = 270;
+    int height = 457;
+    int logoWidth = 380;
+    int logoHeight = 457;
 
     // set reference point, paddings
     int paddingTop = 10;
-    int titleVersionVSpace = 25;
+    int titleVersionVSpace = 280;
 
     float fontFactor            = 1.0;
     float scale = qApp->devicePixelRatio();
@@ -72,8 +72,8 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
     QRect rect = QRect(1, 1, width - 2, height - 2);
     pixPaint.fillRect(rect, GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BACKGROUND_WIDGET));
 
-    pixPaint.drawPixmap((width / 2) - (logoWidth / 2), (height / 2) - (logoHeight / 2) + 20, pixmapLogo.scaled(logoWidth * scale, logoHeight * scale, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    pixPaint.setPen(GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT));
+    pixPaint.drawPixmap((width / 2) - (logoWidth / 2), (height / 2) - (logoHeight / 2), pixmapLogo.scaled(logoWidth * scale, logoHeight * scale, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    pixPaint.setPen(QColor(255, 255, 255));
 
     // check font size and drawing with
     fontBold.setPointSize(50 * fontFactor);
@@ -84,16 +84,10 @@ SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const Netw
         fontFactor = 0.75;
     }
 
-    fontBold.setPointSize(50 * fontFactor);
-    pixPaint.setFont(fontBold);
-    fm = pixPaint.fontMetrics();
-    titleTextWidth  = GUIUtil::TextWidth(fm, titleText);
-    int titleTextHeight = fm.height();
-    pixPaint.drawText((width / 2) - (titleTextWidth / 2), titleTextHeight + paddingTop, titleText);
-
     fontNormal.setPointSize(16 * fontFactor);
     pixPaint.setFont(fontNormal);
     fm = pixPaint.fontMetrics();
+    int titleTextHeight = fm.height();
     int versionTextWidth = GUIUtil::TextWidth(fm, versionText);
     pixPaint.drawText((width / 2) - (versionTextWidth / 2), titleTextHeight + paddingTop + titleVersionVSpace, versionText);
 
