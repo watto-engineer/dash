@@ -84,9 +84,9 @@ OpenRC).
 ### macOS
 
 Binary:              `/usr/local/bin/wagerrd`
-Configuration file:  `~/Library/Application Support/WagerrCore/wagerr.conf`
-Data directory:      `~/Library/Application Support/WagerrCore`
-Lock file:           `~/Library/Application Support/WagerrCore/.lock`
+Configuration file:  `~/Library/Application Support/Wagerrcoin/wagerr.conf`
+Data directory:      `~/Library/Application Support/Wagerrcoin`
+Lock file:           `~/Library/Application Support/Wagerrcoin/.lock`
 
 Installing Service Configuration
 -----------------------------------

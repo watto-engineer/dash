@@ -46,7 +46,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-InstallDir $PROGRAMFILES64\WagerrCore
+InstallDir $PROGRAMFILES64\Wagerrcoin
 CRCCheck on
 XPStyle on
 BrandingText " "
