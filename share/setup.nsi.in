@@ -51,9 +51,9 @@ Var StartMenuGroup
 # Installer attributes
 OutFile @abs_top_srcdir@/@PACKAGE_TARNAME@-${VERSION}-win@WINDOWS_BITS@-setup.exe
 !if "@WINDOWS_BITS@" == "64"
-InstallDir $PROGRAMFILES64\Bytz
+InstallDir $PROGRAMFILES64\Bytzcoin
 !else
-InstallDir $PROGRAMFILES\Bytz
+InstallDir $PROGRAMFILES\Bytzcoin
 !endif
 CRCCheck on
 XPStyle on

@@ -2,8 +2,8 @@
 
 # backward compatibility for existing gentoo layout 
 #
-if [ -d "/var/lib/bytz/.bytz" ]; then
-	BITCOIND_DEFAULT_DATADIR="/var/lib/bytz/.bytz"
+if [ -d "/var/lib/bytz/.bytzcoin" ]; then
+	BITCOIND_DEFAULT_DATADIR="/var/lib/bytz/.bytzcoin"
 else
 	BITCOIND_DEFAULT_DATADIR="/var/lib/bytzd"
 fi

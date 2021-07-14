@@ -42,9 +42,9 @@ Bytz Core is now available at `./src/bytzd`
 
 Before running, it's recommended you create an RPC configuration file.
 
-    echo -e "rpcuser=bytzrpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Bytz/bytz.conf"
+    echo -e "rpcuser=bytzrpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Bytzcoin/bytz.conf"
 
-    chmod 600 "/Users/${USER}/Library/Application Support/Bytz/bytz.conf"
+    chmod 600 "/Users/${USER}/Library/Application Support/Bytzcoin/bytz.conf"
 
 The first time you run bytzd, it will start downloading the blockchain. This process could take several hours.
 

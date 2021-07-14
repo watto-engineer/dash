@@ -21,15 +21,43 @@ Upgrading and downgrading
 How to Upgrade
 --------------
 
+### Backup your data folder
+
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes for older versions), then backup your
-wallet and private keys. The new version needs to resync the blockchain. The
-easiest way to achieve this, is to rename the old data directory and continue
-with a blank data folder. Next, start the new client: run the
-installer (on Windows) or just copy over /Applications/Bytz-Qt (on Mac) or
-bytzd/bytz-qt (on Linux) and run it. After the client has finished syncing,
-shut it down, copy the old wallet.dat to the new wallet subfolder located in the
-Bytz data folder, and start the client again.
+wallet and private keys. 
+
+
+### Install and run the new client
+
+Start the new client: run the installer (on Windows) or just copy over
+/Applications/Bytz-Qt (on Mac) or bytzd/bytz-qt (on Linux) and run it.
+
+The new version (Bytz 2.0) uses a different data folder than
+the old version (Bytz 1.x), and will resync the blockchain on the first run. This is
+a time consuming process. 
+
+### (Optional) Copy your old wallet.dat to the new data folder
+
+If you want to use your old wallet file, you need to copy the wallet file from the
+old data folder to the new data folder.
+
+The new data folders are as follows:
+- Windows < Vista: C:\Documents and Settings\Username\Application Data\Bytzcoin
+- Windows >= Vista: C:\Users\Username\AppData\Roaming\Bytzcoin
+- Mac: ~/Library/Application Support/Bytzcoin
+- Linux: ~/.bytzcoin
+
+The old data folders are as follows:
+- Windows < Vista: C:\Documents and Settings\Username\Application Data\Bytz
+- Windows >= Vista: C:\Users\Username\AppData\Roaming\Bytz
+- Mac: ~/Library/Application Support/Bytz
+- Linux: ~/.bytz
+
+After the client has finished syncing, shut it down, copy the old wallet.dat to the
+new wallet subfolder located in the Bytz data folder, and start the client again.
+
+### Wiki
 
 See the [Bytz wiki page on upgrading](https://github.com/celbalrai/wiki/wiki/How-to-Upgrade-to-Bytz-2.0) for
 additional information.

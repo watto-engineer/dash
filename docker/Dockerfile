@@ -12,7 +12,7 @@ ENV USER_ID ${USER_ID:-1000}
 ENV GROUP_ID ${GROUP_ID:-1000}
 RUN groupadd -g ${GROUP_ID} bytz
 RUN useradd -u ${USER_ID} -g bytz -s /bin/bash -m -d /bytz bytz
-RUN mkdir /bytz/.bytz
+RUN mkdir /bytz/.bytzcoin
 RUN chown bytz:bytz -R /bytz
 
 COPY bin/* /usr/local/bin/

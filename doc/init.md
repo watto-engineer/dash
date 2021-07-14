@@ -68,9 +68,9 @@ can then be controlled by group membership.
 ### Mac OS X
 
 Binary:              `/usr/local/bin/bytzd`  
-Configuration file:  `~/Library/Application Support/Bytz/bytz.conf`  
-Data directory:      `~/Library/Application Support/Bytz`  
-Lock file:           `~/Library/Application Support/Bytz/.lock`  
+Configuration file:  `~/Library/Application Support/Bytzcoin/bytz.conf`  
+Data directory:      `~/Library/Application Support/Bytzcoin`  
+Lock file:           `~/Library/Application Support/Bytzcoin/.lock`  
 
 Installing Service Configuration
 -----------------------------------

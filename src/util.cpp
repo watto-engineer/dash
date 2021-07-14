@@ -662,13 +662,13 @@ void PrintExceptionContinue(const std::exception_ptr pex, const char* pszExcepti
 
 fs::path GetDefaultDataDir()
 {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Bytz
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Bytz
-    // Mac: ~/Library/Application Support/Bytz
-    // Unix: ~/.bytz
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Bytzcoin
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Bytzcoin
+    // Mac: ~/Library/Application Support/Bytzcoin
+    // Unix: ~/.bytzcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytz";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytzcoin";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -678,10 +678,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/Bytz";
+    return pathRet / "Library/Application Support/Bytzcoin";
 #else
     // Unix
-    return pathRet / ".bytz";
+    return pathRet / ".bytzcoin";
 #endif
 #endif
 }
