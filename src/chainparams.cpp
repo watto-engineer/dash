@@ -361,7 +361,7 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.V17DeploymentHeight = 1646350;
+        consensus.V17DeploymentHeight = 1669300;
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e");
         consensus.BIP65Height = consensus.V17DeploymentHeight;
@@ -455,15 +455,11 @@ public:
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("main.seeder.slate.host");       // Slate DNS Seeder
-        vSeeds.emplace_back("main.slateseeder1.xhost.host"); // Slate US1 DNS Seeder
-        vSeeds.emplace_back("main.slateseeder2.xhost.host"); // Slate EU1 DNS Seeder
-        vSeeds.emplace_back("main.slateseeder3.xhost.host"); // Slate ASIA1 (Singapore) DNS Seeder
-        vSeeds.emplace_back("main.slateseeder4.xhost.host"); // Slate AUSTRALIA1 (Sydney) DNS Seeder
-        vSeeds.emplace_back("204.92.235.50"); //Backup Seeder 1
-        vSeeds.emplace_back("204.92.235.51"); //Backup Seeder 2
-        vSeeds.emplace_back("204.92.235.52"); //Backup Seeder 3
-        vSeeds.emplace_back("204.92.235.53"); //Backup Seeder 4
+        vSeeds.emplace_back("main.seeder.bytz.gg"); // Bytz DNS Seeder
+        vSeeds.emplace_back("main.seeder1.bytz.gg"); // Bytz US1 DNS Seeder
+        vSeeds.emplace_back("main.seeder2.bytz.gg"); // Bytz EU1 DNS Seeder
+        vSeeds.emplace_back("main.seeder3.bytz.gg"); // Bytz ASIA1 (Singapore) DNS Seeder
+        vSeeds.emplace_back("main.seeder4.bytz.gg"); // Bytz AUSTRALIA1 (Sydney) DNS Seeder
 
         // Bytz addresses start with 'X'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,125);
@@ -641,10 +637,10 @@ public:
 
         vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.emplace_back("192.219.30.30");  // Bytz seeder located in Dublin
-        vSeeds.emplace_back("192.219.30.29");  // Bytz seeder located in Dublin
-        vSeeds.emplace_back("204.92.235.7");   // Bytz seeder located in Montreal
-        vSeeds.emplace_back("198.96.117.222"); // Bytz seeder located in Montreal
+        vSeeds.emplace_back("testnet.seeder1.bytz.gg"); // Bytz US1 DNS Seeder
+        vSeeds.emplace_back("testnet.seeder2.bytz.gg"); // Bytz EU1 DNS Seeder
+        vSeeds.emplace_back("testnet.seeder3.bytz.gg"); // Bytz ASIA1 (Singapore) DNS Seeder
+        vSeeds.emplace_back("testnet.seeder4.bytz.gg"); // Bytz AUSTRALIA1 (Sydney) DNS Seeder
 
         // Testnet Bytz addresses start with 'T'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
