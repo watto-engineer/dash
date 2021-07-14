@@ -9,7 +9,7 @@
 #define UNUSED
 #endif
 static const char UNUSED *bytz_strings[] = {
-QT_TRANSLATE_NOOP("bytz-core", "Bytz Core"),
+QT_TRANSLATE_NOOP("bytz-core", "BYTZ Core"),
 QT_TRANSLATE_NOOP("bytz-core", "The %s developers"),
 QT_TRANSLATE_NOOP("bytz-core", ""
 "%s file contains all private keys from this wallet. Do not share it with "

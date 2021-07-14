@@ -12,7 +12,7 @@
  * for both bytzd and bytz-qt, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
-const std::string CLIENT_NAME("Bytz Core");
+const std::string CLIENT_NAME("BYTZ Core");
 
 /**
  * Client version number

@@ -2118,7 +2118,7 @@ void ThreadMapPort()
             }
         }
 
-        std::string strDesc = "Bytz Core " + FormatFullVersion();
+        std::string strDesc = "BYTZ Core " + FormatFullVersion();
 
         do {
 #ifndef UPNPDISCOVER_SUCCESS

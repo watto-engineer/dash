@@ -769,15 +769,15 @@ fs::path static StartupShortcutPath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Bytz Core.lnk";
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "BYTZ Core.lnk";
     if (chain == CBaseChainParams::TESTNET) // Remove this special case when CBaseChainParams::TESTNET = "testnet4"
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Bytz Core (testnet).lnk";
-    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Bytz Core (%s).lnk", chain);
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "BYTZ Core (testnet).lnk";
+    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("BYTZ Core (%s).lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
 {
-    // check for "Bytz Core*.lnk"
+    // check for "BYTZ Core*.lnk"
     return fs::exists(StartupShortcutPath());
 }
 
