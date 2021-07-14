@@ -85,7 +85,7 @@ static const bool DEFAULT_LISTEN = true;
 /** The maximum number of peer connections to maintain.
  *  Masternodes are forced to accept at least this many connections
  */
-static const unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 125;
+static const unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 250;
 /** The default for -maxuploadtarget. 0 = Unlimited */
 static const uint64_t DEFAULT_MAX_UPLOAD_TARGET = 0;
 /** The default timeframe for -maxuploadtarget. 1 day. */
