@@ -455,11 +455,8 @@ public:
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("main.seeder.bytz.gg"); // Bytz DNS Seeder
         vSeeds.emplace_back("main.seeder1.bytz.gg"); // Bytz US1 DNS Seeder
         vSeeds.emplace_back("main.seeder2.bytz.gg"); // Bytz EU1 DNS Seeder
-        vSeeds.emplace_back("main.seeder3.bytz.gg"); // Bytz ASIA1 (Singapore) DNS Seeder
-        vSeeds.emplace_back("main.seeder4.bytz.gg"); // Bytz AUSTRALIA1 (Sydney) DNS Seeder
 
         // Bytz addresses start with 'X'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,125);
