@@ -1,7 +1,7 @@
 Bytz Core
 ==========
 
-This is the official reference wallet for Bytz digital currency and comprises the backbone of the Bytz peer-to-peer network. You can [download Bytz Core](https://www.bytz.gg/downloads/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for Bytz digital currency and comprises the backbone of the Bytz peer-to-peer network. You can [download Bytz Core](https://bytz.gg/wallet/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
