@@ -123,6 +123,10 @@ void CSporkManager::ProcessSpork(CNode* pfrom, const std::string& strCommand, CD
 
     if (strCommand == NetMsgType::SPORK) {
 
+        if (pfrom->nVersion < MIN_SPORK_VERSION) {
+            return;
+        }
+
         CSporkMessage spork;
         vRecv >> spork;
 
