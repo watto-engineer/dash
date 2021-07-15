@@ -1,7 +1,7 @@
 Wagerr Core
 ==========
 
-This is the official reference wallet for Wagerr digital currency and comprises the backbone of the Wagerr peer-to-peer network. You can [download Wagerr Core](https://www.wagerr.com/downloads/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for Wagerr digital currency and comprises the backbone of the Wagerr peer-to-peer network. You can [download Wagerr Core](https://wagerr.com/wallet/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
