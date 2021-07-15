@@ -1,14 +1,14 @@
 Bytz Core version 0.2.0.0
 ==========================
 
-Release is now available from:
+The release is now available from:
 
   <https://www.bytz.gg/wallet/>
 
+This release is mandatory for all nodes and clients.
+
 This is a new major version release, bringing new features, various bugfixes
 and other improvements.
-
-This release is mandatory for all nodes and clients.
 
 Please report bugs using the issue tracker at github:
 
