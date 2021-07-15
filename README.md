@@ -11,11 +11,18 @@ https://www.bytz.gg
 What is Bytz?
 -------------
 
-Bytz is an experimental digital currency that enables instant, private
-payments to anyone, anywhere in the world. Bytz uses peer-to-peer technology
-to operate with no central authority: managing transactions and issuing money
-are carried out collectively by the network. Bytz Core is the name of the open
-source software which enables the use of this currency.
+BYTZ is a blockchain-based entertainment utility protocol powered by a
+cryptographically secure multilayered network. Decentralized delivery
+yields low-cost, high-speed, high-definition media access globally.
+Consumers will be able to spend BYTZ cryptocurrency (BYTZ) on some
+of the best entertainment the world has to offer. Tickets will be forgery
+resistant, virtually eliminating fraud. Service providers holding BYTZ can
+earn even more by storing and delivering content.
+
+Together with this use case BYTZ also features fast transactions with low
+transaction fees and a low environmental footprint. It utilizes a custom Proof
+of Stake protocol for securing its network and uses an innovative token system
+to bring you network validated, secure fungible and non-fungible tokens.
 
 For more information, as well as an immediately useable, binary version of
 the Bytz Core software, see https://bytz.gg/getbytz/.
