@@ -2359,7 +2359,7 @@ void CConnman::CheckOffsetDisconnectedPeers(const CNetAddr& ip)
         // clear the set
         setOffsetDisconnectedPeers.clear();
         // Trigger the warning
-        std::string strMessage = _("Warning: Peers are being disconnected due time differences. Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.");
+        std::string strMessage = _("Warning: Peers are being disconnected due time differences. Please check that your computer's date and time are correct! If your clock is wrong BYTZ Core will not work properly.");
         LogPrintf("*** %s\n", strMessage);
         uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_ERROR);
     }
