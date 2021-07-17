@@ -1,7 +1,7 @@
 # Copyright (c) 2018-2021 The Bytz Core developers
 name: bytz
 base: core18
-version: 0.2.99
+version: 0.2.0.0
 summary:   bytz, digital currency for media content
 description: |
   BYTZ is an open-source decentralized peer-to-peer currency featuring a Delegated Proof of Stake algorithm
@@ -29,7 +29,7 @@ description: |
   - twitter (https://twitter.com/bytzcurrency)
   - instagram (https://www.instagram.com/bytzcurrency/)
   - facebook (https://www.facebook.com/bytzcurrency)
-grade: devel
+grade: stable
 confinement: strict
 apps:
   daemon:
@@ -99,7 +99,7 @@ parts:
   bytz:
     source: http://github.com/bytzcurrency/bytz
     source-type: git
-    source-tag: develop
+    source-tag: v0.2.0.0
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
