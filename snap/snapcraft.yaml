@@ -99,7 +99,7 @@ parts:
   bytz:
     source: http://github.com/bytzcurrency/bytz
     source-type: git
-    source-tag: v0.2.0.0
+    source-tag: master
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
