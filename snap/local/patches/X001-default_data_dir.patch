@@ -1,7 +1,7 @@
---- a/src/util.cpp	2021-07-02 14:00:05.384677604 +0100
-+++ b/src/util.cpp	2021-07-02 14:02:18.761271092 +0100
+--- a/src/util.cpp	2021-07-16 14:05:25.916474113 +0100
++++ b/src/util.cpp	2021-07-16 14:08:16.343511483 +0100
 @@ -671,7 +671,7 @@
-     return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytz";
+     return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytzcoin";
  #else
      fs::path pathRet;
 -    char* pszHome = getenv("HOME");
@@ -9,4 +9,3 @@
      if (pszHome == nullptr || strlen(pszHome) == 0)
          pathRet = fs::path("/");
      else
-
