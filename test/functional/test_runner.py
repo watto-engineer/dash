@@ -59,7 +59,6 @@ TRAVIS_TIMEOUT_DURATION = 30 * 60
 BASE_SCRIPTS= [
     # Scripts that are run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
-    'feature_dip3_deterministicmns.py', # NOTE: needs bytz_hash to pass
     #'feature_block_reward_reallocation.py',
     'wallet_hd.py',
     'wallet_backup.py',
@@ -100,6 +99,7 @@ BASE_SCRIPTS= [
     'wallet_keypool_topup.py',
     #'interface_zmq_bytz.py',
     #'interface_zmq.py',
+    'rpc_token_test_pt1.py',
     'interface_bitcoin_cli.py',
     #'mempool_resurrect.py',
     #'wallet_txn_doublespend.py --mineblock',
@@ -184,9 +184,9 @@ EXTENDED_SCRIPTS = [
     #'feature_fee_estimation.py',
     #'feature_llmq_data_recovery.py',
     # vv Tests less than 5m vv
-    'rpc_token_test_pt1.py',
     #'feature_maxuploadtarget.py',
     #'wallet_listsinceblock.py',
+    'feature_dip3_deterministicmns.py', # NOTE: needs bytz_hash to pass
     'wallet_listreceivedby.py',
     #'mempool_packages.py',
     #'feature_dbcrash.py',
