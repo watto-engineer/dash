@@ -1,9 +1,19 @@
 Bytz Core staging tree 0.2
 ===========================
 
-|CI|master|develop|
-|-|-|-|
-|Gitlab|[![Build Status](https://gitlab.com/bytzcurrency/bytz/badges/master/pipeline.svg)](https://gitlab.com/bytzcurrency/bytz/-/tree/master)|[![Build Status](https://gitlab.com/bytzcurrency/bytz/badges/develop/pipeline.svg)](https://gitlab.com/bytzcurrency/bytz/-/tree/develop)|
+Current Build State
+
+[![bytzcurrency](https://circleci.com/gh/bytzcurrency/BYTZ.svg?style=shield)](https://app.circleci.com/pipelines/github/bytzcurrency)
+
+Download the latest release from github
+
+[![Latest release](https://img.shields.io/github/release/bytzcurrency/BYTZ.svg)](https://github.com/bytzcurrency/BYTZ/releases/latest) ![Latest stable Release](https://img.shields.io/github/downloads/bytzcurrency/BYTZ/latest/total.svg?style=social)
+
+Install the latest release from the Snap Store
+
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/bytz)
+
+BYTZ Officlal Web Page
 
 https://www.bytz.gg
 
@@ -62,7 +72,7 @@ There are also [regression and integration tests](/test), written
 in Python, that are run automatically on the build server.
 These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
 
-The Travis CI system makes sure that every pull request is built for Windows, Linux, and OS X, and that unit/sanity tests are run automatically.
+The CircleCI build system makes sure that every pull request is built for Windows, Linux, and OS X, and that unit/sanity tests are run automatically.
 
 ### Manual Quality Assurance (QA) Testing
 
