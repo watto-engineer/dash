@@ -359,6 +359,11 @@ void WalletView::unlockWallet(bool fForMixingOnly)
     }
 }
 
+void WalletView::unlockWalletForStaking()
+{
+    unlockWallet(true);
+}
+
 void WalletView::lockWallet()
 {
     if(!walletModel)
