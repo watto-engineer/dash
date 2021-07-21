@@ -152,6 +152,7 @@ private:
     QAction* backupWalletAction = nullptr;
     QAction* changePassphraseAction = nullptr;
     QAction* unlockWalletAction = nullptr;
+    QAction *unlockWalletForStakingAction;
     QAction* lockWalletAction = nullptr;
     QAction* aboutQtAction = nullptr;
     QAction* openInfoAction = nullptr;

@@ -1925,7 +1925,7 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
         {
             {"passphrase", RPCArg::Type::STR, RPCArg::Optional::NO, "The wallet passphrase"},
             {"timeout", RPCArg::Type::NUM, RPCArg::Optional::NO, "The time to keep the decryption key in seconds; capped at 100000000 (~3 years)."},
-            {"mixingonly", RPCArg::Type::BOOL, /* default */ "false", "If is true sending functions are disabled."},
+            {"stakingonly", RPCArg::Type::BOOL, /* default */ "false", "If is true sending functions are disabled."},
         },
         RPCResult{RPCResult::Type::NONE, "", ""},
         RPCExamples{
@@ -1990,7 +1990,11 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
 
     pwallet->TopUpKeyPool();
 
-    pwallet->nRelockTime = GetTime() + nSleepTime;
+    if (nSleepTime != 0)
+    {
+        pwallet->nRelockTime = GetTime() + nSleepTime;
+        RPCRunLater(strprintf("lockwallet(%s)", pwallet->GetName()), std::bind(LockWallet, pwallet), nSleepTime);
+    }
 
     // Keep a weak pointer to the wallet so that it is possible to unload the
     // wallet before the following callback is called. If a valid shared pointer
@@ -3496,7 +3500,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
 
     bool fValidTime = chainActive.Tip()->nTime > 1471482000;
     bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
-    bool fWalletUnlocked = !pwallet->IsLocked();
+    bool fWalletUnlocked = !pwallet->IsLocked(true);
     bool fMintableCoins = stakingManager->MintableCoins();
     bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance();
     bool fMnSync = masternodeSync.IsSynced();
@@ -4172,7 +4176,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "upgradetohd",                      &upgradetohd,                   {"mnemonic", "mnemonicpassphrase", "walletpassphrase", "rescan"} },
     { "wallet",             "walletlock",                       &walletlock,                    {} },
     { "wallet",             "walletpassphrasechange",           &walletpassphrasechange,        {"oldpassphrase","newpassphrase"} },
-    { "wallet",             "walletpassphrase",                 &walletpassphrase,              {"passphrase","timeout","mixingonly"} },
+    { "wallet",             "walletpassphrase",                 &walletpassphrase,              {"passphrase","timeout","stakingonly"} },
     { "wallet",             "walletprocesspsbt",                &walletprocesspsbt,             {"psbt","sign","sighashtype","bip32derivs"} },
     { "wallet",             "walletcreatefundedpsbt",           &walletcreatefundedpsbt,        {"inputs","outputs","locktime","options","bip32derivs"} },
 };
