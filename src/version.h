@@ -23,7 +23,7 @@ static const int GETHEADERS_VERSION = 70918;
 static const int MIN_SPORK_VERSION = 70918;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT = 70915;
+static const int MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT = 70918;
 static const int MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT = 70918;
 
 //! minimum proto version of masternode to accept in DKGs
