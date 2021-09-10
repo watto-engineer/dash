@@ -65,6 +65,7 @@ jobs:
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
+            make -j${JOBS} check
             git clone http://github.com/bytzcurrency/bytz_hash
             cd bytz_hash
             python3 setup.py install
@@ -218,8 +219,7 @@ jobs:
             tar -C `pwd`/depends/SDKs -xJf ./MacOSX10.11.sdk.tar.xz
             make -j${JOBS} -C depends HOST=${HOST}
             ./autogen.sh
-            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-reduce-exports --enable-werror --disable-ccache --disable-maintainer-mode --disable-dependency-tracking --disable-bench --disable-gui-tests
-
+            CONFIG_SITE=`pwd`/depends/${HOST}/share/config.site ./configure --host=${HOST} --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking --enable-reduce-exports --disable-bench --disable-gui-tests --enable-crash-hooks
             make -j${JOBS}
 workflows:
   version: 2.1
@@ -247,6 +247,6 @@ workflows:
       - win64_bionic:
           requires:
             - lint_all
-      #- mac_bionic:
-      #    requires:
-      #      - lint_all
+      - mac_bionic:
+          requires:
+            - lint_all
