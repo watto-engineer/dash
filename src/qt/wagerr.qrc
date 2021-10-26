@@ -12,6 +12,8 @@
         <file alias="receive">res/icons/receive.png</file>
         <file alias="history">res/icons/history.png</file>
         <file alias="masternodes">res/icons/masternodes.png</file>
+        <file alias="tor">res/icons/tor.png</file>
+        <file alias="tor2">res/icons/tor2.png</file>
         <file alias="transaction_0">res/icons/transaction0.png</file>
         <file alias="transaction_1">res/icons/transaction1.png</file>
         <file alias="transaction_2">res/icons/transaction2.png</file>

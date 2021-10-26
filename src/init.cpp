@@ -1861,7 +1861,7 @@ bool AppInitMain()
     SetLimited(NET_ONION);
     if (proxyArg != "" && proxyArg != "0") {
         CService proxyAddr;
-        if (!Lookup(proxyArg.c_str(), proxyAddr, 9050, fNameLookup)) {
+        if ((!Lookup(proxyArg.c_str(), proxyAddr, 9150, fNameLookup))) {
             return InitError(strprintf(_("Invalid -proxy address or hostname: '%s'"), proxyArg));
         }
 
@@ -1885,7 +1885,7 @@ bool AppInitMain()
             SetLimited(NET_ONION); // set onions as unreachable
         } else {
             CService onionProxy;
-            if (!Lookup(onionArg.c_str(), onionProxy, 9050, fNameLookup)) {
+            if ((!Lookup(onionArg.c_str(), onionProxy, 9150, fNameLookup))){
                 return InitError(strprintf(_("Invalid -onion address or hostname: '%s'"), onionArg));
             }
             proxyType addrOnion = proxyType(onionProxy, proxyRandomize);

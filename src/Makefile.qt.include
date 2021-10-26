@@ -207,6 +207,8 @@ RES_ICONS = \
   qt/res/icons/receive.png \
   qt/res/icons/history.png \
   qt/res/icons/masternodes.png \
+  qt/res/icons/tor.png \
+  qt/res/icons/tor2.png \
   qt/res/icons/editcopy.png \
   qt/res/icons/editpaste.png \
   qt/res/icons/eye.png \

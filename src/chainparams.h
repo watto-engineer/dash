@@ -16,7 +16,7 @@
 #include <vector>
 
 struct SeedSpec6 {
-    uint8_t addr[16];
+    uint8_t addr[41];
     uint16_t port;
 };
 

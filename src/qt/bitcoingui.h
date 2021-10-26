@@ -102,6 +102,7 @@ private:
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
     QLabel *progressBarLabel;
+    QLabel *labelOnionIcon;
     QProgressBar *progressBar;
     QProgressDialog *progressDialog;
 
@@ -343,6 +344,7 @@ private Q_SLOTS:
     /** Toggle networking */
     void toggleNetworkActive();
 
+    void updateOnionIcon();
     void showModalOverlay();
 
     void updateCoinJoinVisibility();

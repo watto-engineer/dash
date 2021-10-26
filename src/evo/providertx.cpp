@@ -36,6 +36,7 @@ static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidati
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-ipaddr-port");
     }
 
+    // Address may not always be IpV4
     if (!proTx.addr.IsIPv4()) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-ipaddr");
     }

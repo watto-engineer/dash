@@ -17,9 +17,12 @@ static const unsigned char g_internal_prefix[] = { 0xFD, 0x6B, 0x88, 0xC0, 0x87,
 
 bool fAllowPrivateNet = DEFAULT_ALLOWPRIVATENET;
 
+bool fTorEnabled = false;
+
 CNetAddr::CNetAddr()
 {
     memset(ip, 0, sizeof(ip));
+    scopeId = 0;
 }
 
 void CNetAddr::SetIP(const CNetAddr& ipIn)
@@ -28,7 +31,7 @@ void CNetAddr::SetIP(const CNetAddr& ipIn)
     memcpy(ip, ipIn.ip, sizeof(ip));
 }
 
-void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[16])
+void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[41])
 {
     if (memcmp(ipv6, pchIPv4, sizeof(pchIPv4)) == 0) {
         m_net = NET_IPV4;
@@ -39,7 +42,7 @@ void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[16])
     } else {
         m_net = NET_IPV6;
     }
-    memcpy(ip, ipv6, 16);
+    memcpy(ip, ipv6, 41);
 }
 
 void CNetAddr::SetRaw(Network network, const uint8_t *ip_in)
@@ -76,13 +79,26 @@ bool CNetAddr::SetSpecial(const std::string &strName)
 {
     if (strName.size()>6 && strName.substr(strName.size() - 6, 6) == ".onion") {
         std::vector<unsigned char> vchAddr = DecodeBase32(strName.substr(0, strName.size() - 6).c_str());
-        if (vchAddr.size() != 16-sizeof(pchOnionCat))
-            return false;
-        m_net = NET_ONION;
-        memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
-        for (unsigned int i=0; i<16-sizeof(pchOnionCat); i++)
-            ip[i + sizeof(pchOnionCat)] = vchAddr[i];
-        return true;
+        // 16' length - v2 tor addresses
+        if (vchAddr.size() == 16 - sizeof(pchOnionCat)){
+            memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
+            for (unsigned int i = 0; i < 16 - sizeof(pchOnionCat); i++)
+                ip[i + sizeof(pchOnionCat)] = vchAddr[i];
+            usesTorV3 = false;
+            fTorEnabled = true;
+            return true;
+        }
+
+        // 56' length - v3 tor addressess
+        std::vector<unsigned char> vchAddrV3 = DecodeBase32(strName.substr(0, strName.size() - 6).c_str());
+        if (vchAddrV3.size() == 41 - sizeof(pchOnionCat)){
+            memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
+            for (unsigned int i = 0; i < 41 - sizeof(pchOnionCat); i++)
+                ip[i + sizeof(pchOnionCat)] = vchAddrV3[i];
+            usesTorV3 = true;
+            fTorEnabled = true;
+            return true;
+        }
     }
     return false;
 }
@@ -115,7 +131,10 @@ bool CNetAddr::IsBindAny() const
 
 bool CNetAddr::IsIPv4() const { return m_net == NET_IPV4; }
 
-bool CNetAddr::IsIPv6() const { return m_net == NET_IPV6; }
+bool CNetAddr::IsIPv6() const
+ {
+    return (!IsIPv4() && !IsTor() && !IsTorV3() && !IsInternal());
+ }
 
 bool CNetAddr::IsRFC1918() const
 {
@@ -199,7 +218,15 @@ bool CNetAddr::IsRFC7343() const
            GetByte(13) == 0x00 && (GetByte(12) & 0xF0) == 0x20;
 }
 
-bool CNetAddr::IsTor() const { return m_net == NET_ONION; }
+bool CNetAddr::IsTor() const
+{
+     return !usesTorV3 && (memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
+}
+
+bool CNetAddr::IsTorV3() const
+{
+    return usesTorV3 && (memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
+}
 
 bool CNetAddr::IsLocal() const
 {
@@ -260,7 +287,7 @@ bool CNetAddr::IsRoutable() const
         return false;
     if (!fAllowPrivateNet && IsRFC1918())
         return false;
-    return !(IsRFC2544() || IsRFC3927() || IsRFC4862() || IsRFC6598() || IsRFC5737() || (IsRFC4193() && !IsTor()) || IsRFC4843() || IsRFC7343() || IsLocal() || IsInternal());
+    return !(IsRFC2544() || IsRFC3927() || IsRFC4862() || IsRFC6598() || IsRFC5737() || (IsRFC4193() && (!IsTor() && !IsTorV3())) || IsRFC4843() || IsRFC7343() || IsLocal() || IsInternal());
 }
 
 bool CNetAddr::IsInternal() const
@@ -276,6 +303,12 @@ enum Network CNetAddr::GetNetwork() const
     if (!IsRoutable())
         return NET_UNROUTABLE;
 
+    if (IsIPv4())
+        return NET_IPV4;
+
+    if (IsTor() || IsTorV3())
+        return NET_ONION;
+
     return m_net;
 }
 
@@ -283,6 +316,8 @@ std::string CNetAddr::ToStringIP(bool fUseGetnameinfo) const
 {
     if (IsTor())
         return EncodeBase32(&ip[6], 10) + ".onion";
+    if (IsTorV3())
+        return EncodeBase32(&ip[6], 35) + ".onion";
     if (IsInternal())
         return EncodeBase32(ip + sizeof(g_internal_prefix), sizeof(ip) - sizeof(g_internal_prefix)) + ".internal";
     if (fUseGetnameinfo)
@@ -387,7 +422,7 @@ std::vector<unsigned char> CNetAddr::GetGroup() const
         vchRet.push_back(GetByte(2) ^ 0xFF);
         return vchRet;
     }
-    else if (IsTor())
+    else if (IsTor() || IsTorV3())
     {
         nClass = NET_ONION;
         nStartByte = 6;
@@ -471,7 +506,7 @@ int CNetAddr::GetReachabilityFrom(const CNetAddr *paddrPartner) const
         switch(ourNet) {
         default:         return REACH_DEFAULT;
         case NET_IPV4:   return REACH_IPV4; // Tor users can connect to IPv4 as well
-        case NET_ONION:    return REACH_PRIVATE;
+        case NET_ONION:  return REACH_PRIVATE;
         }
     case NET_TEREDO:
         switch(ourNet) {
@@ -488,7 +523,7 @@ int CNetAddr::GetReachabilityFrom(const CNetAddr *paddrPartner) const
         case NET_TEREDO:  return REACH_TEREDO;
         case NET_IPV6:    return REACH_IPV6_WEAK;
         case NET_IPV4:    return REACH_IPV4;
-        case NET_ONION:     return REACH_PRIVATE; // either from Tor, or don't care about our address
+        case NET_ONION:   return REACH_PRIVATE; // either from Tor, or don't care about our address
         }
     }
 }
@@ -580,10 +615,12 @@ bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
 
 std::vector<unsigned char> CService::GetKey() const
 {
-    auto key = GetAddrBytes();
-    key.push_back(port / 0x100);
-    key.push_back(port & 0x0FF);
-    return key;
+    std::vector<unsigned char> vKey;
+    vKey.resize(18);
+    memcpy(vKey.data(), ip, 16);
+    vKey[16] = port / 0x100;
+    vKey[17] = port & 0x0FF;
+    return vKey;
 }
 
 std::string CService::ToStringPort() const
@@ -593,7 +630,7 @@ std::string CService::ToStringPort() const
 
 std::string CService::ToStringIPPort(bool fUseGetnameinfo) const
 {
-    if (IsIPv4() || IsTor() || IsInternal()) {
+    if (IsIPv4() || IsTor() || IsTorV3() || IsInternal()) {
         return ToStringIP(fUseGetnameinfo) + ":" + ToStringPort();
     } else {
         return "[" + ToStringIP(fUseGetnameinfo) + "]:" + ToStringPort();

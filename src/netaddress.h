@@ -16,8 +16,11 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <version.h>
+#include <logging.h>
 
 extern bool fAllowPrivateNet;
+extern bool fTorEnable;
 
 /**
  * A network type.
@@ -39,7 +42,7 @@ enum Network
     /// IPv6
     NET_IPV6,
 
-    /// TORv2
+    /// TORv2 Torv3
     NET_ONION,
 
     /// A set of dummy addresses that map a name to an IPv6 address. These
@@ -62,8 +65,8 @@ class CNetAddr
          * Network to which this address belongs.
          */
         Network m_net{NET_IPV6};
-
-        unsigned char ip[16]; // in network byte order
+        unsigned char ip[41]; // in network byte order
+        bool usesTorV3 = true;
         uint32_t scopeId{0}; // for scoped/link-local ipv6 addresses
 
     public:
@@ -77,7 +80,7 @@ class CNetAddr
          * (e.g. IPv4) disguised as IPv6. This encoding is used in the legacy
          * `addr` encoding.
          */
-        void SetLegacyIPv6(const uint8_t ipv6[16]);
+        void SetLegacyIPv6(const uint8_t ipv6[41]);
 
     private:
         /**
@@ -112,6 +115,7 @@ class CNetAddr
         bool IsRFC6052() const; // IPv6 well-known prefix (64:FF9B::/96)
         bool IsRFC6145() const; // IPv6 IPv4-translated address (::FFFF:0:0:0/96)
         bool IsTor() const;
+        bool IsTorV3() const;
         bool IsLocal() const;
         bool IsRoutable() const;
         bool IsInternal() const;
