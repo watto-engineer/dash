@@ -117,6 +117,7 @@ static const uint64_t RANDOMIZER_ID_LOCALHOSTNONCE = 0xd93e69e2bbfa5735ULL; // S
 //
 // Global state variables
 //
+bool fTorEnabled = false;
 bool fDiscover = true;
 bool fListen = true;
 bool fRelayTxes = true;

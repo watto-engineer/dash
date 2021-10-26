@@ -446,11 +446,24 @@ void PushNodeVersion(CNode *pnode, CConnman* connman, int64_t nTime)
     connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::VERSION, nProtocolVersion, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe,
             nonce, strSubVersion, nNodeStartingHeight, ::fRelayTxes, mnauthChallenge, pnode->m_masternode_connection));
 
-    if (fLogIPs) {
-        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, us=%s, them=%s, peer=%d\n", nProtocolVersion, nNodeStartingHeight, addrMe.ToString(), addrYou.ToString(), nodeid);
+/*    if(addrYou.IsTor() && pnode->nVersion < TORV3_SERVICES_VERSION) {
+        LogPrint(BCLog::NET, "send version 1 message: pnode->nVersion %d \n", pnode->nVersion);
+        connman->PushMessage(pnode, CNetMsgMaker(SEGWIT_VERSION).Make(NetMsgType::VERSION, PROTOCOL_VERSION, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe,
+                nonce, strSubVersion, nNodeStartingHeight, ::fRelayTxes, mnauthChallenge, pnode->m_masternode_connection));
     } else {
-        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, us=%s, peer=%d\n", nProtocolVersion, nNodeStartingHeight, addrMe.ToString(), nodeid);
+        LogPrint(BCLog::NET, "send version 2 message: pnode->nVersion %d \n", pnode->nVersion);
+        connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::VERSION, PROTOCOL_VERSION, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe,
+                nonce, strSubVersion, nNodeStartingHeight, ::fRelayTxes, mnauthChallenge, pnode->m_masternode_connection));
+    } */
+
+    if (fLogIPs) {
+        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, us=%s, them=%s, peer=%d\n", PROTOCOL_VERSION, nNodeStartingHeight, addrMe.ToString(), addrYou.ToString(), nodeid);
+    } else {
+        LogPrint(BCLog::NET, "send version message: version %d, blocks=%d, us=%s, peer=%d, \n", PROTOCOL_VERSION, nNodeStartingHeight, addrMe.ToString(), nodeid);
     }
+/*    LogPrint(BCLog::NET, "user agent %s send version 2 message: pnode->nVersion %d \n", strSubVersion, pnode->nVersion);
+    connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::VERSION, nProtocolVersion, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe,
+    nonce, strSubVersion, nNodeStartingHeight, ::fRelayTxes, mnauthChallenge, pnode->m_masternode_connection));*/
 }
 
 // Returns a bool indicating whether we requested this block.
@@ -2162,7 +2175,12 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         int nStartingHeight = -1;
         bool fRelay = true;
 
+        // Tor v3 address - we need the version before deserialisation of an address.
+        /*vRecv >> nVersion;
+        vRecv.SetVersion(nVersion);
+        vRecv >> nServiceInt >> nTime >> addrMe;*/
         vRecv >> nVersion >> nServiceInt >> nTime >> addrMe;
+
         nSendVersion = std::min(nVersion, PROTOCOL_VERSION);
         nServices = ServiceFlags(nServiceInt);
         if (!pfrom->fInbound)
@@ -2196,6 +2214,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         if (!vRecv.empty()) {
             vRecv >> LIMITED_STRING(strSubVer, MAX_SUBVERSION_LENGTH);
             cleanSubVer = SanitizeString(strSubVer);
+            LogPrint(BCLog::NET, "Subversion %s", cleanSubVer);
         }
         if (!vRecv.empty()) {
             vRecv >> nStartingHeight;
@@ -2235,8 +2254,13 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         }
 
         // Be shy and don't send version until we hear
-        if (pfrom->fInbound)
+        if (pfrom->fInbound) {
             PushNodeVersion(pfrom, connman, GetAdjustedTime());
+            // DeepOnion: Due to Tor proxy we do not know it's onion address, so set it here.
+           if(fLogIPs)
+                LogPrint(BCLog::NET, "ProcessMessages: setting peer %d AddrName to %s isTorV3 ? %s\n", pfrom->GetId(), addrFrom.ToString().c_str(), addrFrom.IsTorV3() ? "yes" : "no");
+            pfrom->MaybeSetAddrName(addrFrom.ToString());
+        }
 
         if (Params().NetworkIDString() == CBaseChainParams::DEVNET) {
             if (strSubVer.find(strprintf("devnet=%s", gArgs.GetDevNetName())) == std::string::npos) {
@@ -2259,6 +2283,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             LOCK(pfrom->cs_SubVer);
             pfrom->strSubVer = strSubVer;
             pfrom->cleanSubVer = cleanSubVer;
+            LogPrint(BCLog::NET, "Subversion 6 Clean %s Us %s", cleanSubVer, strSubVer);
         }
         pfrom->nStartingHeight = nStartingHeight;
 
@@ -3766,7 +3791,7 @@ bool PeerLogicValidation::ProcessMessages(CNode* pfrom, std::atomic<bool>& inter
         if (strstr(e.what(), "end of data"))
         {
             // Allow exceptions from under-length message on vRecv
-            LogPrint(BCLog::NET, "%s(%s, %u bytes): Exception '%s' caught, normally caused by a message being shorter than its stated length\n", __func__, SanitizeString(strCommand), nMessageSize, e.what());
+            LogPrint(BCLog::NET, "%s (%s, %u bytes): Exception '%s' caught, normally caused by a message being shorter than its stated length\n", __func__, SanitizeString(strCommand), nMessageSize, e.what());
         }
         else if (strstr(e.what(), "size too large"))
         {
