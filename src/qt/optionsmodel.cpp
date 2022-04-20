@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2022 The Dash Core developers
+// Copyright (c) 2014-2022 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -74,7 +74,7 @@ void OptionsModel::Init(bool resetSettings)
 
     // Display
     if (!settings.contains("nDisplayUnit"))
-        settings.setValue("nDisplayUnit", BitcoinUnits::DASH);
+        settings.setValue("nDisplayUnit", BitcoinUnits::WAGERR);
     nDisplayUnit = settings.value("nDisplayUnit").toInt();
 
     if (!settings.contains("strThirdPartyTxUrls"))
@@ -232,10 +232,10 @@ void OptionsModel::Init(bool resetSettings)
 
     if (!settings.contains("nCoinJoinAmount")) {
         // for migration from old settings
-        if (!settings.contains("nAnonymizeDashAmount"))
+        if (!settings.contains("nAnonymizeWagerrAmount"))
             settings.setValue("nCoinJoinAmount", DEFAULT_COINJOIN_AMOUNT);
         else
-            settings.setValue("nCoinJoinAmount", settings.value("nAnonymizeDashAmount").toInt());
+            settings.setValue("nCoinJoinAmount", settings.value("nAnonymizeWagerrAmount").toInt());
     }
     if (!m_node.softSetArg("-coinjoinamount", settings.value("nCoinJoinAmount").toString().toStdString()))
         addOverriddenOption("-coinjoinamount");

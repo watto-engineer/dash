@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2015-2022 The Dash Core developers
+# Copyright (c) 2015-2022 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,13 +11,13 @@ from decimal import Decimal
 
 from test_framework.blocktools import create_block, create_coinbase, get_masternode_payment
 from test_framework.messages import CCbTx, COIN, CTransaction, FromHex, ToHex, uint256_to_string
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, connect_nodes, force_finish_mnsync, get_bip9_status, p2p_port
 
 class Masternode(object):
     pass
 
-class DIP3Test(BitcoinTestFramework):
+class DIP3Test(WagerrTestFramework):
     def set_test_params(self):
         self.num_initial_mn = 11 # Should be >= 11 to make sure quorums are not always the same MNs
         self.num_nodes = 1 + self.num_initial_mn + 2 # +1 for controller, +1 for mn-qt, +1 for mn created after dip3 activation
@@ -49,7 +49,7 @@ class DIP3Test(BitcoinTestFramework):
         self.log.info("funding controller node")
         while self.nodes[0].getbalance() < (self.num_initial_mn + 3) * 1000:
             self.nodes[0].generate(10) # generate enough for collaterals
-        self.log.info("controller node has {} dash".format(self.nodes[0].getbalance()))
+        self.log.info("controller node has {} wagerr".format(self.nodes[0].getbalance()))
 
         # Make sure we're below block 135 (which activates dip3)
         self.log.info("testing rejection of ProTx before dip3 activation")

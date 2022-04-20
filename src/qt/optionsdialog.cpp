@@ -3,14 +3,14 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/Wagerr-config.h>
 #endif
 
 #include <qt/optionsdialog.h>
 #include <qt/forms/ui_optionsdialog.h>
 
 #include <qt/appearancewidget.h>
-#include <qt/bitcoinunits.h>
+#include <qt/Wagerrunits.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>

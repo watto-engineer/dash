@@ -38,12 +38,12 @@ Test is as follows:
 from decimal import Decimal
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 # from test_framework.mininode import P2PTxInvStore
 from test_framework.util import assert_equal, assert_raises_rpc_error, connect_nodes, disconnect_nodes
 
 
-class MempoolPersistTest(BitcoinTestFramework):
+class MempoolPersistTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 3
         self.extra_args = [[], ["-persistmempool=0"], []]

@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2019 The Bitcoin Core developers
-// Copyright (c) 2014-2022 The Dash Core developers
+// Copyright (c) 2014-2022 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,7 +12,7 @@
 #define BITCOIN_UTIL_SYSTEM_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bitcoin-config.h>
+#include <config/wagerr-config.h>
 #endif
 
 #include <attributes.h>
@@ -50,7 +50,7 @@
 #define DBG( x )
 #endif
 
-//Dash only features
+//Wagerr only features
 
 extern bool fMasternodeMode;
 extern bool fDisableGovernance;

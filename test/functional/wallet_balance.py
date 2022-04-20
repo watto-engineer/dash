@@ -7,7 +7,7 @@ from decimal import Decimal
 import struct
 
 from test_framework.address import ADDRESS_BCRT1_UNSPENDABLE as ADDRESS_WATCHONLY
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -45,7 +45,7 @@ def create_transactions(node, address, amt, fees):
 
     return txs
 
-class WalletTest(BitcoinTestFramework):
+class WalletTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True
@@ -121,8 +121,8 @@ class WalletTest(BitcoinTestFramework):
         test_balances(fee_node_1=Decimal('0.01'))
 
         # Node 1 bumps the transaction fee and resends
-        # self.nodes[1].sendrawtransaction(txs[1]['hex']) # disabled, no RBF in Dash
-        #self.nodes[0].sendrawtransaction(txs[1]['hex'])  # sending on both nodes is faster than waiting for propagation # disabled, no RBF in Dash
+        # self.nodes[1].sendrawtransaction(txs[1]['hex']) # disabled, no RBF in Wagerr
+        #self.nodes[0].sendrawtransaction(txs[1]['hex'])  # sending on both nodes is faster than waiting for propagation # disabled, no RBF in Wagerr
         self.sync_all()
 
         self.log.info("Test getbalance and getunconfirmedbalance with conflicted unconfirmed inputs")

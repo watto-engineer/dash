@@ -6,7 +6,7 @@
 import os
 
 from test_framework.address import ADDRESS_BCRT1_UNSPENDABLE
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     wait_until,
@@ -14,7 +14,7 @@ from test_framework.util import (
 )
 
 
-class NotificationsTest(BitcoinTestFramework):
+class NotificationsTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True

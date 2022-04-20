@@ -8,8 +8,8 @@ import struct
 from codecs import encode
 
 from test_framework.address import ADDRESS_BCRT1_UNSPENDABLE
-from test_framework.test_framework import BitcoinTestFramework
-from test_framework.messages import dashhash
+from test_framework.test_framework import WagerrTestFramework
+from test_framework.messages import wagerrhash
 from test_framework.util import (
     assert_equal,
     hash256,
@@ -17,8 +17,8 @@ from test_framework.util import (
 
 ADDRESS = "tcp://127.0.0.1:28332"
 
-def dashhash_helper(b):
-    return encode(dashhash(b)[::-1], 'hex_codec').decode('ascii')
+def wagerrhash_helper(b):
+    return encode(wagerrhash(b)[::-1], 'hex_codec').decode('ascii')
 
 
 class ZMQSubscriber:
@@ -40,7 +40,7 @@ class ZMQSubscriber:
         return body
 
 
-class ZMQTest (BitcoinTestFramework):
+class ZMQTest (WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
 
@@ -105,7 +105,7 @@ class ZMQTest (BitcoinTestFramework):
 
             # Should receive the generated raw block.
             block = self.rawblock.receive()
-            assert_equal(genhashes[x], dashhash_helper(block[:80]))
+            assert_equal(genhashes[x], wagerrhash_helper(block[:80]))
 
         if self.is_wallet_compiled():
             self.log.info("Wait for tx from second node")

@@ -1,4 +1,4 @@
-Fuzz-testing Dash Core
+Fuzz-testing Wagerr Core
 ==========================
 
 A special test harness in `src/test/fuzz/` is provided for each fuzz target to
@@ -49,7 +49,7 @@ For macOS you may need to ignore x86 compilation checks when running `make`:
 
 ### Instrumentation
 
-To build Dash Core using AFL instrumentation (this assumes that the
+To build Wagerr Core using AFL instrumentation (this assumes that the
 `AFLPATH` was set as above):
 ```
 ./configure --disable-ccache --disable-shared --enable-tests --enable-fuzz CC=${AFLPATH}/afl-gcc CXX=${AFLPATH}/afl-g++

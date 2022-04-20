@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# Copyright (c) 2021 The Dash Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test being able to connect to the same devnet"""
 
 from test_framework.mininode import P2PInterface
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, connect_nodes
 
-class ConnectDevnetNodes(BitcoinTestFramework):
+class ConnectDevnetNodes(WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.chain = "devnet"

@@ -21,7 +21,7 @@ from test_framework.messages import (
 from test_framework.mininode import (
     P2PDataStore,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -37,7 +37,7 @@ def assert_template(node, block, expect, rehash=True):
     assert_equal(rsp, expect)
 
 
-class MiningTest(BitcoinTestFramework):
+class MiningTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True
@@ -188,7 +188,7 @@ class MiningTest(BitcoinTestFramework):
 
         def filter_tip_keys(chaintips):
             """
-            Dash chaintips rpc returns extra info in each tip (difficulty, chainwork, and
+            Wagerr chaintips rpc returns extra info in each tip (difficulty, chainwork, and
             forkpoint). Filter down to relevant ones checked in this test.
             """
             check_keys = ["hash", "height", "branchlen", "status"]

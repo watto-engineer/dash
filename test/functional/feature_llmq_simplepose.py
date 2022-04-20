@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2015-2021 The Dash Core developers
+# Copyright (c) 2015-2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,14 +12,14 @@ Checks simple PoSe system based on LLMQ commitments
 
 import time
 
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import connect_nodes, force_finish_mnsync, p2p_port, wait_until
 
 
-class LLMQSimplePoSeTest(DashTestFramework):
+class LLMQSimplePoSeTest(WagerrTestFramework):
     def set_test_params(self):
-        self.set_dash_test_params(6, 5, fast_dip3_enforcement=True)
-        self.set_dash_llmq_test_params(5, 3)
+        self.set_wagerr_test_params(6, 5, fast_dip3_enforcement=True)
+        self.set_wagerr_llmq_test_params(5, 3)
 
     def run_test(self):
 

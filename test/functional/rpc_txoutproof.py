@@ -7,10 +7,10 @@
 from decimal import Decimal
 
 from test_framework.messages import CMerkleBlock, FromHex, ToHex
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, connect_nodes
 
-class MerkleBlockTest(BitcoinTestFramework):
+class MerkleBlockTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
         self.setup_clean_chain = True
@@ -70,7 +70,7 @@ class MerkleBlockTest(BitcoinTestFramework):
         txid_unspent = txid1 if txin_spent["txid"] != txid1 else txid2
 
         # We can't find the block from a fully-spent tx
-        # Doesn't apply to Dash Core - we have txindex always on
+        # Doesn't apply to Wagerr Core - we have txindex always on
         # assert_raises_rpc_error(-5, "Transaction not yet in block", self.nodes[2].gettxoutproof, [txid_spent])
         # We can get the proof if we specify the block
         assert_equal(self.nodes[2].verifytxoutproof(self.nodes[2].gettxoutproof([txid_spent], blockhash)), [txid_spent])

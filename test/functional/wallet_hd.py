@@ -7,13 +7,13 @@
 import shutil
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     connect_nodes,
 )
 
-class WalletHDTest(BitcoinTestFramework):
+class WalletHDTest(WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2

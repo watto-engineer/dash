@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# Copyright (c) 2021 The Dash Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.messages import hash256
 from test_framework.mininode import P2PInterface
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, hex_str_to_bytes
 
 '''
@@ -15,9 +15,9 @@ Tests mnauth RPC command
 '''
 
 
-class FakeMNAUTHTest(DashTestFramework):
+class FakeMNAUTHTest(WagerrTestFramework):
     def set_test_params(self):
-        self.set_dash_test_params(2, 1, fast_dip3_enforcement=True)
+        self.set_wagerr_test_params(2, 1, fast_dip3_enforcement=True)
 
     def run_test(self):
 

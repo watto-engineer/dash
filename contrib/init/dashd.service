@@ -1,48 +1,48 @@
 # It is not recommended to modify this file in-place, because it will
 # be overwritten during package upgrades. If you want to add further
 # options or overwrite existing ones then use
-# $ systemctl edit dashd.service
+# $ systemctl edit wagerrd.service
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/dash/dash.conf, except for those explicitly specified as arguments
+# /etc/wagerr/wagerr.conf, except for those explicitly specified as arguments
 # in ExecStart=
 
 [Unit]
-Description=Dash daemon
+Description=Wagerr daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/dashd -daemon \
-                                                            -pid=/run/dashd/dashd.pid \
-                                                            -conf=/etc/dash/dash.conf  \
-                                                            -datadir=/var/lib/dashd
+ExecStart=/usr/bin/wagerrd -daemon \
+                                                            -pid=/run/wagerrd/wagerrd.pid \
+                                                            -conf=/etc/wagerr/wagerr.conf  \
+                                                            -datadir=/var/lib/wagerrd
 
 # Process management
 ####################
 
 Type=forking
-PIDFile=/run/dashd/dashd.pid
+PIDFile=/run/wagerrd/wagerrd.pid
 Restart=on-failure
 TimeoutStopSec=600
 
 # Directory creation and permissions
 ####################################
 
-# Run as dash:dash
-User=dashcore
-Group=dashcore
+# Run as wagerr:wagerr
+User=wagerrcore
+Group=wagerrcore
 
-# /run/dashd
-RuntimeDirectory=dashd
+# /run/wagerrd
+RuntimeDirectory=wagerrd
 RuntimeDirectoryMode=0710
 
-# /etc/dash
-ConfigurationDirectory=dash
+# /etc/wagerr
+ConfigurationDirectory=wagerr
 ConfigurationDirectoryMode=0710
 
-# /var/lib/dashd
-StateDirectory=dashd
+# /var/lib/wagerrd
+StateDirectory=wagerrd
 StateDirectoryMode=0710
 
 # Hardening measures

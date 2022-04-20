@@ -11,14 +11,14 @@ Test upgrade to a Hierarchical Deterministic wallet via upgradetohd rpc
 import shutil
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
 )
 
 
-class WalletUpgradeToHDTest(BitcoinTestFramework):
+class WalletUpgradeToHDTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
 

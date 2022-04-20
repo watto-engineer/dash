@@ -164,7 +164,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::ALL, "1"},
     {BCLog::ALL, "all"},
 
-    //Start Dash
+    //Start Wagerr
     {BCLog::CHAINLOCKS, "chainlocks"},
     {BCLog::GOBJECT, "gobject"},
     {BCLog::INSTANTSEND, "instantsend"},
@@ -176,8 +176,8 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::COINJOIN, "coinjoin"},
     {BCLog::SPORK, "spork"},
     {BCLog::NETCONN, "netconn"},
-    {BCLog::DASH, "dash"},
-    //End Dash
+    {BCLog::WAGERR, "wagerr"},
+    //End Wagerr
 
     //Start Wagerr
     {BCLog::ZEROCOIN, "zerocoin"},
@@ -207,7 +207,7 @@ std::string ListLogCategories()
     int outcount = 0;
     for (const CLogCategoryDesc& category_desc : LogCategories) {
         // Omit the special cases.
-        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::DASH) {
+        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::WAGERR) {
             if (outcount != 0) ret += ", ";
             ret += category_desc.category;
             outcount++;
@@ -221,7 +221,7 @@ std::vector<CLogCategoryActive> ListActiveLogCategories()
     std::vector<CLogCategoryActive> ret;
     for (const CLogCategoryDesc& category_desc : LogCategories) {
         // Omit the special cases.
-        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::DASH) {
+        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::WAGERR) {
             CLogCategoryActive catActive;
             catActive.category = category_desc.category;
             catActive.active = LogAcceptCategory(category_desc.flag);
@@ -242,7 +242,7 @@ std::string ListActiveLogCategoriesString()
     int outcount = 0;
     for (const CLogCategoryDesc& category_desc : LogCategories) {
         // Omit the special cases.
-        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::DASH && LogAcceptCategory(category_desc.flag)) {
+        if (category_desc.flag != BCLog::NONE && category_desc.flag != BCLog::ALL && category_desc.flag != BCLog::WAGERR && LogAcceptCategory(category_desc.flag)) {
             if (outcount != 0) ret += ", ";
             ret += category_desc.category;
             outcount++;
@@ -304,7 +304,7 @@ void BCLog::Logger::LogPrintStr(const std::string& str)
     std::string str_prefixed = LogEscapeMessage(str);
 
     if (m_log_threadnames && m_started_new_line) {
-        // 16 chars total, "dash-" is 5 of them and another 1 is a NUL terminator
+        // 16 chars total, "wagerr-" is 5 of them and another 1 is a NUL terminator
         str_prefixed.insert(0, "[" + strprintf("%10s", util::ThreadGetInternalName()) + "] ");
     }
 

@@ -18,13 +18,13 @@ from test_framework.mininode import (
     msg_getdata,
     msg_getheaders,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     wait_until,
 )
 
-class P2PFingerprintTest(BitcoinTestFramework):
+class P2PFingerprintTest(WagerrTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True

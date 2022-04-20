@@ -2,7 +2,7 @@
 # Copyright (c) 2017 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Class for dashd node under test"""
+"""Class for wagerrd node under test"""
 
 import contextlib
 import decimal
@@ -49,7 +49,7 @@ class ErrorMatch(Enum):
 
 
 class TestNode():
-    """A class for representing a dashd node under test.
+    """A class for representing a wagerrd node under test.
 
     This class contains:
 
@@ -72,7 +72,7 @@ class TestNode():
         self.index = i
         self.datadir = datadir
         self.chain = chain
-        self.bitcoinconf = os.path.join(self.datadir, "dash.conf")
+        self.bitcoinconf = os.path.join(self.datadir, "wagerr.conf")
         self.stdout_dir = os.path.join(self.datadir, "stdout")
         self.stderr_dir = os.path.join(self.datadir, "stderr")
         self.rpchost = rpchost
@@ -172,7 +172,7 @@ class TestNode():
         raise AssertionError(self._node_msg(msg))
 
     def __del__(self):
-        # Ensure that we don't leave any dashd processes lying around after
+        # Ensure that we don't leave any wagerrd processes lying around after
         # the test ends
         if self.process and self.cleanup_on_exit:
             # Should only happen on test failure
@@ -194,7 +194,7 @@ class TestNode():
         if extra_args is None:
             extra_args = self.extra_args
 
-        # Add a new stdout and stderr file each time dashd is started
+        # Add a new stdout and stderr file each time wagerrd is started
         if stderr is None:
             stderr = tempfile.NamedTemporaryFile(dir=self.stderr_dir, delete=False)
         if stdout is None:
@@ -210,7 +210,7 @@ class TestNode():
             all_args = all_args + ["-mocktime=%d" % self.mocktime]
 
         # Delete any existing cookie file -- if such a file exists (eg due to
-        # unclean shutdown), it will get overwritten anyway by dashd, and
+        # unclean shutdown), it will get overwritten anyway by wagerrd, and
         # potentially interfere with our attempt to authenticate
         delete_cookie_file(self.datadir, self.chain)
 
@@ -220,19 +220,19 @@ class TestNode():
         self.process = subprocess.Popen(all_args, env=subp_env, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs)
 
         self.running = True
-        self.log.debug("dashd started, waiting for RPC to come up")
+        self.log.debug("wagerrd started, waiting for RPC to come up")
 
         if self.start_perf:
             self._start_perf()
 
     def wait_for_rpc_connection(self):
-        """Sets up an RPC connection to the dashd process. Returns False if unable to connect."""
+        """Sets up an RPC connection to the wagerrd process. Returns False if unable to connect."""
         # Poll at a rate of four times per second
         poll_per_s = 4
         for _ in range(poll_per_s * self.rpc_timeout):
             if self.process.poll() is not None:
                 raise FailedToStartError(self._node_msg(
-                    'dashd exited with status {} during initialization'.format(self.process.returncode)))
+                    'wagerrd exited with status {} during initialization'.format(self.process.returncode)))
             try:
                 rpc = get_rpc_proxy(rpc_url(self.datadir, self.index, self.chain, self.rpchost), self.index, timeout=self.rpc_timeout, coveragedir=self.coverage_dir)
                 rpc.getblockcount()
@@ -270,11 +270,11 @@ class TestNode():
             except OSError as e:
                 if e.errno != errno.ECONNREFUSED:  # Port not yet open?
                     raise  # unknown OS error
-            except ValueError as e:  # cookie file not found and no rpcuser or rpcassword. dashd still starting
+            except ValueError as e:  # cookie file not found and no rpcuser or rpcassword. wagerrd still starting
                 if "No RPC credentials" not in str(e):
                     raise
             time.sleep(1.0 / poll_per_s)
-        self._raise_assertion_error("Unable to connect to dashd")
+        self._raise_assertion_error("Unable to connect to wagerrd")
 
     def generate(self, nblocks, maxtries=1000000):
         self.log.debug("TestNode.generate() dispatches `generate` call to `generatetoaddress`")
@@ -453,11 +453,11 @@ class TestNode():
     def assert_start_raises_init_error(self, extra_args=None, expected_msg=None, match=ErrorMatch.FULL_TEXT, *args, **kwargs):
         """Attempt to start the node and expect it to raise an error.
 
-        extra_args: extra arguments to pass through to dashd
-        expected_msg: regex that stderr should match when dashd fails
+        extra_args: extra arguments to pass through to wagerrd
+        expected_msg: regex that stderr should match when wagerrd fails
 
-        Will throw if dashd starts without an error.
-        Will throw if an expected_msg is provided and it does not match dashd's stdout."""
+        Will throw if wagerrd starts without an error.
+        Will throw if an expected_msg is provided and it does not match wagerrd's stdout."""
         with tempfile.NamedTemporaryFile(dir=self.stderr_dir, delete=False) as log_stderr, \
              tempfile.NamedTemporaryFile(dir=self.stdout_dir, delete=False) as log_stdout:
             try:
@@ -466,7 +466,7 @@ class TestNode():
                 self.stop_node()
                 self.wait_until_stopped()
             except FailedToStartError as e:
-                self.log.debug('dashd failed to start: %s', e)
+                self.log.debug('wagerrd failed to start: %s', e)
                 self.running = False
                 self.process = None
                 # Check stderr for expected message
@@ -487,9 +487,9 @@ class TestNode():
                                 'Expected message "{}" does not fully match stderr:\n"{}"'.format(expected_msg, stderr))
             else:
                 if expected_msg is None:
-                    assert_msg = "dashd should have exited with an error"
+                    assert_msg = "wagerrd should have exited with an error"
                 else:
-                    assert_msg = "dashd should have exited with expected error " + expected_msg
+                    assert_msg = "wagerrd should have exited with expected error " + expected_msg
                 self._raise_assertion_error(assert_msg)
 
     def add_p2p_connection(self, p2p_conn, *, wait_for_verack=True, **kwargs):
@@ -569,17 +569,17 @@ def arg_to_cli(arg):
 
 
 class TestNodeCLI():
-    """Interface to dash-cli for an individual node"""
+    """Interface to wagerr-cli for an individual node"""
 
     def __init__(self, binary, datadir):
         self.options = []
         self.binary = binary
         self.datadir = datadir
         self.input = None
-        self.log = logging.getLogger('TestFramework.dashcli')
+        self.log = logging.getLogger('TestFramework.wagerrcli')
 
     def __call__(self, *options, input=None):
-        # TestNodeCLI is callable with dash-cli command-line options
+        # TestNodeCLI is callable with wagerr-cli command-line options
         cli = TestNodeCLI(self.binary, self.datadir)
         cli.options = [str(o) for o in options]
         cli.input = input
@@ -598,17 +598,17 @@ class TestNodeCLI():
         return results
 
     def send_cli(self, command=None, *args, **kwargs):
-        """Run dash-cli command. Deserializes returned string as python object."""
+        """Run wagerr-cli command. Deserializes returned string as python object."""
         pos_args = [arg_to_cli(arg) for arg in args]
         named_args = [str(key) + "=" + arg_to_cli(value) for (key, value) in kwargs.items()]
-        assert not (pos_args and named_args), "Cannot use positional arguments and named arguments in the same dash-cli call"
+        assert not (pos_args and named_args), "Cannot use positional arguments and named arguments in the same wagerr-cli call"
         p_args = [self.binary, "-datadir=" + self.datadir] + self.options
         if named_args:
             p_args += ["-named"]
         if command is not None:
             p_args += [command]
         p_args += pos_args + named_args
-        self.log.debug("Running dash-cli command: %s" % command)
+        self.log.debug("Running wagerr-cli command: %s" % command)
         process = subprocess.Popen(p_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         cli_stdout, cli_stderr = process.communicate(input=self.input)
         returncode = process.poll()

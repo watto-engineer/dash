@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2014-2022 The Dash Core developers
+// Copyright (c) 2014-2022 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -197,7 +197,7 @@ public:
         consensus.BRRHeight = 1374912; // 000000000000000c5a124f3eccfbe6e17876dca79cec9e63dfa70d269113c926
         consensus.MinBIP9WarningHeight = 1090656; // dip8 activation height + miner confirmation window
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
         consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
@@ -602,8 +602,8 @@ public:
         consensus.BRRHeight = 300;
         consensus.MinBIP9WarningHeight = 2018; // dip8 activation height + miner confirmation window
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Dash: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
 
@@ -693,7 +693,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        //vSeeds.push_back(CDNSSeedData("dashevo.org",  "devnet-seed.dashevo.org"));
+        //vSeeds.push_back(CDNSSeedData("wagerrevo.org",  "devnet-seed.wagerrevo.org"));
 
         // Testnet Wagerr addresses start with 'T'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
@@ -858,8 +858,8 @@ public:
         consensus.BRRHeight = 2500; // see block_reward_reallocation_tests
         consensus.MinBIP9WarningHeight = 0;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Dash: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Dash: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
 
@@ -995,7 +995,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
         // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
-        // Regtest Dash BIP44 coin type is '1' (All coin's testnet default)
+        // Regtest Wagerr BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params

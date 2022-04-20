@@ -7,7 +7,7 @@
 Tests correspond to code in rpc/net.cpp.
 """
 
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_greater_than_or_equal,
@@ -47,7 +47,7 @@ def assert_net_servicesnames(servicesflag, servicenames):
         assert "HEADERS_COMPRESSED" in servicenames
 
 
-class NetTest(DashTestFramework):
+class NetTest(WagerrTestFramework):
     def set_test_params(self):
         self.set_dash_test_params(3, 1, fast_dip3_enforcement=True)
         self.supports_cli = False

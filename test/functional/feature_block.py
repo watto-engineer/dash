@@ -48,7 +48,7 @@ from test_framework.script import (
     SignatureHash,
     hash160,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal
 from data import invalid_txs
 
@@ -74,7 +74,7 @@ class CBrokenBlock(CBlock):
 DUPLICATE_COINBASE_SCRIPT_SIG = b'\x01\x78'  # Valid for block at height 120
 
 
-class FullBlockTest(BitcoinTestFramework):
+class FullBlockTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True
@@ -363,7 +363,7 @@ class FullBlockTest(BitcoinTestFramework):
         b26 = self.update_block(26, [])
         self.send_blocks([b26], success=False, reject_reason='bad-cb-length', reconnect=True)
 
-        # Extend the b26 chain to make sure dashd isn't accepting b26
+        # Extend the b26 chain to make sure wagerrd isn't accepting b26
         b27 = self.next_block(27, spend=out[7])
         self.send_blocks([b27], False)
 
@@ -375,7 +375,7 @@ class FullBlockTest(BitcoinTestFramework):
         b28 = self.update_block(28, [])
         self.send_blocks([b28], success=False, reject_reason='bad-cb-length', reconnect=True)
 
-        # Extend the b28 chain to make sure dashd isn't accepting b28
+        # Extend the b28 chain to make sure wagerrd isn't accepting b28
         b29 = self.next_block(29, spend=out[7])
         self.send_blocks([b29], False)
 
@@ -907,7 +907,7 @@ class FullBlockTest(BitcoinTestFramework):
         assert_equal(len(b64a.serialize()), MAX_BLOCK_SIZE + 8)
         self.send_blocks([b64a], success=False, reject_reason='non-canonical ReadCompactSize()')
 
-        # dashd doesn't disconnect us for sending a bloated block, but if we subsequently
+        # wagerrd doesn't disconnect us for sending a bloated block, but if we subsequently
         # resend the header message, it won't send us the getdata message again. Just
         # disconnect and reconnect and then call sync_blocks.
         # TODO: improve this test to be less dependent on P2P DOS behaviour.

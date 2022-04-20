@@ -5,7 +5,7 @@
 """Test the wallet."""
 from decimal import Decimal
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_array_result,
     assert_equal,
@@ -17,7 +17,7 @@ from test_framework.util import (
 )
 
 
-class WalletTest(BitcoinTestFramework):
+class WalletTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
         self.extra_args = [[
@@ -321,14 +321,14 @@ class WalletTest(BitcoinTestFramework):
         # This will raise an exception for attempting to dump the private key of an address you do not own
         assert_raises_rpc_error(-4, "Private key for address %s is not known" % temp_address, self.nodes[0].dumpprivkey, temp_address)
 
-        # This will raise an exception for attempting to get the private key of an invalid Dash address
-        assert_raises_rpc_error(-5, "Invalid Dash address", self.nodes[0].dumpprivkey, "invalid")
+        # This will raise an exception for attempting to get the private key of an invalid Wagerr address
+        assert_raises_rpc_error(-5, "Invalid Wagerr address", self.nodes[0].dumpprivkey, "invalid")
 
-        # This will raise an exception for attempting to set a label for an invalid Dash address
-        assert_raises_rpc_error(-5, "Invalid Dash address", self.nodes[0].setlabel, "invalid address", "label")
+        # This will raise an exception for attempting to set a label for an invalid Wagerr address
+        assert_raises_rpc_error(-5, "Invalid Wagerr address", self.nodes[0].setlabel, "invalid address", "label")
 
         # This will raise an exception for importing an invalid address
-        assert_raises_rpc_error(-5, "Invalid Dash address or script", self.nodes[0].importaddress, "invalid")
+        assert_raises_rpc_error(-5, "Invalid Wagerr address or script", self.nodes[0].importaddress, "invalid")
 
         # This will raise an exception for attempting to import a pubkey that isn't in hex
         assert_raises_rpc_error(-5, "Pubkey must be a hex string", self.nodes[0].importpubkey, "not hex")

@@ -12,7 +12,7 @@ from test_framework.messages import (
     NODE_NETWORK,
 )
 from test_framework.mininode import P2PInterface
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, wait_until
 
 
@@ -33,7 +33,7 @@ class AddrReceiver(P2PInterface):
         wait_until(lambda: "addrv2" in self.last_message)
 
 
-class AddrTest(BitcoinTestFramework):
+class AddrTest(WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1

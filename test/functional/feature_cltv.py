@@ -12,7 +12,7 @@ from test_framework.blocktools import create_coinbase, create_block, create_tran
 from test_framework.messages import CTransaction, msg_block, ToHex
 from test_framework.mininode import P2PInterface
 from test_framework.script import CScript, OP_1NEGATE, OP_CHECKLOCKTIMEVERIFY, OP_DROP, CScriptNum
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -56,7 +56,7 @@ def cltv_validate(node, tx, height):
     return new_tx
 
 
-class BIP65Test(BitcoinTestFramework):
+class BIP65Test(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [[

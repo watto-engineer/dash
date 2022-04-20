@@ -167,7 +167,7 @@ bool ParseBoolV(const UniValue& v, const std::string &strName)
 
 std::string HelpExampleCli(const std::string& methodname, const std::string& args)
 {
-    return "> dash-cli " + methodname + " " + args + "\n";
+    return "> wagerr-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(const std::string& methodname, const std::string& args)

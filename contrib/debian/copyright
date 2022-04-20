@@ -1,15 +1,15 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Dash Core
-Upstream-Contact: Dash Core Group, Inc https://www.dash.org/team/
-Source: https://github.com/dashpay/dash
+Upstream-Name: Wagerr Core
+Upstream-Contact: Wagerr Core Group, Inc https://www.wagerr.com/team/
+Source: https://github.com/wagerr/wagerr
 
 Files: *
 Copyright: 2009-2019, Bitcoin Core Developers,
-           2019-2020, Dash Core Developers
+           2019-2020, Wagerr Core Developers
 License: Expat
 Comment: The Bitcoin Core Developers encompasses the current developers listed on bitcoin.org,
-         as well as the numerous contributors to the project. The Dash Core Developers
-         encompasses the current developers listed on https://www.dash.org/team/, as well as
+         as well as the numerous contributors to the project. The Wagerr Core Developers
+         encompasses the current developers listed on https://www.wagerr.com/team/, as well as
          the numerous contributors to the project.
 
 Files: debian/*

@@ -1,23 +1,23 @@
 AC_PREREQ([2.69])
-define(_CLIENT_VERSION_MAJOR, 18)
-define(_CLIENT_VERSION_MINOR, 1)
+define(_CLIENT_VERSION_MAJOR, 6)
+define(_CLIENT_VERSION_MINOR, 0)
 define(_CLIENT_VERSION_BUILD, 0)
 define(_CLIENT_VERSION_RC, 0)
 define(_CLIENT_VERSION_IS_RELEASE, true)
 define(_COPYRIGHT_YEAR, 2022)
 define(_COPYRIGHT_HOLDERS,[The %s developers])
-define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[[Dash Core]])
-AC_INIT([Dash Core],m4_join([.], _CLIENT_VERSION_MAJOR, _CLIENT_VERSION_MINOR, _CLIENT_VERSION_BUILD)m4_if(_CLIENT_VERSION_RC, [0], [], [rc]_CLIENT_VERSION_RC),[https://github.com/dashpay/dash/issues],[dashcore],[https://dash.org/])
+define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[[Wagerr Core]])
+AC_INIT([Wagerr Core],m4_join([.], _CLIENT_VERSION_MAJOR, _CLIENT_VERSION_MINOR, _CLIENT_VERSION_BUILD)m4_if(_CLIENT_VERSION_RC, [0], [], [rc]_CLIENT_VERSION_RC),[https://github.com/wagerr/wagerr/issues],[wagerrcore],[https://wagerr.com/])
 AC_CONFIG_SRCDIR([src/validation.cpp])
-AC_CONFIG_HEADERS([src/config/bitcoin-config.h])
+AC_CONFIG_HEADERS([src/config/Wagerr-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
 
-BITCOIN_DAEMON_NAME=dashd
-BITCOIN_GUI_NAME=dash-qt
-BITCOIN_CLI_NAME=dash-cli
-BITCOIN_TX_NAME=dash-tx
-BITCOIN_WALLET_TOOL_NAME=dash-wallet
+BITCOIN_DAEMON_NAME=wagerrd
+BITCOIN_GUI_NAME=wagerr-qt
+BITCOIN_CLI_NAME=wagerr-cli
+BITCOIN_TX_NAME=wagerr-tx
+BITCOIN_WALLET_TOOL_NAME=wagerr-wallet
 
 dnl Unless the user specified ARFLAGS, force it to be cr
 AC_ARG_VAR(ARFLAGS, [Flags for the archiver, defaults to <cr> if not set])
@@ -27,9 +27,9 @@ fi
 
 AC_CANONICAL_HOST
 
-AH_TOP([#ifndef DASH_CONFIG_H])
-AH_TOP([#define DASH_CONFIG_H])
-AH_BOTTOM([#endif //DASH_CONFIG_H])
+AH_TOP([#ifndef WAGERR_CONFIG_H])
+AH_TOP([#define WAGERR_CONFIG_H])
+AH_BOTTOM([#endif //WAGERR_CONFIG_H])
 
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
@@ -591,25 +591,25 @@ CPPFLAGS="$CPPFLAGS -DHAVE_BUILD_INFO -D__STDC_FORMAT_MACROS"
 
 AC_ARG_WITH([utils],
   [AS_HELP_STRING([--with-utils],
-  [build dash-cli dash-tx dash-wallet (default=yes)])],
+  [build wagerr-cli wagerr-tx wagerr-wallet (default=yes)])],
   [build_bitcoin_utils=$withval],
   [build_bitcoin_utils=yes])
 
 AC_ARG_ENABLE([util-cli],
   [AS_HELP_STRING([--enable-util-cli],
-  [build dash-cli])],
+  [build wagerr-cli])],
   [build_bitcoin_cli=$enableval],
   [build_bitcoin_cli=$build_bitcoin_utils])
 
 AC_ARG_ENABLE([util-tx],
   [AS_HELP_STRING([--enable-util-tx],
-  [build dash-tx])],
+  [build wagerr-tx])],
   [build_bitcoin_tx=$enableval],
   [build_bitcoin_tx=$build_bitcoin_utils])
 
 AC_ARG_ENABLE([util-wallet],
   [AS_HELP_STRING([--enable-util-wallet],
-  [build dash-wallet])],
+  [build wagerr-wallet])],
   [build_bitcoin_wallet=$enableval],
   [build_bitcoin_wallet=$build_bitcoin_utils])
 
@@ -621,7 +621,7 @@ AC_ARG_WITH([libs],
 
 AC_ARG_WITH([daemon],
   [AS_HELP_STRING([--with-daemon],
-  [build dashd daemon (default=yes)])],
+  [build wagerrd daemon (default=yes)])],
   [build_bitcoind=$withval],
   [build_bitcoind=yes])
 
@@ -1337,7 +1337,7 @@ define(MINIMUM_REQUIRED_BOOST, 1.47.0)
 dnl Check for boost libs
 AX_BOOST_BASE([MINIMUM_REQUIRED_BOOST])
 if test x$want_boost = xno; then
-    AC_MSG_ERROR([[only libdashconsensus can be built without boost]])
+    AC_MSG_ERROR([[only libwagerrconsensus can be built without boost]])
 fi
 AX_BOOST_FILESYSTEM
 AX_BOOST_THREAD
@@ -1523,19 +1523,19 @@ AC_CHECK_LIB([gmp],  [__gmpz_init],GMP_LIBS=-lgmp, AC_MSG_ERROR(libgmp missing))
 dnl check if immer headers-only library is present
 AC_CHECK_HEADER([immer/map.hpp],, AC_MSG_ERROR(immer map headers missing))
 
-AC_MSG_CHECKING([whether to build dashd])
+AC_MSG_CHECKING([whether to build wagerrd])
 AM_CONDITIONAL([BUILD_BITCOIND], [test x$build_bitcoind = xyes])
 AC_MSG_RESULT($build_bitcoind)
 
-AC_MSG_CHECKING([whether to build dash-cli])
+AC_MSG_CHECKING([whether to build wagerr-cli])
 AM_CONDITIONAL([BUILD_BITCOIN_CLI], [test x$build_bitcoin_cli = xyes])
 AC_MSG_RESULT($build_bitcoin_cli)
 
-AC_MSG_CHECKING([whether to build dash-tx])
+AC_MSG_CHECKING([whether to build wagerr-tx])
 AM_CONDITIONAL([BUILD_BITCOIN_TX], [test x$build_bitcoin_tx = xyes])
 AC_MSG_RESULT($build_bitcoin_tx)
 
-AC_MSG_CHECKING([whether to build dash-wallet])
+AC_MSG_CHECKING([whether to build wagerr-wallet])
 AM_CONDITIONAL([BUILD_BITCOIN_WALLET], [test x$build_bitcoin_wallet = xyes])
 AC_MSG_RESULT($build_bitcoin_wallet)
 
@@ -1543,7 +1543,7 @@ AC_MSG_CHECKING([whether to build libraries])
 AM_CONDITIONAL([BUILD_BITCOIN_LIBS], [test x$build_bitcoin_libs = xyes])
 if test x$build_bitcoin_libs = xyes; then
   AC_DEFINE(HAVE_CONSENSUS_LIB, 1, [Define this symbol if the consensus lib has been built])
-  AC_CONFIG_FILES([libdashconsensus.pc:libdashconsensus.pc.in])
+  AC_CONFIG_FILES([libwagerrconsensus.pc:libwagerrconsensus.pc.in])
 fi
 AC_MSG_RESULT($build_bitcoin_libs)
 
@@ -1687,7 +1687,7 @@ if test x$bitcoin_enable_qt != xno; then
     AC_MSG_WARN("xgettext is required to update qt translations")
   fi
 
-  AC_MSG_CHECKING([whether to build test_dash-qt])
+  AC_MSG_CHECKING([whether to build test_wagerr-qt])
   if test x$use_gui_tests$bitcoin_enable_qt_test = xyesyes; then
     AC_MSG_RESULT([yes])
     BUILD_TEST_QT="yes"
@@ -1709,7 +1709,7 @@ gmp)
 esac
 
 AM_CONDITIONAL([USE_NUM_GMP], [test "x$set_bignum" = "xgmp"])
-AC_MSG_CHECKING([whether to build test_dash])
+AC_MSG_CHECKING([whether to build test_wagerr])
 if test x$use_tests = xyes; then
   AC_MSG_RESULT([yes])
   BUILD_TEST="yes"

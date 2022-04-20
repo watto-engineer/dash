@@ -17,14 +17,14 @@ from decimal import Decimal
 import os
 import shutil
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
         assert_equal,
         connect_nodes,
         disconnect_nodes,
 )
 
-class ReorgsRestoreTest(BitcoinTestFramework):
+class ReorgsRestoreTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 3
 

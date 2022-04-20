@@ -1,5 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2022 The Dash Core developers
+// Copyright (c) 2014-2022 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -43,7 +43,7 @@ class CDeterministicMNList;
 class CGovernanceObject;
 typedef std::shared_ptr<CDeterministicMNList> CDeterministicMNListPtr;
 
-/** Model for Dash network client. */
+/** Model for Wagerr network client. */
 class ClientModel : public QObject
 {
     Q_OBJECT

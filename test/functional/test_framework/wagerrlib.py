@@ -25,7 +25,7 @@ class Error(BaseException):
 def init(libwagerrcorefile=None):
     global wagerrlib
     if libwagerrcorefile is None:
-        libwagerrcorefile = "libdashcore.so"
+        libwagerrcorefile = "libwagerrcore.so"
         try:
             wagerrlib = CDLL(libwagerrcorefile)
         except OSError:

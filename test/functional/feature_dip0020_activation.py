@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# Copyright (c) 2015-2021 The Dash Core developers
+# Copyright (c) 2015-2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 from test_framework.messages import COIN, COutPoint, CTransaction, CTxIn, CTxOut, ToHex
 from test_framework.script import CScript, OP_CAT, OP_DROP, OP_TRUE
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, get_bip9_status, satoshi_round
 
 '''
@@ -16,7 +16,7 @@ This test checks activation of DIP0020 opcodes
 DISABLED_OPCODE_ERROR = "non-mandatory-script-verify-flag (Attempted to use a disabled opcode)"
 
 
-class DIP0020ActivationTest(BitcoinTestFramework):
+class DIP0020ActivationTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [["-acceptnonstdtxn=1"]]

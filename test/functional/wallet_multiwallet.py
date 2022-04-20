@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test multiwallet.
 
-Verify that a dashd node can load multiple wallet files
+Verify that a wagerrd node can load multiple wallet files
 """
 from threading import Thread
 from decimal import Decimal
@@ -13,7 +13,7 @@ import shutil
 import time
 
 from test_framework.authproxy import JSONRPCException
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.test_node import ErrorMatch
 from test_framework.util import (
     assert_equal,
@@ -38,7 +38,7 @@ def test_load_unload(node, name):
                 return
 
 
-class MultiWalletTest(BitcoinTestFramework):
+class MultiWalletTest(WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
@@ -365,7 +365,7 @@ class MultiWalletTest(BitcoinTestFramework):
         assert_raises_rpc_error(
             -4,
             'Wallet loading failed. Error loading {}: Wallet requires newer version of {}'.format(
-                wallet_dir('high_minversion', 'wallet.dat'), "Dash Core"),
+                wallet_dir('high_minversion', 'wallet.dat'), "Wagerr Core"),
             lambda: self.nodes[0].loadwallet(filename='high_minversion'),
         )
 
