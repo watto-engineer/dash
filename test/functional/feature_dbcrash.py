@@ -38,7 +38,7 @@ from test_framework.messages import (
     CTxOut,
     ToHex,
 )
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     create_confirmed_utxos,
@@ -46,7 +46,7 @@ from test_framework.util import (
 )
 
 
-class ChainstateWriteCrashTest(BitcoinTestFramework):
+class ChainstateWriteCrashTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
         self.setup_clean_chain = False
@@ -94,14 +94,14 @@ class ChainstateWriteCrashTest(BitcoinTestFramework):
                 return utxo_hash
             except:
                 # An exception here should mean the node is about to crash.
-                # If dashd exits, then try again.  wait_for_node_exit()
-                # should raise an exception if dashd doesn't exit.
+                # If wagerrd exits, then try again.  wait_for_node_exit()
+                # should raise an exception if wagerrd doesn't exit.
                 self.wait_for_node_exit(node_index, timeout=10)
             self.crashed_on_restart += 1
             time.sleep(1)
 
-        # If we got here, dashd isn't coming back up on restart.  Could be a
-        # bug in dashd, or we've gotten unlucky with our dbcrash ratio --
+        # If we got here, wagerrd isn't coming back up on restart.  Could be a
+        # bug in wagerrd, or we've gotten unlucky with our dbcrash ratio --
         # perhaps we generated a test case that blew up our cache?
         # TODO: If this happens a lot, we should try to restart without -dbcrashratio
         # and make sure that recovery happens.

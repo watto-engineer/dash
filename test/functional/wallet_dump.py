@@ -5,7 +5,7 @@
 """Test the dumpwallet RPC."""
 import os
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -76,7 +76,7 @@ def read_dump(file_name, addrs, script_addrs, hd_master_addr_old):
         return found_addr, found_script_addr, found_addr_chg, found_addr_rsv, hd_master_addr_ret
 
 
-class WalletDumpTest(BitcoinTestFramework):
+class WalletDumpTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [["-keypool=90", "-usehd=1"]]
@@ -132,7 +132,7 @@ class WalletDumpTest(BitcoinTestFramework):
         assert_equal(found_addr, test_addr_count)
         # This is 1, not 2 because we aren't testing for witness scripts
         assert_equal(found_script_addr, 1)
-        # TODO clarify if we want the behavior that is tested below in Dash (only when HD seed was generated and not user-provided)
+        # TODO clarify if we want the behavior that is tested below in Wagerr (only when HD seed was generated and not user-provided)
         # assert_equal(found_addr_chg, 180 + 50)  # old reserve keys are marked as change now
         assert_equal(found_addr_rsv, 180)  # keypool size
 

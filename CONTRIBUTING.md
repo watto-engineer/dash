@@ -1,7 +1,7 @@
-Contributing to Dash Core
+Contributing to Wagerr Core
 ============================
 
-The Dash Core project operates an open contributor model where anyone is
+The Wagerr Core project operates an open contributor model where anyone is
 welcome to contribute towards development in the form of peer review, testing
 and patches. This document explains the practical process and guidelines for
 contributing.
@@ -15,7 +15,7 @@ merging pull requests as well as a "lead maintainer" who is responsible for the
 release cycle, overall merging, moderation and appointment of maintainers.
 
 If you're looking for somewhere to start contributing, check out the
-[good first issue](https://github.com/dashpay/dash/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+[good first issue](https://github.com/wagerr/wagerr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 list.
 
 Contributor Workflow
@@ -75,7 +75,7 @@ all available types and scopes, please see the
 include:
 
   - *consensus* for changes to consensus critical code
-  - *qt* for changes to dash-qt
+  - *qt* for changes to wagerr-qt
   - *log* Changes to log messages
   - *mining* for changes to the mining code
   - *net* for changes to the peer-to-peer network code
@@ -93,7 +93,7 @@ Examples:
     feat(rpc)!: modify gettransaction parameter type
 
 Note that translations should not be submitted as pull requests. Please see
-[Translation Process](https://github.com/dashpay/dash/blob/master/doc/translation_process.md)
+[Translation Process](https://github.com/wagerr/wagerr/blob/master/doc/translation_process.md)
 for more information on helping with translations.
 
 If a pull request is not to be considered for merging (yet), please
@@ -192,11 +192,11 @@ where possible keep them short, uncomplex and easy to verify.
 "Decision Making" Process
 -------------------------
 
-The following applies to code changes to the Dash Core project (and related
-projects such as libsecp256k1), and is not to be confused with overall Dash
+The following applies to code changes to the Wagerr Core project (and related
+projects such as libsecp256k1), and is not to be confused with overall Wagerr
 Network Protocol consensus changes.
 
-Whether a pull request is merged into Dash Core rests with the project merge
+Whether a pull request is merged into Wagerr Core rests with the project merge
 maintainers and ultimately the project lead.
 
 Maintainers will take into consideration if a patch is in line with the general
@@ -215,7 +215,7 @@ In general, all pull requests must:
     demonstrating the bug and also proving the fix. This helps prevent regression.
   - Change relevant comments and documentation when behaviour of code changes.
 
-Patches that change Dash consensus rules are considerably more involved than
+Patches that change Wagerr consensus rules are considerably more involved than
 normal because they affect the entire ecosystem and so must be preceded by
 extensive mailing list discussions and have a numbered BIP. While each case will
 be different, one should be prepared to expend more time and effort than for
@@ -271,7 +271,7 @@ higher in terms of discussion and peer review requirements, keeping in mind that
 mistakes could be very costly to the wider community. This includes refactoring
 of consensus critical code.
 
-Where a patch set proposes to change the Dash consensus, it must have been
+Where a patch set proposes to change the Wagerr consensus, it must have been
 discussed extensively on the mailing list and IRC, be accompanied by a widely
 discussed BIP and have a generally widely perceived technical consensus of being
 a worthwhile change based on the judgement of the maintainers.
@@ -297,7 +297,7 @@ function gfd() {
 
 ### Finding Reviewers
 
-The review process is normally fairly responsive on the Dash Core repository, however
+The review process is normally fairly responsive on the Wagerr Core repository, however
 this might not always be the case. If you find that you've been waiting
 for a pull request to be given attention for several months, there may be a number
 of reasons for this, some of which you can do something about:
@@ -351,10 +351,10 @@ https://github.com/bitcoin/bitcoin/pull/16189).
 Also see the [backport.py script](
 https://github.com/bitcoin-core/bitcoin-maintainer-tools#backport).
 
-Bitcoin Backports are an incredibly valuable part of Dash's development. Backporting allows us to easily implement new
+Bitcoin Backports are an incredibly valuable part of Wagerr's development. Backporting allows us to easily implement new
 features, improvements and fixes as bitcoin implements them.
 
-To see detailed statistics & progress see Google Sheet tracker: [Bitcoin backports for Dash](https://docs.google.com/spreadsheets/d/1DnKxat0S0H62CJOzXpKGPXTa8hgoVOjGYZzoClmGSB8/edit?usp=sharing).
+To see detailed statistics & progress see Google Sheet tracker: [Bitcoin backports for Wagerr](https://docs.google.com/spreadsheets/d/1DnKxat0S0H62CJOzXpKGPXTa8hgoVOjGYZzoClmGSB8/edit?usp=sharing).
 You should use this sheet to find what PRs to backport and its commit.
 
 Updating the Spreadsheet
@@ -425,7 +425,7 @@ When pasting the contents, make sure to split the values into the cells so every
 Release Policy
 --------------
 
-The project leader is the release manager for each Dash Core release.
+The project leader is the release manager for each Wagerr Core release.
 
 Copyright
 ---------

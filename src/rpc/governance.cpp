@@ -174,9 +174,9 @@ static UniValue gobject_prepare(const JSONRPCRequest& request)
 
     CGovernanceObject govobj(hashParent, nRevision, nTime, uint256(), strDataHex);
 
-    // This command is dangerous because it consumes 5 DASH irreversibly.
+    // This command is dangerous because it consumes 5 WAGERR irreversibly.
     // If params are lost, it's very hard to bruteforce them and yet
-    // users ignore all instructions on dashcentral etc. and do not save them...
+    // users ignore all instructions on wagerrcentral etc. and do not save them...
     // Let's log them here and hope users do not mess with debug.log
     LogPrintf("gobject_prepare -- params: %s %s %s %s, data: %s, hash: %s\n",
                 request.params[0].getValStr(), request.params[1].getValStr(),
@@ -416,7 +416,7 @@ static UniValue gobject_submit(const JSONRPCRequest& request)
 static void gobject_vote_conf_help(const JSONRPCRequest& request)
 {
     RPCHelpMan{"gobject vote-conf",
-        "Vote on a governance object by masternode configured in dash.conf\n",
+        "Vote on a governance object by masternode configured in wagerr.conf\n",
         {
             {"governance-hash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "hash of the governance object"},
             {"vote", RPCArg::Type::STR, RPCArg::Optional::NO, "vote, possible values: [funding|valid|delete|endorsed]"},
@@ -473,7 +473,7 @@ static UniValue gobject_vote_conf(const JSONRPCRequest& request)
         nFailed++;
         statusObj.pushKV("result", "failed");
         statusObj.pushKV("errorMessage", "Can't find masternode by collateral output");
-        resultsObj.pushKV("dash.conf", statusObj);
+        resultsObj.pushKV("wagerr.conf", statusObj);
         returnObj.pushKV("overall", strprintf("Voted successfully %d time(s) and failed %d time(s).", nSuccessful, nFailed));
         returnObj.pushKV("detail", resultsObj);
         return returnObj;
@@ -497,7 +497,7 @@ static UniValue gobject_vote_conf(const JSONRPCRequest& request)
         nFailed++;
         statusObj.pushKV("result", "failed");
         statusObj.pushKV("errorMessage", "Failure to sign.");
-        resultsObj.pushKV("dash.conf", statusObj);
+        resultsObj.pushKV("wagerr.conf", statusObj);
         returnObj.pushKV("overall", strprintf("Voted successfully %d time(s) and failed %d time(s).", nSuccessful, nFailed));
         returnObj.pushKV("detail", resultsObj);
         return returnObj;
@@ -514,7 +514,7 @@ static UniValue gobject_vote_conf(const JSONRPCRequest& request)
         statusObj.pushKV("errorMessage", exception.GetMessage());
     }
 
-    resultsObj.pushKV("dash.conf", statusObj);
+    resultsObj.pushKV("wagerr.conf", statusObj);
 
     returnObj.pushKV("overall", strprintf("Voted successfully %d time(s) and failed %d time(s).", nSuccessful, nFailed));
     returnObj.pushKV("detail", resultsObj);
@@ -1002,7 +1002,7 @@ static UniValue gobject_getcurrentvotes(const JSONRPCRequest& request)
 #ifdef ENABLE_WALLET
         "  vote-alias         - Vote on a governance object by masternode proTxHash\n"
 #endif // ENABLE_WALLET
-        "  vote-conf          - Vote on a governance object by masternode configured in dash.conf\n"
+        "  vote-conf          - Vote on a governance object by masternode configured in wagerr.conf\n"
 #ifdef ENABLE_WALLET
         "  vote-many          - Vote on a governance object by all masternodes for which the voting key is in the wallet\n"
 #endif // ENABLE_WALLET
@@ -1213,11 +1213,11 @@ static UniValue getsuperblockbudget(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    /* Dash features */
-    { "dash",               "getgovernanceinfo",      &getgovernanceinfo,      {} },
-    { "dash",               "getsuperblockbudget",    &getsuperblockbudget,    {"index"} },
-    { "dash",               "gobject",                &gobject,                {} },
-    { "dash",               "voteraw",                &voteraw,                {"tx_hash","tx_index","gov_hash","signal","outcome","time","sig"} },
+    /* Wagerr features */
+    { "wagerr",               "getgovernanceinfo",      &getgovernanceinfo,      {} },
+    { "wagerr",               "getsuperblockbudget",    &getsuperblockbudget,    {"index"} },
+    { "wagerr",               "gobject",                &gobject,                {} },
+    { "wagerr",               "voteraw",                &voteraw,                {"tx_hash","tx_index","gov_hash","signal","outcome","time","sig"} },
 
 };
 // clang-format on

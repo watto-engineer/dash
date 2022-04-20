@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# Copyright (c) 2020-2022 The Dash Core developers
+# Copyright (c) 2020-2022 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, get_bip9_status
 
 '''
@@ -13,7 +13,7 @@ Tests the activation of a new quorum type in v17 via a bip9-like hardfork
 '''
 
 
-class NewQuorumTypeActivationTest(BitcoinTestFramework):
+class NewQuorumTypeActivationTest(WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1

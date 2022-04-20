@@ -4,8 +4,8 @@
 
 #include "consensus/tokengroups.h"
 #include "miner.h"
-#include "test/test_dash.h"
-#include "utilstrencodings.h"
+#include <test/util/setup_common.h>
+#include <util/strencodings.h>
 #include "tokens/tokengroupwallet.h"
 #include <boost/test/unit_test.hpp>
 

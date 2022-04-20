@@ -8,14 +8,14 @@ Test that permissions are correctly calculated and applied
 """
 
 from test_framework.test_node import ErrorMatch
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     connect_nodes,
     p2p_port,
 )
 
-class P2PPermissionsTests(BitcoinTestFramework):
+class P2PPermissionsTests(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True

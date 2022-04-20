@@ -93,7 +93,7 @@ public:
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }
 
-    // Dash-specific helpers
+    // Wagerr-specific helpers
 
     void UseCoinJoin(bool fUseCoinJoin)
     {

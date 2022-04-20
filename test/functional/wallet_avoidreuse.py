@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the avoid_reuse and setwalletflag features."""
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -63,7 +63,7 @@ def assert_unspent(node, total_count=None, total_sum=None, reused_supported=None
     if reused_sum is not None:
         assert_approx(stats["reused"]["sum"], reused_sum, 0.001)
 
-class AvoidReuseTest(BitcoinTestFramework):
+class AvoidReuseTest(WagerrTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = False

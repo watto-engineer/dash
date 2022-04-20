@@ -7,7 +7,7 @@
 # You can also use this template to quickly start and connect a few regtest nodes.
 
 from test_framework.util import *
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 import hashlib
 import logging
 import pprint
@@ -18,7 +18,7 @@ if sys.version_info[0] < 3:
 logging.basicConfig(format='%(asctime)s.%(levelname)s: %(message)s', level=logging.INFO, stream=sys.stdout)
 
 
-class MyTest (BitcoinTestFramework):
+class MyTest (WagerrTestFramework):
 
     def setup_chain(self, bitcoinConfDict=None, wallets=None):
         print("Initializing test directory "+self.options.tmpdir)

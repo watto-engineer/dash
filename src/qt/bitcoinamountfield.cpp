@@ -2,9 +2,9 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <qt/bitcoinamountfield.h>
+#include <qt/wagerramountfield.h>
 
-#include <qt/bitcoinunits.h>
+#include <qt/wagerrunits.h>
 #include <qt/guiutil.h>
 
 #include <QApplication>
@@ -41,7 +41,7 @@ class AmountValidator : public QValidator
 public:
     explicit AmountValidator(QObject *parent) :
         QValidator(parent),
-        currentUnit(BitcoinUnits::DASH) {}
+        currentUnit(BitcoinUnits::WAGERR) {}
 
     State validate(QString &input, int &pos) const override
     {
@@ -69,7 +69,7 @@ class AmountLineEdit: public QLineEdit
 public:
     explicit AmountLineEdit(QWidget *parent):
         QLineEdit(parent),
-        currentUnit(BitcoinUnits::DASH)
+        currentUnit(BitcoinUnits::WAGERR)
     {
         setAlignment(Qt::AlignLeft);
         amountValidator = new AmountValidator(this);
@@ -141,14 +141,14 @@ public:
         ensurePolished();
         const QFontMetrics fm(fontMetrics());
         int h = 0;
-        int w = GUIUtil::TextWidth(fm, BitcoinUnits::format(BitcoinUnits::DASH, BitcoinUnits::maxMoney(), false, BitcoinUnits::separatorAlways));
+        int w = GUIUtil::TextWidth(fm, BitcoinUnits::format(BitcoinUnits::WAGERR, BitcoinUnits::maxMoney(), false, BitcoinUnits::separatorAlways));
         w += 2; // cursor blinking space
-        w += GUIUtil::dashThemeActive() ? 24 : 0; // counteract padding from css
+        w += GUIUtil::wagerrThemeActive() ? 24 : 0; // counteract padding from css
         return QSize(w, h);
     }
 
 private:
-    int currentUnit{BitcoinUnits::DASH};
+    int currentUnit{BitcoinUnits::WAGERR};
     bool m_allow_empty{true};
     CAmount m_min_amount{CAmount(0)};
     CAmount m_max_amount{BitcoinUnits::maxMoney()};
@@ -181,7 +181,7 @@ Q_SIGNALS:
     void valueChanged();
 };
 
-#include <qt/bitcoinamountfield.moc>
+#include <qt/wagerramountfield.moc>
 
 BitcoinAmountField::BitcoinAmountField(QWidget *parent) :
     QWidget(parent),

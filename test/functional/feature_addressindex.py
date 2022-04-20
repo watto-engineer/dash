@@ -10,12 +10,12 @@
 import binascii
 
 from test_framework.messages import COIN, COutPoint, CTransaction, CTxIn, CTxOut
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.test_node import ErrorMatch
 from test_framework.script import CScript, OP_CHECKSIG, OP_DUP, OP_EQUAL, OP_EQUALVERIFY, OP_HASH160
 from test_framework.util import assert_equal, connect_nodes
 
-class AddressIndexTest(BitcoinTestFramework):
+class AddressIndexTest(WagerrTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True

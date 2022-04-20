@@ -10,11 +10,11 @@ BUILDDIR=${BUILDDIR:-$TOPDIR}
 BINDIR=${BINDIR:-$BUILDDIR/src}
 MANDIR=${MANDIR:-$TOPDIR/doc/man}
 
-BITCOIND=${BITCOIND:-$BINDIR/dashd}
-BITCOINCLI=${BITCOINCLI:-$BINDIR/dash-cli}
-BITCOINTX=${BITCOINTX:-$BINDIR/dash-tx}
-WALLET_TOOL=${WALLET_TOOL:-$BINDIR/dash-wallet}
-BITCOINQT=${BITCOINQT:-$BINDIR/qt/dash-qt}
+BITCOIND=${BITCOIND:-$BINDIR/wagerrd}
+BITCOINCLI=${BITCOINCLI:-$BINDIR/wagerr-cli}
+BITCOINTX=${BITCOINTX:-$BINDIR/wagerr-tx}
+WALLET_TOOL=${WALLET_TOOL:-$BINDIR/wagerr-wallet}
+BITCOINQT=${BITCOINQT:-$BINDIR/qt/wagerr-qt}
 
 [ ! -x $BITCOIND ] && echo "$BITCOIND not found or not executable." && exit 1
 
@@ -22,8 +22,8 @@ BITCOINQT=${BITCOINQT:-$BINDIR/qt/dash-qt}
 read -r -a BTCVER <<< "$($BITCOINCLI --version | head -n1 | awk -F'[ -]' '{ print $6, $7 }')"
 
 # Create a footer file with copyright content.
-# This gets autodetected fine for dashd if --version-string is not set,
-# but has different outcomes for dash-qt and dash-cli.
+# This gets autodetected fine for wagerrd if --version-string is not set,
+# but has different outcomes for wagerr-qt and wagerr-cli.
 echo "[COPYRIGHT]" > footer.h2m
 $BITCOIND --version | sed -n '1!p' >> footer.h2m
 

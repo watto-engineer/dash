@@ -1,82 +1,46 @@
-Dash Core staging tree 18.0
-===========================
+Wagerr Core integration/staging repository
+=====================================
 
-|CI|master|develop|
-|-|-|-|
-|Gitlab|[![Build Status](https://gitlab.com/dashpay/dash/badges/master/pipeline.svg)](https://gitlab.com/dashpay/dash/-/tree/master)|[![Build Status](https://gitlab.com/dashpay/dash/badges/develop/pipeline.svg)](https://gitlab.com/dashpay/dash/-/tree/develop)|
+[![Build Status](https://travis-ci.org/wagerr/wagerr.svg?branch=1.6.01)](https://travis-ci.org/wagerr/wagerr) [![GitHub version](https://badge.fury.io/gh/wagerr%2Fwagerr.svg)](https://badge.fury.io/gh/wagerr%2Fwagerr) [![Snap Status](https://build.snapcraft.io/badge/wagerr/wagerr.svg)](https://build.snapcraft.io/user/wagerr/wagerr) [![GitHub issues](https://img.shields.io/github/issues/wagerr/wagerr.svg)](https://github.com/wagerr/wagerr/issues) [![GitHub forks](https://img.shields.io/github/forks/wagerr/wagerr.svg)](https://github.com/wagerr/wagerr/network) [![GitHub stars](https://img.shields.io/github/stars/wagerr/wagerr.svg)](https://github.com/wagerr/wagerr/stargazers) [![GitHub license](https://img.shields.io/github/license/wagerr/wagerr.svg)](https://github.com/wagerr/wagerr/blob/master/COPYING) [![Twitter](https://img.shields.io/twitter/url/http/github.com/wagerr/wagerr.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=http%3A%2F%2Fgithub.com%2Fwagerr%2Fwagerr)
 
-https://www.dash.org
+Wagerr is a cutting edge cryptocurrency, with many features not available in most other cryptocurrencies.
+- Anonymized transactions using the _Zerocoin Protocol_.
+- Fast transactions featuring guaranteed zero confirmation transactions, we call it _SwiftX_.
+- Decentralized blockchain voting providing for consensus based advancement of the current Masternode
+  technology used to secure the network and provide the above features, each Masternode is secured
+  with a collateral of 25K WGR.
 
+More information at [wagerr.com](http://www.wagerr.com/) Visit our ANN thread at [BitcoinTalk](https://bitcointalk.org/index.php?topic=1911583.0)
 
-What is Dash?
--------------
+### Coin Specs
+<table>
+<tr><td>Algo</td><td>Quark</td></tr>
+<tr><td>Block Time</td><td>60 Seconds</td></tr>
+<tr><td>Difficulty Retargeting</td><td>Every Block</td></tr>
+<tr><td>Max Coin Supply (PoW Phase)</td><td>198,360,471 WGR</td></tr>
+<tr><td>Max Coin Supply (PoS Phase)</td><td>Infinite</td></tr>
+<tr><td>Premine in block 1</td><td>173,360,471 WGR*</td></tr>
+<tr><td>Premine in blocks 2-101</td><td>25,000,000 WGR*</td></tr>
+<tr><td>Full Premine</td><td>198,360,471 WGR*</td></tr>
+</table>
 
-Dash is an experimental digital currency that enables instant, private
-payments to anyone, anywhere in the world. Dash uses peer-to-peer technology
-to operate with no central authority: managing transactions and issuing money
-are carried out collectively by the network. Dash Core is the name of the open
-source software which enables the use of this currency.
+### Reward Distribution
 
-Pre-Built Binary
-----------------
+<table>
+<th colspan=4>PoW Phase</th>
+<tr><th>Block Height</th><th>Reward Amount</th><th>Notes</th><th>Duration (Days)</th></tr>
+<tr><td>1</td><td>173,360,471 WGR</td><td>Initial Premine</td><td>0 Days</td></tr>
+<tr><td>2-101</td><td>250,000 WGR</td><td rowspan=2>Closed Mining</td><td rowspan=2> Approx 2 Days</td></tr>
+<tr><td>102-1001</td><td>0 WGR</td></tr>
+<tr><th colspan=4>PoS Phase</th></tr>
+<tr><th>Block Height</th><th colspan=3>Reward Amount</th></tr>
+<tr><td>1002-Infinite</td><td colspan=3>Variable based on <a href="https://pivx.org/knowledge-base/see-saw-rewards-mechanism/">SeeSaw Reward Mechanism</a></td></tr>
+</table>
 
-For more information, as well as an immediately usable, binary version of
-the Dash Core software, see https://www.dash.org/downloads/.
+### PoS Rewards Breakdown
 
-License
--------
-
-Dash Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
-information or see https://opensource.org/licenses/MIT.
-
-Development Process
--------------------
-
-The `master` branch is meant to be stable. Development is normally done in separate branches.
-[Tags](https://github.com/dashpay/dash/tags) are created to indicate new official,
-stable release versions of Dash Core.
-
-The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
-and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
-
-Testing
--------
-
-Testing and code review is the bottleneck for development; we get more pull
-requests than we can review and test on short notice. Please be patient and help out by testing
-other people's pull requests, and remember this is a security-critical project where any mistake might cost people
-lots of money.
-
-### Automated Testing
-
-Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
-submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`. Further details on running
-and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
-
-There are also [regression and integration tests](/test), written
-in Python, that are run automatically on the build server.
-These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
-
-The Travis CI system makes sure that every pull request is built for Windows, Linux, and macOS, and that unit/sanity tests are run automatically.
-
-### Manual Quality Assurance (QA) Testing
-
-Changes should be tested by somebody other than the developer who wrote the
-code. This is especially important for large or high-risk changes. It is useful
-to add a test plan to the pull request description if testing the changes is
-not straightforward.
-
-Translations
-------------
-
-Changes to translations as well as new translations can be submitted to
-[Dash Core's Transifex page](https://www.transifex.com/projects/p/dash/).
-
-Translations are periodically pulled from Transifex and merged into the git repository. See the
-[translation process](doc/translation_process.md) for details on how this works.
-
-**Important**: We do not accept translation changes as GitHub pull requests because the next
-pull from Transifex would automatically overwrite them again.
-
-Translators should also follow the [forum](https://www.dash.org/forum/topic/dash-worldwide-collaboration.88/).
+<table>
+<th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th><th>Budget</th>
+<tr><td>Phase 1</td><td>1002-10000</td><td>0 WGR</td><td>75% (0 WGR) & 25% (0 WGR) respectively</td><td>0% (0 WGR)</td></tr>
+<tr><td>Phase 2</td><td>10001-ToBeSet</td><td>3.8 WGR</td><td>75% (2.85 WGR) & 25% (0.95 WGR) respectively</td><td>0% (0 WGR)</td></tr>
+</table>

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_CRYPTO_BLS_H
-#define DASH_CRYPTO_BLS_H
+#ifndef WAGERR_CRYPTO_BLS_H
+#define WAGERR_CRYPTO_BLS_H
 
 #include <hash.h>
 #include <serialize.h>
@@ -11,14 +11,14 @@
 #include <util/strencodings.h>
 #include <util/ranges.h>
 
-// bls-dash uses relic, which may define DEBUG and ERROR, which leads to many warnings in some build setups
+// bls-wagerr uses relic, which may define DEBUG and ERROR, which leads to many warnings in some build setups
 #undef ERROR
 #undef DEBUG
-#include <bls-dash/bls.hpp>
-#include <bls-dash/privatekey.hpp>
-#include <bls-dash/elements.hpp>
-#include <bls-dash/schemes.hpp>
-#include <bls-dash/threshold.hpp>
+#include <bls-wagerr/bls.hpp>
+#include <bls-wagerr/privatekey.hpp>
+#include <bls-wagerr/elements.hpp>
+#include <bls-wagerr/schemes.hpp>
+#include <bls-wagerr/threshold.hpp>
 #undef DOUBLE
 #undef SEED
 
@@ -447,4 +447,4 @@ using BLSVerificationVectorPtr = std::shared_ptr<BLSVerificationVector>;
 
 bool BLSInit();
 
-#endif // DASH_CRYPTO_BLS_H
+#endif // WAGERR_CRYPTO_BLS_H

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2018-2020 The Dash Core developers
+# Copyright (c) 2018-2020 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Tests around dash governance objects."""
@@ -8,7 +8,7 @@ import json
 import time
 
 from test_framework.messages import uint256_to_string
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_greater_than, assert_raises_rpc_error
 
 
@@ -22,7 +22,7 @@ def validate_object(prepared, rpc_prepared):
     assert_equal(prepared["data"], rpc_prepared["data"])
 
 
-class DashGovernanceTest (DashTestFramework):
+class WagerrGovernanceTest (WagerrTestFramework):
     def set_test_params(self):
         self.set_dash_test_params(2, 1)
 
@@ -100,4 +100,4 @@ class DashGovernanceTest (DashTestFramework):
 
 
 if __name__ == '__main__':
-    DashGovernanceTest().main()
+    WagerrGovernanceTest().main()

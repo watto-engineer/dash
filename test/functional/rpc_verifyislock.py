@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# Copyright (c) 2020-2022 The Dash Core developers
+# Copyright (c) 2020-2022 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.messages import CTransaction, FromHex, hash256, ser_compact_size, ser_string
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_raises_rpc_error, satoshi_round, wait_until
 
 '''
@@ -14,7 +14,7 @@ Test verifyislock rpc
 
 '''
 
-class RPCVerifyISLockTest(DashTestFramework):
+class RPCVerifyISLockTest(WagerrTestFramework):
     def set_test_params(self):
         # -whitelist is needed to avoid the trickling logic on node0
         self.set_dash_test_params(6, 5, [["-whitelist=127.0.0.1"], [], [], [], [], []], fast_dip3_enforcement=True)

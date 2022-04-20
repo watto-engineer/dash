@@ -5,10 +5,10 @@
 """Test the listtransactions API."""
 from decimal import Decimal
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_array_result, assert_equal
 
-class ListTransactionsTest(BitcoinTestFramework):
+class ListTransactionsTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
 

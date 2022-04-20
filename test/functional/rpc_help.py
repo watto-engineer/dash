@@ -4,13 +4,13 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test RPC help output."""
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error
 
 import os
 
 
-class HelpRpcTest(BitcoinTestFramework):
+class HelpRpcTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.supports_cli = False
@@ -24,7 +24,7 @@ class HelpRpcTest(BitcoinTestFramework):
     def test_categories(self):
         node = self.nodes[0]
 
-        # wrong argument count, note: Dash's help allows for two options since we utilize subcommands
+        # wrong argument count, note: Wagerr's help allows for two options since we utilize subcommands
         assert_raises_rpc_error(-1, 'help', node.help, 'foo', 'bar', 'foobar')
 
         # invalid argument
@@ -36,7 +36,7 @@ class HelpRpcTest(BitcoinTestFramework):
         # command titles
         titles = [line[3:-3] for line in node.help().splitlines() if line.startswith('==')]
 
-        components = ['Addressindex', 'Blockchain', 'Control', 'Dash', 'Evo', 'Generating', 'Mining', 'Network', 'Rawtransactions', 'Util']
+        components = ['Addressindex', 'Blockchain', 'Control', 'Wagerr', 'Evo', 'Generating', 'Mining', 'Network', 'Rawtransactions', 'Util']
 
         if self.is_wallet_compiled():
             components.append('Wallet')

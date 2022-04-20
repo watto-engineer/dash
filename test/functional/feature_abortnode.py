@@ -10,11 +10,11 @@
 - Verify that dashd AbortNode's.
 """
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import wait_until, get_datadir_path, connect_nodes
 import os
 
-class AbortNodeTest(BitcoinTestFramework):
+class AbortNodeTest(WagerrTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True

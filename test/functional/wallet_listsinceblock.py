@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the listsincelast RPC."""
 
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.messages import BIP125_SEQUENCE_NUMBER
 from test_framework.util import (
     assert_array_result,
@@ -17,7 +17,7 @@ from test_framework.util import (
 
 from decimal import Decimal
 
-class ListSinceBlockTest(BitcoinTestFramework):
+class ListSinceBlockTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
         self.setup_clean_chain = True

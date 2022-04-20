@@ -8,11 +8,11 @@
 import os
 import json
 from decimal import Decimal
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_greater_than, assert_raises_rpc_error, find_output
 
 # Create one-input, one-output, no-fee transaction:
-class PSBTTest(BitcoinTestFramework):
+class PSBTTest(WagerrTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = False

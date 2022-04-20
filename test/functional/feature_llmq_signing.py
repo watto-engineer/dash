@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2015-2022 The Dash Core developers
+# Copyright (c) 2015-2022 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,14 +12,14 @@ Checks LLMQs signing sessions
 
 from test_framework.messages import CSigShare, msg_qsigshare, uint256_to_string
 from test_framework.mininode import P2PInterface
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, assert_raises_rpc_error, connect_nodes, force_finish_mnsync, hex_str_to_bytes, wait_until
 
 
-class LLMQSigningTest(DashTestFramework):
+class LLMQSigningTest(WagerrTestFramework):
     def set_test_params(self):
-        self.set_dash_test_params(6, 5, fast_dip3_enforcement=True)
-        self.set_dash_llmq_test_params(5, 3)
+        self.set_wagerr_test_params(6, 5, fast_dip3_enforcement=True)
+        self.set_wagerr_llmq_test_params(5, 3)
 
     def add_options(self, parser):
         parser.add_argument("--spork21", dest="spork21", default=False, action="store_true",
