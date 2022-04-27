@@ -11,6 +11,7 @@ packages:
 - "automake"
 - "libtool"
 - "pkg-config"
+- "bison"
 remotes:
 - "url": "https://github.com/wagerr/wagerr-detached-sigs.git"
   "dir": "signature"
