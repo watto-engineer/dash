@@ -6,6 +6,7 @@
 #include "pos/rewards.h"
 
 #include "chainparams.h"
+#include <chain.h>
 #include <evo/cbtx.h>
 #include <evo/specialtx.h>
 #include "tokens/tokengroupmanager.h"
@@ -310,6 +311,10 @@ void CBlockReward::RemoveMasternodeReward() {
     if (r_it != rewards.end()) {
         rewards.erase(r_it);
     }
+}
+
+void CBlockReward::AddFees(const CAmount nFees) {
+    AddReward(CReward::RewardType::REWARD_BURN, nFees);
 }
 
 void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS) {

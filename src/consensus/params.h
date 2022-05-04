@@ -63,8 +63,8 @@ struct Params {
     int nGovernanceMinQuorum; // Min absolute vote count to trigger an action
     int nGovernanceFilterElements;
     int nMasternodeMinimumConfirmations;
-    /** Deployment of v16 Hard Fork */
-    int V16DeploymentHeight;
+    /** Deployment of v17 Hard Fork */
+    int V17DeploymentHeight;
     /** Block height and hash at which BIP34 becomes active */
     int BIP34Height;
     uint256 BIP34Hash;
