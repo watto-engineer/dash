@@ -28,17 +28,17 @@
   { "exec": "./wagerr-tx",
     "args": ["-create", "nversion=1foo"],
     "return_code": 1,
-    "error_txt": "error: Invalid TX version requested",
+    "error_txt": "error: Invalid TX version requested: '1foo'",
     "description": "Tests the check for invalid nversion value"
   },
   { "exec": "./wagerr-tx",
-    "args": ["-", "delin=1"],
+    "args": ["-", "delin=0"],
     "input": "tx394b54bb.hex",
     "output_cmp": "tt-delin1-out.hex",
     "description": "Deletes a single input from a transaction"
   },
   { "exec": "./wagerr-tx",
-    "args": ["-json", "-", "delin=1"],
+    "args": ["-json", "-", "delin=0"],
     "input": "tx394b54bb.hex",
     "output_cmp": "tt-delin1-out.json",
     "description": "Deletes a single input from a transaction (output in json)"
@@ -47,7 +47,7 @@
     "args": ["-", "delin=31"],
     "input": "tx394b54bb.hex",
     "return_code": 1,
-    "error_txt": "error: Invalid TX input index '31'",
+    "error_txt": "error: Invalid TX input index",
     "description": "Attempts to delete an input with a bad index from a transaction. Expected to fail."
   },
   { "exec": "./wagerr-tx",
@@ -73,7 +73,7 @@
     "args": ["-", "delout=2"],
     "input": "tx394b54bb.hex",
     "return_code": 1,
-    "error_txt": "error: Invalid TX output index '2'",
+    "error_txt": "error: Invalid TX output index",
     "description": "Attempts to delete an output with a bad index from a transaction. Expected to fail."
   },
   { "exec": "./wagerr-tx",
@@ -98,7 +98,7 @@
   { "exec": "./wagerr-tx",
     "args": ["-create", "locktime=317000foo"],
     "return_code": 1,
-    "error_txt": "error: Invalid TX locktime requested",
+    "error_txt": "error: Invalid TX locktime requested:",
     "description": "Tests the check for invalid locktime value"
   },
   { "exec": "./wagerr-tx",
@@ -120,7 +120,7 @@
   { "exec": "./wagerr-tx",
     "args":
     ["-create",
-     "outaddr=1:sU8uqD2gX6fm5eRvgUxPbRKpGJ24CMCSgE:garbage"],
+     "outaddr=1:WfERA7QPaEdAmJwyZr1F7P11np7cTNbxEC:garbage"],
     "return_code": 1,
     "error_txt": "error: TX output missing or too many separators",
     "description": "Malformed outaddr argument (too many separators). Expected to fail."
@@ -147,8 +147,8 @@
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
      "in=bf829c6bcf84579331337659d31f89dfd138f7f7785802d5501c92333145ca7c:18",
      "in=22a6f904655d53ae2ff70e701a0bbd90aa3975c0f40bfc6cc996a9049e31cdfc:1",
-     "outaddr=0.18:sM9JNsURmybh5x7VyXwHE7fCKduuZFMScN",
-     "outaddr=4:sU8uqD2gX6fm5eRvgUxPbRKpGJ24CMCSgE"],
+     "outaddr=0.18:WZdnYKYaKCqMDbQXXYtia3tZWLy5umyk1S",
+     "outaddr=4:WfERA7QPaEdAmJwyZr1F7P11np7cTNbxEC"],
     "output_cmp": "txcreate1.hex",
     "description": "Creates a new transaction with three inputs and two outputs"
   },
@@ -159,8 +159,8 @@
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
      "in=bf829c6bcf84579331337659d31f89dfd138f7f7785802d5501c92333145ca7c:18",
      "in=22a6f904655d53ae2ff70e701a0bbd90aa3975c0f40bfc6cc996a9049e31cdfc:1",
-     "outaddr=0.18:sM9JNsURmybh5x7VyXwHE7fCKduuZFMScN",
-     "outaddr=4:sU8uqD2gX6fm5eRvgUxPbRKpGJ24CMCSgE"],
+     "outaddr=0.18:WZdnYKYaKCqMDbQXXYtia3tZWLy5umyk1S",
+     "outaddr=4:WfERA7QPaEdAmJwyZr1F7P11np7cTNbxEC"],
     "output_cmp": "txcreate1.json",
     "description": "Creates a new transaction with three inputs and two outputs (output in json)"
   },
@@ -208,10 +208,10 @@
     "args":
     ["-create", "nversion=1",
      "in=924492787e3c43699a845d4cd2bdaea95fa3db81943b0b4325ac07e275bdcb38:0",
-     "set=privatekeys:[\"MncgKh8PvSYufYLQMankt6EsybFnw2SepY6A6ra3bdeTQEAhctWY\"]",
+     "set=privatekeys:[\"WXyJWL5iP7bfyLeqzMk4H3ezAfYaerazcPQMfoFEE8CX3DgNApBy\"]",
      "set=prevtxs:[{\"txid\":\"d71b9105d185de8b0859d4a85694f3dab19aad401de7c7c52f96ff464af35559\",\"vout\":0,\"scriptPubKey\":\"76a91491b24bf9f5288532960ac687abb035127b1d28a588ac\"}]",
      "sign=ALL",
-     "outaddr=0.001:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+     "outaddr=0.001:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "output_cmp": "txcreatesignv1.hex",
     "description": "Creates a new v1 transaction with a single input and a single output, and then signs the transaction"
   },
@@ -220,10 +220,10 @@
     ["-json",
      "-create", "nversion=1",
      "in=924492787e3c43699a845d4cd2bdaea95fa3db81943b0b4325ac07e275bdcb38:0",
-     "set=privatekeys:[\"MncgKh8PvSYufYLQMankt6EsybFnw2SepY6A6ra3bdeTQEAhctWY\"]",
+     "set=privatekeys:[\"WXyJWL5iP7bfyLeqzMk4H3ezAfYaerazcPQMfoFEE8CX3DgNApBy\"]",
      "set=prevtxs:[{\"txid\":\"d71b9105d185de8b0859d4a85694f3dab19aad401de7c7c52f96ff464af35559\",\"vout\":0,\"scriptPubKey\":\"76a91491b24bf9f5288532960ac687abb035127b1d28a588ac\"}]",
      "sign=ALL",
-     "outaddr=0.001:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+     "outaddr=0.001:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "output_cmp": "txcreatesignv1.json",
     "description": "Creates a new v1 transaction with a single input and a single output, and then signs the transaction (output in json)"
   },
@@ -231,10 +231,10 @@
     "args":
     ["-create", "nversion=2",
       "in=4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485:0",
-      "set=privatekeys:[\"MncgKh8PvSYufYLQMankt6EsybFnw2SepY6A6ra3bdeTQEAhctWY\"]",
+      "set=privatekeys:[\"WXyJWL5iP7bfyLeqzMk4H3ezAfYaerazcPQMfoFEE8CX3DgNApBy\"]",
       "set=prevtxs:[{\"txid\":\"4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485\",\"vout\":0,\"scriptPubKey\":\"76a91491b24bf9f5288532960ac687abb035127b1d28a588ac\"}]",
       "sign=ALL",
-      "outaddr=0.001:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+      "outaddr=0.001:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "output_cmp": "txcreatesignv2.hex",
     "description": "Creates a new transaction with a single input and a single output, and then signs the transaction"
   },
@@ -242,10 +242,10 @@
     "args":
     ["-create", "nversion=2",
       "in=4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485:0",
-      "set=privatekeys:[\"MncgKh8PvSYufYLQMankt6EsybFnw2SepY6A6ra3bdeTQEAhctWY\"]",
+      "set=privatekeys:[\"WXyJWL5iP7bfyLeqzMk4H3ezAfYaerazcPQMfoFEE8CX3DgNApBy\"]",
       "set=prevtxs:[{\"txid\":\"4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485\",\"vout\":\"0foo\",\"scriptPubKey\":\"76a91491b24bf9f5288532960ac687abb035127b1d28a588ac\"}]",
       "sign=ALL",
-      "outaddr=0.001:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+      "outaddr=0.001:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "return_code": 1,
     "error_txt": "error: prevtxs internal object typecheck fail",
     "description": "Tests the check for invalid vout index in prevtxs for sign"
@@ -284,7 +284,7 @@
     "args":
     ["-create",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd",
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK",
      "outdata=4:54686973204f505f52455455524e207472616e73616374696f6e206f7574707574207761732063726561746564206279206d6f646966696564206372656174657261777472616e73616374696f6e2e"],
     "output_cmp": "txcreatedata1.hex",
     "description": "Creates a new transaction with one input, one address output and one data output"
@@ -294,7 +294,7 @@
     ["-json",
      "-create", "nversion=1",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd",
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK",
      "outdata=4:54686973204f505f52455455524e207472616e73616374696f6e206f7574707574207761732063726561746564206279206d6f646966696564206372656174657261777472616e73616374696f6e2e"],
     "output_cmp": "txcreatedata1.json",
     "description": "Creates a new v1 transaction with one input, one address output and one data output (output in json)"
@@ -303,7 +303,7 @@
     "args":
     ["-create", "nversion=2",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd",
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK",
      "outdata=54686973204f505f52455455524e207472616e73616374696f6e206f7574707574207761732063726561746564206279206d6f646966696564206372656174657261777472616e73616374696f6e2e"],
     "output_cmp": "txcreatedata2.hex",
     "description": "Creates a new transaction with one input, one address output and one data (zero value) output"
@@ -313,7 +313,7 @@
     ["-json",
      "-create", "nversion=2",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd",
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK",
      "outdata=54686973204f505f52455455524e207472616e73616374696f6e206f7574707574207761732063726561746564206279206d6f646966696564206372656174657261777472616e73616374696f6e2e"],
     "output_cmp": "txcreatedata2.json",
     "description": "Creates a new transaction with one input, one address output and one data (zero value) output (output in json)"
@@ -322,7 +322,7 @@
     "args":
     ["-create", "nversion=2",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0:4294967293",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "output_cmp": "txcreatedata_seq0.hex",
     "description": "Creates a new transaction with one input with sequence number and one address output"
   },
@@ -331,7 +331,7 @@
     ["-json",
      "-create", "nversion=2",
      "in=5897de6bd6027a475eadd57019d4e6872c396d0716c4875a5f1a6fcfdf385c1f:0:4294967293",
-     "outaddr=0.18:sT6CehN2zH33iyB92wzum4FJ7gVbwQo9Hd"],
+     "outaddr=0.18:WSQaac68aRe4GCg3V6FD3sYiQMi3wLPqBK"],
     "output_cmp": "txcreatedata_seq0.json",
     "description": "Creates a new transaction with one input with sequence number and one address output (output in json)"
   },

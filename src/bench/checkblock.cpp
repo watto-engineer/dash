@@ -14,7 +14,7 @@
 // These are the two major time-sinks which happen after we have fully received
 // a block off the wire, but before we can relay the block on to peers using
 // compact block relay.
-
+/*
 static void DeserializeBlockTest(benchmark::State& state)
 {
     CDataStream stream((const char*)raw_bench::block813851,
@@ -51,4 +51,4 @@ static void DeserializeAndCheckBlockTest(benchmark::State& state)
 }
 
 BENCHMARK(DeserializeBlockTest, 130);
-BENCHMARK(DeserializeAndCheckBlockTest, 160);
+BENCHMARK(DeserializeAndCheckBlockTest, 160); */
