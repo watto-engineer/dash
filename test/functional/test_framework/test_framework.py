@@ -55,7 +55,7 @@ from .util import (
     get_chain_folder,
 )
 
-WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
 
 class TestStatus(Enum):
     PASSED = 1
@@ -149,7 +149,7 @@ class BitcoinTestFramework():
 
         config = configparser.ConfigParser()
         config.read_file(open(self.options.configfile))
-        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/wagerrd' + config["environment"]["EXEEXT"])
+        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/qt/wagerr-qt' + config["environment"]["EXEEXT"])
         self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/wagerr-cli' + config["environment"]["EXEEXT"])
 
         self.extra_args_from_options = self.options.wagerrd_extra_args
@@ -510,7 +510,7 @@ class BitcoinTestFramework():
         for i in range(self.num_nodes):
             initialize_datadir(self.options.tmpdir, i, self.chain)
 
-MASTERNODE_COLLATERAL = 10000000
+MASTERNODE_COLLATERAL = 25000
 
 
 class MasternodeInfo:
@@ -537,7 +537,7 @@ class WagerrTestFramework(BitcoinTestFramework):
             extra_args = [[]] * num_nodes
         assert_equal(len(extra_args), num_nodes)
         self.extra_args = [copy.deepcopy(a) for a in extra_args]
-        self.extra_args[0] += ["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"]
+        self.extra_args[0] += ["-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH"]
         self.fast_dip3_enforcement = fast_dip3_enforcement
         if fast_dip3_enforcement:
             for i in range(0, num_nodes):
@@ -587,11 +587,11 @@ class WagerrTestFramework(BitcoinTestFramework):
     def create_management_tokens(self):
         self.log.info("Generating Management Tokens...")
         self.nodes[0].generate(280)
-        WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+        WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
         global creditsubgroupID
         MGTAddr=self.nodes[0].getnewaddress()
         GVTAddr=self.nodes[0].getnewaddress()
-        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].importprivkey("TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")

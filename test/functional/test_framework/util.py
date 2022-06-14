@@ -457,7 +457,6 @@ def sync_blocks(rpc_connections, *, wait=1, timeout=60):
     chance it might return before all nodes are stably synced.
     """
     timeout *= Options.timeout_scale
-
     stop_time = time.time() + timeout
     while time.time() <= stop_time:
         best_hash = [x.getbestblockhash() for x in rpc_connections]

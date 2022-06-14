@@ -15,7 +15,7 @@ from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from time import sleep
 
-WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
 
 class Masternode(object):
     pass
@@ -27,7 +27,7 @@ class DIP3Test(WagerrTestFramework):
         self.setup_clean_chain = True
 
         self.extra_args = ["-budgetparams=10:10:10"]
-        self.extra_args += ["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"]
+        self.extra_args += ["-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH"]
         self.extra_args += ["-dip3params=135:150"]
         self.extra_args += ["-reservebalance=12000000"]
 
@@ -68,10 +68,10 @@ class DIP3Test(WagerrTestFramework):
         self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", self.nodes[0].getblockcount())
 
         self.nodes[0].generate(284)
-        WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+        WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
         MGTAddr=self.nodes[0].getnewaddress()
         GVTAddr=self.nodes[0].getnewaddress()
-        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].importprivkey("TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")
@@ -269,13 +269,13 @@ class DIP3Test(WagerrTestFramework):
 
     def create_mn_collateral(self, node, mn):
         mn.collateral_address = node.getnewaddress()
-        mn.collateral_txid = node.sendtoaddress(mn.collateral_address, 10000000)
+        mn.collateral_txid = node.sendtoaddress(mn.collateral_address, 25000)
         mn.collateral_vout = -1
         node.generate(1)
 
         rawtx = node.getrawtransaction(mn.collateral_txid, 1)
         for txout in rawtx['vout']:
-            if txout['value'] == Decimal(10000000):
+            if txout['value'] == Decimal(25000):
                 mn.collateral_vout = txout['n']
                 break
         assert(mn.collateral_vout != -1)
@@ -283,7 +283,7 @@ class DIP3Test(WagerrTestFramework):
     # register a protx MN and also fund it (using collateral inside ProRegTx)
     def register_fund_mn(self, node, mn):
         node.sendtoken(creditsubgroupID, mn.fundsAddr, 1)
-        node.sendtoaddress(mn.fundsAddr, 10000000.001)
+        node.sendtoaddress(mn.fundsAddr, 25000.001)
         mn.collateral_address = node.getnewaddress()
         mn.rewards_address = node.getnewaddress()
         node.generate(1)
@@ -293,7 +293,7 @@ class DIP3Test(WagerrTestFramework):
 
         rawtx = node.getrawtransaction(mn.collateral_txid, 1)
         for txout in rawtx['vout']:
-            if txout['value'] == Decimal(10000000):
+            if txout['value'] == Decimal(25000):
                 mn.collateral_vout = txout['n']
                 break
         assert(mn.collateral_vout != -1)
@@ -320,7 +320,7 @@ class DIP3Test(WagerrTestFramework):
         self.sync_all()
 
     def spend_mn_collateral(self, mn, with_dummy_input_output=False):
-        return self.spend_input(mn.collateral_txid, mn.collateral_vout, 10000000, with_dummy_input_output)
+        return self.spend_input(mn.collateral_txid, mn.collateral_vout, 25000, with_dummy_input_output)
 
     def update_mn_payee(self, mn, payee):
         self.nodes[0].sendtoaddress(mn.fundsAddr, 0.001)
