@@ -22,14 +22,14 @@ Loaded in GUIUtil::loadStyleSheet() in guitil.cpp.
 #00000000
 #555
 #ff005b
-#c2064a
-#a7a7a7
+#f8f6f6
+#ffffff
 #c7c7c7
-#d2d2d2
+#454545;
 #dcdcdc
 #e0e0e0
 #eaeaec
-#f2f2f4
+#ffffff
 #ccfafafa
 
 </colors>
@@ -43,12 +43,12 @@ QDialog,
 QMainWindow,
 QMessageBox
 WalletFrame {
-    background-color: #f2f2f4;
+    background-color: ##b70000;;;
 }
 
 QWidget { /* override text selection background color for all text widgets */
-    selection-color: #eaeaec;
-    selection-background-color: #555;
+    selection-color: #333333;
+    selection-background-color: #fcfcfc;
 }
 
 QCheckBox,
@@ -56,14 +56,14 @@ QLabel,
 QListView,
 QRadioButton,
 QTreeWidget {
-    color: #555;
+    color: #fcfcfc;
 }
 
 QCheckBox:disabled,
 QLabel:disabled,
 QListView:disabled,
 QRadioButton:disabled {
-    color: #c7c7c7;
+    color: #AAAAAA;
 }
 
 /******************************************************
@@ -76,8 +76,8 @@ QComboBox,
 QPlainTextEdit,
 QLineEdit {
     background-color: #eaeaec;
-    border-color: #ff005b;
-    color: #555;
+    border-color: ##b70000;;;
+    color: #fcfcfc;
 }
 
 BitcoinAmountField:hover:!focus,
@@ -86,7 +86,7 @@ QComboBox:hover:!focus,
 QPlainTextEdit:hover:!focus,
 QLineEdit:hover:!focus {
     background-color: #eaeaec;
-    border-color: #c2064a;
+    border-color: #f8f6f6;
 }
 
 
@@ -96,8 +96,8 @@ QComboBox:checked,
 QComboBox:focus,
 QPlainTextEdit:focus,
 QLineEdit:focus {
-    background-color: #d2d2d2;
-    border-color: #c2064a;
+    background-color: #454545;;
+    border-color: #f8f6f6;
 }
 
 BitcoinAmountField:disabled,
@@ -106,8 +106,8 @@ QComboBox:disabled,
 QPlainTextEdit:disabled,
 QLineEdit:disabled {
     background-color: #eaeaec;
-    border-color: #d2d2d2;
-    color: #c7c7c7;
+    border-color: #454545;;
+    color: #AAAAAA;
 }
 
 /******************************************************
@@ -166,7 +166,7 @@ QCalendarWidget,
 #qt_calendar_nextmonth:hover,
 #qt_calendar_monthbutton:hover,
 #qt_calendar_yearbutton:hover {
-    background-color: #d2d2d2;
+    background-color: #454545;;
 }
 
 #qt_calendar_prevmonth {
@@ -177,21 +177,21 @@ QCalendarWidget,
 }
 
 QCalendarWidget QToolButton {
-    color: #555;
+    color: #fcfcfc;
 }
 
 QCalendarWidget QWidget {
-    alternate-background-color: #c7c7c7;
+    alternate-background-color: #AAAAAA;
 }
 
 QCalendarWidget QAbstractItemView:enabled {
-    color: #555;
-    selection-background-color: #d2d2d2;
-    selection-color: #555;
+    color: #fcfcfc;
+    selection-background-color: #454545;;
+    selection-color: #fcfcfc;
 }
 
 QCalendarWidget QAbstractItemView:disabled {
-    color: #a7a7a7;
+    color: #ffffff;
 }
 
 /******************************************************
@@ -234,20 +234,20 @@ QComboBox
 ******************************************************/
 
 QComboBox QListView {
-    background-color: #f2f2f4;
-    color: #555;
+    background-color: #ffffff;
+    color: #fcfcfc;
 }
 
 QComboBox::item {
-    color: #555;
+    color: #fcfcfc;
 }
 
 QComboBox::item:alternate {
-    background-color: #f2f2f4;
+    background-color: #fcfcfc;
 }
 
-QComboBox::item:selected {
-    background-color: #d2d2d2;
+::item:selected {
+    background-color: #f2f2f2;;
 }
 
 QComboBox::down-arrow {
@@ -268,8 +268,8 @@ QGroupBox
 ******************************************************/
 
 QGroupBox {
-    background-color: #f2f2f4;
-    color: #555;
+    background-color: #fcfcfc;
+    color: #330;
 }
 
 /******************************************************
@@ -277,14 +277,14 @@ QHeaderView
 ******************************************************/
 
 QHeaderView::section { /* Table Header Sections */
-    background-color: #ff005b;
-    border-color: #f2f2f4;
-    color: #f2f2f4;
+    background-color: ##b70000;;;
+    border-color: #ffffff;
+    color: #fff;
 }
 
 QHeaderView::section:hover { /* Table Header Sections */
-    background-color: #c2064a;
-    color: #f2f2f4;
+    background-color: #f8f6f6;
+    color: #ffffff;
 }
 
 /******************************************************
@@ -298,24 +298,24 @@ QMenu
 ******************************************************/
 
 QMenu {
-    background-color: #31353c;
-    border-color: #31353c;
+    background-color: #f8f6f6;
+    border-color: #f8f6f6;
 }
 
 QMenu::item {
-    color: #000000;
+    color: #330;
 }
 
 QMenu::item:selected:!disabled {
-    background-color: #d2d2d2;
+    background-color: #f2f0f0;;
 }
 
 QMenu::item:disabled {
-    color: #a7a7a7;
+    color: #ffffff;
 }
 
 QMenu::separator {
-    background-color: #c7c7c7;
+    background-color: #AAAAAA;
 }
 
 /******************************************************
@@ -323,7 +323,7 @@ QMenuBar
 ******************************************************/
 
 QMenuBar {
-    background-color: #f2f2f4;
+    background-color: #fff;
 }
 
 /******************************************************
@@ -331,13 +331,13 @@ QProgressBar
 ******************************************************/
 
 QProgressBar {
-    background-color: #c7c7c7;
-    border-color: #00000000;
-    color: #00000000;
+    background-color: #AAAAAA;
+    border-color: #AAAAAA;
+    color: #AAAAAA;
 }
 
 QProgressBar::chunk {
-    background-color: #ff005b;
+    background-color: ##b70000;;;
 }
 
 /******************************************************
@@ -345,7 +345,7 @@ QProgressDialog
 ******************************************************/
 
 .QProgressDialog {
-    background-color: #f2f2f4;
+    background-color: #ffffff;
 }
 
 /******************************************************
@@ -353,22 +353,22 @@ QPushButton
 ******************************************************/
 
 QPushButton {
-    background-color: #ff005b;
-    color: #f2f2f4;
+    background-color: #b70000;;
+    color: #ffffff;
 }
 
 QPushButton:hover {
-    background-color: #c2064a;
+    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #ffffff, stop: 0.1 #ffffff, stop: 0.101 #454545, stop: 0.9 #454545, stop: 0.901 #ffffff, stop: 1 #ffffff);
 }
 
 QPushButton:pressed {
-    background-color: #ff005b;
+    background-color: ##b70000;;;
 }
 
 QPushButton:disabled {
     background-color: #eaeaec;
-    border-color: #d2d2d2;
-    color: #d2d2d2;
+    border-color: #454545;;
+    color: #454545;;
 }
 
 /******************************************************
@@ -388,8 +388,8 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM {
-    background-color: #c7c7c7;
-    color: #555;
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    color: #616161;
 }
 
 QWidget#AddressBookPage QPushButton#newAddress:hover,
@@ -405,8 +405,7 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:hover,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:hover,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:hover,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:hover {
-    background-color: #a7a7a7;
-    color: #555;
+    background-color: #F8F6F6;
 }
 
 QWidget#AddressBookPage QPushButton#newAddress:pressed,
@@ -422,8 +421,7 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:pressed,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:pressed,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:pressed,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:pressed {
-    background-color: #c7c7c7;
-    color: #555;
+    background-color: #AAAAAA;
 }
 
 QWidget#AddressBookPage QPushButton#newAddress:disabled,
@@ -439,9 +437,7 @@ QWidget#ReceiveCoinsDialog .QFrame#frame2 QPushButton#clearButton:disabled,
 QWidget#ReceiveCoinsDialog .QFrame#frame QPushButton#showRequestButton:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_SM:disabled,
 QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:disabled {
-    background-color: #eaeaec;
-    border-color: #d2d2d2;
-    color: #d2d2d2;
+    background-color:#F8F6F6;
 }
 
 /******************************************************
@@ -464,8 +460,8 @@ QPushButton - Special case, tabbar replacement buttons
 /* Sign/Verify dialog buttons */
 #btnSignMessage,
 #btnVerifyMessage {
-    border-color: #ff005b;
-    color: #a7a7a7;
+    border-color: ##b70000;;;
+    color: #ffffff;
 }
 
 /* Debug window buttons */
@@ -484,8 +480,8 @@ QPushButton - Special case, tabbar replacement buttons
 /* Sign/Verify dialog buttons */
 #btnSignMessage:hover:checked,
 #btnVerifyMessage:hover:checked {
-    border-color: #555;
-    color: #555;
+    border-color: #fcfcfc;
+    color: #fcfcfc;
 }
 
 /* Debug window buttons */
@@ -504,8 +500,8 @@ QPushButton - Special case, tabbar replacement buttons
 /* Sign/Verify dialog buttons */
 #btnSignMessage:hover:!checked,
 #btnVerifyMessage:hover:!checked {
-    border-color: #c2064a;
-    color: #555;
+    border-color: #f8f6f6;
+    color: #fcfcfc;
 }
 
 /* Debug window buttons */
@@ -524,8 +520,8 @@ QPushButton - Special case, tabbar replacement buttons
 /* Sign/Verify dialog buttons */
 #btnSignMessage:checked,
 #btnVerifyMessage:checked {
-    border-color: #555;
-    color: #555;
+    border-color: #fcfcfc;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -574,16 +570,16 @@ QSlider
 ******************************************************/
 
 QSlider::handle:horizontal {
-	background-color: #ff005b;
+	background-color: ##b70000;;;
 }
 QSlider::handle:horizontal:hover {
-	background-color: #c2064a;
+	background-color: #f8f6f6;
 }
 QSlider::sub-page:horizontal {
-	background-color: #c7c7c7;
+	background-color: #AAAAAA;
 }
 QSlider::add-page:horizontal {
-	background-color: #c7c7c7;
+	background-color: #AAAAAA;
 }
 
 /******************************************************
@@ -591,8 +587,8 @@ QStatusBar
 ******************************************************/
 
 QStatusBar {
-    background-color: #f2f2f4;
-    color: #555;
+    background-color: #ffffff;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -606,13 +602,13 @@ QTableView
 
 QTableView::item { /* Table Item */
     background-color: #eaeaec;
-    border-color: #c7c7c7;
+    border-color: #AAAAAA;
 }
 
 QTableView::item:selected { /* Table Item Selected */
-    background-color: #d2d2d2;
-    border-color: #d2d2d2;
-    color: #555;
+    background-color: #454545;;
+    border-color: #454545;;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -622,7 +618,7 @@ QTableWidget
 .QTableWidget {
     background-color: #eaeaec;
     border-color: #dcdcdc;
-    color: #555;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -638,7 +634,7 @@ QTextEdit
 QTextEdit {
     background-color: #eaeaec;
     border-color: #dcdcdc;
-    color: #555;
+    color: #fcfcfc;
 }
 
 
@@ -657,12 +653,12 @@ QToolBar > QToolButton {
 
 QToolBar > QToolButton:hover:!checked {
     background-color: #11161d;
-    color: #ff005b;
+    color: ##b70000;;;
 }
 
 QToolBar > QToolButton:checked {
     background-color: #11161D;
-    color: #ff005b;
+    color: ##b70000;;;
 }
 
 QToolBar > QToolButton:disabled {
@@ -675,8 +671,8 @@ QToolTip
 
 QToolTip {
     background-color: #eaeaec;
-    border-color: #555;
-    color: #555;
+    border-color: #fcfcfc;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -758,7 +754,7 @@ AddressBookPage
 ******************************************************/
 
 AddressBookPage QTableView {
-    color: #555;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -786,15 +782,15 @@ CoinControlDialog
 ******************************************************/
 
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item {
-    border-color: #c7c7c7;
+    border-color: #AAAAAA;
 }
 
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:selected,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:checked,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:selected,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:checked  {
-    background-color: #d2d2d2;
-    color: #555;
+    background-color: #454545;;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -827,8 +823,8 @@ QWidget#bgWidget { /* The frame overlaying the overview-page */
 }
 
 QWidget#contentWidget { /* The actual content with the text/buttons/etc... */
-    background-color: #f2f2f4;
-    border-color: #c7c7c7;
+    background-color: #ffffff;
+    border-color: #AAAAAA;
 }
 
 /******************************************************
@@ -869,7 +865,7 @@ ReceiveCoinsDialog
 ******************************************************/
 
 ReceiveCoinsDialog QTableView {
-    color: #555;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -877,11 +873,11 @@ RPCConsole
 ******************************************************/
 
 QWidget#RPCConsole { /* RPC Console Dialog Box */
-    background-color: #f2f2f4;
+    background-color: #ffffff;
 }
 
 RPCConsole QTableView {
-    color: #555;
+    color: #fcfcfc;
 }
 
 #rpcAutoCompleter {
@@ -890,12 +886,12 @@ RPCConsole QTableView {
 }
 
 #rpcAutoCompleter::item {
-    color: #555;
+    color: #fcfcfc;
 }
 
 #rpcAutoCompleter::item:selected {
-    background-color: #d2d2d2;
-    color: #555;
+    background-color: #454545;;
+    color: #fcfcfc;
 }
 
 /******************************************************
@@ -924,7 +920,7 @@ ShutdownWindow
 ******************************************************/
 
 QWidget#ShutdownWindow {
-    background-color: #f2f2f4;
+    background-color: #ffffff;
 }
 
 /******************************************************
@@ -967,7 +963,7 @@ QScrollBar
 
 QScrollBar::add-page,
 QScrollBar::sub-page {
-    background-color: #f2f2f4;
+    background-color: #ffffff;
 }
 QScrollBar::handle:vertical,
 QScrollBar::handle:horizontal {
@@ -975,11 +971,11 @@ QScrollBar::handle:horizontal {
 }
 QScrollBar:handle:horizontal:hover,
 QScrollBar:handle:vertical:hover {
-    background-color: #d2d2d2;
+    background-color: #454545;;
 }
 QScrollBar:handle:horizontal:pressed,
 QScrollBar:handle:vertical:pressed {
-    background-color: #c7c7c7;
+    background-color: #AAAAAA;
 }
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical,
@@ -991,7 +987,7 @@ QScrollBar::add-line:vertical:hover,
 QScrollBar::sub-line:vertical:hover,
 QScrollBar::add-line:horizontal:hover,
 QScrollBar::sub-line:horizontal:hover {
-    background-color: #d2d2d2;
+    background-color: #454545;;
 }
 QScrollBar::add-line:vertical:pressed,
 QScrollBar::sub-line:vertical:pressed,
