@@ -15,7 +15,9 @@ class ImportPrunedFundsTest(BitcoinTestFramework):
     def run_test(self):
         self.log.info("Mining blocks...")
         self.nodes[0].generate(101)
-
+        self.stop_node(1)
+        self.start_node(1)
+        connect_nodes_bi(self.nodes, 0 , 1)
         self.sync_all()
 
         # address

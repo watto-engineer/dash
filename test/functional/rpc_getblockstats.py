@@ -105,6 +105,7 @@ class GetblockstatsTest(BitcoinTestFramework):
             self.load_test_data(test_data)
 
         self.sync_all()
+        breakpoint()
         stats = self.get_stats()
         expected_stats_noindex = []
         for stat_row in stats:

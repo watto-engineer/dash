@@ -83,6 +83,13 @@ class MinimumChainWorkTest(BitcoinTestFramework):
         # we'd expect node1 to have disconnected node0 for serving an
         # insufficient work chain, in which case we'd need to reconnect them to
         # continue the test.
+        self.stop_node(1)
+        self.stop_node(2)
+        self.start_node(1)
+        self.start_node(2)
+        connect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[1], 2)
 
         self.sync_all()
         self.log.info("Blockcounts: %s", [n.getblockcount() for n in self.nodes])

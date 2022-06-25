@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test deprecation of RPC calls."""
 from test_framework.test_framework import BitcoinTestFramework
-from test_framework.util import assert_raises_rpc_error
+from test_framework.util import assert_raises_rpc_error, connect_nodes_bi, disconnect_nodes
 
 class DeprecatedRpcTest(BitcoinTestFramework):
     def set_test_params(self):
@@ -21,7 +21,7 @@ class DeprecatedRpcTest(BitcoinTestFramework):
         # self.nodes[1].createmultisig(1, [self.nodes[1].getnewaddress()])
 
         self.log.info("Test validateaddress deprecation")
-        SOME_ADDRESS = "TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt"  # This is just some random address to pass as a parameter to validateaddress
+        SOME_ADDRESS = "TPEdK89Rwds4rxdbBApYCKM6AQPcDZf8qh"  # This is just some random address to pass as a parameter to validateaddress
         dep_validate_address = self.nodes[0].validateaddress(SOME_ADDRESS)
         assert "ismine" not in dep_validate_address
         not_dep_val = self.nodes[1].validateaddress(SOME_ADDRESS)
@@ -48,6 +48,9 @@ class DeprecatedRpcTest(BitcoinTestFramework):
         #
         address0 = self.nodes[0].getnewaddress()
         self.nodes[0].generatetoaddress(101, address0)
+        disconnect_nodes(self.nodes[0], 1)
+        disconnect_nodes(self.nodes[1], 0)
+        connect_nodes_bi(self.nodes, 0, 1)
         self.sync_all()
         address1 = self.nodes[1].getnewaddress()
         self.nodes[1].generatetoaddress(101, address1)

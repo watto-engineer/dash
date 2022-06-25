@@ -99,7 +99,7 @@ class P2PFingerprintTest(BitcoinTestFramework):
             node0.send_and_ping(msg_block(block))
 
         # Check that reorg succeeded
-        assert_equal(self.nodes[0].getblockcount(), 13)
+        assert_equal(self.nodes[0].getblockcount(), 10)
 
         stale_hash = int(block_hashes[-1], 16)
 
@@ -116,7 +116,7 @@ class P2PFingerprintTest(BitcoinTestFramework):
         # Longest chain is extended so stale is much older than chain tip
         self.nodes[0].setmocktime(0)
         tip = self.nodes[0].generate(nblocks=1)[0]
-        assert_equal(self.nodes[0].getblockcount(), 14)
+        assert_equal(self.nodes[0].getblockcount(), 11)
 
         # Send getdata & getheaders to refresh last received getheader message
         block_hash = int(tip, 16)

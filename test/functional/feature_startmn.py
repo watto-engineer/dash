@@ -10,13 +10,13 @@ from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from test_framework.blocktools import *
 
-WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
 
 class WalletTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True
-        self.extra_args = [['-sporkkey=TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH'],[]]
+        self.extra_args = [['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],[]]
 
     def setup_network(self):
         self.add_nodes(2, self.extra_args, stderr=sys.stdout)
@@ -27,9 +27,9 @@ class WalletTest(WagerrTestFramework):
 
     def run_test(self):
         self.log.info("Importing token management privkey...")
-        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
-        privkey = self.nodes[0].dumpprivkey("TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U")
-        assert_equal(privkey, "TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].importprivkey("TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
+        privkey = self.nodes[0].dumpprivkey("TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk")
+        assert_equal(privkey, "TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
 
         self.log.info("Mining blocks...")
         self.nodes[0].generate(16)
@@ -45,7 +45,7 @@ class WalletTest(WagerrTestFramework):
         self.nodes[0].generate(300)
 
         self.log.info("Funding token management address...")
-        self.nodes[0].sendtoaddress("TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U", 1)
+        self.nodes[0].sendtoaddress("TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk", 1)
 
         self.log.info("Mining blocks...")
         self.nodes[0].generate(1)
@@ -120,14 +120,17 @@ class WalletTest(WagerrTestFramework):
 
         rawtx = self.nodes[0].getrawtransaction(mn01_collateral_txid, 1)
         for txout in rawtx['vout']:
-            if txout['value'] == Decimal(10000000):
+            if txout['value'] == Decimal(25000):
                 mn01_collateral_vout = txout['n']
                 break
         assert(mn01_collateral_vout != -1)
 
         self.log.info("mn01_protx_hash:")
         self.log.info(mn01_protx_hash)
-
+        disconnect_nodes(0,1) 
+        disconnect_nodes(1,0) 
+        time.sleep(10)
+        connect_nodes_bi(self.nodes,0,1)
         self.sync_all()
         self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", self.nodes[0].getblockcount() + 1)
         self.wait_for_sporks_same()

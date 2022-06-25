@@ -116,7 +116,7 @@ class WalletDumpTest(BitcoinTestFramework):
         assert_equal(found_addr, test_addr_count)  # all keys must be in the dump
         # This is 1, not 2 because we aren't testing for witness scripts
         assert_equal(found_script_addr, 1)  # all scripts must be in the dump
-        assert_equal(found_addr_chg, 50)  # 50 blocks where mined
+        assert_equal(found_addr_chg, 50)  # 50 blocks were mined
         assert_equal(found_addr_rsv, 180)  # keypool size (external+internal)
 
         #encrypt wallet, restart, unlock and dump

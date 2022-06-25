@@ -49,6 +49,12 @@ class SpentIndexTest(BitcoinTestFramework):
 
         self.log.info("Mining blocks...")
         self.nodes[0].generate(105)
+        disconnect_nodes(self.nodes[0], 1)
+        disconnect_nodes(self.nodes[0], 2)
+        disconnect_nodes(self.nodes[0], 3)
+        connect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[0], 3)
         self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
@@ -57,12 +63,12 @@ class SpentIndexTest(BitcoinTestFramework):
         # Check that
         self.log.info("Testing spent index...")
 
-        privkey = "cU4zhap7nPJAWeMFu4j6jLrfPmqakDAzy8zn8Fhb3oEevdm4e5Lc"
+        privkey = "THTeyaP8QLTG8zwG1AdYrnWqCaaAjbj7TcW9xRhJ7n6LRLCeg6Bc"
         addressHash = binascii.unhexlify("C5E4FB9171C22409809A3E8047A29C83886E325D")
         scriptPubKey = CScript([OP_DUP, OP_HASH160, addressHash, OP_EQUALVERIFY, OP_CHECKSIG])
         unspent = self.nodes[0].listunspent()
         tx = CTransaction()
-        tx_fee = Decimal('0.00001')
+        tx_fee = Decimal('0.00011')
         tx_fee_sat = int(tx_fee * COIN)
         amount = int(unspent[0]["amount"] * COIN) - tx_fee_sat
         tx.vin = [CTxIn(COutPoint(int(unspent[0]["txid"], 16), unspent[0]["vout"]))]

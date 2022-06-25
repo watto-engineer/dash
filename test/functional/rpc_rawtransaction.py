@@ -50,6 +50,13 @@ class RawTransactionsTest(BitcoinTestFramework):
     def run_test(self):
         self.log.info('prepare some coins for multiple *rawtransaction commands')
         self.nodes[2].generate(1)
+        self.stop_node(1)
+        self.stop_node(2)
+        self.start_node(1)
+        self.start_node(2)
+        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes_bi(self.nodes, 0, 2)
+        connect_nodes_bi(self.nodes, 1, 2)
         self.sync_all()
         self.nodes[0].generate(101)
         self.sync_all()

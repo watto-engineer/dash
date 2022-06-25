@@ -41,22 +41,32 @@ class WalletTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
 
         walletinfo = self.nodes[0].getwalletinfo()
-        assert_equal(walletinfo['immature_balance'], 500)
+        assert_equal(walletinfo['immature_balance'], 947000000.00000000)
         assert_equal(walletinfo['balance'], 0)
-
-        self.sync_all(self.nodes[0:3])
+        self.stop_node(1)
+        self.stop_node(2)
+        self.stop_node(3)
+        self.start_node(1)
+        self.start_node(2)
+        self.start_node(3)
+        connect_nodes_bi(self.nodes, 0, 1) 
+        connect_nodes_bi(self.nodes, 0, 2) 
+        connect_nodes_bi(self.nodes, 0, 3) 
+        connect_nodes_bi(self.nodes, 1, 2) 
+        connect_nodes_bi(self.nodes, 1, 3) 
+        connect_nodes_bi(self.nodes, 2, 3) 
         self.nodes[1].generate(101)
         self.sync_all(self.nodes[0:3])
 
-        assert_equal(self.nodes[0].getbalance(), 500)
-        assert_equal(self.nodes[1].getbalance(), 500)
+        assert_equal(self.nodes[0].getbalance(), 947000000)
+        assert_equal(self.nodes[1].getbalance(), 760000)
         assert_equal(self.nodes[2].getbalance(), 0)
 
         # Check getbalance with different arguments
-        assert_equal(self.nodes[0].getbalance("*"), 500)
-        assert_equal(self.nodes[0].getbalance("*", 1), 500)
-        assert_equal(self.nodes[0].getbalance("*", 1, True), 500)
-        assert_equal(self.nodes[0].getbalance(minconf=1), 500)
+        assert_equal(self.nodes[0].getbalance("*"), 947000000)
+        assert_equal(self.nodes[0].getbalance("*", 1), 947000000)
+        assert_equal(self.nodes[0].getbalance("*", 1, True), 947000000)
+        assert_equal(self.nodes[0].getbalance(minconf=1), 947000000)
 
         # first argument of getbalance must be excluded or set to "*"
         assert_raises_rpc_error(-32, "dummy first argument must be excluded or set to \"*\"", self.nodes[0].getbalance, "")
@@ -64,7 +74,7 @@ class WalletTest(BitcoinTestFramework):
         # Check that only first and second nodes have UTXOs
         utxos = self.nodes[0].listunspent()
         assert_equal(len(utxos), 1)
-        assert_equal(len(self.nodes[1].listunspent()), 1)
+        assert_equal(len(self.nodes[1].listunspent()), 86)
         assert_equal(len(self.nodes[2].listunspent()), 0)
 
         self.log.info("test gettxout")
@@ -72,9 +82,9 @@ class WalletTest(BitcoinTestFramework):
         # First, outputs that are unspent both in the chain and in the
         # mempool should appear with or without include_mempool
         txout = self.nodes[0].gettxout(txid=confirmed_txid, n=confirmed_index, include_mempool=False)
-        assert_equal(txout['value'], 500)
+        assert_equal(txout['value'], 947000000)
         txout = self.nodes[0].gettxout(txid=confirmed_txid, n=confirmed_index, include_mempool=True)
-        assert_equal(txout['value'], 500)
+        assert_equal(txout['value'], 947000000)
 
         # Send 210 WAGERR from 0 to 2 using sendtoaddress call.
         # Second transaction will be child of first, and will require a fee
@@ -85,7 +95,7 @@ class WalletTest(BitcoinTestFramework):
         # utxo spent in mempool should be visible if you exclude mempool
         # but invisible if you include mempool
         txout = self.nodes[0].gettxout(confirmed_txid, confirmed_index, False)
-        assert_equal(txout['value'], 500)
+        assert_equal(txout['value'], 947000000)
         txout = self.nodes[0].gettxout(confirmed_txid, confirmed_index, True)
         assert txout is None
         # new utxo from mempool should be invisible if you exclude mempool
@@ -138,7 +148,7 @@ class WalletTest(BitcoinTestFramework):
 
         # node0 should end up with 1000 WAGERR in block rewards plus fees, but
         # minus the 210 plus fees sent to node2
-        assert_equal(self.nodes[0].getbalance(), 1000-210)
+        assert_equal(self.nodes[0].getbalance(), 947010000-210)
         assert_equal(self.nodes[2].getbalance(), 210)
 
         # Node0 should have two unspent outputs.
@@ -147,7 +157,7 @@ class WalletTest(BitcoinTestFramework):
         node0utxos = self.nodes[0].listunspent(1)
         assert_equal(len(node0utxos), 2)
 
-        fee_per_input = Decimal('0.00001')
+        fee_per_input = Decimal('0.00002')
         totalfee = 0
         # create both transactions
         txns_to_send = []
@@ -169,7 +179,7 @@ class WalletTest(BitcoinTestFramework):
         self.sync_all(self.nodes[0:3])
 
         assert_equal(self.nodes[0].getbalance(), 0)
-        assert_equal(self.nodes[2].getbalance(), 1000 - totalfee)
+        assert_equal(self.nodes[2].getbalance(), 947010000 - totalfee)
 
         # Verify that a spent output cannot be locked anymore
         spent_0 = {"txid": node0utxos[0]["txid"], "vout": node0utxos[0]["vout"]}
@@ -177,9 +187,10 @@ class WalletTest(BitcoinTestFramework):
 
         # Send 100 WAGERR normal
         address = self.nodes[0].getnewaddress("test")
-        fee_per_byte = Decimal('0.00001') / 1000
+        fee_per_byte = Decimal('0.00002') / 1000
         self.nodes[2].settxfee(fee_per_byte * 1000)
         txid = self.nodes[2].sendtoaddress(address, 100, "", "", False)
+        breakpoint()
         self.nodes[2].generate(1)
         self.sync_all(self.nodes[0:3])
         node_2_bal = self.check_fee_amount(self.nodes[2].getbalance(), Decimal('900') - totalfee, fee_per_byte, count_bytes(self.nodes[2].getrawtransaction(txid)))

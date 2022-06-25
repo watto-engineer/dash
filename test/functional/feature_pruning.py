@@ -61,7 +61,7 @@ class PruneTest(BitcoinTestFramework):
     def create_big_chain(self):
         # Start by creating some coinbases we can spend later
         self.nodes[1].generate(200)
-        self.sync_blocks(self.nodes[0:2])
+        connect_nodes(self.nodes[0], 1)
         self.nodes[0].generate(150)
         # Then mine enough full blocks to create more than 550MiB of data
         for i in range(645):

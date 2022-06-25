@@ -149,7 +149,7 @@ class BitcoinTestFramework():
 
         config = configparser.ConfigParser()
         config.read_file(open(self.options.configfile))
-        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/wagerrd' + config["environment"]["EXEEXT"])
+        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src//wagerrd' + config["environment"]["EXEEXT"])
         self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/wagerr-cli' + config["environment"]["EXEEXT"])
 
         self.extra_args_from_options = self.options.wagerrd_extra_args
@@ -478,6 +478,8 @@ class BitcoinTestFramework():
                     for j in range(25):
                         set_node_times(self.nodes, block_time)
                         self.nodes[peer].generate(1)
+                        self.stop_node(peer)
+                        self.start_node(peer)
                         block_time += 62
                     # Must sync before next peer starts generating blocks
                     self.sync_blocks()

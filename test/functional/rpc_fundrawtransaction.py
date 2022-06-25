@@ -55,6 +55,18 @@ class RawTransactionsTest(BitcoinTestFramework):
         feeTolerance = 2 * min_relay_tx_fee/1000
 
         self.nodes[2].generate(1)
+        self.stop_node(1)
+        self.stop_node(2)
+        self.stop_node(3)
+        self.start_node(1)
+        self.start_node(2)
+        self.start_node(3)
+        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes_bi(self.nodes, 0, 2)
+        connect_nodes_bi(self.nodes, 0, 3)
+        connect_nodes_bi(self.nodes, 1, 2)
+        connect_nodes_bi(self.nodes, 1, 3)
+        connect_nodes_bi(self.nodes, 2, 3)
         self.sync_all()
         self.nodes[0].generate(121)
         self.sync_all()

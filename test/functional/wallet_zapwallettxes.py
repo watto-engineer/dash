@@ -18,6 +18,7 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
+    connect_nodes_bi,
 )
 from test_framework.mininode import wait_until
 
@@ -29,6 +30,9 @@ class ZapWalletTXesTest (BitcoinTestFramework):
     def run_test(self):
         self.log.info("Mining blocks...")
         self.nodes[0].generate(1)
+        self.stop_node(1)
+        self.start_node(1)
+        connect_nodes_bi(self.nodes, 0, 1)
         self.sync_all()
         self.nodes[1].generate(100)
         self.sync_all()

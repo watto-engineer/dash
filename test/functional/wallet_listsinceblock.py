@@ -5,7 +5,8 @@
 """Test the listsincelast RPC."""
 
 from test_framework.test_framework import BitcoinTestFramework
-from test_framework.util import assert_equal, assert_array_result, assert_raises_rpc_error
+from test_framework.util import assert_equal, assert_array_result, assert_raises_rpc_error, connect_nodes_bi
+from time import sleep
 
 class ListSinceBlockTest (BitcoinTestFramework):
     def set_test_params(self):
@@ -14,6 +15,19 @@ class ListSinceBlockTest (BitcoinTestFramework):
 
     def run_test(self):
         self.nodes[2].generate(101)
+        self.stop_node(0)
+        self.stop_node(1)
+        self.stop_node(3)
+        self.start_node(0)
+        self.start_node(1)
+        self.start_node(3)
+        sleep(10)
+        connect_nodes_bi(self.nodes, 0 , 1)
+        connect_nodes_bi(self.nodes, 0 , 2)
+        connect_nodes_bi(self.nodes, 0 , 3)
+        connect_nodes_bi(self.nodes, 1 , 2)
+        connect_nodes_bi(self.nodes, 1 , 3)
+        connect_nodes_bi(self.nodes, 2 , 3)
         self.sync_all()
 
         self.test_no_blockhash()
@@ -255,7 +269,6 @@ class ListSinceBlockTest (BitcoinTestFramework):
         self.nodes[2].generate(2)
 
         self.join_network()
-
         self.sync_all()
 
         # gettransaction should work for txid1
@@ -264,6 +277,7 @@ class ListSinceBlockTest (BitcoinTestFramework):
         # listsinceblock(lastblockhash) should now include txid1 in transactions
         # as well as in removed
         lsbres = self.nodes[0].listsinceblock(lastblockhash)
+        breakpoint()
         assert any(tx['txid'] == txid1 for tx in lsbres['transactions'])
         assert any(tx['txid'] == txid1 for tx in lsbres['removed'])
 

@@ -42,19 +42,19 @@ class WalletLabelsTest(BitcoinTestFramework):
         # the same address, so we call twice to get two addresses w/500 each
         node.generate(1)
         node.generate(101)
-        assert_equal(node.getbalance(), 1000)
+        assert_equal(node.getbalance(), 947760000)
 
         # there should be 2 address groups
         # each with 1 address with a balance of 500 Wagerr
         address_groups = node.listaddressgroupings()
-        assert_equal(len(address_groups), 2)
+        assert_equal(len(address_groups), 102)
         # the addresses aren't linked now, but will be after we send to the
         # common address
         linked_addresses = set()
         for address_group in address_groups:
             assert_equal(len(address_group), 1)
             assert_equal(len(address_group[0]), 2)
-            assert_equal(address_group[0][1], 500)
+            assert_equal(address_group[0][1], 10000.00000000)
             linked_addresses.add(address_group[0][0])
 
         # send 500 from each address to a third address not in this wallet

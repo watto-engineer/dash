@@ -16,7 +16,7 @@ from decimal import Decimal
 from test_framework.blocktools import create_coinbase
 from test_framework.mininode import CBlock
 from test_framework.test_framework import BitcoinTestFramework
-from test_framework.util import assert_equal, assert_raises_rpc_error
+from test_framework.util import assert_equal, assert_raises_rpc_error, connect_nodes_bi, disconnect_nodes
 
 def b2x(b):
     return b2a_hex(b).decode('ascii')
@@ -35,6 +35,9 @@ class MiningTest(BitcoinTestFramework):
     def run_test(self):
         node = self.nodes[0]
         self.nodes[0].generate(200)
+        disconnect_nodes(self.nodes[0],1)
+        disconnect_nodes(self.nodes[1],0)
+        connect_nodes_bi(self.nodes,0,1)
         self.sync_all()
         self.log.info('getmininginfo')
         mining_info = node.getmininginfo()

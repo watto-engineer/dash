@@ -27,43 +27,43 @@ class MultiKeySporkTest(BitcoinTestFramework):
         self.is_network_split = False
 
     def setup_network(self):
-        # secret(base58): NNaCsaiaNDc5GFEp8bXVngvxeKazj7HVPXH8n6ywHWrDRomj4yor
+        # secret(base58): TD1oyPKTwkCQjugLVy3QCzgHgKTdGvLg1BiGAd7wdCnJDYPijnKA
         # keyid(hex): 60f0f57f71f0081f1aacdd8432340a33a526f91b
-        # address(base58): TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt
+        # address(base58): TVkNnmvXDG7PSpqkuey8rC9qXMvSKWpYnb
 
-        # secret(base58): NQhNc5UpCiPRrwE6HvnYuHz7i8aNwUm6QoMv5xUPk7HWsfSupVjq
+        # secret(base58): THP5qnU3d4t3o1hR4zq1ejGWPqKFws3kvzV35eK5CokZmXTE2cyr
         # keyid(hex): 43dff2b09de2f904f688ec14ee6899087b889ad0
-        # address(base58): TxWap683gHnERvK86W4DNZUHPeaR8XvSXx
+        # address(base58): TC718jAVnKZMk2nkF1GJAAW6kXZ3w6LZcu
 
-        # secret(base58): NRzqHHPT5NHy4NZhfNqGj3w4JLyU7KGGFKTja6vx5KoTsaCVZvwZ
+        # secret(base58): TBeGp82H5rCdSHMRJwtrXfc7KpbxM5KZYb8L9F4E3fQkrJDJpu7s
         # keyid(hex): d9aa5fa00cce99101a4044e65dc544d1579890de
-        # address(base58): TxSr9mDxoC4u4Q1UqqzWvnQzvMWYyiYeeQ
+        # address(base58): TRBjcmyE9YBfvWxCDRTpL41sUzxCj6nnMi
 
-        # secret(base58): NPo1astJDM7LEDkUVViqScS2oXmxGGGxpKTQjDanYRqYyXV6jcPE
+        # secret(base58): THXf1NqkvtgiVk23Z4Ns6TFDQ4XNVDuzD7jPk2nh4fwwauUqXZeC
         # keyid(hex): 0b23935ce0bea3b997a334f6fa276c9fa17687b2
-        # address(base58): TxCQxNd4qmJJjREV8cf6GgRDWd69KGh5G9
+        # address(base58): TYd2UH2v5eeHYV7REaHfkGsnMMFcYgL9vc
 
-        # secret(base58): NJeFmk3hhB8PKoYSE9R5RKqcEyqFiKmjPtQmHitxgifAJtRdUZ7M
+        # secret(base58): TL1z4PKdMmLtMnmBQsTXE3bvuuYWm7DTDPmE7wFjCx2fFs7pcocQ
         # keyid(hex): 1d1098b2b1f759b678a0a7a098637a9b898adcac
-        # address(base58): Tx2n9FNwoNCKdCUtfbnqLcLgPao3bpGjCp
+        # address(base58): TSXFddherPjT1Y1pdpwJsLXM7QBYufxPHQ
 
         self.add_nodes(5)
 
-        spork_chain_params =   ["-sporkaddr=TxSr9mDxoC4u4Q1UqqzWvnQzvMWYyiYeeQ",
-                                "-sporkaddr=TxWap683gHnERvK86W4DNZUHPeaR8XvSXx",
-                                "-sporkaddr=TZMsX7b1FAjJvnP78y7ChjpSMZ1N2zCDGt",
-                                "-sporkaddr=TxCQxNd4qmJJjREV8cf6GgRDWd69KGh5G9",
-                                "-sporkaddr=Tx2n9FNwoNCKdCUtfbnqLcLgPao3bpGjCp",
+        spork_chain_params =   ["-sporkaddr=TRBjcmyE9YBfvWxCDRTpL41sUzxCj6nnMi",
+                                "-sporkaddr=TC718jAVnKZMk2nkF1GJAAW6kXZ3w6LZcu",
+                                "-sporkaddr=TVkNnmvXDG7PSpqkuey8rC9qXMvSKWpYnb",
+                                "-sporkaddr=TYd2UH2v5eeHYV7REaHfkGsnMMFcYgL9vc",
+                                "-sporkaddr=TSXFddherPjT1Y1pdpwJsLXM7QBYufxPHQ",
                                 "-minsporkkeys=3"]
 
         # Node0 extra args to use on normal node restarts
-        self.node0_extra_args = ["-sporkkey=NNaCsaiaNDc5GFEp8bXVngvxeKazj7HVPXH8n6ywHWrDRomj4yor"] + spork_chain_params
+        self.node0_extra_args = ["-sporkkey=TD1oyPKTwkCQjugLVy3QCzgHgKTdGvLg1BiGAd7wdCnJDYPijnKA"] + spork_chain_params
 
         self.start_node(0, self.node0_extra_args)
-        self.start_node(1, ["-sporkkey=NQhNc5UpCiPRrwE6HvnYuHz7i8aNwUm6QoMv5xUPk7HWsfSupVjq"] + spork_chain_params)
-        self.start_node(2, ["-sporkkey=NRzqHHPT5NHy4NZhfNqGj3w4JLyU7KGGFKTja6vx5KoTsaCVZvwZ"] + spork_chain_params)
-        self.start_node(3, ["-sporkkey=NPo1astJDM7LEDkUVViqScS2oXmxGGGxpKTQjDanYRqYyXV6jcPE"] + spork_chain_params)
-        self.start_node(4, ["-sporkkey=NJeFmk3hhB8PKoYSE9R5RKqcEyqFiKmjPtQmHitxgifAJtRdUZ7M"] + spork_chain_params)
+        self.start_node(1, ["-sporkkey=THP5qnU3d4t3o1hR4zq1ejGWPqKFws3kvzV35eK5CokZmXTE2cyr"] + spork_chain_params)
+        self.start_node(2, ["-sporkkey=TBeGp82H5rCdSHMRJwtrXfc7KpbxM5KZYb8L9F4E3fQkrJDJpu7s"] + spork_chain_params)
+        self.start_node(3, ["-sporkkey=THXf1NqkvtgiVk23Z4Ns6TFDQ4XNVDuzD7jPk2nh4fwwauUqXZeC"] + spork_chain_params)
+        self.start_node(4, ["-sporkkey=TL1z4PKdMmLtMnmBQsTXE3bvuuYWm7DTDPmE7wFjCx2fFs7pcocQ"] + spork_chain_params)
 
         # connect nodes at start
         for i in range(0, 5):

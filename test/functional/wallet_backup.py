@@ -98,6 +98,8 @@ class WalletBackupTest(BitcoinTestFramework):
     def run_test(self):
         self.log.info("Generating initial blockchain")
         self.nodes[0].generate(1)
+        self.stop_three()
+        self.start_three()
         self.sync_blocks()
         self.nodes[1].generate(20)
         self.sync_blocks()

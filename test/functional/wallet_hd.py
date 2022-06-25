@@ -68,6 +68,10 @@ class WalletHDTest(BitcoinTestFramework):
         change_addrV= self.nodes[1].getaddressinfo(change_addr)
         assert_equal(change_addrV["hdkeypath"], "m/44'/1'/0'/1/1") #second internal child key
 
+        self.stop_node(1)
+        self.start_node(1)
+        connect_nodes_bi(self.nodes, 0, 1)
+
         self.sync_all()
         assert_equal(self.nodes[1].getbalance(), NUM_HD_ADDS + 1)
 

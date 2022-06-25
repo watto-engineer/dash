@@ -50,6 +50,12 @@ class TxIndexTest(BitcoinTestFramework):
 
         self.log.info("Mining blocks...")
         self.nodes[0].generate(105)
+        disconnect_nodes(self.nodes[0], 1)
+        disconnect_nodes(self.nodes[0], 2)
+        disconnect_nodes(self.nodes[0], 3)
+        connect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[0], 3)
         self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
