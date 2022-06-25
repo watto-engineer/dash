@@ -18,7 +18,7 @@ import os
 import subprocess
 
 WAGERR_TX_FEE = 0.001
-WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
 
 class TokenTest (BitcoinTestFramework):
     def set_test_params(self):
@@ -31,7 +31,7 @@ class TokenTest (BitcoinTestFramework):
         tmpdir=self.options.tmpdir
         self.log.info("Generating Tokens...")
         self.nodes[0].generate(100)
-        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].importprivkey("TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
         self.nodes[0].generate(100)
         self.nodes[0].generate(100)
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
