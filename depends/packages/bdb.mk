@@ -16,19 +16,6 @@ $(package)_cppflags_mingw32=-DUNICODE -D_UNICODE
 endef
 
 define $(package)_preprocess_cmds
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' csharp/DatabaseEnvironment.cs && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' csharp/DatabaseEnvironmentConfig.cs && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' csharp/doc/libdb_dotnet48.XML && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/api_reference/C/envset_tmp_dir.html && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/api_reference/CXX/envset_tmp_dir.html && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/csharp/html/F_BerkeleyDB_DatabaseEnvironmentConfig_TempDir.htm && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/csharp/html/P_BerkeleyDB_DatabaseEnvironment_TempDir.htm && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/java/com/sleepycat/db/EnvironmentConfig.html && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' docs/programmer_reference/test.html && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' java/src/com/sleepycat/db/EnvironmentConfig.java && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' os/os_tmpdir.c && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' php_db4/samples/simple_counter.php && \
-  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' php_db4/samples/transactional_counter.php && \
   patch -p1 < $($(package)_patch_dir)/clang_cxx_11.patch && \
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub dist
 endef
