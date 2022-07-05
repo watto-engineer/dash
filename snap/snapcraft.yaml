@@ -97,9 +97,9 @@ apps:
     plugs: [home]
 parts:
   wagerr:
-    source: http://github.com/wagerr/wagerr
+    source: https://github.com/wagerr/wagerr
     source-type: git
-    source-tag: master
+    source-tag: v5.0.0
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
@@ -286,6 +286,7 @@ parts:
       - doxygen
       - npm
       - libts-dev
+      - bison
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family

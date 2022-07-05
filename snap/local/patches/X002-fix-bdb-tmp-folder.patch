@@ -1,17 +1,17 @@
-From dcfe31b190ab8a28f2617914afdf15c6be2a74d2 Mon Sep 17 00:00:00 2001
-From: cevap <dev@i2pmail.org>
-Date: Mon, 4 Feb 2019 07:41:47 +0100
-Subject: [PATCH] fix-bdb-tmp-folder
+From 626cac6ba8ead11bb3382fe05f634e8f2e7ff9e7 Mon Sep 17 00:00:00 2001
+From: wagerr-builder <104495875+wagerr-builder@users.noreply.github.com>
+Date: Sun, 3 Jul 2022 10:28:21 +0100
+Subject: [PATCH] Patched bdb
 
 ---
  depends/packages/bdb.mk | 13 +++++++++++++
  1 file changed, 13 insertions(+)
 
 diff --git a/depends/packages/bdb.mk b/depends/packages/bdb.mk
-index 6c9876c..291111c 100644
+index 9e533cc61..4af4b6241 100644
 --- a/depends/packages/bdb.mk
 +++ b/depends/packages/bdb.mk
-@@ -13,6 +13,19 @@ $(package)_cxxflags=-std=c++11
+@@ -16,6 +16,19 @@ $(package)_cppflags_mingw32=-DUNICODE -D_UNICODE
  endef
  
  define $(package)_preprocess_cmds
@@ -28,9 +28,9 @@ index 6c9876c..291111c 100644
 +  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' os/os_tmpdir.c && \
 +  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' php_db4/samples/simple_counter.php && \
 +  sed -i.old 's/\/var\/tmp/$HOME\/snap\/wagerr\/common\/var\/tmp/g' php_db4/samples/transactional_counter.php && \
-   sed -i.old 's/__atomic_compare_exchange/__atomic_compare_exchange_db/' dbinc/atomic.h && \
-   sed -i.old 's/atomic_init/atomic_init_db/' dbinc/atomic.h mp/mp_region.c mp/mp_mvcc.c mp/mp_fget.c mutex/mut_method.c mutex/mut_tas.c && \
+   patch -p1 < $($(package)_patch_dir)/clang_cxx_11.patch && \
    cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub dist
+ endef
 -- 
-2.17.1
+2.25.1
 
