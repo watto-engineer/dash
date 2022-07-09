@@ -3745,12 +3745,12 @@ static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state,
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
     // Check DevNet
-    if (!consensusParams.hashDevnetGenesisBlock.IsNull() &&
+    /* if (!consensusParams.hashDevnetGenesisBlock.IsNull() &&
             block.hashPrevBlock == consensusParams.hashGenesisBlock &&
             block.GetHash() != consensusParams.hashDevnetGenesisBlock) {
         return state.DoS(100, error("CheckBlockHeader(): wrong devnet genesis"),
                          REJECT_INVALID, "devnet-genesis");
-    }
+    }*/
 
     return true;
 }
@@ -3888,7 +3888,7 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
         return state.Invalid(false, REJECT_INVALID, "time-too-new", strprintf("block timestamp too far in the future %d %d", block.GetBlockTime(), nAdjustedTime + 2 * 60 * 60));
 
     // Check blocktime mask
-    if (!IsValidBlockTimeStamp(block.GetBlockTime(), nHeight, consensusParams) && Params().NetworkIDString() != CBaseChainParams::REGTEST)
+    if (!IsValidBlockTimeStamp(block.GetBlockTime(), nHeight, consensusParams) && (Params().NetworkIDString() != CBaseChainParams::REGTEST) && (Params().NetworkIDString() != CBaseChainParams::DEVNET))
         return state.DoS(100, error("%s : block timestamp mask not valid", __func__), REJECT_INVALID, "invalid-time-mask");
 
     // check for version 2, 3 and 4 upgrades
@@ -4977,7 +4977,7 @@ bool CChainState::LoadGenesisBlock(const CChainParams& chainparams)
         if (chainparams.NetworkIDString() == CBaseChainParams::DEVNET) {
             // We can't continue if devnet genesis block is invalid
             std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(
-                    chainparams.DevNetGenesisBlock());
+                    chainparams.GenesisBlock());
             bool fCheckBlock = CheckBlock(*shared_pblock, state, chainparams.GetConsensus());
             assert(fCheckBlock);
             if (!AcceptBlock(shared_pblock, state, chainparams, nullptr, true, nullptr, nullptr))

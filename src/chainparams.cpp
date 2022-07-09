@@ -704,37 +704,38 @@ class CDevNetParams : public CChainParams {
 public:
     CDevNetParams(bool fHelpOnly = false) {
         strNetworkID = "devnet";
-        consensus.nSubsidyHalvingInterval = 210240;
-        consensus.nMasternodePaymentsStartBlock = 4010; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
-        consensus.nMasternodePaymentsIncreaseBlock = 4030;
+        consensus.nSubsidyHalvingInterval = 150;
+        consensus.nMasternodePaymentsStartBlock = 240;
+        consensus.nMasternodePaymentsIncreaseBlock = 350;
         consensus.nMasternodePaymentsIncreasePeriod = 10;
         consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = 4100;
+        consensus.nBudgetPaymentsStartBlock = 1000;
         consensus.nBudgetPaymentsCycleBlocks = 50;
         consensus.nBudgetPaymentsWindowBlocks = 10;
-        consensus.nSuperblockStartBlock = 4200; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
+        consensus.nSuperblockStartBlock = 1500;
         consensus.nSuperblockStartHash = uint256(); // do not check this on devnet
-        consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on devnet
+        consensus.nSuperblockCycle = 10;
         consensus.nGovernanceMinQuorum = 1;
-        consensus.nGovernanceFilterElements = 500;
+        consensus.nGovernanceFilterElements = 100;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V17DeploymentHeight = 1;
-        consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
-        consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
-        consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
+        consensus.V17DeploymentHeight = 300;
+        consensus.BIP34Height = 100000000; // BIP34 has not activated on devnet (far in the future so block v1 are not rejected in tests)
+        consensus.BIP34Hash = uint256();
+        consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
+        consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
         consensus.CSVHeight = consensus.V17DeploymentHeight;
         consensus.BIP147Height = consensus.V17DeploymentHeight;
-        consensus.DIP0001Height = 2; // DIP0001 activated immediately on devnet
-        consensus.DIP0003Height = 2; // DIP0003 activated immediately on devnet
-//        consensus.DIP0003EnforcementHeight = 2; // DIP0003 activated immediately on devnet
+        consensus.DIP0001Height = 2;
+        consensus.DIP0003Height = 2;
+//        consensus.DIP0003EnforcementHeight = 500;
         consensus.DIP0003EnforcementHash = uint256();
-        consensus.DIP0008Height = 2; // DIP0008 activated immediately on devnet
+        consensus.DIP0008Height = 2;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
-        consensus.fPowNoRetargeting = false;
+        consensus.fPowNoRetargeting = true;
 
         // Wagerr specific parameters
         // Proof of Stake parameters
@@ -746,13 +747,13 @@ public:
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
-        consensus.nStakeMinDepth = 100;
-        consensus.nStakeMinAge = 60 * 60; // 1 hour
-        consensus.nBlockStakeModifierV1A = 1000;
+        consensus.nStakeMinDepth = 1;
+        consensus.nStakeMinAge = 0;
+        consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
-        consensus.WagerrAddrPrefix = "wagerrtest";
+        consensus.WagerrAddrPrefix = "wagerrdev";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
@@ -773,18 +774,17 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
-
-        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999;
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
+        consensus.nMinimumChainWork = uint256S("0x00");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
+        consensus.defaultAssumeValid = uint256S("0x00");
 
         pchMessageStart[0] = 0xc5;
         pchMessageStart[1] = 0x2a;
@@ -798,14 +798,37 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
-        if (!fHelpOnly) {
-            devnetGenesis = FindDevNetGenesisBlock(genesis, 0 * COIN);
-            consensus.hashDevnetGenesisBlock = devnetGenesis.GetHash();
-        }
+        vFixedSeeds.clear(); //!< Devnet mode doesn't have any fixed seeds.
+        vSeeds.clear();      //!< Devnet mode doesn't have any DNS seeds.
 
-        vFixedSeeds.clear();
-        vSeeds.clear();
-        //vSeeds.push_back(CDNSSeedData("dashevo.org",  "devnet-seed.dashevo.org"));
+        fDefaultConsistencyChecks = true;
+        fRequireStandard = false;
+        fRequireRoutableExternalIP = false;
+        fMineBlocksOnDemand = true;
+        fAllowMultipleAddressesFromGroup = true;
+        fAllowMultiplePorts = true;
+        nLLMQConnectionRetryTimeout = 1; // must be lower then the LLMQ signing session timeout so that tests have control over failing behavior
+
+        nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
+        nPoolMinParticipants = 2;
+        nPoolMaxParticipants = 20;
+
+        vSporkAddresses = {"TNZgamuYWzNeupr9qD1To2rEBoEcbPA2x4"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
+        nMinSporkKeys = 1;
+        // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
+        fBIP9CheckMasternodesUpgraded = false;
+
+        checkpointData = {
+            {
+                {0,uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
+            }
+        };
+
+        chainTxData = ChainTxData{
+            1518696184,
+            1,
+            0.01
+        };
 
         // Testnet Wagerr addresses start with 'y'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
@@ -818,7 +841,7 @@ public:
         // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Testnet Wagett BIP44 coin type is '1' (All coin's testnet default)
+        // Regtest Wagerr BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params
@@ -831,35 +854,6 @@ public:
         consensus.llmqTypeInstantSend = Consensus::LLMQ_20_60;
         consensus.llmqTypePlatform = Consensus::LLMQ_20_70;
 
-        fDefaultConsistencyChecks = false;
-        fRequireStandard = false;
-        fRequireRoutableExternalIP = true;
-        fMineBlocksOnDemand = false;
-        fAllowMultipleAddressesFromGroup = true;
-        fAllowMultiplePorts = true;
-        nLLMQConnectionRetryTimeout = 60;
-
-        nPoolMinParticipants = 2;
-        nPoolMaxParticipants = 20;
-        nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
-
-        vSporkAddresses = {"TNZgamuYWzNeupr9qD1To2rEBoEcbPA2x4"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
-        nMinSporkKeys = 1;
-        // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
-        fBIP9CheckMasternodesUpgraded = false;
-
-        checkpointData = {
-            {
-                { 0, uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
-                { 1, devnetGenesis.GetHash() },
-            }
-        };
-
-        chainTxData = ChainTxData{
-            devnetGenesis.GetBlockTime(), // * UNIX timestamp of devnet genesis block
-            2,                            // * we only have 2 coinbase transactions when a devnet is started up
-            0.01                          // * estimated number of transactions per second
-        };
     }
 };
 

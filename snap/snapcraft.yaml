@@ -97,7 +97,7 @@ apps:
     plugs: [home]
 parts:
   wagerr:
-    source: http://github.com/wagerr/wagerr
+    source: https://github.com/wagerr/wagerr
     source-type: git
     source-tag: v5.0.0
     plugin: nil

@@ -2025,9 +2025,9 @@ bool AppInitMain()
                     return InitError(_("Incorrect or no genesis block found. Wrong datadir for network?"));
                 }
 
-                if (!chainparams.GetConsensus().hashDevnetGenesisBlock.IsNull() && !mapBlockIndex.empty() && mapBlockIndex.count(chainparams.GetConsensus().hashDevnetGenesisBlock) == 0)
+                /*if (!chainparams.GetConsensus().hashDevnetGenesisBlock.IsNull() && !mapBlockIndex.empty() && mapBlockIndex.count(chainparams.GetConsensus().hashDevnetGenesisBlock) == 0)
                     return InitError(_("Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?"));
-
+                */
                 // Check for changed -txindex state
                 if (fTxIndex != gArgs.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
                     strLoadError = _("You need to rebuild the database using -reindex to change -txindex");
@@ -2072,7 +2072,9 @@ bool AppInitMain()
                 // block tree into mapBlockIndex!
 
                 // Load Accumulator Checkpoints according to network (main/test/regtest)
-                assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
+                if (chainparams.NetworkIDString() != CBaseChainParams::DEVNET) {
+                    assert(AccumulatorCheckpoints::LoadCheckpoints(Params().NetworkIDString()));
+                }
 
                 // Drop all information from the tokenDB and repopulate
                 bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
