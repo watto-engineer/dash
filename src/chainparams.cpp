@@ -704,23 +704,23 @@ class CDevNetParams : public CChainParams {
 public:
     CDevNetParams(bool fHelpOnly = false) {
         strNetworkID = "devnet";
-        consensus.nSubsidyHalvingInterval = 150;
-        consensus.nMasternodePaymentsStartBlock = 240;
-        consensus.nMasternodePaymentsIncreaseBlock = 350;
+        consensus.nSubsidyHalvingInterval = 210240;
+        consensus.nMasternodePaymentsStartBlock = 4010;
+        consensus.nMasternodePaymentsIncreaseBlock = 4030;
         consensus.nMasternodePaymentsIncreasePeriod = 10;
         consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = 1000;
+        consensus.nBudgetPaymentsStartBlock = 4100;
         consensus.nBudgetPaymentsCycleBlocks = 50;
         consensus.nBudgetPaymentsWindowBlocks = 10;
-        consensus.nSuperblockStartBlock = 1500;
-        consensus.nSuperblockStartHash = uint256(); // do not check this on devnet
-        consensus.nSuperblockCycle = 10;
+        consensus.nSuperblockStartBlock = 4200;
+        consensus.nSuperblockStartHash = uint256(); // do not check this on regtest
+        consensus.nSuperblockCycle = 64;
         consensus.nGovernanceMinQuorum = 1;
-        consensus.nGovernanceFilterElements = 100;
+        consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.V17DeploymentHeight = 300;
-        consensus.BIP34Height = 100000000; // BIP34 has not activated on devnet (far in the future so block v1 are not rejected in tests)
+        consensus.BIP34Height = 100000000; // BIP34 has not activated on regtest (far in the future so block v1 are not rejected in tests)
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
@@ -735,7 +735,7 @@ public:
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
-        consensus.fPowNoRetargeting = true;
+        consensus.fPowNoRetargeting = false;
 
         // Wagerr specific parameters
         // Proof of Stake parameters
@@ -774,10 +774,10 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
-        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 2016; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 11991456010;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999;
 
         // The best chain should have at least this much work.
@@ -798,8 +798,8 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530"));
 //        assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
-        vFixedSeeds.clear(); //!< Devnet mode doesn't have any fixed seeds.
-        vSeeds.clear();      //!< Devnet mode doesn't have any DNS seeds.
+        vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
+        vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
 
         fDefaultConsistencyChecks = true;
         fRequireStandard = false;
@@ -813,9 +813,13 @@ public:
         nPoolMinParticipants = 2;
         nPoolMaxParticipants = 20;
 
+        /* Spork Key for RegTest:
+        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
+        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
+        */
         vSporkAddresses = {"TNZgamuYWzNeupr9qD1To2rEBoEcbPA2x4"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
         nMinSporkKeys = 1;
-        // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
+        // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
 
         checkpointData = {
