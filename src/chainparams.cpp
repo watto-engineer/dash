@@ -547,12 +547,12 @@ public:
         consensus.nMasternodePaymentsIncreasePeriod = 10;
         consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = 4200;
+        consensus.nBudgetPaymentsStartBlock = 4100;
         consensus.nBudgetPaymentsCycleBlocks = 144;
         consensus.nBudgetPaymentsWindowBlocks = 64;
-        consensus.nSuperblockStartBlock = std::numeric_limits<int>::max(); // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
-        consensus.nSuperblockStartHash = uint256(); // do not check this on devnet
-        consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on devnet
+        consensus.nSuperblockStartBlock = 4200;
+        consensus.nSuperblockStartHash = uint256(); // do not check this on regtest
+        consensus.nSuperblockCycle = 64;
         consensus.nSuperblockMaturityWindow = 24; // This is equal to SB cycle on devnet
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
@@ -906,7 +906,7 @@ public:
         WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
         private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
         */
-        vSporkAddresses = {"TPiq9YKZdbfEGuZuZhQtLNGrkKSchmL1gc"}; // 048b664010f7851071787d58c276c05701b7109fa29f2360a3e72b3bdfa32b49cf20a23fd34bcc49fc564fdbdccc54dd0dc9183a7bdf05d580d118fcdcd4abfb3f
+        vSporkAddresses = {"TNZgamuYWzNeupr9qD1To2rEBoEcbPA2x4"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
         nMinSporkKeys = 1;
         // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
