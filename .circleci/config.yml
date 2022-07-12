@@ -27,7 +27,6 @@ jobs:
             git remote add -f univalue https://github.com/jgarzik/univalue
             git rm -rf src/leveldb
             git rm -rf src/secp256k1
-            git rm -rf src/crypto/ctaes
             git rm -rf src/univalue
             git add .
             git config --global user.email "lint@dev.null"
@@ -98,15 +97,17 @@ jobs:
             update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
             update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
             ./autogen.sh
-            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
+            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --disable-debug --enable-stacktraces --enable-crash-hooks --enable-bench --enable-gui-test --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
-            #apt-get -y install libfontconfig1
-            #make -j${JOBS} check
+            apt-get -y install libfontconfig1 libxkbcommon-x11-0
+            src/test/test_wagerr
+            src/qt/test/test_wagerr-qt
+            src/bench/bench_wagerr
             #git clone http://github.com/wagerr/wagerr_hash
             #cd wagerr_hash
             #python3 setup.py install
             #cd -
-            #test/functional/test_runner.py
+            #test/functional/test_runner.py --exclude rpc_token_test_pt1.py
   x86_64_focal_depends:
     docker:
       - image: cimg/base:stable-20.04
