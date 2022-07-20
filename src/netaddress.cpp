@@ -25,11 +25,11 @@ CNetAddr::CNetAddr()
 
 void CNetAddr::SetIP(const CNetAddr& ipIn)
 {
-    m_net = ipIn.m_net;
+   // m_net = ipIn.m_net;
     memcpy(ip, ipIn.ip, sizeof(ip));
 }
 
-void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[16])
+/*void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[16])
 {
     if (memcmp(ipv6, pchIPv4, sizeof(pchIPv4)) == 0) {
         m_net = NET_IPV4;
@@ -41,19 +41,20 @@ void CNetAddr::SetLegacyIPv6(const uint8_t ipv6[16])
         m_net = NET_IPV6;
     }
     memcpy(ip, ipv6, 16);
-}
+}*/
 
 void CNetAddr::SetRaw(Network network, const uint8_t *ip_in)
 {
     switch(network)
     {
         case NET_IPV4:
-            m_net = NET_IPV4;
+            //m_net = NET_IPV4;
             memcpy(ip, pchIPv4, 12);
             memcpy(ip+12, ip_in, 4);
             break;
         case NET_IPV6:
-            SetLegacyIPv6(ip_in);
+            //SetLegacyIPv6(ip_in);
+            memcpy(ip, ip_in, 16);
             break;
         default:
             assert(!"invalid network");
@@ -65,7 +66,7 @@ bool CNetAddr::SetInternal(const std::string &name)
     if (name.empty()) {
         return false;
     }
-    m_net = NET_INTERNAL;
+    //m_net = NET_INTERNAL;
     unsigned char hash[32] = {};
     CSHA256().Write((const unsigned char*)name.data(), name.size()).Finalize(hash);
     memcpy(ip, g_internal_prefix, sizeof(g_internal_prefix));
@@ -126,12 +127,22 @@ bool CNetAddr::IsBindAny() const
     return true;
 }
 
-bool CNetAddr::IsIPv4() const { return m_net == NET_IPV4; }
+bool CNetAddr::IsIPv4() const
+{
+    return (memcmp(ip, pchIPv4, sizeof(pchIPv4)) == 0);
+}
+
+//bool CNetAddr::IsIPv4() const { return m_net == NET_IPV4; }
+
+//bool CNetAddr::IsIPv6() const
+// {
+//    return (!IsIPv4() && !IsTor() && !IsTorV3() && !IsInternal());
+// }
 
 bool CNetAddr::IsIPv6() const
- {
+{
     return (!IsIPv4() && !IsTor() && !IsTorV3() && !IsInternal());
- }
+}
 
 bool CNetAddr::IsRFC1918() const
 {
@@ -289,7 +300,8 @@ bool CNetAddr::IsRoutable() const
 
 bool CNetAddr::IsInternal() const
 {
-   return m_net == NET_INTERNAL;
+   //return m_net == NET_INTERNAL;
+   return memcmp(ip, g_internal_prefix, sizeof(g_internal_prefix)) == 0;
 }
 
 enum Network CNetAddr::GetNetwork() const
@@ -306,7 +318,8 @@ enum Network CNetAddr::GetNetwork() const
     if (IsTor() || IsTorV3())
         return NET_ONION;
 
-    return m_net;
+    //return m_net;
+    return NET_IPV6;
 }
 
 std::string CNetAddr::ToStringIP(bool fUseGetnameinfo) const
@@ -345,12 +358,19 @@ std::string CNetAddr::ToString() const
 
 bool operator==(const CNetAddr& a, const CNetAddr& b)
 {
-    return a.m_net == b.m_net && memcmp(a.ip, b.ip, 16) == 0;
+    //return a.m_net == b.m_net && memcmp(a.ip, b.ip, 16) == 0;
+    return (memcmp(a.ip, b.ip, 16) == 0);
 }
+
+/*bool operator!=(const CNetAddr& a, const CNetAddr& b)
+{
+    return (memcmp(a.ip, b.ip, 16) != 0);
+}*/
 
 bool operator<(const CNetAddr& a, const CNetAddr& b)
 {
-    return a.m_net < b.m_net || (a.m_net == b.m_net && memcmp(a.ip, b.ip, 16) < 0);
+    //return a.m_net < b.m_net || (a.m_net == b.m_net && memcmp(a.ip, b.ip, 16) < 0);
+    return (memcmp(a.ip, b.ip, 16) < 0);
 }
 
 bool CNetAddr::GetInAddr(struct in_addr* pipv4Addr) const
@@ -702,7 +722,8 @@ CSubNet::CSubNet(const CNetAddr &addr):
 
 bool CSubNet::Match(const CNetAddr &addr) const
 {
-    if (!valid || !addr.IsValid() || network.m_net != addr.m_net)
+    //if (!valid || !addr.IsValid() || network.m_net != addr.m_net)
+    if (!valid || !addr.IsValid())
         return false;
     for(int x=0; x<16; ++x)
         if ((addr.ip[x] & netmask[x]) != network.ip[x])
