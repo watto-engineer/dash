@@ -13,6 +13,7 @@ $(package)_patches += fix_qt_pkgconfig.patch mac-qmake.conf fix_no_printer.patch
 $(package)_patches+= dont_hardcode_pwd.patch
 $(package)_patches+= no_sdk_version_check.patch qttools_config.patch
 $(package)_patches+= qtbase-moc-ignore-gcc-macro.patch fix_limits_header.patch
+$(package)_patches+= qrandom_patch_for_gcc10.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=5b4f186e0b96703041319b5b131393b6aa829ea74e067697ede548d936327508
@@ -211,6 +212,7 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/qtbase-moc-ignore-gcc-macro.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_limits_header.patch && \
   patch -p1 -i $($(package)_patch_dir)/qttools_config.patch && \
+  patch -p1 -i $($(package)_patch_dir)/qrandom_patch_for_gcc10.patch && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\
   cp -f $($(package)_patch_dir)/mac-qmake.conf qtbase/mkspecs/macx-clang-linux/qmake.conf && \
