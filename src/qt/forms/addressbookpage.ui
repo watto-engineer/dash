@@ -157,7 +157,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../bytz.qrc"/>
+  <include location="../wagerr.qrc"/>
  </resources>
  <connections/>
 </ui>

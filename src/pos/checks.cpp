@@ -8,9 +8,9 @@
 #include "util.h"
 
 #include "validation.h"
-#include "zbytz/zbytzchain.h"
-#include "zbytz/zbytzmodule.h"
-#include "zbytz/zerocoindb.h"
+#include "zwgr/zwgrchain.h"
+#include "zwgr/zwgrmodule.h"
+#include "zwgr/zerocoindb.h"
 
 bool IsBlockHashInChain(const uint256& hashBlock)
 {
@@ -177,7 +177,7 @@ bool CheckZerocoinSpendTx(CBlockIndex *pindex, CValidationState& state, const CT
         if (isPublicSpend) {
             libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
             PublicCoinSpend publicSpend(params);
-            if (!ZBYTZModule::ParseZerocoinPublicSpend(txIn, tx, state, publicSpend)){
+            if (!ZWGRModule::ParseZerocoinPublicSpend(txIn, tx, state, publicSpend)){
                 LogPrintf("%s - Unable to parse zerocoin spend", __func__);
                 return false;
             }
@@ -211,7 +211,7 @@ bool CheckZerocoinSpendTx(CBlockIndex *pindex, CValidationState& state, const CT
         }
     }
 */
-    // Check that zBYTZ mints are not already known
+    // Check that zWAGERR mints are not already known
     if (tx.HasZerocoinMintOutputs()) {
         for (auto& out : tx.vout) {
             if (!out.IsZerocoinMint())

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bytz-config.h>
+#include <config/wagerr-config.h>
 #endif
 
 #include <qt/optionsmodel.h>
@@ -72,7 +72,7 @@ void OptionsModel::Init(bool resetSettings)
 
     // Display
     if (!settings.contains("nDisplayUnit"))
-        settings.setValue("nDisplayUnit", BitcoinUnits::BYTZ);
+        settings.setValue("nDisplayUnit", BitcoinUnits::WAGERR);
     nDisplayUnit = settings.value("nDisplayUnit").toInt();
 
     if (!settings.contains("strThirdPartyTxUrls"))
@@ -201,10 +201,10 @@ void OptionsModel::Init(bool resetSettings)
 
     if (!settings.contains("nCoinJoinAmount")) {
         // for migration from old settings
-        if (!settings.contains("nAnonymizeBytzAmount"))
+        if (!settings.contains("nAnonymizeWagerrAmount"))
             settings.setValue("nCoinJoinAmount", DEFAULT_COINJOIN_AMOUNT);
         else
-            settings.setValue("nCoinJoinAmount", settings.value("nAnonymizeBytzAmount").toInt());
+            settings.setValue("nCoinJoinAmount", settings.value("nAnonymizeWagerrAmount").toInt());
     }
     if (!m_node.softSetArg("-coinjoinamount", settings.value("nCoinJoinAmount").toString().toStdString()))
         addOverriddenOption("-coinjoinamount");

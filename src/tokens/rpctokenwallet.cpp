@@ -1,6 +1,6 @@
 // Copyright (c) 2015-2018 The Bitcoin Unlimited developers
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,7 +9,7 @@
 #include "dstencode.h"
 #include <evo/specialtx.h>
 #include "init.h"
-#include "bytzaddrenc.h"
+#include "wagerraddrenc.h"
 #include "rpc/protocol.h"
 #include "rpc/server.h"
 #include "script/tokengroup.h"
@@ -292,11 +292,11 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
             "If a groupID is specified, returns the balance of the specified token group.\n"
             "\nArguments:\n"
             "1. \"groupid\" (string, optional) the token group identifier to filter\n"
-            "2. \"address\" (string, optional) the Bytz address to filter\n"
+            "2. \"address\" (string, optional) the Wagerr address to filter\n"
             "3. \"minconf\" (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("gettokenbalance", "groupid bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re") +
+            HelpExampleCli("gettokenbalance", "groupid wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re") +
             "\n"
         );
 
@@ -397,7 +397,7 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the "
             "transaction. \n"
             "                                                It will be \"\" for the default account.\n"
-            "    \"address\":\"Bytz address\",    (string) The Bytz address of the transaction. Not present for \n"
+            "    \"address\":\"Wagerr address\",    (string) The Wagerr address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off "
             "blockchain)\n"
@@ -414,7 +414,7 @@ extern UniValue listtokentransactions(const JSONRPCRequest& request)
                             "                                         and for the 'move' category for inbound funds.\n"
                             "    \"vout\": n,                (numeric) the vout value\n"
                             "    \"fee\": x.xxx,             (numeric) The amount of the fee in "
-            "BYTZ"
+            "WAGERR"
             ". This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for "
@@ -574,17 +574,17 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
             "  \"transactions\": [\n"
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the "
             "transaction. Will be \"\" for the default account.\n"
-            "    \"address\":\"Bytz address\",    (string) The Bytz address of the transaction. Not present for "
+            "    \"address\":\"Wagerr address\",    (string) The Wagerr address of the transaction. Not present for "
             "move transactions (category = move).\n"
             "    \"category\":\"send|receive\",     (string) The transaction category. 'send' has negative amounts, "
             "'receive' has positive amounts.\n"
             "    \"amount\": x.xxx,          (numeric) The amount in "
-            "BYTZ. This is negative for the 'send' category, and for the 'move' category for moves \n"
+            "WAGERR. This is negative for the 'send' category, and for the 'move' category for moves \n"
                             "                                          outbound. It is positive for the 'receive' "
                             "category, and for the 'move' category for inbound funds.\n"
                             "    \"vout\" : n,               (numeric) the vout value\n"
                             "    \"fee\": x.xxx,             (numeric) The amount of the fee in "
-            "BYTZ"
+            "WAGERR"
             ". This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for "
             "'send' and 'receive' category of transactions.\n"
@@ -608,7 +608,7 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("listtokenssinceblock", "") +
-            HelpExampleCli("listtokenssinceblock", "\"bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"36507bf934ffeb556b4140a8d57750954ad4c3c3cd8abad3b8a7fd293ae6e93b\" 6") +
+            HelpExampleCli("listtokenssinceblock", "\"wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"36507bf934ffeb556b4140a8d57750954ad4c3c3cd8abad3b8a7fd293ae6e93b\" 6") +
             HelpExampleRpc(
                 "listtokenssinceblock", "\"36507bf934ffeb556b4140a8d57750954ad4c3c3cd8abad3b8a7fd293ae6e93b\", 6"));
 
@@ -742,7 +742,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
             "6. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuretoken", "\"FUN\" \"FunToken\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-mainnet-FUN.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 6 true") +
+            HelpExampleCli("configuretoken", "\"FUN\" \"FunToken\" \"https://raw.githubusercontent.com/wagerr/ATP-descriptions/master/WAGERR-mainnet-FUN.json\" 4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765 6 true") +
             "\n"
         );
 
@@ -838,7 +838,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "8. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"MGT\" \"Management Token\" \"https://raw.githubusercontent.com/bytzcurrency/ATP-descriptions/master/BYTZ-testnet-MGT.json\" 969d29b4cd99ee7c6c188068c9f6f8f4051daa37f124a327ed86774d760dba74 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
+            HelpExampleCli("configuremanagementtoken", "\"MGT\" \"Management Token\" \"https://raw.githubusercontent.com/wagerr/ATP-descriptions/master/WAGERR-testnet-MGT.json\" 969d29b4cd99ee7c6c188068c9f6f8f4051daa37f124a327ed86774d760dba74 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
             "\n"
         );
 
@@ -864,7 +864,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
 
     COutput coin(nullptr, 0, 0, false, false, false);
     // If the MGTToken exists: spend a magic token output
-    // Otherwise: spend a Bytz output from the token management address
+    // Otherwise: spend a Wagerr output from the token management address
     if (tokenGroupManager.get()->MGTTokensCreated()){
         CTokenGroupID magicID = tokenGroupManager.get()->GetMGTID();
 
@@ -1071,7 +1071,7 @@ extern UniValue createtokenauthorities(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() < 1)
         throw std::runtime_error(
-            "createtokenauthorities \"groupid\" \"bytzaddress\" authoritylist \n"
+            "createtokenauthorities \"groupid\" \"wagerraddress\" authoritylist \n"
             "\nCreates new authorities and sends them to the specified address.\n"
             "\nArguments:\n"
             "1. \"groupid\"     (string, required) the group identifier\n"
@@ -1080,7 +1080,7 @@ extern UniValue createtokenauthorities(const JSONRPCRequest& request)
             "\n"
             "\nExamples:\n"
             "\nCreate a new authority that allows the reciepient to: 1) melt tokens, and 2) create new melt tokens:\n" +
-            HelpExampleCli("createtokenauthorities", "\"bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"g74Uz39YSNBB3DouQdH1UokcFT5qDWBMfa\" \"melt child\"") +
+            HelpExampleCli("createtokenauthorities", "\"wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"g74Uz39YSNBB3DouQdH1UokcFT5qDWBMfa\" \"melt child\"") +
             "\n"
         );
 
@@ -1202,8 +1202,8 @@ extern UniValue listtokenauthorities(const JSONRPCRequest& request)
             "1. \"groupid\"     (string, optional) the token group identifier\n"
             "\n"
             "\nExamples:\n"
-            "\nList all available token authorities of group bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re:\n" +
-            HelpExampleCli("listtokenauthorities", "\"bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" ") +
+            "\nList all available token authorities of group wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re:\n" +
+            HelpExampleCli("listtokenauthorities", "\"wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" ") +
             "\n"
         );
 
@@ -1263,7 +1263,7 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
             "\n"
             "\nExamples:\n"
             "\nDrop mint and melt authorities:\n" +
-            HelpExampleCli("droptokenauthorities", "\"bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"a018c9581b853e6387cf263fc14eeae07158e8e2ae47ce7434fcb87a3b75e7bf\" 1 \"mint\" \"melt\"") +
+            HelpExampleCli("droptokenauthorities", "\"wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re\" \"a018c9581b853e6387cf263fc14eeae07158e8e2ae47ce7434fcb87a3b75e7bf\" 1 \"mint\" \"melt\"") +
             "\n"
         );
 
@@ -1404,7 +1404,7 @@ extern UniValue minttoken(const JSONRPCRequest& request)
 
     if (request.fHelp || request.params.size() < 1)
         throw std::runtime_error(
-            "minttoken \"groupid\" \"bytzaddress\" quantity \n"
+            "minttoken \"groupid\" \"wagerraddress\" quantity \n"
             "\nMint new tokens.\n"
             "\nArguments:\n"
             "1. \"groupID\"     (string, required) the group identifier\n"
@@ -1412,7 +1412,7 @@ extern UniValue minttoken(const JSONRPCRequest& request)
             "3. \"amount\"      (numeric, required) the amount of tokens desired\n"
             "\n"
             "\nExample:\n" +
-            HelpExampleCli("minttoken", "bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re gMngqs6eX1dUd8dKdwPqGJchc1S3e6b9Cx 40") +
+            HelpExampleCli("minttoken", "wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re gMngqs6eX1dUd8dKdwPqGJchc1S3e6b9Cx 40") +
             "\n"
         );
 
@@ -1437,7 +1437,7 @@ extern UniValue minttoken(const JSONRPCRequest& request)
     }
 
     CCoinControl coinControl;
-    coinControl.fAllowOtherInputs = true; // Allow a normal BYTZ input for change
+    coinControl.fAllowOtherInputs = true; // Allow a normal WAGERR input for change
     std::string strError;
 
     // Now find a mint authority
@@ -1514,7 +1514,7 @@ extern UniValue melttoken(const JSONRPCRequest& request)
             "2. \"amount\"      (numeric, required) the amount of tokens desired\n"
             "\n"
             "\nExample:\n" +
-            HelpExampleCli("melttoken", "bytzreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re 4.3") +
+            HelpExampleCli("melttoken", "wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re 4.3") +
             "\n"
         );
 
@@ -1558,9 +1558,9 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
             "1. \"groupid\"      (string, optional) the token group identifier. Leave empty for all groups.\n"
             "2. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "3. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "4. \"addresses\"      (string) A json array of Bytz addresses to filter\n"
+            "4. \"addresses\"      (string) A json array of Wagerr addresses to filter\n"
             "    [\n"
-            "      \"address\"     (string) Bytz address\n"
+            "      \"address\"     (string) Wagerr address\n"
             "      ,...\n"
             "    ]\n"
             "5. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
@@ -1577,9 +1577,9 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
             "  {\n"
             "    \"txid\" : \"txid\",          (string) the transaction id \n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the Bytz address\n"
-            "    \"address\" : \"address\",    (string) the Bytz address\n"
-            "    \"address\" : \"address\",    (string) the Bytz address\n"
+            "    \"address\" : \"address\",    (string) the Wagerr address\n"
+            "    \"address\" : \"address\",    (string) the Wagerr address\n"
+            "    \"address\" : \"address\",    (string) the Wagerr address\n"
             "    \"account\" : \"account\",    (string) DEPRECATED. The associated account, or \"\" for the default account\n"
             "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
@@ -1834,7 +1834,7 @@ UniValue signtokenmetadata(const JSONRPCRequest& request)
     std::string strAddress = request.params[1].get_str();
     CTxDestination dest = DecodeDestination(strAddress);
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
     const CKeyID *keyID = boost::get<CKeyID>(&dest);
     if (!keyID) {

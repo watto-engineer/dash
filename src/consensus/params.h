@@ -59,7 +59,7 @@ enum LLMQType : uint8_t
 };
 
 // Configures a LLMQ and its DKG
-// See https://github.com/bytzcurrency/dips/blob/master/dip-0006.md for more details
+// See https://github.com/wagerr/dips/blob/master/dip-0006.md for more details
 struct LLMQParams {
     LLMQType type;
 
@@ -198,7 +198,6 @@ struct Params {
     int32_t nStakeMinAge;
     int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
-    std::string strCarbonOffsetAddress;
 
     /** Time Protocol V2 **/
     int nBlockTimeProtocolV2;
@@ -207,13 +206,9 @@ struct Params {
 
     /** ATP parameters */
     int64_t ATPStartHeight;
-    std::string BytzAddrPrefix;
+    std::string WagerrAddrPrefix;
     std::string strTokenManagementKey;
     int nOpGroupNewRequiredConfirmations;
-
-    /** Carbon Offset */
-    int AccruedCarbonOffsetStartHeight;
-    int AccruedCarbonOffsetWindow;
 
     /** Zerocoin - retired functionality */
     int64_t nZerocoinStartHeight;

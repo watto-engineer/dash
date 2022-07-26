@@ -1,6 +1,6 @@
 // Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018-2020 The Ion developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +10,8 @@
 #include "stakeinput.h"
 #include "validation.h"
 #include "wallet/wallet.h"
-#include "zbytz/accumulators.h"
-#include "zbytz/deterministicmint.h"
+#include "zwgr/accumulators.h"
+#include "zwgr/deterministicmint.h"
 
 typedef std::vector<unsigned char> valtype;
 
@@ -45,7 +45,7 @@ uint32_t CZStake::GetChecksum()
     return nChecksum;
 }
 
-// The zBYTZ block index is the first appearance of the accumulator checksum that was used in the spend
+// The zWAGERR block index is the first appearance of the accumulator checksum that was used in the spend
 // note that this also means when staking that this checksum should be from a block that is beyond 60 minutes old and
 // 100 blocks deep.
 CBlockIndex* CZStake::GetIndexFrom()
@@ -105,7 +105,7 @@ bool CZStake::GetModifier(uint64_t& nStakeModifier)
 
 CDataStream CZStake::GetUniqueness()
 {
-    //The unique identifier for a zBYTZ is a hash of the serial
+    //The unique identifier for a zWAGERR is a hash of the serial
     CDataStream ss(SER_GETHASH, 0);
     ss << hashSerial;
     return ss;
@@ -138,17 +138,17 @@ bool CZStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>
 {
     return false;
 /*
-    //Create an output returning the zBYTZ that was staked
+    //Create an output returning the zWAGERR that was staked
     CTxOut outReward;
     libzerocoin::CoinDenomination denomStaked = libzerocoin::AmountToZerocoinDenomination(this->GetValue());
     CDeterministicMint dMint;
-    if (!pwallet->CreateZBYTZOutPut(denomStaked, outReward, dMint))
-        return error("%s: failed to create zBYTZ output", __func__);
+    if (!pwallet->CreateZWGROutPut(denomStaked, outReward, dMint))
+        return error("%s: failed to create zWAGERR output", __func__);
     vout.emplace_back(outReward);
 
     //Add new staked denom to our wallet
     if (!pwallet->DatabaseMint(dMint))
-        return error("%s: failed to database the staked zBYTZ", __func__);
+        return error("%s: failed to database the staked zWAGERR", __func__);
 
     CAmount toMint = (nTotal - this->GetValue()) / 2;
     CAmount nRemaining = 0;
@@ -156,15 +156,15 @@ bool CZStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>
         libzerocoin::CoinDenomination denomination = libzerocoin::AmountToClosestDenomination(toMint, nRemaining);
 
         if (denomination == libzerocoin::ZQ_ERROR)
-            return error("%s: failed to create zBYTZ output", __func__);
+            return error("%s: failed to create zWAGERR output", __func__);
 
         CAmount nValueNewMint = libzerocoin::ZerocoinDenominationToAmount(denomination);
         toMint -= nValueNewMint;
 
         CTxOut out;
         CDeterministicMint dMintReward;
-        if (!pwallet->CreateZBYTZOutPut(denomination, out, dMintReward))
-            return error("%s: failed to create zBYTZ output", __func__);
+        if (!pwallet->CreateZWGROutPut(denomination, out, dMintReward))
+            return error("%s: failed to create zWAGERR output", __func__);
         vout.emplace_back(out);
 
         if (!pwallet->DatabaseMint(dMintReward))
@@ -188,17 +188,17 @@ bool CZStake::GetScriptPubKeyKernel(CScript& scriptPubKeyKernel) const
 /*
 bool CZStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 {
-    CxBYTZTracker* zbytzTracker = pwallet->zbytzTracker.get();
+    CxWAGERRTracker* zwgrTracker = pwallet->zwgrTracker.get();
     CMintMeta meta;
-    if (!zbytzTracker->GetMetaFromStakeHash(hashSerial, meta))
+    if (!zwgrTracker->GetMetaFromStakeHash(hashSerial, meta))
         return error("%s: tracker does not have serialhash", __func__);
 
-    zbytzTracker->SetPubcoinUsed(meta.hashPubcoin, txid);
+    zwgrTracker->SetPubcoinUsed(meta.hashPubcoin, txid);
     return true;
 }
 */
 
-//!Bytz Stake
+//!Wagerr Stake
 bool CStake::SetInput(CTransactionRef txPrev, unsigned int n)
 {
     this->txFrom = txPrev;

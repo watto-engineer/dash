@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,7 +15,7 @@
 #include <util.h>
 #include <ui_interface.h>
 #include <init.h>
-#include <zbytz/accumulators.h>
+#include <zwgr/accumulators.h>
 
 #include <stdint.h>
 
@@ -456,8 +456,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nAccumulatorCheckpoint = diskindex.nAccumulatorCheckpoint;
                 pindexNew->mapZerocoinSupply = diskindex.mapZerocoinSupply;
                 pindexNew->vMintDenominationsInBlock = diskindex.vMintDenominationsInBlock;
-
-                pindexNew->nCarbonFeesEscrow = diskindex.nCarbonFeesEscrow;
 
                 if (!IsProofOfStakeHeight(pindexNew->nHeight, consensusParams) && pindexNew->IsProofOfWork() && !CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams))
                     return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());

@@ -34,7 +34,7 @@ namespace interfaces {
 class Handler;
 class Wallet;
 
-//! Interface for the src/evo part of a bytz node (bytzd process).
+//! Interface for the src/evo part of a wagerr node (wagerrd process).
 class EVO
 {
 public:
@@ -42,7 +42,7 @@ public:
     virtual CDeterministicMNList getListAtChainTip() = 0;
 };
 
-//! Interface for the src/llmq part of a bytz node (bytzd process).
+//! Interface for the src/llmq part of a wagerr node (wagerrd process).
 class LLMQ
 {
 public:
@@ -50,7 +50,7 @@ public:
     virtual size_t getInstantSentLockCount() = 0;
 };
 
-//! Interface for the src/masternode part of a bytz node (bytzd process).
+//! Interface for the src/masternode part of a wagerr node (wagerrd process).
 namespace Masternode
 {
 class Sync
@@ -88,7 +88,7 @@ public:
 };
 }
 
-//! Top-level interface for a bytz node (bytzd process).
+//! Top-level interface for a wagerr node (wagerrd process).
 class Node
 {
 public:

@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -177,7 +177,6 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.pushKV("difficulty", GetDifficulty(blockindex));
     result.pushKV("chainwork", blockindex->nChainWork.GetHex());
     result.pushKV("nTx", (uint64_t)blockindex->nTx);
-    result.pushKV("carbonfees_escrow", ValueFromAmount(blockindex->nCarbonFeesEscrow));
 
     if (blockindex->pprev)
         result.pushKV("previousblockhash", blockindex->pprev->GetBlockHash().GetHex());
@@ -1223,8 +1222,8 @@ UniValue gettxout(const JSONRPCRequest& request)
             "     \"hex\" : \"hex\",        (string) \n"
             "     \"reqSigs\" : n,          (numeric) Number of required signatures\n"
             "     \"type\" : \"pubkeyhash\", (string) The type, eg pubkeyhash\n"
-            "     \"addresses\" : [          (array of string) array of bytz addresses\n"
-            "        \"address\"     (string) bytz address\n"
+            "     \"addresses\" : [          (array of string) array of wagerr addresses\n"
+            "        \"address\"     (string) wagerr address\n"
             "        ,...\n"
             "     ]\n"
             "  },\n"

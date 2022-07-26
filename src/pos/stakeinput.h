@@ -1,6 +1,6 @@
 // Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018-2019 The Ion developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,7 +31,7 @@ public:
     virtual CAmount GetValue() const = 0;
     virtual bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) = 0;
     virtual bool GetModifier(uint64_t& nStakeModifier) = 0;
-    virtual bool IsZBYTZ() = 0;
+    virtual bool IsZWGR() = 0;
     virtual CDataStream GetUniqueness() = 0;
     virtual uint256 GetSerialHash() const = 0;
 
@@ -43,7 +43,7 @@ public:
 
 // zStake can take two forms
 // 1) the stake candidate, which is a zcmint that is attempted to be staked
-// 2) a staked zbytz, which is a zcspend that has successfully staked
+// 2) a staked zwgr, which is a zcspend that has successfully staked
 class CZStake : public CStakeInput
 {
 private:
@@ -71,7 +71,7 @@ public:
     bool CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
     bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
 //    bool MarkSpent(CWallet* pwallet, const uint256& txid);
-    bool IsZBYTZ() override { return true; }
+    bool IsZWGR() override { return true; }
     uint256 GetSerialHash() const override { return hashSerial; }
     int GetChecksumHeightFromMint();
     int GetChecksumHeightFromSpend();
@@ -101,7 +101,7 @@ public:
     CDataStream GetUniqueness() override;
     bool CreateTxIn(std::shared_ptr<CWallet> pwallet, CTxIn& txIn, uint256 hashTxOut = uint256()) override;
     bool CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal) override;
-    bool IsZBYTZ() override { return false; }
+    bool IsZWGR() override { return false; }
     uint256 GetSerialHash() const override { return uint256(); }
 
     uint64_t getStakeModifierHeight() const override { return nStakeModifierHeight; }

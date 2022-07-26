@@ -3,7 +3,7 @@
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2018-2020 The Ion developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,8 +19,8 @@
 #include "timedata.h"
 #include "util.h"
 #include "stakeinput.h"
-#include "zbytz/zbytzchain.h"
-#include "zbytz/accumulators.h"
+#include "zwgr/zwgrchain.h"
+#include "zwgr/accumulators.h"
 
 // v1 modifier interval.
 static const int64_t OLD_MODIFIER_INTERVAL = 2087;
@@ -328,22 +328,22 @@ bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
 bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
 {
     if (nPreviousBlockHeight < Params().GetConsensus().nBlockZerocoinV2)
-        return error("%s : zBYTZ stake block is less than allowed start height", __func__);
+        return error("%s : zWAGERR stake block is less than allowed start height", __func__);
 
-    if (CZStake* zBYTZ = dynamic_cast<CZStake*>(stake)) {
-        CBlockIndex* pindexFrom = zBYTZ->GetIndexFrom();
+    if (CZStake* zWAGERR = dynamic_cast<CZStake*>(stake)) {
+        CBlockIndex* pindexFrom = zWAGERR->GetIndexFrom();
         if (!pindexFrom)
-            return error("%s: failed to get index associated with zBYTZ stake checksum", __func__);
+            return error("%s: failed to get index associated with zWAGERR stake checksum", __func__);
 
         int depth = (nPreviousBlockHeight + 1) - pindexFrom->nHeight;
         if (depth < Params().GetConsensus().nZerocoinRequiredStakeDepth)
-            return error("%s : zBYTZ stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, nPreviousBlockHeight, pindexFrom->nHeight);
+            return error("%s : zWAGERR stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, nPreviousBlockHeight, pindexFrom->nHeight);
 
         //The checksum needs to be the exact checksum from 200 blocks ago
         uint256 nCheckpoint200 = chainActive[nPreviousBlockHeight - Params().GetConsensus().nZerocoinRequiredStakeDepth]->GetBlockHeader().nAccumulatorCheckpoint;
-        uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zBYTZ->GetValue()));
-        if (nChecksum200 != zBYTZ->GetChecksum())
-            return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zBYTZ->GetChecksum(), nChecksum200);
+        uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zWAGERR->GetValue()));
+        if (nChecksum200 != zWAGERR->GetChecksum())
+            return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zWAGERR->GetChecksum(), nChecksum200);
     } else {
         return error("%s: dynamic_cast of stake ptr failed", __func__);
     }
@@ -369,7 +369,7 @@ bool initStakeInput(const CBlock& block, std::unique_ptr<CStake>& ionStake, std:
         zStake.reset(new CZStake(spend));
 
         if (!ContextualCheckZerocoinStake(nPreviousBlockHeight, zStake.get()))
-            return error("%s: staked zBYTZ fails context checks", __func__);
+            return error("%s: staked zWAGERR fails context checks", __func__);
     } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;

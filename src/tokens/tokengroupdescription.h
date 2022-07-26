@@ -1,5 +1,5 @@
 // Copyright (c) 2019 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -339,7 +339,7 @@ inline uint8_t tgDescGetDecimalPos(CTokenGroupDescriptionVariant& tgDesc) {
 }
 
 // Tokens with no fractional quantities have nDecimalPos=0
-// Bytz has has decimalPos=8 (1 BYTZ is 100000000 satoshi)
+// Wagerr has has decimalPos=8 (1 WAGERR is 100000000 satoshi)
 // Maximum value is 10^16
 class tgdesc_get_coin_amount : public boost::static_visitor<CAmount>
 {

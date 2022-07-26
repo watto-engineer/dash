@@ -11,7 +11,7 @@
   </array>
 
   <key>CFBundleIconFile</key>
-  <string>bytz.icns</string>
+  <string>wagerr.icns</string>
 
   <key>CFBundlePackageType</key>
   <string>APPL</string>
@@ -26,16 +26,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Bytz-Qt</string>
+  <string>Wagerr-Qt</string>
 
   <key>CFBundleName</key>
-  <string>Bytz-Qt</string>
+  <string>Wagerr-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>org.bytz.Bytz-Qt</string>
+  <string>org.wagerr.Wagerr-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -43,10 +43,10 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.bytz.BytzPayment</string>
+      <string>org.wagerr.WagerrPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>bytz</string>
+        <string>wagerr</string>
       </array>
     </dict>
   </array>
@@ -55,9 +55,9 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>org.bytz.paymentrequest</string>
+      <string>org.wagerr.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Bytz payment request</string>
+      <string>Wagerr payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
@@ -65,10 +65,10 @@
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.mime-type</key>
-        <string>application/x-bytz-payment-request</string>
+        <string>application/x-wagerr-payment-request</string>
         <key>public.filename-extension</key>
         <array>
-          <string>bytzcurrencymentrequest</string>
+          <string>wagerrmentrequest</string>
         </array>
       </dict>
     </dict>
@@ -81,7 +81,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>org.bytz.paymentrequest</string>
+        <string>org.wagerr.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>

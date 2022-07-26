@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2018-2021 The Bytz Core developers
+# Copyright (c) 2018-2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the functionality of all CLI commands.
@@ -17,8 +17,8 @@ import sys
 import os
 import subprocess
 
-BYTZ_TX_FEE = 0.001
-BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_TX_FEE = 0.001
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class TokenTest (BitcoinTestFramework):
     def set_test_params(self):
@@ -31,21 +31,21 @@ class TokenTest (BitcoinTestFramework):
         tmpdir=self.options.tmpdir
         self.log.info("Generating Tokens...")
         self.nodes[0].generate(100)
-        self.nodes[0].importprivkey("5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
+        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
         self.nodes[0].generate(100)
         self.nodes[0].generate(100)
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")
-        XBYTZBLS=self.nodes[0].bls("generate")
+        XWAGERRBLS=self.nodes[0].bls("generate")
         PARTBLS=self.nodes[0].bls("generate")
         LiveBLS=self.nodes[0].bls("generate")
         HulkBLS=self.nodes[0].bls("generate")
         self.log.info("MGTBLS %s" % MGTBLS["public"])
         MGTAddr=self.nodes[0].getnewaddress()
         GVTAddr=self.nodes[0].getnewaddress()
-        XBYTZAddr=self.nodes[0].getnewaddress()
+        XWAGERRAddr=self.nodes[0].getnewaddress()
         PARTAddr=self.nodes[0].getnewaddress()
         LIVEAddr=self.nodes[0].getnewaddress()
         HulkAddr=self.nodes[0].getnewaddress()
@@ -54,7 +54,7 @@ class TokenTest (BitcoinTestFramework):
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator","0",  "https://www.google.com", "0", GVTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
@@ -62,27 +62,27 @@ class TokenTest (BitcoinTestFramework):
         GVTGroup_ID=GVT['groupID']
         self.nodes[0].minttoken(GVTGroup_ID, GVTAddr, '43')
         mintaddr=self.nodes[0].getnewaddress()
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         self.nodes[0].minttoken(MGTGroup_ID, mintaddr, 500)
         self.nodes[0].generate(1)
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
-        XBYTZTok=self.nodes[0].configuremanagementtoken("XBYTZ", "ExtraBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-XBYTZ.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd",XBYTZBLS["public"], "true", "true")
-        XBYTZGroup_ID=XBYTZTok['groupID']
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        XWAGERRTok=self.nodes[0].configuremanagementtoken("XWAGERR", "ExtraWagerr", "0", "https://github.com/wagerr/ATP-descriptions/blob/master/WAGERR-testnet-XWAGERR.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd",XWAGERRBLS["public"], "true", "true")
+        XWAGERRGroup_ID=XWAGERRTok['groupID']
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
-        PARTTok=self.nodes[0].configuremanagementtoken("PART", "PartBytz", "0", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-PART.json", "b0425ee4ba234099970c53c28288da749e2a1afc0f49856f4cab82b37f72f6a5",PARTBLS["public"], "true", "true")
+        PARTTok=self.nodes[0].configuremanagementtoken("PART", "PartWagerr", "0", "https://github.com/wagerr/ATP-descriptions/blob/master/WAGERR-testnet-PART.json", "b0425ee4ba234099970c53c28288da749e2a1afc0f49856f4cab82b37f72f6a5",PARTBLS["public"], "true", "true")
         PARTGroup_ID=PARTTok['groupID']
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
-        LIVETok=self.nodes[0].configuremanagementtoken("LIVE", "LiveBytz", "13", "https://github.com/bytzcurrency/ATP-descriptions/blob/master/BYTZ-testnet-LIVE.json", "6de2409add060ec4ef03d61c0966dc46508ed3498e202e9459e492a372ddccf5", LiveBLS["public"], "true", "true")
+        LIVETok=self.nodes[0].configuremanagementtoken("LIVE", "LiveWagerr", "13", "https://github.com/wagerr/ATP-descriptions/blob/master/WAGERR-testnet-LIVE.json", "6de2409add060ec4ef03d61c0966dc46508ed3498e202e9459e492a372ddccf5", LiveBLS["public"], "true", "true")
         LIVEGroup_ID=LIVETok['groupID']
         self.nodes[0].generate(1)
         self.log.info("Token Info %s" % json.dumps(self.nodes[0].tokeninfo("all"), indent=4))
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '4975')
         self.nodes[0].generate(1)
-        self.nodes[0].minttoken(XBYTZGroup_ID, XBYTZAddr, '71')
+        self.nodes[0].minttoken(XWAGERRGroup_ID, XWAGERRAddr, '71')
         self.nodes[0].generate(1)
         self.nodes[0].minttoken(PARTGroup_ID, PARTAddr, '100')
         self.nodes[0].generate(1)
@@ -137,20 +137,20 @@ class TokenTest (BitcoinTestFramework):
             self.log.info("Token Name %s" % balance['name'])
             self.log.info("Token Balance %s" % balance['balance'])
         PARTBalance=self.nodes[0].gettokenbalance(PARTGroup_ID)
-        self.log.info("PARTBytz Balance %s"  % PARTBalance['balance'])
-        self.log.info("Melt 10 tokens from PartBytz Group")
+        self.log.info("PARTWagerr Balance %s"  % PARTBalance['balance'])
+        self.log.info("Melt 10 tokens from PartWagerr Group")
         self.nodes[0].melttoken(PARTGroup_ID, '10')
         PARTBalance=self.nodes[0].gettokenbalance(PARTGroup_ID)
         self.log.info("PART Balance %s\n"  % PARTBalance['balance'])
         self.log.info("Token info all (from node1)\n%s\n" % json.dumps(self.nodes[1].tokeninfo('all'), indent=4))
         self.log.info("Token info ticker Hulk\n%s\n" % json.dumps(self.nodes[0].tokeninfo('ticker', 'Hulk'), indent=4))
-        self.log.info("Token info name ExtraBytz\n%s\n" % json.dumps(self.nodes[0].tokeninfo('name', 'ExtraBytz'), indent=4))
+        self.log.info("Token info name ExtraWagerr\n%s\n" % json.dumps(self.nodes[0].tokeninfo('name', 'ExtraWagerr'), indent=4))
         self.log.info("Token info groupid %s\n%s\n" % (HulkGroup_ID, json.dumps(self.nodes[0].tokeninfo('groupid', HulkGroup_ID), indent=4)))
         LIVE_Trans=self.nodes[0].listtokentransactions(LIVEGroup_ID)
-        self.log.info("Token Transactions LiveBytz Token\n%s\n" % LIVE_Trans)
+        self.log.info("Token Transactions LiveWagerr Token\n%s\n" % LIVE_Trans)
         LIVETrans=LIVE_Trans[0]['txid']
         LIVE_BlockHash=self.nodes[0].getblockhash(200)
-        self.log.info("LiveBytz Transaction\n%s" % self.nodes[0].gettokentransaction(LIVETrans))
+        self.log.info("LiveWagerr Transaction\n%s" % self.nodes[0].gettokentransaction(LIVETrans))
         self.log.info("Blockhash block 200 %s" % LIVE_BlockHash)
         self.log.info("\nTransaction ID %s" % LIVETrans)
         self.log.info("Transaction Details %s" % self.nodes[0].gettokentransaction(LIVETrans, LIVE_BlockHash))

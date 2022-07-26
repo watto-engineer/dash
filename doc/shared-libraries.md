@@ -1,21 +1,21 @@
 Shared Libraries
 ================
 
-## bytzconsensus
+## wagerrconsensus
 
-The purpose of this library is to make the verification functionality that is critical to Bytz's consensus available to other applications, e.g. to language bindings.
+The purpose of this library is to make the verification functionality that is critical to Wagerr's consensus available to other applications, e.g. to language bindings.
 
 ### API
 
-The interface is defined in the C header `bytzconsensus.h` located in  `src/script/bytzconsensus.h`.
+The interface is defined in the C header `wagerrconsensus.h` located in  `src/script/wagerrconsensus.h`.
 
 #### Version
 
-`bytzconsensus_version` returns an `unsigned int` with the API version *(currently at an experimental `0`)*.
+`wagerrconsensus_version` returns an `unsigned int` with the API version *(currently at an experimental `0`)*.
 
 #### Script Validation
 
-`bytzconsensus_verify_script` returns an `int` with the status of the verification. It will be `1` if the input script correctly spends the previous output `scriptPubKey`.
+`wagerrconsensus_verify_script` returns an `int` with the status of the verification. It will be `1` if the input script correctly spends the previous output `scriptPubKey`.
 
 ##### Parameters
 - `const unsigned char *scriptPubKey` - The previous output script that encumbers spending.
@@ -24,21 +24,21 @@ The interface is defined in the C header `bytzconsensus.h` located in  `src/scri
 - `unsigned int txToLen` - The number of bytes for the `txTo`.
 - `unsigned int nIn` - The index of the input in `txTo` that spends the `scriptPubKey`.
 - `unsigned int flags` - The script validation flags *(see below)*.
-- `bytzconsensus_error* err` - Will have the error/success code for the operation *(see below)*.
+- `wagerrconsensus_error* err` - Will have the error/success code for the operation *(see below)*.
 
 ##### Script Flags
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_NONE`
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_P2SH` - Evaluate P2SH ([BIP16](https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki)) subscripts
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_DERSIG` - Enforce strict DER ([BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)) compliance
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY` - Enforce NULLDUMMY ([BIP147](https://github.com/bitcoin/bips/blob/master/bip-0147.mediawiki))
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY` - Enable CHECKLOCKTIMEVERIFY ([BIP65](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki))
-- `bytzconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY` - Enable CHECKSEQUENCEVERIFY ([BIP112](https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki))
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_NONE`
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_P2SH` - Evaluate P2SH ([BIP16](https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki)) subscripts
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_DERSIG` - Enforce strict DER ([BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)) compliance
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY` - Enforce NULLDUMMY ([BIP147](https://github.com/bitcoin/bips/blob/master/bip-0147.mediawiki))
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY` - Enable CHECKLOCKTIMEVERIFY ([BIP65](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki))
+- `wagerrconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY` - Enable CHECKSEQUENCEVERIFY ([BIP112](https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki))
 
 ##### Errors
-- `bytzconsensus_ERR_OK` - No errors with input parameters *(see the return value of `bytzconsensus_verify_script` for the verification status)*
-- `bytzconsensus_ERR_TX_INDEX` - An invalid index for `txTo`
-- `bytzconsensus_ERR_TX_SIZE_MISMATCH` - `txToLen` did not match with the size of `txTo`
-- `bytzconsensus_ERR_DESERIALIZE` - An error deserializing `txTo`
+- `wagerrconsensus_ERR_OK` - No errors with input parameters *(see the return value of `wagerrconsensus_verify_script` for the verification status)*
+- `wagerrconsensus_ERR_TX_INDEX` - An invalid index for `txTo`
+- `wagerrconsensus_ERR_TX_SIZE_MISMATCH` - `txToLen` did not match with the size of `txTo`
+- `wagerrconsensus_ERR_DESERIALIZE` - An error deserializing `txTo`
 
 ### Example Implementations
 - [NBitcoin](https://github.com/NicolasDorier/NBitcoin/blob/master/NBitcoin/Script.cs#L814) (.NET Bindings)

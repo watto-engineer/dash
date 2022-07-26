@@ -14,7 +14,7 @@
 #include <util.h>
 #include <validation.h>
 
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <stdint.h>
 

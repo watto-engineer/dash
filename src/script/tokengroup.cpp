@@ -6,7 +6,7 @@
 #include <script/tokengroup.h>
 
 #include <consensus/tokengroups.h>
-#include <bytzaddrenc.h>
+#include <wagerraddrenc.h>
 
 class CTokenGroupID;
 
@@ -27,8 +27,8 @@ CTokenGroupID GetTokenGroup(const CTxDestination &id)
 
 CTokenGroupID GetTokenGroup(const std::string &addr, const CChainParams &params)
 {
-    BytzAddrContent cac = DecodeBytzAddrContent(addr, params);
-    if (cac.type == BytzAddrType::GROUP_TYPE)
+    WagerrAddrContent cac = DecodeWagerrAddrContent(addr, params);
+    if (cac.type == WagerrAddrType::GROUP_TYPE)
         return CTokenGroupID(cac.hash);
     // otherwise it becomes NoGroup (i.e. data is size 0)
     return CTokenGroupID();

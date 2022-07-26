@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # Copyright (c) 2018-2019 The Bitcoin Core developers
-# Copyright (c) 2020-2021 The Bytz Core Developers
+# Copyright (c) 2020-2021 The Wagerr Core Developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-# how to use and guide: https://github.com/bytzcurrency/docs/blob/master/gitian-building.md
-# Setup: gitian-build.py --setup --build $SIGNER $VERSION 192.168.1.37 SHA256 bytz-binaries
+# how to use and guide: https://github.com/wagerr/docs/blob/master/gitian-building.md
+# Setup: gitian-build.py --setup --build $SIGNER $VERSION 192.168.1.37 SHA256 wagerr-binaries
 #usage: gitian-build.py [-h] [-c] [-p] [-u URL] [-v] [-b] [-s] [-B] [-o OS]
 #                       [-j JOBS] [-m MEMORY] [-k] [-d] [-S] [-D] [-n] [-z]
 #                       [-x SERVER] [-l] [-f UPLOADFOLDER] [-y HASH]
@@ -33,13 +33,13 @@ def setup():
         programs += ['apt-cacher-ng', 'lxc', 'debootstrap']
     subprocess.check_call(['sudo', 'apt-get', 'install', '-qq'] + programs)
     if not os.path.isdir('gitian.sigs'):
-        subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/gitian.sigs.git', 'gitian.sigs'])
-    if not os.path.isdir('bytz-detached-sigs'):
-        subprocess.check_call(['git', 'clone', 'https://github.com/bytzcurrency/bytz-detached-sigs.git'])
+        subprocess.check_call(['git', 'clone', 'https://github.com/wagerr/gitian.sigs.git', 'gitian.sigs'])
+    if not os.path.isdir('wagerr-detached-sigs'):
+        subprocess.check_call(['git', 'clone', 'https://github.com/wagerr/wagerr-detached-sigs.git'])
     if not os.path.isdir('gitian-builder'):
         subprocess.check_call(['git', 'clone', 'https://github.com/devrandom/gitian-builder.git'])
-    if not os.path.isdir('bytz'):
-        subprocess.check_call(['git', 'clone', '--recurse-submodules', 'https://github.com/bytzcurrency/bytz.git'])
+    if not os.path.isdir('wagerr'):
+        subprocess.check_call(['git', 'clone', '--recurse-submodules', 'https://github.com/wagerr/wagerr.git'])
     os.chdir('gitian-builder')
     make_image_prog = ['bin/make-base-vm', '--suite', 'bionic', '--arch', 'amd64']
     if args.docker:
@@ -56,13 +56,13 @@ def setup():
 def build():
     global args, workdir
 
-    os.makedirs('bytz-binaries/' + args.version, exist_ok=True)
+    os.makedirs('wagerr-binaries/' + args.version, exist_ok=True)
     print('\nBuilding Dependencies\n')
     os.chdir('gitian-builder')
     os.makedirs('inputs', exist_ok=True)
 
     if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
-    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/bytzcurrency/macosx-sdks/downloads/MacOSX10.11.sdk.tar.xz'])
+    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/wagerr/macosx-sdks/downloads/MacOSX10.11.sdk.tar.xz'])
 
     if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
     	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/gitianuser/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz'])
@@ -71,33 +71,33 @@ def build():
         subprocess.check_call(['wget', '-O', 'inputs/osslsigncode-2.0.tar.gz', 'https://github.com/mtrojnar/osslsigncode/archive/2.0.tar.gz'])
 
     subprocess.check_call(["echo '5a60e0a4b3e0b4d655317b2f12a810211c50242138322b16e7e01c6fbb89d92f inputs/osslsigncode-2.0.tar.gz' | sha256sum -c"], shell=True)
-    subprocess.check_call(['make', '-C', '../bytz/depends', 'download', 'SOURCES_PATH=' + os.getcwd() + '/cache/common'])
+    subprocess.check_call(['make', '-C', '../wagerr/depends', 'download', 'SOURCES_PATH=' + os.getcwd() + '/cache/common'])
 
     if args.linux:
         print('\nCompiling ' + args.version + ' Linux')
-        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-linux.yml'])
-        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-linux', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-linux.yml'])
-        subprocess.check_call('mv build/out/bytz-*.tar.gz build/out/src/bytz-*.tar.gz ../bytz-binaries/'+args.version, shell=True)
+        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'wagerr='+args.commit, '--url', 'wagerr='+args.url, '../wagerr/contrib/gitian-descriptors/gitian-linux.yml'])
+        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-linux', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-linux.yml'])
+        subprocess.check_call('mv build/out/wagerr-*.tar.gz build/out/src/wagerr-*.tar.gz ../wagerr-binaries/'+args.version, shell=True)
 
     if args.windows:
         print('\nCompiling ' + args.version + ' Windows')
-        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
-        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win.yml'])
-        subprocess.check_call('mv build/out/bytz-*-win-unsigned.tar.gz inputs/', shell=True)
-        subprocess.check_call('mv build/out/bytz-*.zip build/out/bytz-*.exe ../bytz-binaries/'+args.version, shell=True)
+        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'wagerr='+args.commit, '--url', 'wagerr='+args.url, '../wagerr/contrib/gitian-descriptors/gitian-win.yml'])
+        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-unsigned', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-win.yml'])
+        subprocess.check_call('mv build/out/wagerr-*-win-unsigned.tar.gz inputs/', shell=True)
+        subprocess.check_call('mv build/out/wagerr-*.zip build/out/wagerr-*.exe ../wagerr-binaries/'+args.version, shell=True)
 
     if args.macos:
         print('\nCompiling ' + args.version + ' MacOS')
-        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'bytz='+args.commit, '--url', 'bytz='+args.url, '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
-        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-unsigned', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx.yml'])
-        subprocess.check_call('mv build/out/bytz-*-osx-unsigned.tar.gz inputs/', shell=True)
-        subprocess.check_call('mv build/out/bytz-*.tar.gz build/out/bytz-*.dmg ../bytz-binaries/'+args.version, shell=True)
+        subprocess.check_call(['bin/gbuild', '-j', args.jobs, '-m', args.memory, '--commit', 'wagerr='+args.commit, '--url', 'wagerr='+args.url, '../wagerr/contrib/gitian-descriptors/gitian-osx.yml'])
+        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-unsigned', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-osx.yml'])
+        subprocess.check_call('mv build/out/wagerr-*-osx-unsigned.tar.gz inputs/', shell=True)
+        subprocess.check_call('mv build/out/wagerr-*.tar.gz build/out/wagerr-*.dmg ../wagerr-binaries/'+args.version, shell=True)
 
     os.chdir(workdir)
 
     if args.hash:
-        os.chdir('bytz-binaries/'+args.version)
-        subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
+        os.chdir('wagerr-binaries/'+args.version)
+        subprocess.check_call('sha'+args.hash+'sum wagerr* > SHA'+args.hash+'SUMS', shell=True)
         subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
 
     os.chdir(workdir)
@@ -119,18 +119,18 @@ def sign():
 
     if args.windows:
         print('\nSigning ' + args.version + ' Windows')
-        subprocess.check_call('cp inputs/bytz-' + args.version + '-win-unsigned.tar.gz inputs/bytz-win-unsigned.tar.gz', shell=True)
-        subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
-        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml'])
-        subprocess.check_call('mv build/out/bytz-*win64-setup.exe ../bytz-binaries/'+args.version, shell=True)
-        subprocess.check_call('mv build/out/bytz-*win32-setup.exe ../bytz-binaries/'+args.version, shell=True)
+        subprocess.check_call('cp inputs/wagerr-' + args.version + '-win-unsigned.tar.gz inputs/wagerr-win-unsigned.tar.gz', shell=True)
+        subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml'])
+        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-win-signed', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml'])
+        subprocess.check_call('mv build/out/wagerr-*win64-setup.exe ../wagerr-binaries/'+args.version, shell=True)
+        subprocess.check_call('mv build/out/wagerr-*win32-setup.exe ../wagerr-binaries/'+args.version, shell=True)
 
     if args.macos:
         print('\nSigning ' + args.version + ' MacOS')
-        subprocess.check_call('cp inputs/bytz-' + args.version + '-osx-unsigned.tar.gz inputs/bytz-osx-unsigned.tar.gz', shell=True)
-        subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
-        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-signed', '--destination', '../gitian.sigs/', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml'])
-        subprocess.check_call('mv build/out/bytz-osx-signed.dmg ../bytz-binaries/'+args.version+'/bytz-'+args.version+'-osx.dmg', shell=True)
+        subprocess.check_call('cp inputs/wagerr-' + args.version + '-osx-unsigned.tar.gz inputs/wagerr-osx-unsigned.tar.gz', shell=True)
+        subprocess.check_call(['bin/gbuild', '-i', '--commit', 'signature='+args.commit, '../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml'])
+        subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-signed', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml'])
+        subprocess.check_call('mv build/out/wagerr-osx-signed.dmg ../wagerr-binaries/'+args.version+'/wagerr-'+args.version+'-osx.dmg', shell=True)
 
     os.chdir(workdir)
 
@@ -145,8 +145,8 @@ def sign():
 def createhashes():
     global args, workdir
     os.chdir(workdir)
-    os.chdir('bytz-binaries/'+args.version)
-    subprocess.check_call('sha'+args.hash+'sum bytz* > SHA'+args.hash+'SUMS', shell=True)
+    os.chdir('wagerr-binaries/'+args.version)
+    subprocess.check_call('sha'+args.hash+'sum wagerr* > SHA'+args.hash+'SUMS', shell=True)
     subprocess.check_call('gpg -u '+args.signer+' --digest-algo sha'+args.hash+' --clearsign SHA'+args.hash+'SUMS', shell=True)
     subprocess.check_call('rm', '-f', '/SHA'+args.hash+'SUMS', shell=True)
     os.chdir(workdir)
@@ -168,7 +168,7 @@ def logsupload():
         subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/logs'])
         subprocess.check_call(['ssh', args.server, 'mkdir', '-p', args.uploadfolder+'/'+args.version+'/result'])
         subprocess.check_call(['scp', '-r', 'gitian-builder/var', args.server+':'+args.uploadfolder+'/'+args.version+'/logs'])
-        subprocess.check_call(['scp', 'gitian-builder/result/bytz-*.yml', args.server+':'+args.uploadfolder+'/'+args.version+'/result'])
+        subprocess.check_call(['scp', 'gitian-builder/result/wagerr-*.yml', args.server+':'+args.uploadfolder+'/'+args.version+'/result'])
 
     if args.createreleasenotes:
         print('\n'+args.server+': Start uploading release notes to the uploadserver.\n')
@@ -184,17 +184,17 @@ def releasenotes():
     if not os.path.isdir(args.uploadfolder+'/'+args.version+'/release-notes'):
         subprocess.check_call('mkdir -p '+args.uploadfolder+'/'+args.version+'/release-notes', shell=True)
 
-    os.chdir('bytz')
+    os.chdir('wagerr')
     
     if args.previousver:
         # Create shortlog notes
-        subprocess.check_call('git shortlog --no-merges v'+args.previousver+'..v'+args.version+' > ../bytz-binaries/'+args.version+'/release-notes/shortlog_v'+args.previousver+'..v'+args.version+'.md', shell=True)
+        subprocess.check_call('git shortlog --no-merges v'+args.previousver+'..v'+args.version+' > ../wagerr-binaries/'+args.version+'/release-notes/shortlog_v'+args.previousver+'..v'+args.version+'.md', shell=True)
         # Create changes notes
-        subprocess.check_call('git log --oneline v'+args.previousver+'..v'+args.version+' > ../bytz-binaries/'+args.version+'/release-notes/changes_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        subprocess.check_call('git log --oneline v'+args.previousver+'..v'+args.version+' > ../wagerr-binaries/'+args.version+'/release-notes/changes_'+args.previousver+'-v'+args.version+'.md', shell=True)
         # Create authors notes
         subprocess.check_call('git log --format='"'- %aN' v'+args.previousver+'..v'+args.version+' | sort -fiu > ../ion-binaries/"+args.version+'/release-notes/authors_'+args.previousver+'-v'+args.version+'.md', shell=True)
         # Create detailed notes
-        subprocess.check_call('git log v'+args.previousver+'..v'+args.version+' --pretty="format:%at %C(yellow)commit %H%Creset\nAuthor: %an <%ae>\nDate: %aD\n\n %s\n" | sort -r | cut -d" " -f2- | sed -e "s/\\\n/\\`echo -e '+"'"+"\n\r'`/g"+'" | tr -d '+"'\15\32'"+' | less -R  > ../bytz-binaries/'+args.version+'/release-notes/detailedlog_'+args.previousver+'-v'+args.version+'.md', shell=True)
+        subprocess.check_call('git log v'+args.previousver+'..v'+args.version+' --pretty="format:%at %C(yellow)commit %H%Creset\nAuthor: %an <%ae>\nDate: %aD\n\n %s\n" | sort -r | cut -d" " -f2- | sed -e "s/\\\n/\\`echo -e '+"'"+"\n\r'`/g"+'" | tr -d '+"'\15\32'"+' | less -R  > ../wagerr-binaries/'+args.version+'/release-notes/detailedlog_'+args.previousver+'-v'+args.version+'.md', shell=True)
 
     os.chdir(workdir)
 
@@ -204,27 +204,27 @@ def verify():
     os.chdir('gitian-builder')
 
     print('\nVerifying v'+args.version+' Linux\n')
-    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-linux', '../bytz/contrib/gitian-descriptors/gitian-linux.yml']):
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-linux', '../wagerr/contrib/gitian-descriptors/gitian-linux.yml']):
         print('Verifying v'+args.version+' Linux FAILED\n')
         rc = 1
 
     print('\nVerifying v'+args.version+' Windows\n')
-    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-unsigned', '../bytz/contrib/gitian-descriptors/gitian-win.yml']):
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-unsigned', '../wagerr/contrib/gitian-descriptors/gitian-win.yml']):
         print('Verifying v'+args.version+' Windows FAILED\n')
         rc = 1
 
     print('\nVerifying v'+args.version+' MacOS\n')
-    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-unsigned', '../bytz/contrib/gitian-descriptors/gitian-osx.yml']):
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-unsigned', '../wagerr/contrib/gitian-descriptors/gitian-osx.yml']):
         print('Verifying v'+args.version+' MacOS FAILED\n')
         rc = 1
 
     print('\nVerifying v'+args.version+' Signed Windows\n')
-    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-signed', '../bytz/contrib/gitian-descriptors/gitian-win-signer.yml']):
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-win-signed', '../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml']):
         print('Verifying v'+args.version+' Signed Windows FAILED\n')
         rc = 1
 
     print('\nVerifying v'+args.version+' Signed MacOS\n')
-    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-signed', '../bytz/contrib/gitian-descriptors/gitian-osx-signer.yml']):
+    if subprocess.call(['bin/gverify', '-v', '-d', '../gitian.sigs/', '-r', args.version+'-osx-signed', '../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml']):
         print('Verifying v'+args.version+' Signed MacOS FAILED\n')
         rc = 1
 
@@ -237,7 +237,7 @@ def main():
     parser = argparse.ArgumentParser(description='Script for running full Gitian builds.')
     parser.add_argument('-c', '--commit', action='store_true', dest='commit', help='Indicate that the version argument is for a commit or branch')
     parser.add_argument('-p', '--pull', action='store_true', dest='pull', help='Indicate that the version argument is the number of a github repository pull request')
-    parser.add_argument('-u', '--url', dest='url', default='https://github.com/bytzcurrency/bytz', help='Specify the URL of the repository. Default is %(default)s')
+    parser.add_argument('-u', '--url', dest='url', default='https://github.com/wagerr/wagerr', help='Specify the URL of the repository. Default is %(default)s')
     parser.add_argument('-v', '--verify', action='store_true', dest='verify', help='Verify the Gitian build')
     parser.add_argument('-b', '--build', action='store_true', dest='build', help='Do a Gitian build')
     parser.add_argument('-s', '--sign', action='store_true', dest='sign', help='Make signed binaries for Windows and MacOS')
@@ -319,11 +319,11 @@ def main():
         raise Exception('Cannot have both commit and pull')
     args.commit = ('' if args.commit else 'v') + args.version
 
-    os.chdir('bytz')
+    os.chdir('wagerr')
     if args.pull:
         subprocess.check_call(['git', 'fetch', args.url, 'refs/pull/'+args.version+'/merge'])
         subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
-        os.chdir('../gitian-builder/inputs/bytz')
+        os.chdir('../gitian-builder/inputs/wagerr')
         subprocess.check_call(['git', 'fetch', args.url, 'refs/pull/'+args.version+'/merge'])
         args.commit = subprocess.check_output(['git', 'show', '-s', '--format=%H', 'FETCH_HEAD'], universal_newlines=True, encoding='utf8').strip()
         args.version = 'pull-' + args.version

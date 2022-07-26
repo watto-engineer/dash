@@ -6,7 +6,7 @@
 #include "blocksignature.h"
 #include "util.h"
 #include "utilstrencodings.h"
-#include "zbytz/zbytzchain.h"
+#include "zwgr/zwgrchain.h"
 
 typedef std::vector<unsigned char> valtype;
 
@@ -64,8 +64,8 @@ bool CheckBlockSignature(const CBlock& block)
     if (block.vchBlockSig.empty())
         return error("%s: vchBlockSig is empty!", __func__);
 
-    /** Each block is signed by the private key of the input that is staked. This can be either zBYTZ or normal UTXO
-     *  zBYTZ: Each zBYTZ has a keypair associated with it. The serial number is a hash of the public key.
+    /** Each block is signed by the private key of the input that is staked. This can be either zWAGERR or normal UTXO
+     *  zWAGERR: Each zWAGERR has a keypair associated with it. The serial number is a hash of the public key.
      *  UTXO: The public key that signs must match the public key associated with the first utxo of the coinstake tx.
      */
     CPubKey pubkey;

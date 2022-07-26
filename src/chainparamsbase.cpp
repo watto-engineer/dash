@@ -35,9 +35,9 @@ const CBaseChainParams& BaseParams()
 std::unique_ptr<CBaseChainParams> CreateBaseChainParams(const std::string& chain)
 {
     if (chain == CBaseChainParams::MAIN)
-        return MakeUnique<CBaseChainParams>("", 37414);
+        return MakeUnique<CBaseChainParams>("", 55003);
     else if (chain == CBaseChainParams::TESTNET)
-        return MakeUnique<CBaseChainParams>("testnet", 47414);
+        return MakeUnique<CBaseChainParams>("testnet", 55005);
     else if (chain == CBaseChainParams::DEVNET)
         return MakeUnique<CBaseChainParams>(gArgs.GetDevNetName(), 37314);
     else if (chain == CBaseChainParams::REGTEST)

@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <addrman.h>
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 #include <string>
 #include <boost/test/unit_test.hpp>
 
@@ -198,8 +198,8 @@ BOOST_AUTO_TEST_CASE(addrman_select)
 
     // Add three addresses to new table.
     CService addr2 = ResolveService("250.3.1.1", 8333);
-    CService addr3 = ResolveService("250.3.2.2", 37415);
-    CService addr4 = ResolveService("250.3.3.3", 37415);
+    CService addr3 = ResolveService("250.3.2.2", 55002);
+    CService addr4 = ResolveService("250.3.3.3", 55002);
 
     addrman.Add(CAddress(addr2, NODE_NONE), ResolveService("250.3.1.1", 8333));
     addrman.Add(CAddress(addr3, NODE_NONE), ResolveService("250.3.1.1", 8333));
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(addrman_find)
     BOOST_CHECK_EQUAL(addrman.size(), 0);
 
     CAddress addr1 = CAddress(ResolveService("250.1.2.1", 8333), NODE_NONE);
-    CAddress addr2 = CAddress(ResolveService("250.1.2.1", 37415), NODE_NONE);
+    CAddress addr2 = CAddress(ResolveService("250.1.2.1", 55002), NODE_NONE);
     CAddress addr3 = CAddress(ResolveService("251.255.2.1", 8333), NODE_NONE);
 
     CNetAddr source1 = ResolveIP("250.1.2.1");
@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE(addrman_getaddr)
 
     CAddress addr1 = CAddress(ResolveService("250.250.2.1", 8333), NODE_NONE);
     addr1.nTime = GetAdjustedTime(); // Set time so isTerrible = false
-    CAddress addr2 = CAddress(ResolveService("250.251.2.2", 37415), NODE_NONE);
+    CAddress addr2 = CAddress(ResolveService("250.251.2.2", 55002), NODE_NONE);
     addr2.nTime = GetAdjustedTime();
     CAddress addr3 = CAddress(ResolveService("251.252.2.3", 8333), NODE_NONE);
     addr3.nTime = GetAdjustedTime();
@@ -420,7 +420,7 @@ BOOST_AUTO_TEST_CASE(caddrinfo_get_tried_bucket)
     CAddrManTest addrman;
 
     CAddress addr1 = CAddress(ResolveService("250.1.1.1", 8333), NODE_NONE);
-    CAddress addr2 = CAddress(ResolveService("250.1.1.1", 37415), NODE_NONE);
+    CAddress addr2 = CAddress(ResolveService("250.1.1.1", 55002), NODE_NONE);
 
     CNetAddr source1 = ResolveIP("250.1.1.1");
 
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(caddrinfo_get_new_bucket)
     CAddrManTest addrman;
 
     CAddress addr1 = CAddress(ResolveService("250.1.2.1", 8333), NODE_NONE);
-    CAddress addr2 = CAddress(ResolveService("250.1.2.1", 37415), NODE_NONE);
+    CAddress addr2 = CAddress(ResolveService("250.1.2.1", 55002), NODE_NONE);
 
     CNetAddr source1 = ResolveIP("250.1.2.1");
 

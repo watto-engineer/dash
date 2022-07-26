@@ -20,7 +20,7 @@
 #include <util.h>
 #include <utilstrencodings.h>
 
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <memory>
 

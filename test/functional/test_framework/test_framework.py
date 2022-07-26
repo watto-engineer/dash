@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
 # Copyright (c) 2014-2020 The Dash Core developers
-# Copyright (c) 2014-2020 The Bytz Core developers
+# Copyright (c) 2014-2020 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Base class for RPC testing."""
@@ -55,7 +55,7 @@ from .util import (
     get_chain_folder,
 )
 
-BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class TestStatus(Enum):
     PASSED = 1
@@ -102,11 +102,11 @@ class BitcoinTestFramework():
 
         parser = optparse.OptionParser(usage="%prog [options]")
         parser.add_option("--nocleanup", dest="nocleanup", default=False, action="store_true",
-                          help="Leave bytzds and test.* datadir on exit or error")
+                          help="Leave wagerrds and test.* datadir on exit or error")
         parser.add_option("--noshutdown", dest="noshutdown", default=False, action="store_true",
-                          help="Don't stop bytzds after the test execution")
+                          help="Don't stop wagerrds after the test execution")
         parser.add_option("--srcdir", dest="srcdir", default=os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../../src"),
-                          help="Source directory containing bytzd/bytz-cli (default: %default)")
+                          help="Source directory containing wagerrd/wagerr-cli (default: %default)")
         parser.add_option("--cachedir", dest="cachedir", default=os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../cache"),
                           help="Directory for caching pregenerated datadirs (default: %default)")
         parser.add_option("--tmpdir", dest="tmpdir", help="Root directory for datadirs")
@@ -124,9 +124,9 @@ class BitcoinTestFramework():
         parser.add_option("--pdbonfailure", dest="pdbonfailure", default=False, action="store_true",
                           help="Attach a python debugger if test fails")
         parser.add_option("--usecli", dest="usecli", default=False, action="store_true",
-                          help="use bytz-cli instead of RPC for all commands")
-        parser.add_option("--bytzd-arg", dest="bytzd_extra_args", default=[], type='string', action='append',
-                          help="Pass extra args to all bytzd instances")
+                          help="use wagerr-cli instead of RPC for all commands")
+        parser.add_option("--wagerrd-arg", dest="wagerrd_extra_args", default=[], type='string', action='append',
+                          help="Pass extra args to all wagerrd instances")
         parser.add_option("--timeoutscale", dest="timeout_scale", default=1, type='int' ,
                           help="Scale the test timeouts by multiplying them with the here provided value (defaul: 1)")
         self.add_options(parser)
@@ -149,10 +149,10 @@ class BitcoinTestFramework():
 
         config = configparser.ConfigParser()
         config.read_file(open(self.options.configfile))
-        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/bytzd' + config["environment"]["EXEEXT"])
-        self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/bytz-cli' + config["environment"]["EXEEXT"])
+        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/wagerrd' + config["environment"]["EXEEXT"])
+        self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/wagerr-cli' + config["environment"]["EXEEXT"])
 
-        self.extra_args_from_options = self.options.bytzd_extra_args
+        self.extra_args_from_options = self.options.wagerrd_extra_args
 
         # Set up temp directory and start logging
         if self.options.tmpdir:
@@ -200,7 +200,7 @@ class BitcoinTestFramework():
         else:
             for node in self.nodes:
                 node.cleanup_on_exit = False
-            self.log.info("Note: bytzds were not stopped and may still be running")
+            self.log.info("Note: wagerrds were not stopped and may still be running")
 
         if not self.options.nocleanup and not self.options.noshutdown and success != TestStatus.FAILED:
             self.log.info("Cleaning up {} on exit".format(self.options.tmpdir))
@@ -289,7 +289,7 @@ class BitcoinTestFramework():
             self.nodes.append(TestNode(old_num_nodes + i, get_datadir_path(self.options.tmpdir, old_num_nodes + i), self.extra_args_from_options, chain=self.chain, rpchost=rpchost, timewait=timewait, bitcoind=binary[i], bitcoin_cli=self.options.bitcoincli, stderr=stderr, mocktime=self.mocktime, coverage_dir=self.options.coveragedir, extra_conf=extra_confs[i], extra_args=extra_args[i], use_cli=self.options.usecli))
 
     def start_node(self, i, *args, **kwargs):
-        """Start a bytzd"""
+        """Start a wagerrd"""
 
         node = self.nodes[i]
 
@@ -300,7 +300,7 @@ class BitcoinTestFramework():
             coverage.write_all_rpc_commands(self.options.coveragedir, node.rpc)
 
     def start_nodes(self, extra_args=None, stderr=None, *args, **kwargs):
-        """Start multiple bytzds"""
+        """Start multiple wagerrds"""
 
         if extra_args is None:
             extra_args = [None] * self.num_nodes
@@ -320,12 +320,12 @@ class BitcoinTestFramework():
                 coverage.write_all_rpc_commands(self.options.coveragedir, node.rpc)
 
     def stop_node(self, i, wait=0):
-        """Stop a bytzd test node"""
+        """Stop a wagerrd test node"""
         self.nodes[i].stop_node(wait=wait)
         self.nodes[i].wait_until_stopped()
 
     def stop_nodes(self, wait=0):
-        """Stop multiple bytzd test nodes"""
+        """Stop multiple wagerrd test nodes"""
         for node in self.nodes:
             # Issue RPC to stop nodes
             node.stop_node(wait=wait)
@@ -411,7 +411,7 @@ class BitcoinTestFramework():
         # User can provide log level as a number or string (eg DEBUG). loglevel was caught as a string, so try to convert it to an int
         ll = int(self.options.loglevel) if self.options.loglevel.isdigit() else self.options.loglevel.upper()
         ch.setLevel(ll)
-        # Format logs the same as bytzd's debug.log with microprecision (so log files can be concatenated and sorted)
+        # Format logs the same as wagerrd's debug.log with microprecision (so log files can be concatenated and sorted)
         formatter = logging.Formatter(fmt='%(asctime)s.%(msecs)03d000Z %(name)s (%(levelname)s): %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
         formatter.converter = time.gmtime
         fh.setFormatter(formatter)
@@ -448,7 +448,7 @@ class BitcoinTestFramework():
                 if os.path.isdir(get_datadir_path(self.options.cachedir, i)):
                     shutil.rmtree(get_datadir_path(self.options.cachedir, i))
 
-            # Create cache directories, run bytzds:
+            # Create cache directories, run wagerrds:
             self.set_genesis_mocktime()
             for i in range(MAX_NODES):
                 datadir = initialize_datadir(self.options.cachedir, i, self.chain)
@@ -500,7 +500,7 @@ class BitcoinTestFramework():
             from_dir = get_datadir_path(self.options.cachedir, i)
             to_dir = get_datadir_path(self.options.tmpdir, i)
             shutil.copytree(from_dir, to_dir)
-            initialize_datadir(self.options.tmpdir, i, self.chain)  # Overwrite port/rpcport in bytz.conf
+            initialize_datadir(self.options.tmpdir, i, self.chain)  # Overwrite port/rpcport in wagerr.conf
 
     def _initialize_chain_clean(self):
         """Initialize empty blockchain for use by the test.
@@ -525,8 +525,8 @@ class MasternodeInfo:
         self.collateral_vout = collateral_vout
 
 
-class BytzTestFramework(BitcoinTestFramework):
-    def set_bytz_test_params(self, num_nodes, masterodes_count, extra_args=None, fast_dip3_enforcement=False):
+class WagerrTestFramework(BitcoinTestFramework):
+    def set_wagerr_test_params(self, num_nodes, masterodes_count, extra_args=None, fast_dip3_enforcement=False):
         self.mn_count = masterodes_count
         self.num_nodes = num_nodes
         self.mninfo = []
@@ -544,18 +544,18 @@ class BytzTestFramework(BitcoinTestFramework):
                 self.extra_args[i].append("-dip3params=30:50")
 
         # make sure to activate dip8 after prepare_masternodes has finished its job already
-        self.set_bytz_dip8_activation(200)
+        self.set_wagerr_dip8_activation(200)
 
         # LLMQ default test params (no need to pass -llmqtestparams)
         self.llmq_size = 3
         self.llmq_threshold = 2
 
-        # This is nRequestTimeout in bytz-q-recovery thread
+        # This is nRequestTimeout in wagerr-q-recovery thread
         self.quorum_data_thread_request_timeout_seconds = 10
         # This is EXPIRATION_TIMEOUT in CQuorumDataRequest
         self.quorum_data_request_expiration_timeout = 300
 
-    def set_bytz_dip8_activation(self, activate_after_block):
+    def set_wagerr_dip8_activation(self, activate_after_block):
         self.dip8_activation_height = activate_after_block
         for i in range(0, self.num_nodes):
             self.extra_args[i].append("-dip8params=%d" % (activate_after_block))
@@ -571,7 +571,7 @@ class BytzTestFramework(BitcoinTestFramework):
                 self.sync_blocks()
         self.sync_blocks()
 
-    def set_bytz_llmq_test_params(self, llmq_size, llmq_threshold):
+    def set_wagerr_llmq_test_params(self, llmq_size, llmq_threshold):
         self.llmq_size = llmq_size
         self.llmq_threshold = llmq_threshold
         for i in range(0, self.num_nodes):
@@ -587,19 +587,19 @@ class BytzTestFramework(BitcoinTestFramework):
     def create_management_tokens(self):
         self.log.info("Generating Management Tokens...")
         self.nodes[0].generate(280)
-        BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+        WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
         global creditsubgroupID
         MGTAddr=self.nodes[0].getnewaddress()
         GVTAddr=self.nodes[0].getnewaddress()
-        self.nodes[0].importprivkey("5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")
         MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", MGTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '25')
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "0", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", GVTBLS["public"], "true", "true")
         self.nodes[0].generate(1)
@@ -1221,9 +1221,9 @@ def skip_if_no_py3_zmq():
 
 
 def skip_if_no_bitcoind_zmq(test_instance):
-    """Skip the running test if bytzd has not been compiled with zmq support."""
+    """Skip the running test if wagerrd has not been compiled with zmq support."""
     config = configparser.ConfigParser()
     config.read_file(open(test_instance.options.configfile))
 
     if not config["components"].getboolean("ENABLE_ZMQ"):
-        raise SkipTest("bytzd has not been built with zmq enabled.")
+        raise SkipTest("wagerrd has not been built with zmq enabled.")

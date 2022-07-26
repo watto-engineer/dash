@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The Bytz Core developers
+# Copyright (c) 2020 The Wagerr developers
 version: 2.1
 jobs:
   lint_all:
@@ -14,7 +14,7 @@ jobs:
         command: |
             apt-get -y update
             apt-get -y install python-pip
-            git clone --depth 1 https://github.com/bytzcurrency/BYTZ .
+            git clone --depth 1 https://github.com/wagerr/wagerr .
             source .circleci/lint_04_install.sh
             source .circleci/lint_05_before_script.sh
             # LevelDB
@@ -66,8 +66,8 @@ jobs:
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
             make -j${JOBS} check
-            git clone http://github.com/bytzcurrency/bytz_hash
-            cd bytz_hash
+            git clone http://github.com/wagerr/wagerr_hash
+            cd wagerr_hash
             python3 setup.py install
             cd -
             test/functional/test_runner.py

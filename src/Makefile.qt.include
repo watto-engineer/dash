@@ -3,32 +3,32 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-bin_PROGRAMS += qt/bytz-qt
-EXTRA_LIBRARIES += qt/libbytzqt.a
+bin_PROGRAMS += qt/wagerr-qt
+EXTRA_LIBRARIES += qt/libwagerrqt.a
 
-# bytz qt core #
+# wagerr qt core #
 QT_TS = \
-  qt/locale/bytz_ar.ts \
-  qt/locale/bytz_bg.ts \
-  qt/locale/bytz_de.ts \
-  qt/locale/bytz_en.ts \
-  qt/locale/bytz_es.ts \
-  qt/locale/bytz_fi.ts \
-  qt/locale/bytz_fr.ts \
-  qt/locale/bytz_it.ts \
-  qt/locale/bytz_ja.ts \
-  qt/locale/bytz_ko.ts \
-  qt/locale/bytz_nl.ts \
-  qt/locale/bytz_pl.ts \
-  qt/locale/bytz_pt.ts \
-  qt/locale/bytz_ro.ts \
-  qt/locale/bytz_ru.ts \
-  qt/locale/bytz_sk.ts \
-  qt/locale/bytz_th.ts \
-  qt/locale/bytz_tr.ts \
-  qt/locale/bytz_vi.ts \
-  qt/locale/bytz_zh_CN.ts \
-  qt/locale/bytz_zh_TW.ts
+  qt/locale/wagerr_ar.ts \
+  qt/locale/wagerr_bg.ts \
+  qt/locale/wagerr_de.ts \
+  qt/locale/wagerr_en.ts \
+  qt/locale/wagerr_es.ts \
+  qt/locale/wagerr_fi.ts \
+  qt/locale/wagerr_fr.ts \
+  qt/locale/wagerr_it.ts \
+  qt/locale/wagerr_ja.ts \
+  qt/locale/wagerr_ko.ts \
+  qt/locale/wagerr_nl.ts \
+  qt/locale/wagerr_pl.ts \
+  qt/locale/wagerr_pt.ts \
+  qt/locale/wagerr_ro.ts \
+  qt/locale/wagerr_ru.ts \
+  qt/locale/wagerr_sk.ts \
+  qt/locale/wagerr_th.ts \
+  qt/locale/wagerr_tr.ts \
+  qt/locale/wagerr_vi.ts \
+  qt/locale/wagerr_zh_CN.ts \
+  qt/locale/wagerr_zh_TW.ts
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
@@ -109,17 +109,17 @@ BITCOIN_MM = \
   qt/macos_appnap.mm
 
 QT_MOC = \
-  qt/bytz.moc \
+  qt/wagerr.moc \
   qt/bitcoinamountfield.moc \
   qt/callback.moc \
   qt/intro.moc \
   qt/overviewpage.moc \
   qt/rpcconsole.moc
 
-QT_QRC_CPP = qt/qrc_bytz.cpp
-QT_QRC = qt/bytz.qrc
-QT_QRC_LOCALE_CPP = qt/qrc_bytz_locale.cpp
-QT_QRC_LOCALE = qt/bytz_locale.qrc
+QT_QRC_CPP = qt/qrc_wagerr.cpp
+QT_QRC = qt/wagerr.qrc
+QT_QRC_LOCALE_CPP = qt/qrc_wagerr_locale.cpp
+QT_QRC_LOCALE = qt/wagerr_locale.qrc
 
 PROTOBUF_CC = qt/paymentrequest.pb.cc
 PROTOBUF_H = qt/paymentrequest.pb.h
@@ -185,9 +185,9 @@ BITCOIN_QT_H = \
   qt/winshutdownmonitor.h
 
 RES_ICONS = \
-  qt/res/icons/bytz.ico \
-  qt/res/icons/bytz_testnet.ico \
-  qt/res/icons/bytz.png \
+  qt/res/icons/wagerr.ico \
+  qt/res/icons/wagerr_testnet.ico \
+  qt/res/icons/wagerr.png \
   qt/res/icons/warning.png \
   qt/res/icons/address-book.png \
   qt/res/icons/transaction0.png \
@@ -315,8 +315,8 @@ RES_IMAGES = \
   qt/res/images/checkbox_partly_checked_light.png \
   qt/res/images/checkbox_partly_checked_hover_light.png \
   qt/res/images/checkbox_partly_checked_disabled_light.png \
-  qt/res/images/bytz_logo_toolbar.png \
-  qt/res/images/bytz_logo_toolbar_blue.png \
+  qt/res/images/wagerr_logo_toolbar.png \
+  qt/res/images/wagerr_logo_toolbar_blue.png \
   qt/res/images/radio_normal_dark.png \
   qt/res/images/radio_normal_hover_dark.png \
   qt/res/images/radio_checked_dark.png \
@@ -359,19 +359,19 @@ RES_FONTS = \
 
 RES_MOVIES = $(wildcard $(srcdir)/qt/res/movies/spinner-*.png)
 
-BITCOIN_RC = qt/res/bytz-qt-res.rc
+BITCOIN_RC = qt/res/wagerr-qt-res.rc
 
 BITCOIN_QT_INCLUDES = -DQT_NO_KEYWORDS
 
-qt_libbytzqt_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
+qt_libwagerrqt_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_DBUS_INCLUDES) $(PROTOBUF_CFLAGS) $(QR_CFLAGS)
-qt_libbytzqt_a_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
-qt_libbytzqt_a_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(QT_PIE_FLAGS)
+qt_libwagerrqt_a_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
+qt_libwagerrqt_a_OBJCXXFLAGS = $(AM_OBJCXXFLAGS) $(QT_PIE_FLAGS)
 
-qt_libbytzqt_a_SOURCES = $(BITCOIN_QT_CPP) $(BITCOIN_QT_H) $(QT_FORMS_UI) \
+qt_libwagerrqt_a_SOURCES = $(BITCOIN_QT_CPP) $(BITCOIN_QT_H) $(QT_FORMS_UI) \
   $(QT_QRC) $(QT_QRC_LOCALE) $(QT_TS) $(PROTOBUF_PROTO) $(RES_ICONS) $(RES_IMAGES) $(RES_CSS) $(RES_FONTS) $(RES_MOVIES)
 
-nodist_qt_libbytzqt_a_SOURCES = $(QT_MOC_CPP) $(QT_MOC) $(PROTOBUF_CC) \
+nodist_qt_libwagerrqt_a_SOURCES = $(QT_MOC_CPP) $(QT_MOC) $(PROTOBUF_CC) \
   $(PROTOBUF_H) $(QT_QRC_CPP) $(QT_QRC_LOCALE_CPP)
 
 # forms/foo.h -> forms/ui_foo.h
@@ -380,71 +380,71 @@ QT_FORMS_H=$(join $(dir $(QT_FORMS_UI)),$(addprefix ui_, $(notdir $(QT_FORMS_UI:
 # Most files will depend on the forms and moc files as includes. Generate them
 # before anything else.
 $(QT_MOC): $(QT_FORMS_H)
-$(qt_libbytzqt_a_OBJECTS) $(qt_bytz_qt_OBJECTS) : | $(QT_MOC)
+$(qt_libwagerrqt_a_OBJECTS) $(qt_wagerr_qt_OBJECTS) : | $(QT_MOC)
 
 #Generating these with a half-written protobuf header leads to wacky results.
 #This makes sure it's done.
 $(QT_MOC): $(PROTOBUF_H)
 $(QT_MOC_CPP): $(PROTOBUF_H)
 
-# bytz-qt binary #
-qt_bytz_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
+# wagerr-qt binary #
+qt_wagerr_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(PROTOBUF_CFLAGS) $(QR_CFLAGS)
-qt_bytz_qt_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
+qt_wagerr_qt_CXXFLAGS = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
 
-qt_bytz_qt_SOURCES = qt/bytz.cpp
+qt_wagerr_qt_SOURCES = qt/wagerr.cpp
 if TARGET_DARWIN
-  qt_bytz_qt_SOURCES += $(BITCOIN_MM)
+  qt_wagerr_qt_SOURCES += $(BITCOIN_MM)
 endif
 if TARGET_WINDOWS
-  qt_bytz_qt_SOURCES += $(BITCOIN_RC)
+  qt_wagerr_qt_SOURCES += $(BITCOIN_RC)
 endif
-qt_bytz_qt_LDADD = qt/libbytzqt.a $(LIBBITCOIN_SERVER)
+qt_wagerr_qt_LDADD = qt/libwagerrqt.a $(LIBBITCOIN_SERVER)
 if ENABLE_WALLET
-qt_bytz_qt_LDADD += $(LIBBITCOIN_UTIL) $(LIBBITCOIN_WALLET)
+qt_wagerr_qt_LDADD += $(LIBBITCOIN_UTIL) $(LIBBITCOIN_WALLET)
 endif
 if ENABLE_ZMQ
-qt_bytz_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
+qt_wagerr_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
 endif
-qt_bytz_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_CRYPTO) $(LIBUNIVALUE) $(LIBBITCOIN_ZEROCOIN) $(LIBLEVELDB) $(LIBLEVELDB_SSE42) $(LIBMEMENV) \
+qt_wagerr_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_CRYPTO) $(LIBUNIVALUE) $(LIBBITCOIN_ZEROCOIN) $(LIBLEVELDB) $(LIBLEVELDB_SSE42) $(LIBMEMENV) \
   $(BACKTRACE_LIB) $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
   $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
-qt_bytz_qt_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-qt_bytz_qt_LIBTOOLFLAGS = $(AM_LIBTOOLFLAGS) --tag CXX
+qt_wagerr_qt_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+qt_wagerr_qt_LIBTOOLFLAGS = $(AM_LIBTOOLFLAGS) --tag CXX
 
 #locale/foo.ts -> locale/foo.qm
 QT_QM=$(QT_TS:.ts=.qm)
 
 SECONDARY: $(QT_QM)
 
-$(srcdir)/qt/bytzstrings.cpp: FORCE
+$(srcdir)/qt/wagerrstrings.cpp: FORCE
 	@test -n $(XGETTEXT) || echo "xgettext is required for updating translations"
-	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $(libbytz_server_a_SOURCES) $(libbytz_wallet_a_SOURCES) $(libbytz_common_a_SOURCES) $(libbytz_zmq_a_SOURCES) $(libbytz_consensus_a_SOURCES) $(libbytz_util_a_SOURCES)
+	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $(libwagerr_server_a_SOURCES) $(libwagerr_wallet_a_SOURCES) $(libwagerr_common_a_SOURCES) $(libwagerr_zmq_a_SOURCES) $(libwagerr_consensus_a_SOURCES) $(libwagerr_util_a_SOURCES)
 
-translate: $(srcdir)/qt/bytzstrings.cpp $(QT_FORMS_UI) $(QT_FORMS_UI) $(BITCOIN_QT_BASE_CPP) qt/bytz.cpp $(BITCOIN_QT_WINDOWS_CPP) $(BITCOIN_QT_WALLET_CPP) $(BITCOIN_QT_H) $(BITCOIN_MM)
+translate: $(srcdir)/qt/wagerrstrings.cpp $(QT_FORMS_UI) $(QT_FORMS_UI) $(BITCOIN_QT_BASE_CPP) qt/wagerr.cpp $(BITCOIN_QT_WINDOWS_CPP) $(BITCOIN_QT_WALLET_CPP) $(BITCOIN_QT_H) $(BITCOIN_MM)
 	@test -n $(LUPDATE) || echo "lupdate is required for updating translations"
-	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(LUPDATE) $^ -I$(srcdir) -locations relative -no-obsolete -ts $(srcdir)/qt/locale/bytz_en.ts
+	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(LUPDATE) $^ -I$(srcdir) -locations relative -no-obsolete -ts $(srcdir)/qt/locale/wagerr_en.ts
 
 $(QT_QRC_LOCALE_CPP): $(QT_QRC_LOCALE) $(QT_QM)
 	@test -f $(RCC)
 	@cp -f $< $(@D)/temp_$(<F)
-	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(RCC) $(RCCFLAGS) -name bytz_locale $(@D)/temp_$(<F) | \
+	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(RCC) $(RCCFLAGS) -name wagerr_locale $(@D)/temp_$(<F) | \
 	  $(SED) -e '/^\*\*.*Created:/d' -e '/^\*\*.*by:/d' > $@
 	@rm $(@D)/temp_$(<F)
 
 $(QT_QRC_CPP): $(QT_QRC) $(QT_FORMS_H) $(RES_ICONS) $(RES_IMAGES) $(RES_CSS) $(RES_FONTS) $(RES_MOVIES) $(PROTOBUF_H)
 	@test -f $(RCC)
-	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(RCC) $(RCCFLAGS) -name bytz $< | \
+	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(RCC) $(RCCFLAGS) -name wagerr $< | \
 	  $(SED) -e '/^\*\*.*Created:/d' -e '/^\*\*.*by:/d' > $@
 
-CLEAN_QT = $(nodist_qt_libbytzqt_a_SOURCES) $(QT_QM) $(QT_FORMS_H) qt/*.gcda qt/*.gcno qt/temp_bytz_locale.qrc qt/res/css/colors/*
+CLEAN_QT = $(nodist_qt_libwagerrqt_a_SOURCES) $(QT_QM) $(QT_FORMS_H) qt/*.gcda qt/*.gcno qt/temp_wagerr_locale.qrc qt/res/css/colors/*
 
 CLEANFILES += $(CLEAN_QT)
 
-bytz_qt_clean: FORCE
-	rm -f $(CLEAN_QT) $(qt_libbytzqt_a_OBJECTS) $(qt_bytz_qt_OBJECTS) qt/bytz-qt$(EXEEXT) $(LIBBITCOINQT)
+wagerr_qt_clean: FORCE
+	rm -f $(CLEAN_QT) $(qt_libwagerrqt_a_OBJECTS) $(qt_wagerr_qt_OBJECTS) qt/wagerr-qt$(EXEEXT) $(LIBBITCOINQT)
 
-bytz_qt : qt/bytz-qt$(EXEEXT)
+wagerr_qt : qt/wagerr-qt$(EXEEXT)
 
 ui_%.h: %.ui
 	@test -f $(UIC)

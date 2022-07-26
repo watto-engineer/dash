@@ -4,7 +4,7 @@
 
 #include <compressor.h>
 #include <util.h>
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <stdint.h>
 

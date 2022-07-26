@@ -6,15 +6,15 @@ reset-files.bash
 *.tar.gz
 
 *.exe
-src/bytz
-src/bytzd
-src/bytz-cli
-src/bytz-tx
-src/test/test_bytz
-src/test/test_bytz_fuzzy
-src/qt/test/test_bytz-qt
+src/wagerr
+src/wagerrd
+src/wagerr-cli
+src/wagerr-tx
+src/test/test_wagerr
+src/test/test_wagerr_fuzzy
+src/qt/test/test_wagerr-qt
 src/qt/res/css/colors/*
-src/bench/bench_bytz
+src/bench/bench_wagerr
 
 # autoreconf
 Makefile.in
@@ -37,8 +37,8 @@ config.log
 config.status
 configure
 libtool
-src/config/bytz-config.h
-src/config/bytz-config.h.in
+src/config/wagerr-config.h
+src/config/wagerr-config.h.in
 src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
@@ -85,14 +85,14 @@ libconftest.dylib*
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
-bytz-qt
-Bytz-Qt.app
+wagerr-qt
+Wagerr-Qt.app
 background.tiff*
 !/depends/Makefile
 
 # Unit-tests
 Makefile.test
-bytz-qt_test
+wagerr-qt_test
 
 # Resources cpp
 qrc_*.cpp
@@ -106,7 +106,7 @@ build
 *.gcno
 *.gcda
 /*.info
-test_bytz.coverage/
+test_wagerr.coverage/
 total.coverage/
 coverage_percent.txt
 
@@ -124,15 +124,15 @@ test/cache/*
 .autotools
 /doc/doxygen/
 
-libbytzconsensus.pc
+libwagerrconsensus.pc
 contrib/devtools/split-debug.sh
-src/qt/bytz-qt.bash
+src/qt/wagerr-qt.bash
 qa/pull-tester/tests-config.sh
 
 #development symlinks
-bytz-cli
-bytzd
-bytz-qt
+wagerr-cli
+wagerrd
+wagerr-qt
 make
 
 /docker/bin

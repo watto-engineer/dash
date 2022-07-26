@@ -3,20 +3,20 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <dstencode.h>
 #include <key_io.h>
-#include <bytzaddrenc.h>
+#include <wagerraddrenc.h>
 #include <chainparams.h>
 //#include <config.h>
 #include <script/standard.h>
 
 std::string EncodeDestination(const CTxDestination &dst, const CChainParams &params/*, const Config &cfg*/)
 {
-    //return cfg.UseCashAddrEncoding() ? EncodeBytzAddr(dst, params) : EncodeLegacyAddr(dst, params);
+    //return cfg.UseCashAddrEncoding() ? EncodeWagerrAddr(dst, params) : EncodeLegacyAddr(dst, params);
     return EncodeLegacyAddr(dst, params);
 }
 
 CTxDestination DecodeDestination(const std::string &addr, const CChainParams &params)
 {
-    CTxDestination dst = DecodeBytzAddr(addr, params);
+    CTxDestination dst = DecodeWagerrAddr(addr, params);
     if (IsValidDestination(dst))
     {
         return dst;

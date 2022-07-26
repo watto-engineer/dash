@@ -136,7 +136,7 @@ public:
 };
 
 /**
- * Bytz RPC command dispatcher.
+ * Wagerr RPC command dispatcher.
  */
 class CRPCTable
 {

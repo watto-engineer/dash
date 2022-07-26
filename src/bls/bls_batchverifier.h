@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BYTZ_CRYPTO_BLS_BATCHVERIFIER_H
-#define BYTZ_CRYPTO_BLS_BATCHVERIFIER_H
+#ifndef WAGERR_CRYPTO_BLS_BATCHVERIFIER_H
+#define WAGERR_CRYPTO_BLS_BATCHVERIFIER_H
 
 #include <bls/bls.h>
 
@@ -237,4 +237,4 @@ private:
     }
 };
 
-#endif //BYTZ_CRYPTO_BLS_BATCHVERIFIER_H
+#endif //WAGERR_CRYPTO_BLS_BATCHVERIFIER_H

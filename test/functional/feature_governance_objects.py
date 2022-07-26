@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # Copyright (c) 2018-2020 The Dash Core developers
-# Copyright (c) 2018-2020 The Bytz Core developers
+# Copyright (c) 2018-2020 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Tests around bytz governance objects."""
+"""Tests around wagerr governance objects."""
 
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from test_framework.messages import *
 
@@ -20,9 +20,9 @@ def validate_object(prepared, rpc_prepared):
     assert_equal(prepared["data"], rpc_prepared["data"])
 
 
-class BytzGovernanceTest (BytzTestFramework):
+class WagerrGovernanceTest (WagerrTestFramework):
     def set_test_params(self):
-        self.set_bytz_test_params(2, 1)
+        self.set_wagerr_test_params(2, 1)
 
     def prepare_object(self, object_type, parent_hash, creation_time, revision, name, amount):
         proposal_rev = revision
@@ -34,7 +34,7 @@ class BytzGovernanceTest (BytzTestFramework):
             "end_epoch": proposal_time + 24 * 60 * 60,
             "payment_amount": amount,
             "payment_address": self.nodes[0].getnewaddress(),
-            "url": "https://bytz.org"
+            "url": "https://wagerr.com"
         }
         proposal_hex = ''.join(format(x, '02x') for x in json.dumps(proposal_template).encode())
         collateral_hash = self.nodes[0].gobject("prepare", parent_hash, proposal_rev, proposal_time, proposal_hex)
@@ -98,4 +98,4 @@ class BytzGovernanceTest (BytzTestFramework):
 
 
 if __name__ == '__main__':
-    BytzGovernanceTest().main()
+    WagerrGovernanceTest().main()

@@ -8,10 +8,10 @@ architectures:
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/bytzcurrency/bytz-detached-sigs.git"
+- "url": "https://github.com/wagerr/wagerr-detached-sigs.git"
   "dir": "signature"
 files:
-- "bytz-osx-unsigned.tar.gz"
+- "wagerr-osx-unsigned.tar.gz"
 script: |
   set -e -o pipefail
   WRAP_DIR=$HOME/wrapped
@@ -27,8 +27,8 @@ script: |
     echo "\$REAL \$@" >> $WRAP_DIR/${prog}
     chmod +x ${WRAP_DIR}/${prog}
   done
-  UNSIGNED=bytz-osx-unsigned.tar.gz
-  SIGNED=bytz-osx-signed.dmg
+  UNSIGNED=wagerr-osx-unsigned.tar.gz
+  SIGNED=wagerr-osx-signed.dmg
   tar -xf ${UNSIGNED}
   OSX_VOLNAME="$(cat osx_volname)"
   ./detached-sig-apply.sh ${UNSIGNED} signature/osx

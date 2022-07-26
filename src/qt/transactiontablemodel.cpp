@@ -403,7 +403,7 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
     case TransactionRecord::MNReward:
         return tr("Masternode Reward");
     case TransactionRecord::StakeMint:
-        return tr("BYTZ Stake");
+        return tr("WAGERR Stake");
 
     default:
         return QString();

@@ -1,7 +1,7 @@
 Description
 ------------
 
-This directory contains data-driven tests for various aspects of Bytz.
+This directory contains data-driven tests for various aspects of Wagerr.
 
 License
 --------

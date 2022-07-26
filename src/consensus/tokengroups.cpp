@@ -1,6 +1,6 @@
 // Copyright (c) 2015-2017 The Bitcoin Unlimited developers
 // Copyright (c) 2019 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <clientversion.h>
@@ -8,7 +8,7 @@
 #include "consensus/tokengroups.h"
 #include "dstencode.h"
 #include <evo/specialtx.h>
-#include "bytzaddrenc.h"
+#include "wagerraddrenc.h"
 #include "logging.h"
 #include "rpc/server.h"
 #include <streams.h>

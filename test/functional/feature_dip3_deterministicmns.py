@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2020 The Dash Core developers
-# Copyright (c) 2015-2020 The Bytz Core developers
+# Copyright (c) 2015-2020 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,16 +11,16 @@ from logging import raiseExceptions
 from test_framework.blocktools import create_block, create_coinbase, get_masternode_payment
 from test_framework.messages import uint256_to_string
 from test_framework.mininode import CTransaction, ToHex, FromHex, COIN, CCbTx
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from time import sleep
 
-BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class Masternode(object):
     pass
 
-class DIP3Test(BytzTestFramework):
+class DIP3Test(WagerrTestFramework):
     def set_test_params(self):
         self.num_initial_mn = 11 # Should be >= 11 to make sure quorums are not always the same MNs
         self.num_nodes = 1 + self.num_initial_mn + 2 # +1 for controller, +1 for mn-qt, +1 for mn created after dip3 activation
@@ -68,18 +68,18 @@ class DIP3Test(BytzTestFramework):
         self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", self.nodes[0].getblockcount())
 
         self.nodes[0].generate(284)
-        BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+        WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
         MGTAddr=self.nodes[0].getnewaddress()
         GVTAddr=self.nodes[0].getnewaddress()
-        self.nodes[0].importprivkey("5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         MGTBLS=self.nodes[0].bls("generate")
         GVTBLS=self.nodes[0].bls("generate")
         MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0", MGTBLS["public"], "false", "true")
         self.nodes[0].generate(1)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '25')
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         GVT=self.nodes[0].configuremanagementtoken("GVT", "GuardianValidator", "0", "https://www.google.com", "0", GVTBLS["public"], "true", "true")
         self.nodes[0].generate(1)
@@ -98,7 +98,7 @@ class DIP3Test(BytzTestFramework):
         assert active == True, "Not Active"
 
         self.log.info("funding controller node")
-        self.log.info("controller node has {} bytz".format(self.nodes[0].getbalance()))
+        self.log.info("controller node has {} wagerr".format(self.nodes[0].getbalance()))
         # Send 1 GVT.credit to controller node
         GVTcreditAddress = self.nodes[0].getnewaddress()
         self.nodes[0].sendtoken(creditsubgroupID, GVTcreditAddress, 1)

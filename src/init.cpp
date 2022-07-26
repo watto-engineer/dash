@@ -2,12 +2,12 @@
 // Copyright (c) 2009-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Copyright (c) 2019-2021 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bytz-config.h>
+#include <config/wagerr-config.h>
 #endif
 
 #include <init.h>
@@ -67,8 +67,8 @@
 #include <tokens/tokengroupmanager.h>
 #include <tokens/tokendb.h>
 
-#include <zbytz/accumulatorcheckpoints.h>
-#include <zbytz/zerocoindb.h>
+#include <zwgr/accumulatorcheckpoints.h>
+#include <zwgr/zerocoindb.h>
 
 #include <evo/deterministicmns.h>
 #include <llmq/quorums_init.h>
@@ -123,7 +123,7 @@ public:
     void Stop() const override {}
     void Close() const override {}
 
-    // Bytz Specific WalletInitInterface InitCoinJoinSettings
+    // Wagerr Specific WalletInitInterface InitCoinJoinSettings
     void AutoLockMasternodeCollaterals() const override {}
     void InitStaking() const override {}
     void InitRewardsManagement() const override {}
@@ -192,7 +192,7 @@ bool ShutdownRequested()
 /**
  * This is a minimally invasive approach to shutdown on LevelDB read errors from the
  * chainstate, while keeping user interface out of the common library, which is shared
- * between bytzd, and bytz-qt and non-server tools.
+ * between wagerrd, and wagerr-qt and non-server tools.
 */
 class CCoinsViewErrorCatcher final : public CCoinsViewBacked
 {
@@ -246,7 +246,7 @@ void PrepareShutdown()
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
     /// module was initialized.
-    RenameThread("bytz-shutoff");
+    RenameThread("wagerr-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopHTTPRPC();
     StopREST();
@@ -625,7 +625,7 @@ void SetupServerArgs()
     gArgs.AddArg("-printtoconsole", "Send trace/debug info to console instead of debug.log file", false, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-printtodebuglog", strprintf("Send trace/debug info to debug.log file (default: %u)", 1), false, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-shrinkdebugfile", "Shrink debug.log file on client startup (default: 1 when no -debug)", false, OptionsCategory::DEBUG_TEST);
-    gArgs.AddArg("-sporkaddr=<bytzaddress>", "Override spork address. Only useful for regtest and devnet. Using this on mainnet or testnet will ban you.", false, OptionsCategory::DEBUG_TEST);
+    gArgs.AddArg("-sporkaddr=<wagerraddress>", "Override spork address. Only useful for regtest and devnet. Using this on mainnet or testnet will ban you.", false, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-sporkkey=<privatekey>", "Set the private key to be used for signing spork messages.", false, OptionsCategory::DEBUG_TEST);
     gArgs.AddArg("-uacomment=<cmt>", "Append comment to the user agent string", false, OptionsCategory::DEBUG_TEST);
 
@@ -634,7 +634,7 @@ void SetupServerArgs()
     gArgs.AddArg("-llmq-data-recovery=<n>", strprintf("Enable automated quorum data recovery (default: %u)", llmq::DEFAULT_ENABLE_QUORUM_DATA_RECOVERY), false, OptionsCategory::MASTERNODE);
     gArgs.AddArg("-llmq-qvvec-sync=<quorum_name>:<mode>", strprintf("Defines from which LLMQ type the masternode should sync quorum verification vectors. Can be used multiple times with different LLMQ types. <mode>: %d (sync always from all quorums of the type defined by <quorum_name>), %d (sync from all quorums of the type defined by <quorum_name> if a member of any of the quorums)", (int32_t)llmq::QvvecSyncMode::Always, (int32_t)llmq::QvvecSyncMode::OnlyIfTypeMember), false, OptionsCategory::MASTERNODE);
     gArgs.AddArg("-masternodeblsprivkey=<hex>", "Set the masternode BLS private key and enable the client to act as a masternode", false, OptionsCategory::MASTERNODE);
-    gArgs.AddArg("-platform-user=<user>", "Set the username for the \"platform user\", a restricted user intended to be used by Bytz Platform, to the specified username.", false, OptionsCategory::MASTERNODE);
+    gArgs.AddArg("-platform-user=<user>", "Set the username for the \"platform user\", a restricted user intended to be used by Wagerr Platform, to the specified username.", false, OptionsCategory::MASTERNODE);
 
     gArgs.AddArg("-acceptnonstdtxn", strprintf("Relay and mine \"non-standard\" transactions (%sdefault: %u)", "testnet/regtest only; ", !testnetChainParams->RequireStandard()), true, OptionsCategory::NODE_RELAY);
     gArgs.AddArg("-dustrelayfee=<amt>", strprintf("Fee rate (in %s/kB) used to defined dust, the value of an output such that it will cost more than its value in fees at this fee rate to spend it. (default: %s)", CURRENCY_UNIT, FormatMoney(DUST_RELAY_TX_FEE)), true, OptionsCategory::NODE_RELAY);
@@ -666,7 +666,7 @@ void SetupServerArgs()
 
 #ifdef ENABLE_WALLET
     gArgs.AddArg("-staking=<n>", strprintf(_("Enable staking functionality (0-1, default: %u)"), 1), false, OptionsCategory::BLOCK_CREATION);
-    gArgs.AddArg("-bytzstake=<n>", strprintf(_("Enable or disable staking functionality for BYTZ inputs (0-1, default: %u)"), 1), false, OptionsCategory::BLOCK_CREATION);
+    gArgs.AddArg("-wagerrstake=<n>", strprintf(_("Enable or disable staking functionality for WAGERR inputs (0-1, default: %u)"), 1), false, OptionsCategory::BLOCK_CREATION);
     gArgs.AddArg("-reservebalance=<n>", "Keep the specified amount available for spending at all times (default: 0)", false, OptionsCategory::BLOCK_CREATION);
 #endif // ENABLE_WALLET
 
@@ -680,8 +680,8 @@ void SetupServerArgs()
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/bytzcurrency/bytz>";
-    const std::string URL_WEBSITE = "<https://bytz.gg>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/wagerr/wagerr>";
+    const std::string URL_WEBSITE = "<https://wagerr.com>";
 
     return CopyrightHolders(_("Copyright (C)"), 2014, COPYRIGHT_YEAR) + "\n" +
            "\n" +
@@ -786,7 +786,7 @@ void CleanupBlockRevFiles()
 void ThreadImport(std::vector<fs::path> vImportFiles)
 {
     const CChainParams& chainparams = Params();
-    RenameThread("bytz-loadblk");
+    RenameThread("wagerr-loadblk");
     ScheduleBatchPriority();
 
     {
@@ -943,7 +943,7 @@ void PeriodicStats()
 }
 
 /** Sanity checks
- *  Ensure that Bytz Core is running in a usable environment with all
+ *  Ensure that Wagerr Core is running in a usable environment with all
  *  necessary library support.
  */
 bool InitSanityCheck(void)
@@ -1655,7 +1655,7 @@ bool AppInitParameterInteraction()
 
 static bool LockDataDirectory(bool probeOnly)
 {
-    // Make sure only a single Bytz Core process is using the data directory.
+    // Make sure only a single Wagerr Core process is using the data directory.
     fs::path datadir = GetDataDir();
     if (!DirIsWritable(datadir)) {
         return InitError(strprintf(_("Cannot write to data directory '%s'; check permissions."), datadir.string()));
@@ -1728,9 +1728,9 @@ bool AppInitMain()
     // Warn about relative -datadir path.
     if (gArgs.IsArgSet("-datadir") && !fs::path(gArgs.GetArg("-datadir", "")).is_absolute()) {
         LogPrintf("Warning: relative datadir option '%s' specified, which will be interpreted relative to the " /* Continued */
-                  "current working directory '%s'. This is fragile, because if Bytz Core is started in the future "
+                  "current working directory '%s'. This is fragile, because if Wagerr Core is started in the future "
                   "from a different location, it will be unable to locate the current data files. There could "
-                  "also be data loss if Bytz Core is started while in a temporary directory.\n",
+                  "also be data loss if Wagerr Core is started while in a temporary directory.\n",
             gArgs.GetArg("-datadir", ""), fs::current_path().string());
     }
 

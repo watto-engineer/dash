@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Copyright (c) 2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -48,7 +48,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
 
         isminetype mine = wtx.txout_is_mine[1];
         if (mine) {
-            // BYTZ stake reward
+            // WAGERR stake reward
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
             sub.credit = nNet + wtx.immature_credit;
@@ -87,7 +87,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 if (wtx.txout_address_is_mine[i])
                 {
-                    // Received by Bytz Address
+                    // Received by Wagerr Address
                     sub.type = TransactionRecord::RecvWithAddress;
                     sub.strAddress = EncodeDestination(wtx.txout_address[i]);
                     sub.txDest = wtx.txout_address[i];
@@ -148,7 +148,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                 CTxDestination address;
                 if (ExtractDestination(wtx.tx->vout[0].scriptPubKey, address))
                 {
-                    // Sent to Bytz Address
+                    // Sent to Wagerr Address
                     sub.strAddress = EncodeDestination(address);
                     sub.txDest = address;
                     sub.updateLabel(wallet);
@@ -240,7 +240,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
 
                 if (!boost::get<CNoDestination>(&wtx.txout_address[nOut]))
                 {
-                    // Sent to Bytz Address
+                    // Sent to Wagerr Address
                     sub.type = TransactionRecord::SendToAddress;
                     sub.strAddress = EncodeDestination(wtx.txout_address[nOut]);
                     sub.txDest = wtx.txout_address[nOut];

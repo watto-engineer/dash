@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.mininode import *
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import isolate_node, reconnect_isolated_node, assert_equal, \
     assert_raises_rpc_error
 
@@ -14,9 +14,9 @@ p2p_instantsend.py
 Tests InstantSend functionality (prevent doublespend for unconfirmed transactions)
 '''
 
-class InstantSendTest(BytzTestFramework):
+class InstantSendTest(WagerrTestFramework):
     def set_test_params(self):
-        self.set_bytz_test_params(7, 3, fast_dip3_enforcement=True)
+        self.set_wagerr_test_params(7, 3, fast_dip3_enforcement=True)
         # set sender,  receiver,  isolated nodes
         self.isolated_idx = 1
         self.receiver_idx = 2

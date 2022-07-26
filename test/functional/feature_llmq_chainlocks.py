@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2021 The Dash Core developers
-# Copyright (c) 2020-2021 The Bytz Core developers
+# Copyright (c) 2020-2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 import time
 
 from test_framework.mininode import *
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 
 '''
@@ -17,9 +17,9 @@ Checks LLMQs based ChainLocks
 
 '''
 
-class LLMQChainLocksTest(BytzTestFramework):
+class LLMQChainLocksTest(WagerrTestFramework):
     def set_test_params(self):
-        self.set_bytz_test_params(4, 3, fast_dip3_enforcement=True)
+        self.set_wagerr_test_params(4, 3, fast_dip3_enforcement=True)
 
     def run_test(self):
 

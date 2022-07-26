@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bytz-config.h>
+#include <config/wagerr-config.h>
 #endif
 
 #include <qt/forms/ui_appearancewidget.h>

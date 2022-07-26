@@ -1,5 +1,5 @@
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "chain.h"
 #include "coins.h"
 #include "dstencode.h"
-#include "bytzaddrenc.h"
+#include "wagerraddrenc.h"
 #include "logging.h"
 #include "policy/policy.h"
 #include "rpc/protocol.h"
@@ -76,12 +76,12 @@ void CTokenGroupManager::ResetTokenGroups() {
     mapTokenGroups.clear();
     ClearManagementTokenGroups();
 
-    CTokenGroupInfo tgInfoBYTZ(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
-    CTransaction tgTxBytz;
-    CTokenGroupDescriptionVariant tgDescriptionBYTZ = CTokenGroupDescriptionRegular("BYTZ", "Bytz", 8, "https://bytz.gg", uint256());
+    CTokenGroupInfo tgInfoWAGERR(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
+    CTransaction tgTxWagerr;
+    CTokenGroupDescriptionVariant tgDescriptionWAGERR = CTokenGroupDescriptionRegular("WAGERR", "Wagerr", 8, "https://wagerr.com", uint256());
     CTokenGroupStatus tokenGroupStatus;
-    CTokenGroupCreation tgCreationBYTZ(MakeTransactionRef(tgTxBytz), uint256(), tgInfoBYTZ, std::make_shared<CTokenGroupDescriptionVariant>(tgDescriptionBYTZ), tokenGroupStatus);
-    mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationBYTZ));
+    CTokenGroupCreation tgCreationWAGERR(MakeTransactionRef(tgTxWagerr), uint256(), tgInfoWAGERR, std::make_shared<CTokenGroupDescriptionVariant>(tgDescriptionWAGERR), tokenGroupStatus);
+    mapTokenGroups.insert(std::pair<CTokenGroupID, CTokenGroupCreation>(NoGroup, tgCreationWAGERR));
 
 }
 

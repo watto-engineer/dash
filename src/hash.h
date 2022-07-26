@@ -25,8 +25,13 @@
 #include <crypto/sph_shavite.h>
 #include <crypto/sph_simd.h>
 #include <crypto/sph_echo.h>
+#include <crypto/sha512.h>
 
+#include <iomanip>
+#include <openssl/sha.h>
+#include <sstream>
 #include <vector>
+
 
 typedef uint256 ChainCode;
 
@@ -54,6 +59,64 @@ public:
         return *this;
     }
 };
+
+class CHash512
+{
+private:
+    CSHA512 sha;
+
+public:
+    static const size_t OUTPUT_SIZE = CSHA512::OUTPUT_SIZE;
+
+    void Finalize(unsigned char hash[OUTPUT_SIZE])
+    {
+        unsigned char buf[CSHA512::OUTPUT_SIZE];
+        sha.Finalize(buf);
+        sha.Reset().Write(buf, CSHA512::OUTPUT_SIZE).Finalize(hash);
+    }
+
+    CHash512& Write(const unsigned char* data, size_t len)
+    {
+        sha.Write(data, len);
+        return *this;
+    }
+
+    CHash512& Reset()
+    {
+        sha.Reset();
+        return *this;
+    }
+};
+
+#ifdef GLOBALDEFINED
+#define GLOBAL
+#else
+#define GLOBAL extern
+#endif
+
+GLOBAL sph_blake512_context z_blake;
+GLOBAL sph_bmw512_context z_bmw;
+GLOBAL sph_groestl512_context z_groestl;
+GLOBAL sph_jh512_context z_jh;
+GLOBAL sph_keccak512_context z_keccak;
+GLOBAL sph_skein512_context z_skein;
+
+#define fillz()                          \
+    do {                                 \
+        sph_blake512_init(&z_blake);     \
+        sph_bmw512_init(&z_bmw);         \
+        sph_groestl512_init(&z_groestl); \
+        sph_jh512_init(&z_jh);           \
+        sph_keccak512_init(&z_keccak);   \
+        sph_skein512_init(&z_skein);     \
+    } while (0)
+
+#define ZBLAKE (memcpy(&ctx_blake, &z_blake, sizeof(z_blake)))
+#define ZBMW (memcpy(&ctx_bmw, &z_bmw, sizeof(z_bmw)))
+#define ZGROESTL (memcpy(&ctx_groestl, &z_groestl, sizeof(z_groestl)))
+#define ZJH (memcpy(&ctx_jh, &z_jh, sizeof(z_jh)))
+#define ZKECCAK (memcpy(&ctx_keccak, &z_keccak, sizeof(z_keccak)))
+#define ZSKEIN (memcpy(&ctx_skein, &z_skein, sizeof(z_skein)))
 
 /** A hasher class for Bitcoin's 160-bit hash (SHA-256 + RIPEMD-160). */
 class CHash160 {
@@ -153,6 +216,24 @@ inline uint256 Hash(const T1 p1begin, const T1 p1end,
               .Write(p5begin == p5end ? pblank : (const unsigned char*)&p5begin[0], (p5end - p5begin) * sizeof(p5begin[0]))
               .Write(p6begin == p6end ? pblank : (const unsigned char*)&p6begin[0], (p6end - p6begin) * sizeof(p6begin[0]))
               .Finalize((unsigned char*)&result);
+    return result;
+}
+
+/** Compute the 512-bit hash of an object. */
+template <typename T1>
+inline uint512 Hash512(const T1 pbegin, const T1 pend)
+{
+    static const unsigned char pblank[1] = {};
+    uint512 result;
+    CHash512().Write(pbegin == pend ? pblank : (const unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0])).Finalize((unsigned char*)&result);
+    return result;
+}
+template <typename T1, typename T2>
+inline uint512 Hash512(const T1 p1begin, const T1 p1end, const T2 p2begin, const T2 p2end)
+{
+    static const unsigned char pblank[1] = {};
+    uint512 result;
+    CHash512().Write(p1begin == p1end ? pblank : (const unsigned char*)&p1begin[0], (p1end - p1begin) * sizeof(p1begin[0])).Write(p2begin == p2end ? pblank : (const unsigned char*)&p2begin[0], (p2end - p2begin) * sizeof(p2begin[0])).Finalize((unsigned char*)&result);
     return result;
 }
 
@@ -297,7 +378,7 @@ public:
 uint64_t SipHashUint256(uint64_t k0, uint64_t k1, const uint256& val);
 uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint32_t extra);
 
-/* ----------- Bytz Hash ------------------------------------------------ */
+/* ----------- X11 Hash ------------------------------------------------ */
 template<typename T1>
 inline uint256 HashX11(const T1 pbegin, const T1 pend)
 
@@ -364,4 +445,81 @@ inline uint256 HashX11(const T1 pbegin, const T1 pend)
     return hash[10].trim256();
 }
 
+/* ----------- Quark Hash ------------------------------------------------ */
+template <typename T1>
+inline uint256 HashQuark(const T1 pbegin, const T1 pend)
+{
+  sph_blake512_context ctx_blake;
+  sph_bmw512_context ctx_bmw;
+  sph_groestl512_context ctx_groestl;
+  sph_jh512_context ctx_jh;
+  sph_keccak512_context ctx_keccak;
+  sph_skein512_context ctx_skein;
+
+  uint256 hash[1];
+  uint32_t mask = 8;
+  uint32_t zero = 0;
+
+  uint32_t hashA[16], hashB[16];
+
+  sph_blake512_init(&ctx_blake);
+  sph_blake512(&ctx_blake, static_cast<const void*>(&pbegin[0]), 80);
+  sph_blake512_close(&ctx_blake, hashA); // 0
+
+  sph_bmw512_init(&ctx_bmw);
+  sph_bmw512(&ctx_bmw, hashA, 64); // 0
+  sph_bmw512_close(&ctx_bmw, hashB); // 1
+
+  if ((hashB[0] & mask) != zero)
+  {
+    sph_groestl512_init(&ctx_groestl);
+    sph_groestl512(&ctx_groestl, hashB, 64); // 1
+    sph_groestl512_close(&ctx_groestl, hashA); // 2
+  } else {
+    sph_skein512_init(&ctx_skein);
+    sph_skein512(&ctx_skein, hashB, 64); // 1
+    sph_skein512_close(&ctx_skein, hashA); // 2
+  }
+
+  sph_groestl512_init(&ctx_groestl);
+  sph_groestl512(&ctx_groestl, hashA, 64); // 2
+  sph_groestl512_close(&ctx_groestl, hashB); // 3
+
+  sph_jh512_init(&ctx_jh);
+  sph_jh512(&ctx_jh, hashB, 64); // 3
+  sph_jh512_close(&ctx_jh, hashA); // 4
+
+  if ((hashA[0] & mask) != zero) // 4
+  {
+    sph_blake512_init(&ctx_blake);
+    sph_blake512(&ctx_blake, hashA, 64); //
+    sph_blake512_close(&ctx_blake, hashB); // 5
+  } else {
+    sph_bmw512_init(&ctx_bmw);
+    sph_bmw512(&ctx_bmw, hashA, 64); // 4
+    sph_bmw512_close(&ctx_bmw, hashB); // 5
+  }
+
+  sph_keccak512_init(&ctx_keccak);
+  sph_keccak512(&ctx_keccak, hashB, 64); // 5
+  sph_keccak512_close(&ctx_keccak, hashA); // 6
+
+  sph_skein512_init(&ctx_skein);
+  sph_skein512(&ctx_skein, hashA, 64); // 6
+  sph_skein512_close(&ctx_skein, hashB); // 7
+
+  if ((hashB[0] & mask) != zero) // 7
+  {
+    sph_keccak512_init(&ctx_keccak);
+    sph_keccak512(&ctx_keccak, hashB, 64); //
+    sph_keccak512_close(&ctx_keccak, hashA); // 8
+  } else {
+    sph_jh512_init(&ctx_jh);
+    sph_jh512(&ctx_jh, hashB, 64); // 7
+    sph_jh512_close(&ctx_jh, hashA); // 8
+  }
+
+  memcpy(&hash[0], hashA, 32);
+  return hash[0];
+}
 #endif // BITCOIN_HASH_H

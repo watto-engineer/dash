@@ -87,7 +87,7 @@
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-//Bytz only features
+//Wagerr only features
 bool fMasternodeMode = false;
 bool fDisableGovernance = false;
 /**
@@ -99,8 +99,8 @@ bool fDisableGovernance = false;
 */
 int nWalletBackups = 10;
 
-const char * const BITCOIN_CONF_FILENAME = "bytz.conf";
-const char * const BITCOIN_PID_FILENAME = "bytzd.pid";
+const char * const BITCOIN_CONF_FILENAME = "wagerr.conf";
+const char * const BITCOIN_PID_FILENAME = "wagerrd.pid";
 
 ArgsManager gArgs;
 
@@ -291,7 +291,7 @@ public:
         std::pair<bool,std::string> found_result(false, std::string());
 
         // We pass "true" to GetArgHelper in order to return the last
-        // argument value seen from the command line (so "bytzd -foo=bar
+        // argument value seen from the command line (so "wagerrd -foo=bar
         // -foo=baz" gives GetArg(am,"foo")=={true,"baz"}
         found_result = GetArgHelper(am.m_override_args, arg, true);
         if (found_result.first) {
@@ -662,13 +662,13 @@ void PrintExceptionContinue(const std::exception_ptr pex, const char* pszExcepti
 
 fs::path GetDefaultDataDir()
 {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Bytzcoin
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Bytzcoin
-    // Mac: ~/Library/Application Support/Bytzcoin
-    // Unix: ~/.bytzcoin
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Wagerrcoin
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Wagerrcoin
+    // Mac: ~/Library/Application Support/Wagerrcoin
+    // Unix: ~/.wagerrcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Bytzcoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Wagerrcoin";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -678,10 +678,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/Bytzcoin";
+    return pathRet / "Library/Application Support/Wagerrcoin";
 #else
     // Unix
-    return pathRet / ".bytzcoin";
+    return pathRet / ".wagerrcoin";
 #endif
 #endif
 }
@@ -807,7 +807,7 @@ void ArgsManager::ReadConfigFile(const std::string& confPath)
     if (stream.good()) {
         ReadConfigStream(stream);
     } else {
-        // Create an empty bytz.conf if it does not excist
+        // Create an empty wagerr.conf if it does not excist
         FILE* configFile = fopen(GetConfigFile(confPath).string().c_str(), "a");
         if (configFile != nullptr)
             fclose(configFile);
@@ -1147,8 +1147,8 @@ std::string CopyrightHolders(const std::string& strPrefix, unsigned int nStartYe
 {
     std::string strCopyrightHolders = strPrefix + strprintf(" %u-%u ", nStartYear, nEndYear) + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
 
-    // Check for untranslated substitution to make sure Bytz Core copyright is not removed by accident
-    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("BYTZ Core") == std::string::npos) {
+    // Check for untranslated substitution to make sure Wagerr Core copyright is not removed by accident
+    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("WAGERR Core") == std::string::npos) {
         strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2014, nEndYear) + "The Dash Core developers";
     }
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident

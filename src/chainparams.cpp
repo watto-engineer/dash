@@ -1,7 +1,7 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2014-2021 The Dash Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -76,8 +76,8 @@ static CBlock CreateDevNetGenesisBlock(const uint256 &prevBlockHash, const std::
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "Investing.com 23/Apr/2018 Facebook Gets First Downgrade Since Data Scandal";
-    const CScript genesisOutputScript = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
+    const char* pszTimestamp = "RT 15/Feb/2018 12.03 GMT - Soros brands bitcoin nest egg for dictators, but still invests in it";
+    const CScript genesisOutputScript = CScript() << ParseHex("046013426db3d877adca7cea18ebeca33e88fafc53ab4040e0fe1bd0429712178c10571dfed6b3f1f19bcff0805cdf1c798e7a84ef0f5e0f4459aabd7e94ced9e6") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
@@ -363,7 +363,7 @@ public:
         consensus.nMasternodeMinimumConfirmations = 15;
         consensus.V17DeploymentHeight = 1669300;
         consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e");
+        consensus.BIP34Hash = uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b");
         consensus.BIP65Height = consensus.V17DeploymentHeight;
         consensus.BIP66Height = 1; // 000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e
         consensus.CSVHeight = consensus.V17DeploymentHeight;
@@ -374,12 +374,12 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V17DeploymentHeight;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
-        consensus.nPowTargetSpacing = 1 * 60; // Bytz: 1 minute
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
 
-        // Bytz specific parameters
+        // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
@@ -393,16 +393,13 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.strCarbonOffsetAddress = "8GDeXyYNyc1o34v8BjtS3e1ZzvLDaqXNNK";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
-        consensus.BytzAddrPrefix = "bytz";
+        consensus.WagerrAddrPrefix = "wagerr";
         consensus.strTokenManagementKey = "sYCxBVHJx3A1tt7B1tFnaCJGnci3hvEf2c"; // 04d449cc1ac45d327c34d8b116797ad9ed287980a9199ea48dc4c8beab90ae2ded738e826ba0b27b5571d63884d985e2a50afbe8eef2925fc280af51a2a2d5e0e0
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 100;
-        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight;
-        consensus.AccruedCarbonOffsetWindow = 1000;
 
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
@@ -422,13 +419,12 @@ public:
 
         consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000e9b67326dfc16f4713f"); // 1623262
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000009db835052f74f73219"); // 1623262
 
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x0");
@@ -438,39 +434,40 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xa3;
-        pchMessageStart[1] = 0xea;
-        pchMessageStart[2] = 0xb5;
-        pchMessageStart[3] = 0x81;
-        nDefaultPort = 37415;
+        pchMessageStart[0] = 0x84;
+        pchMessageStart[1] = 0x2d;
+        pchMessageStart[2] = 0x61;
+        pchMessageStart[3] = 0xfd;
+        nDefaultPort = 55002;
         nPruneAfterHeight = 100000;
 
-        genesis = CreateGenesisBlock(1524496461, 67657104, 0x1e0ffff0, 1, 0 * COIN);
+        genesis = CreateGenesisBlock(1518696181, 96620932, 0x1e0ffff0, 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000feb03167c4a4fa9f2bafcaea0e9f7e5646330e13c69e7ffa2dce58ace44"));
-        assert(genesis.hashMerkleRoot == uint256S("0x80290404060ff7ff5bc6a42f755d24f6087ba5685474a5c8ffafac65de8b2bbf"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079"));
+        assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("main.seeder1.bytz.gg"); // Bytz US1 DNS Seeder
-        vSeeds.emplace_back("main.seeder2.bytz.gg"); // Bytz EU1 DNS Seeder
-
-        // Bytz addresses start with 'X'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,125);
-        // Bytz script addresses start with '7'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,18);
-        // Bytz private keys start with '7' or 'X'
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,140);
-        // Bytz BIP32 pubkeys start with 'xpub' (Bitcoin defaults)
+        vSeeds.emplace_back("main.seederv1.wgr.host");       // Wagerr's official seed 1
+        vSeeds.emplace_back("main.seederv2.wgr.host");       // Wagerr's official seed 2
+        vSeeds.emplace_back("main.devseeder1.wgr.host");     // Wagerr's dev1 testseed
+        vSeeds.emplace_back("main.devseeder2.wgr.host");     // Wagerr's dev1 testseed
+        // Wagerr addresses start with 'W
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
+        // Wagerr script addresses start with '7'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);
+        // Wagerr private keys start with '7' or 'W'
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 199);
+        // Wagerr BIP32 pubkeys start with 'xpub' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x02, 0x2D, 0x25, 0x33};
-        // Bytz BIP32 prvkeys start with 'xprv' (Bitcoin defaults)
+        // Wagerr BIP32 prvkeys start with 'xprv' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x02, 0x21, 0x31, 0x2B};
 
-        // Bytz BIP44 coin type is '416'
-        nExtCoinType = 416;
+        // Wagerr BIP44 coin type is '0x776772'
+        nExtCoinType = 7825266;
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
@@ -495,35 +492,35 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
 
-        vSporkAddresses = {"sYJv3DxNMecQx7Z6FuQqqLGRBFjCVVpxmN"}; // 04a555983e950ddde95d4f236a1faa44eaf7399512342b40163afdc078dea8a941eb48834c61f22bd9632cbb2d7971bfdeddb6e476dc28726449eeb867affc5b26
+        vSporkAddresses = {"WgLzEjcmwJ48x3iTpyPGfcksV71efcTq8n"}; // 043432137728fb0f6ea29315e3e65d76f976b5d88710a8921437e1aabf1adc98ddb55035c17ffa581243db4bc7b6b3e5d0bdd968a28be906098c0b6cb8c6936b80
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
         checkpointData = {
             {
-                {0, uint256S("00000feb03167c4a4fa9f2bafcaea0e9f7e5646330e13c69e7ffa2dce58ace44")},     // Genesis block
-                {1, uint256S("000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e")},     // First mined block
-                {25, uint256S("0000016f6d9c834f269f07e624feb02ba725e3d954017549afde932c8f6d6dc7")},    // Zerocoin enabled
-                {60, uint256S("00000039aca457e0dd2287e0fd636f1998e6b2774a64e8c18fa853776ec309c8")},    // Zerocoin V2 enabled
-                {200, uint256S("000000078d815b257737d227d50e22f2486fd3ded21c5c0bca347a410c71bd26")},   // Switch PoW-PoS
-                {201, uint256S("5542cf20a79e2658f45fc5385cc431035efae3980985254e01a08d930408bc52")},   // Switch PoW-PoS
-                {202, uint256S("016023220b7e1578f923a126dddecbf345d8004734afb52636f60954ba116d21")},   // Switch PoW-PoS
-                {300, uint256S("0cddd447eebbc7bd9f158bdc25eb1b290ab2b6f54ae77b07229c8da7b1999d99")},   //
-                {700, uint256S("eac3327ace445de2f39a6209b3a778d370a7e6d676c254d82e3d1c8de272559b")},   // tx=1230 time=1526558980
-                {67000, uint256S("727101d555687b91ed9740f3301048f3cfe5e5062babe491f2120ea7173b7234")}, // Add 3 premine blocks after this one
-                {69713, uint256S("097a4a371b031eea8d26384a15e894dc60fcb7cd8304f62ab35c760317c36e28")}, // release v0.1.03
-                {1623268, uint256S("1a0a8a556b6d95a44f7ba8c587879197051c1652e430ee3c3f57e5c173d80d38")}, // tx=3981853 time=1624868163
-                {1669299, uint256S("039f15ac2d9a8e0adb7c9040428e8784782b20100185dc4949323c661617070a")}, // release v0.2.0.0
-                {1669300, uint256S("fbfcaed9ada1df81ec70ba584576bd0128730d6e88866e93d4c4c512d82fb707")}, // release v0.2.0.0
-                {1733710, uint256S("62257b9363e5e62207cb86539c93726ce6ba3901501d2ca992460d55193e82d7")}, // tx=4270019 time=1631277915
+                {1, uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b")},     // First PoW premine block
+                {101, uint256S("0000005e89a1fab52bf996e7eb7d653962a0eb064c16c09887504797deb7feaf")},     // Last premine block
+                {1001, uint256S("0000002a314058a8f61293e18ddbef5664a2097ac0178005f593444549dd5b8c")},     // Last PoW block
+                {5530, uint256S("b3a8e6eb90085394c1af916d5690fd5b83d53c43cf60c7b6dd1e904e0ede8e88")},     // Block on which switch off happened, 5531, 5532 differed
+                {14374, uint256S("61dc2dbb225de3146bc59ab96dedf48047ece84d004acaf8f386ae7a7d074983")},
+                {70450, uint256S("ea83266a9dfd7cf92a96aa07f86bdf60d45850bd47c175745e71a1aaf60b4091")},
+                {257142, uint256S("eca635870323e7c0785fec1e663f4cb8645b7e84b5df4511ba4c189e580bfafd")},
+                {290000, uint256S("5a70e614a2e6035be0fa1dd1a67bd6caa0a78e396e889aac42bbbc08e11cdabd")},
+                {294400, uint256S("01be3c3c84fd6063ba27080996d346318242d5335efec936408c1e1ae3fdb4a1")},
+                {320000, uint256S("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb")},
+                {695857, uint256S("680a170b5363f308cc0698a53ab6a83209dab06c138c98f91110f9e11e273778")},
+                {720000, uint256S("63fc356380b3b8791e83a9d63d059ccc8d0e65dab703575ef4ca070e26e02fc7")},
+                {732900, uint256S("5d832b3de9b207e03366fb8d4da6265d52015f5d1bd8951a656b5d4508a1da8e")},
+                {891270, uint256S("eedb1794ca9267fb0ef88aff27afdd376ac93a54491a7b812cbad4b6c2e28d25")},
+                {1427000, uint256S("2ee16722a21094f4ae8e371021c28d19268d6058de42e37ea0d4c90273c6a42e")},    // 3693972 1605485238
             }
         };
 
         chainTxData = ChainTxData{
-            1631277915, // * UNIX timestamp of last known number of transactions (Block 1733710)
-            4270019,    // * total number of transactions between genesis and that timestamp
+            1605485238, // * UNIX timestamp of last known number of transactions (Block 1344000)
+            3693972,     // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.044       // * estimated number of transactions per second after that timestamp
+            0.0008        // * estimated number of transactions per second after that timestamp
         };
     }
 };
@@ -563,12 +560,12 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V17DeploymentHeight;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
-        consensus.nPowTargetSpacing = 1 * 60; // Bytz: 1 minute
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
 
-        // Bytz specific parameters
+        // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
@@ -582,16 +579,13 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 51197;
         consensus.nBlockStakeModifierV2 = 826130;
-        consensus.strCarbonOffsetAddress = "TqqiV3twXTaD5pL4vrA3nZqT8d8BPbxM3e";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
-        consensus.BytzAddrPrefix = "bytztest";
-        consensus.strTokenManagementKey = "TsdKwqnDKEN3N38QG5hTQBNJe6y1mdECy8";
+        consensus.WagerrAddrPrefix = "wagerrtest";
+        consensus.strTokenManagementKey = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nCoinbaseMaturity = 15;
-        consensus.AccruedCarbonOffsetStartHeight = 831200;
-        consensus.AccruedCarbonOffsetWindow = 100;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -620,40 +614,40 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x0000009303aeadf8cf3812f5c869691dbd4cb118ad20e9bf553be434bafe6a52"); // 470000
 
-        pchMessageStart[0] = 0x81;
-        pchMessageStart[1] = 0xbb;
-        pchMessageStart[2] = 0x9f;
-        pchMessageStart[3] = 0x83;
-        nDefaultPort = 47415;
+        pchMessageStart[0] = 0x87;
+        pchMessageStart[1] = 0x9e;
+        pchMessageStart[2] = 0xd1;
+        pchMessageStart[3] = 0x99;
+        nDefaultPort = 55004;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1524496461, 846737, 0x1e0ffff0, 1, 0 * COIN);
+        genesis = CreateGenesisBlock(1518696182, 75183976, 0x1e0ffff0, 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12"));
-        //assert(genesis.hashMerkleRoot == uint256S("0xe0028eb9648db56b1ac77cf090b99048a8007e2bb64b68f092c03c7f56a662c7"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"));
+        //assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
         vFixedSeeds.clear();
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 
         vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.emplace_back("testnet.seeder1.bytz.gg"); // Bytz US1 DNS Seeder
-        vSeeds.emplace_back("testnet.seeder2.bytz.gg"); // Bytz EU1 DNS Seeder
-        vSeeds.emplace_back("testnet.seeder3.bytz.gg"); // Bytz ASIA1 (Singapore) DNS Seeder
-        vSeeds.emplace_back("testnet.seeder4.bytz.gg"); // Bytz AUSTRALIA1 (Sydney) DNS Seeder
+        vSeeds.emplace_back("testnet-seeder-01.wgr.host");
+        vSeeds.emplace_back("testnet-seedr-02.wgr.host");
+        vSeeds.emplace_back("testnet.testnet-seeder-01.wgr.host");
+        vSeeds.emplace_back("testnet.testnet-seeder-02.wgr.host");
 
-        // Testnet Bytz addresses start with 'T'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Bytz script addresses start with '4' or '5'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
-        // Testnet private keys start with 'z' or '2'
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Wagerr addresses start with 'y'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
+        // Testnet Wagerr script addresses start with '8' or '9'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,125);
+        // Testnet private keys start with '9' or 'c'
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,177);
+        // Testnet Wagerr BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Testnet Bytz BIP44 coin type is '1' (All coin's testnet default)
+        // Testnet Wagerr BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params
@@ -678,21 +672,26 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TozWRrxnKYpshJw5PhAaP7gHzTLDFhKCnr"};
+        vSporkAddresses = {"TNV3YwvMaD7qBASs6KjPTdYiC8GjqeQosm"}; // 04d23d4179050244bfeff9f03ab4117e79a8835a9c0aba21b6df8d9e31042cc3b76bcb323a6e3a0e87b801ba2beef2c1db3a2a93d62bdb2e10192d8807f27e6f33
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
         checkpointData = {
             {
-                {0, uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12")},
+                {0, uint256S("00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5")},
+                {1, uint256S("0000098cc93ece2804776d2e9eda2d01e2ff830d80bab22500821361259f8aa3")},
+                {450, uint256S("3cec3911fdf321a22b8109ca95ca28913e6b51f0d80cc6d2b2e30e1f2a6115c0")},
+                {469, uint256S("d69d843cd63d333cfa3ff4dc0675fa320d6ef8cab7ab1a73bf8a1482210f93ce")},
+                {1100, uint256S("fa462709a1f3cf81d699ffbd45440204aa4d38de84c2da1fc8b3ff15c3c7a95f")},  // 1588780440
+                {2000, uint256S("a5aab45e4e2345715adf79774d661a5bb9b2a2efd001c339df5678418fb51409")}, // 1588834261
             }
         };
 
         chainTxData = ChainTxData{
-            1530893198, // * UNIX timestamp of last known number of transactions (Block 387900)
-            4404,       // * total number of transactions between genesis and that timestamp
-                        //   (the tx=... number in the SetBestChain debug.log lines)
-            0.01        // * estimated number of transactions per second after that timestamp
+            1518696183, // * UNIX timestamp of last known number of transactions (Block 387900)
+            0,       // * total number of transactions between genesis and that timestamp
+                     //   (the tx=... number in the SetBestChain debug.log lines)
+            0.000019 // * estimated number of transactions per second after that timestamp
         };
 
     }
@@ -732,12 +731,12 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 2; // DIP0008 activated immediately on devnet
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Bytz: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
 
-        // Bytz specific parameters
+        // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
@@ -751,12 +750,9 @@ public:
         consensus.nStakeMinAge = 60 * 60; // 1 hour
         consensus.nBlockStakeModifierV1A = 1000;
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.strCarbonOffsetAddress = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
-        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight;
-        consensus.AccruedCarbonOffsetWindow = 100;
-        consensus.BytzAddrPrefix = "bytztest";
+        consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TkDutp66Ygp5PpPnrETvfyrtnxq5UevLpo";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
@@ -790,17 +786,17 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
 
-        pchMessageStart[0] = 0xb2;
-        pchMessageStart[1] = 0x8f;
-        pchMessageStart[2] = 0xa3;
-        pchMessageStart[3] = 0xcc;
-        nDefaultPort = 47626;
+        pchMessageStart[0] = 0xc5;
+        pchMessageStart[1] = 0x2a;
+        pchMessageStart[2] = 0x93;
+        pchMessageStart[3] = 0xeb;
+        nDefaultPort = 55008;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1524496461, 12351, 0x207fffff, 1, 0 * COIN);
+        genesis = CreateGenesisBlock(1518696184, 4638953, 0x207fffff, 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x618435c615f3d628acf97c19c4b3e6320555c62f515d4144425e4e8b7610fbab"));
-//        assert(genesis.hashMerkleRoot == uint256S("0xe0028eb9648db56b1ac77cf090b99048a8007e2bb64b68f092c03c7f56a662c7"));
+        assert(consensus.hashGenesisBlock == uint256S("0x174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530"));
+//        assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
         if (!fHelpOnly) {
             devnetGenesis = FindDevNetGenesisBlock(genesis, 0 * COIN);
@@ -809,20 +805,20 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        //vSeeds.push_back(CDNSSeedData("bytzevo.org",  "devnet-seed.bytzevo.org"));
+        //vSeeds.push_back(CDNSSeedData("dashevo.org",  "devnet-seed.dashevo.org"));
 
-        // Testnet Bytz addresses start with 'T'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Bytz script addresses start with '4' or '5'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
-        // Testnet private keys start with 'z' or '2'
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Wagerr addresses start with 'y'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
+        // Testnet Wagerr script addresses start with '8' or '9'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,125);
+        // Testnet private keys start with '9' or 'c'
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,177);
+        // Testnet Wagerr BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Testnet Bytz BIP44 coin type is '1' (All coin's testnet default)
+        // Testnet Wagett BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params
@@ -847,14 +843,14 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TkDutp66Ygp5PpPnrETvfyrtnxq5Z1ub79"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
+        vSporkAddresses = {"TNV3YwvMaD7qBASs6KjPTdYiC8GjqeQosm"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
         nMinSporkKeys = 1;
         // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
         fBIP9CheckMasternodesUpgraded = false;
 
-        checkpointData = (CCheckpointData) {
+        checkpointData = {
             {
-                { 0, uint256S("0x000008ca1832a4baf228eb1553c03d3a2c8e02399550dd6ea8d65cec3ef23d2e")},
+                { 0, uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
                 { 1, devnetGenesis.GetHash() },
             }
         };
@@ -902,12 +898,12 @@ public:
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 432;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Bytz: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Bytz: 2.5 minutes
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
 
-        // Bytz specific parameters
+        // Wagerr specific parameters
         // Proof of Stake parameters
         consensus.nPosStartHeight = 201;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
@@ -921,12 +917,9 @@ public:
         consensus.nStakeMinAge = 0;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.strCarbonOffsetAddress = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
-        consensus.AccruedCarbonOffsetStartHeight = consensus.V17DeploymentHeight + 30;
-        consensus.AccruedCarbonOffsetWindow = 10;
-        consensus.BytzAddrPrefix = "bytzreg";
+        consensus.WagerrAddrPrefix = "wagerrreg";
         consensus.strTokenManagementKey = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
@@ -960,17 +953,17 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x00");
 
-        pchMessageStart[0] = 0xb2;
-        pchMessageStart[1] = 0x8f;
-        pchMessageStart[2] = 0xa3;
-        pchMessageStart[3] = 0xcc;
-        nDefaultPort = 47526;
+        pchMessageStart[0] = 0x12;
+        pchMessageStart[1] = 0x76;
+        pchMessageStart[2] = 0xa1;
+        pchMessageStart[3] = 0xfa;
+        nDefaultPort = 55006;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1524496461, 12351, 0x207fffff, 1, 0 * COIN);
+        genesis = CreateGenesisBlock(1518696183, 574752, 0x207fffff, 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x618435c615f3d628acf97c19c4b3e6320555c62f515d4144425e4e8b7610fbab"));
-//        assert(genesis.hashMerkleRoot == uint256S("0xe0028eb9648db56b1ac77cf090b99048a8007e2bb64b68f092c03c7f56a662c7"));
+        assert(consensus.hashGenesisBlock == uint256S("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
+//        assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
@@ -987,15 +980,18 @@ public:
         nPoolMinParticipants = 2;
         nPoolMaxParticipants = 20;
 
-        // privKey: 5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG
-        vSporkAddresses = {"TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"}; // 048b664010f7851071787d58c276c05701b7109fa29f2360a3e72b3bdfa32b49cf20a23fd34bcc49fc564fdbdccc54dd0dc9183a7bdf05d580d118fcdcd4abfb3f
+        /* Spork Key for RegTest:
+        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
+        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
+        */
+        vSporkAddresses = {"TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH"}; // 048b664010f7851071787d58c276c05701b7109fa29f2360a3e72b3bdfa32b49cf20a23fd34bcc49fc564fdbdccc54dd0dc9183a7bdf05d580d118fcdcd4abfb3f
         nMinSporkKeys = 1;
         // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
 
         checkpointData = {
             {
-                {0, uint256S("0x000008ca1832a4baf228eb1553c03d3a2c8e02399550dd6ea8d65cec3ef23d2e")},
+                {0, uint256S("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec")},
             }
         };
 
@@ -1005,18 +1001,18 @@ public:
             0
         };
 
-        // Testnet Bytz addresses start with 'T'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,66);
-        // Testnet Bytz script addresses start with '4' or '5'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,9);
-        // Testnet private keys start with 'z' or '2'
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,144);
-        // Testnet Bytz BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        // Testnet Wagerr addresses start with 'y'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
+        // Testnet Wagerr script addresses start with '8' or '9'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,125);
+        // Testnet private keys start with '9' or 'c'
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,177);
+        // Testnet Wagerr BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
         base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Bytz BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
         base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
 
-        // Regtest Bytz BIP44 coin type is '1' (All coin's testnet default)
+        // Regtest Wagerr BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
         // long living quorum params

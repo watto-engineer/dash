@@ -18,7 +18,7 @@
 #include <QPixmap>
 
 #if defined(HAVE_CONFIG_H)
-#include <config/bytz-config.h> /* for USE_QRCODE */
+#include <config/wagerr-config.h> /* for USE_QRCODE */
 #endif
 
 #ifdef USE_QRCODE

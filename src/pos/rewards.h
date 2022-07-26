@@ -1,5 +1,5 @@
 // Copyright (c) 2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,14 +11,11 @@
 #include "primitives/block.h"
 #include "tokens/groups.h"
 
-class CBlockIndex;
-
 class CReward {
 public:
     typedef enum RewardType_t {
         REWARD_COINBASE,
         REWARD_COINSTAKE,
-        REWARD_CARBON,
         REWARD_MASTERNODE,
         REWARD_OPERATOR,
 
@@ -68,7 +65,7 @@ public:
     };
 
     CBlockReward(const CBlock& block, const bool fLegacy, const CAmount coinstakeValueIn);
-    CBlockReward(const int nHeight, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fPos, const Consensus::Params& consensusParams);
+    CBlockReward(const int nHeight, const CAmount nFees, const bool fPos, const Consensus::Params& consensusParams);
 
     bool operator<(const CBlockReward& rhs) const { return CompareTo(rhs) < 0; }
     bool operator>(const CBlockReward& rhs) const { return CompareTo(rhs) > 0; }
@@ -85,13 +82,11 @@ public:
     CReward GetReward(CReward::RewardType rewardType);
     CReward GetCoinbaseReward();
     CReward GetCoinstakeReward();
-    CReward GetCarbonReward();
     CReward GetMasternodeReward();
     CReward GetOperatorReward();
 
     void SetCoinbaseReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
     void SetCoinstakeReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
-    void SetCarbonReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
     void SetMasternodeReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
     void SetOperatorReward(const CAmount amount, const CTokenGroupID tokenID = NoGroup, const CAmount tokenAmount = 0);
 
@@ -99,14 +94,13 @@ public:
     void MoveMasternodeRewardToCoinstake();
     void RemoveMasternodeReward();
 
-    void AddFees(const CAmount nMinerFees, const CAmount nCarbonFeesEscrow);
+    void AddFees(const CAmount nFees);
 
-    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fLegacy, const bool fPOS);
+    void SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS);
 
     CReward GetTotalRewards();
 };
 
-CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams);
-bool GetCarbonPayments(CBlockIndex* pindexPrev, const int nHeight, const Consensus::Params& consensus_params, const CAmount nFees, CAmount& nMinerFees, CAmount& nCarbonFeesEscrow, CAmount& nCarbonFeesPayable);
+CAmount GetBlockSubsidyWagerr(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams);
 
 #endif //POS_REWARDS_H

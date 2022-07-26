@@ -13,7 +13,7 @@
 - (NSString *)__bundleIdentifier
 {
     if (self == [NSBundle mainBundle]) {
-        return @"org.bytz.Bytz-Qt";
+        return @"org.wagerr.Wagerr-Qt";
     } else {
         return [self __bundleIdentifier];
     }

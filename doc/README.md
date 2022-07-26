@@ -1,39 +1,39 @@
-Bytz Core
+Wagerr Core
 ==========
 
-This is the official reference wallet for Bytz digital currency and comprises the backbone of the Bytz peer-to-peer network. You can [download Bytz Core](https://bytz.gg/wallet/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for Wagerr digital currency and comprises the backbone of the Wagerr peer-to-peer network. You can [download Wagerr Core](https://wagerr.com/wallet/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
-The following are some helpful notes on how to run Bytz on your native platform.
+The following are some helpful notes on how to run Wagerr on your native platform.
 
 ### Unix
 
 Unpack the files into a directory and run:
 
-- `bin/bytz-qt` (GUI) or
-- `bin/bytzd` (headless)
+- `bin/wagerr-qt` (GUI) or
+- `bin/wagerrd` (headless)
 
 ### Windows
 
-Unpack the files into a directory, and then run bytz-qt.exe.
+Unpack the files into a directory, and then run wagerr-qt.exe.
 
 ### OS X
 
-Drag Bytz-Qt to your applications folder, and then run Bytz-Qt.
+Drag Wagerr-Qt to your applications folder, and then run Wagerr-Qt.
 
 ### Need Help?
 
-* See the [Bytz documentation](https://docs.bytz.gg)
+* See the [Wagerr documentation](https://docs.wagerr.com)
 for help and more information.
-* See the [Bytz Developer Documentation](https://bytz-docs.github.io/) 
+* See the [Wagerr Developer Documentation](https://wagerr-docs.github.io/)
 for technical specifications and implementation details.
-* Ask for help on [Bytz Nation Discord](http://bytzchat.org)
-* Ask for help on the [Bytz Forum](https://bytz.gg/forum)
+* Ask for help on [Wagerr Nation Discord](http://wagerrchat.org)
+* Ask for help on the [Wagerr Forum](https://wagerr.com/forum)
 
 Building
 ---------------------
-The following are developer notes on how to build Bytz Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
+The following are developer notes on how to build Wagerr Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
 - [OS X Build Notes](build-osx.md)
 - [Unix Build Notes](build-unix.md)
@@ -43,7 +43,7 @@ The following are developer notes on how to build Bytz Core on your native platf
 
 Development
 ---------------------
-The Bytz Core repo's [root README](/README.md) contains relevant information on the development process and automated testing.
+The Wagerr Core repo's [root README](/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Release Notes](release-notes.md)
@@ -59,8 +59,8 @@ The Bytz Core repo's [root README](/README.md) contains relevant information on 
 - [Benchmarking](benchmarking.md)
 
 ### Resources
-* Discuss on the [Bytz Forum](https://bytz.gg/forum), in the Development & Technical Discussion board.
-* Discuss on [Bytz Nation Discord](http://bytzchat.org)
+* Discuss on the [Wagerr Forum](https://wagerr.com/forum), in the Development & Technical Discussion board.
+* Discuss on [Wagerr Nation Discord](http://wagerrchat.org)
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)

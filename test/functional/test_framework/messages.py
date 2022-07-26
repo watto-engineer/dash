@@ -24,10 +24,10 @@ import time
 from test_framework.siphash import siphash256
 from test_framework.util import hex_str_to_bytes, bytes_to_hex_str
 
-import bytz_hash
+import wagerr_hash
 
-MIN_VERSION_SUPPORTED = 70915
-MY_VERSION = 70918  # LLMQ_DATA_MESSAGES_VERSION
+MIN_VERSION_SUPPORTED = 70924
+MY_VERSION = 70930  # LLMQ_DATA_MESSAGES_VERSION
 MY_SUBVERSION = b"/python-mininode-tester:0.0.3%s/"
 MY_RELAY = 1 # from version 70001 onwards, fRelay should be appended to version messages (BIP37)
 
@@ -49,8 +49,8 @@ def sha256(s):
 def hash256(s):
     return sha256(sha256(s))
 
-def bytzhash(s):
-    return bytz_hash.getPoWHash(s)
+def wagerrhash(s):
+    return wagerr_hash.getPoWHash(s)
 
 def ser_compact_size(l):
     r = b""
@@ -200,7 +200,7 @@ def FromHex(obj, hex_string):
 def ToHex(obj):
     return bytes_to_hex_str(obj.serialize())
 
-# Objects that map to bytzd objects, which can be serialized/deserialized
+# Objects that map to wagerrd objects, which can be serialized/deserialized
 
 class CService():
     def __init__(self):
@@ -486,8 +486,8 @@ class CBlockHeader():
             r += struct.pack("<I", self.nTime)
             r += struct.pack("<I", self.nBits)
             r += struct.pack("<I", self.nNonce)
-            self.sha256 = uint256_from_str(bytzhash(r))
-            self.hash = encode(bytzhash(r)[::-1], 'hex_codec').decode('ascii')
+            self.sha256 = uint256_from_str(wagerrhash(r))
+            self.hash = encode(wagerrhash(r)[::-1], 'hex_codec').decode('ascii')
 
     def rehash(self):
         self.sha256 = None
@@ -1351,7 +1351,7 @@ class msg_headers():
         self.headers = headers if headers is not None else []
 
     def deserialize(self, f):
-        # comment in bytzd indicates these should be deserialized as blocks
+        # comment in wagerrd indicates these should be deserialized as blocks
         blocks = deser_vector(f, CBlock)
         for x in blocks:
             self.headers.append(CBlockHeader(x))

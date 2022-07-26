@@ -4,7 +4,7 @@
 
 #include <bls/bls.h>
 #include <bls/bls_batchverifier.h>
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <boost/test/unit_test.hpp>
 

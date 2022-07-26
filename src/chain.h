@@ -4,7 +4,7 @@
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2019 The PIVX developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -227,10 +227,6 @@ public:
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
-    //! Carbon Offset related fields
-    //! Amount of accrued carbon offset fees that will be paid in the next carbon payment block
-    uint32_t nCarbonFeesEscrow;
-
     //! block header
     int32_t nVersion;
     uint256 hashMerkleRoot;
@@ -270,8 +266,6 @@ public:
         mapZerocoinSupply.clear();
         vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
-
-        nCarbonFeesEscrow = 0;
 
         nVersion       = 0;
         hashMerkleRoot = uint256();
@@ -536,12 +530,12 @@ public:
             READWRITE(nAccumulatorCheckpoint);
             READWRITE(mapZerocoinSupply);
             READWRITE(vMintDenominationsInBlock);
-            READWRITE(nStakeModifier);
         }
-
+        // v1/v2 modifier selection.
         if (this->nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(nStakeModifierV2);
-            READWRITE(nCarbonFeesEscrow);
+        } else {
+            READWRITE(nStakeModifier);
         }
     }
 

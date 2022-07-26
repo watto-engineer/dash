@@ -111,7 +111,7 @@ EXPECTED_HOLDER_NAMES = [
     "The Dash Core developers\n",
     "The PIVX developers\n",
     "The Ion developers\n",
-    "The Bytz Core developers\n",
+    "The Wagerr developers\n",
 ]
 
 DOMINANT_STYLE_COMPILED = {}
@@ -284,7 +284,7 @@ Usage:
     $ ./copyright_header.py report <base_directory> [verbose]
 
 Arguments:
-    <base_directory> - The base directory of a Bytz Core source code repository.
+    <base_directory> - The base directory of a Wagerr Core source code repository.
     [verbose] - Includes a list of every file of each subcategory in the report.
 """
 
@@ -347,7 +347,7 @@ def write_file_lines(filename, file_lines):
 COPYRIGHT = 'Copyright \(c\)'
 YEAR = "20[0-9][0-9]"
 YEAR_RANGE = '(%s)(-%s)?' % (YEAR, YEAR)
-HOLDER = 'The Bytz Core developers'
+HOLDER = 'The Wagerr developers'
 UPDATEABLE_LINE_COMPILED = re.compile(' '.join([COPYRIGHT, YEAR_RANGE, HOLDER]))
 
 def get_updatable_copyright_line(file_lines):
@@ -415,24 +415,24 @@ def exec_update_header_year(base_directory):
 ################################################################################
 
 UPDATE_USAGE = """
-Updates all the copyright headers of "The Bytz Core developers" which were
+Updates all the copyright headers of "The Wagerr developers" which were
 changed in a year more recent than is listed. For example:
 
-// Copyright (c) <firstYear>-<lastYear> The Bytz Core developers
+// Copyright (c) <firstYear>-<lastYear> The Wagerr developers
 
 will be updated to:
 
-// Copyright (c) <firstYear>-<lastModifiedYear> The Bytz Core developers
+// Copyright (c) <firstYear>-<lastModifiedYear> The Wagerr developers
 
 where <lastModifiedYear> is obtained from the 'git log' history.
 
 This subcommand also handles copyright headers that have only a single year. In those cases:
 
-// Copyright (c) <year> The Bytz Core developers
+// Copyright (c) <year> The Wagerr developers
 
 will be updated to:
 
-// Copyright (c) <year>-<lastModifiedYear> The Bytz Core developers
+// Copyright (c) <year>-<lastModifiedYear> The Wagerr developers
 
 where the update is appropriate.
 
@@ -440,7 +440,7 @@ Usage:
     $ ./copyright_header.py update <base_directory>
 
 Arguments:
-    <base_directory> - The base directory of Bytz Core source code repository.
+    <base_directory> - The base directory of Wagerr Core source code repository.
 """
 
 def print_file_action_message(filename, action):
@@ -465,7 +465,7 @@ def get_header_lines(header, start_year, end_year):
     return [line + '\n' for line in lines]
 
 CPP_HEADER = '''
-// Copyright (c) %s The Bytz Core developers
+// Copyright (c) %s The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 '''
@@ -474,7 +474,7 @@ def get_cpp_header_lines_to_insert(start_year, end_year):
     return reversed(get_header_lines(CPP_HEADER, start_year, end_year))
 
 PYTHON_HEADER = '''
-# Copyright (c) %s The Bytz Core developers
+# Copyright (c) %s The Wagerr developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 '''
@@ -528,7 +528,7 @@ def insert_cpp_header(filename, file_lines, start_year, end_year):
 def exec_insert_header(filename, style):
     file_lines = read_file_lines(filename)
     if file_already_has_core_copyright(file_lines):
-        sys.exit('*** %s already has a copyright by The Bytz Core developers'
+        sys.exit('*** %s already has a copyright by The Wagerr developers'
                  % (filename))
     start_year, end_year = get_git_change_year_range(filename)
     if style == 'python':
@@ -541,7 +541,7 @@ def exec_insert_header(filename, style):
 ################################################################################
 
 INSERT_USAGE = """
-Inserts a copyright header for "The Bytz Core developers" at the top of the
+Inserts a copyright header for "The Wagerr developers" at the top of the
 file in either Python or C++ style as determined by the file extension. If the
 file is a Python file and it has a '#!' starting the first line, the header is
 inserted in the line below it.
@@ -555,14 +555,14 @@ where <year_introduced> is according to the 'git log' history. If
 
 "<current_year>"
 
-If the file already has a copyright for "The Bytz Core developers", the
+If the file already has a copyright for "The Wagerr developers", the
 script will exit.
 
 Usage:
     $ ./copyright_header.py insert <file>
 
 Arguments:
-    <file> - A source file in the Bytz Core repository.
+    <file> - A source file in the Wagerr Core repository.
 """
 
 def insert_cmd(argv):
@@ -587,7 +587,7 @@ def insert_cmd(argv):
 ################################################################################
 
 USAGE = """
-copyright_header.py - utilities for managing copyright headers of 'The Bytz
+copyright_header.py - utilities for managing copyright headers of 'The Wagerr
 Core developers' in repository source files.
 
 Usage:

@@ -1,5 +1,5 @@
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,7 +24,7 @@ std::shared_ptr<CStakingManager> stakingManager;
 
 CStakingManager::CStakingManager(std::shared_ptr<CWallet> pwalletIn) :
         nMintableLastCheck(0), fMintableCoins(false), fLastLoopOrphan(false), nExtraNonce(0), // Currently unused
-        fEnableStaking(false), fEnableBYTZStaking(false), nReserveBalance(0), pwallet(pwalletIn),
+        fEnableStaking(false), fEnableWAGERRStaking(false), nReserveBalance(0), pwallet(pwalletIn),
         nHashInterval(22), nLastCoinStakeSearchInterval(0), nLastCoinStakeSearchTime(GetAdjustedTime()) {}
 
 bool CStakingManager::MintableCoins()
@@ -59,7 +59,7 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
     if (pwallet == nullptr) return false;
 
     LOCK2(cs_main, pwallet->cs_wallet);
-    //Add BYTZ
+    //Add WAGERR
     std::vector<COutput> vCoins;
     CCoinControl coin_control;
     coin_control.nCoinType = CoinType::STAKABLE_COINS;

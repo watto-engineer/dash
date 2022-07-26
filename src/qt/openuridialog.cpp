@@ -18,7 +18,7 @@ OpenURIDialog::OpenURIDialog(QWidget *parent) :
     ui->setupUi(this);
     GUIUtil::updateFonts();
     GUIUtil::disableMacFocusRect(this);
-    ui->uriEdit->setPlaceholderText("bytz:");
+    ui->uriEdit->setPlaceholderText("wagerr:");
 }
 
 OpenURIDialog::~OpenURIDialog()
@@ -49,5 +49,5 @@ void OpenURIDialog::on_selectFileButton_clicked()
     if(filename.isEmpty())
         return;
     QUrl fileUri = QUrl::fromLocalFile(filename);
-    ui->uriEdit->setText("bytz:?r=" + QUrl::toPercentEncoding(fileUri.toString()));
+    ui->uriEdit->setText("wagerr:?r=" + QUrl::toPercentEncoding(fileUri.toString()));
 }

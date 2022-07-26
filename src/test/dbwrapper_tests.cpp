@@ -5,7 +5,7 @@
 #include <dbwrapper.h>
 #include <uint256.h>
 #include <random.h>
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <memory>
 

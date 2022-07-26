@@ -53,13 +53,13 @@ void masternode_list_help()
             "  json           - Print info in JSON format (can be additionally filtered, partial match)\n"
             "  lastpaidblock  - Print the last block height a node was paid on the network\n"
             "  lastpaidtime   - Print the last time a node was paid on the network\n"
-            "  owneraddress   - Print the masternode owner Bytz address\n"
-            "  payee          - Print the masternode payout Bytz address (can be additionally filtered,\n"
+            "  owneraddress   - Print the masternode owner Wagerr address\n"
+            "  payee          - Print the masternode payout Wagerr address (can be additionally filtered,\n"
             "                   partial match)\n"
             "  pubKeyOperator - Print the masternode operator public key\n"
             "  status         - Print masternode status: ENABLED / POSE_BANNED\n"
             "                   (can be additionally filtered, partial match)\n"
-            "  votingaddress  - Print the masternode voting Bytz address\n"
+            "  votingaddress  - Print the masternode voting Wagerr address\n"
         );
 }
 
@@ -439,14 +439,9 @@ UniValue masternode_payments(const JSONRPCRequest& request)
             nBlockFees += nValueIn - tx->GetValueOut();
         }
 
-        CAmount nMinerFees;
-        CAmount nCarbonFeesEscrow;
-        CAmount nCarbonFeesPayable;
-        const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindex->pprev, pindex->nHeight, Params().GetConsensus(), nBlockFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
-
         std::vector<CTxOut> voutMasternodePayments, voutDummy;
         CMutableTransaction dummyTx;
-        CBlockReward blockReward(pindex->nHeight, nMinerFees, nCarbonFeesEscrow, block.IsProofOfStake(), Params().GetConsensus());
+        CBlockReward blockReward(pindex->nHeight, nBlockFees, block.IsProofOfStake(), Params().GetConsensus());
         FillBlockPayments(dummyTx, pindex->nHeight, blockReward, voutMasternodePayments, voutDummy);
 
         UniValue blockObj(UniValue::VOBJ);
@@ -705,8 +700,8 @@ UniValue masternodelist(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    { "bytz",               "masternode",             &masternode,             {} },
-    { "bytz",               "masternodelist",         &masternodelist,         {} },
+    { "wagerr",               "masternode",             &masternode,             {} },
+    { "wagerr",               "masternodelist",         &masternodelist,         {} },
 };
 
 void RegisterMasternodeRPCCommands(CRPCTable &t)

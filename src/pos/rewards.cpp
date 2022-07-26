@@ -1,5 +1,5 @@
 // Copyright (c) 2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +11,7 @@
 #include <evo/specialtx.h>
 #include "tokens/tokengroupmanager.h"
 
-CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams)
+CAmount GetBlockSubsidyWagerr(const int nPrevHeight, const bool fPos, const Consensus::Params& consensusParams)
 {
     CAmount nSubsidy = 0;
     int nHeight = nPrevHeight + 1;
@@ -31,14 +31,14 @@ CAmount GetBlockSubsidyBytz(const int nPrevHeight, const bool fPos, const Consen
     return 0 * COIN;
 }
 
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZBYTZStake, const Consensus::Params& consensusParams) {
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZWGRStake, const Consensus::Params& consensusParams) {
     if (nHeight >= consensusParams.V17DeploymentHeight + 4 * 513000) return 156 * COIN;
     if (nHeight >= consensusParams.V17DeploymentHeight + 3 * 513000) return 312 * COIN;
     if (nHeight >= consensusParams.V17DeploymentHeight + 2 * 513000) return 462 * COIN;
     if (nHeight >= consensusParams.V17DeploymentHeight + 513000) return 600 * COIN;
     if (nHeight >= consensusParams.V17DeploymentHeight) return 726 * COIN;
-    if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZBYTZStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
-    if (nHeight >= consensusParams.nBlockZerocoinV2 && isZBYTZStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
+    if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZWGRStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
+    if (nHeight >= consensusParams.nBlockZerocoinV2 && isZWGRStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
     if (nHeight >= consensusParams.nPosStartHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) return 0.4 * blockValue;
     return 0 * COIN;
@@ -111,11 +111,10 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
             int nTx = 0;
             GetTxPayload(*block.vtx[0], cbTx);
 
-            bool fCarbonOffset;
             bool fMasternodeTx;
             bool fOperatorTx;
-            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
-            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx));
+            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx);
+            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx));
 
             nTx++;
             int nOutput = 1;
@@ -124,7 +123,6 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
                 AddReward(CReward(CReward::REWARD_COINSTAKE, block.vtx[nTx]->vout[++nOutput]));
                 fSplitCoinstake = true;
             }
-            if (fCarbonOffset) AddReward(CReward(CReward::REWARD_CARBON, block.vtx[nTx]->vout[++nOutput]));
             if (fMasternodeTx) AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[nTx]->vout[++nOutput]));
             if (fOperatorTx) AddReward(CReward(CReward::REWARD_OPERATOR, block.vtx[nTx]->vout[++nOutput]));
         }
@@ -137,10 +135,8 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
             if (coinbaseVoutSize == 2) {
                 AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[coinbaseVoutSize-1]));
             } else if (coinbaseVoutSize == 3) {
-                AddReward(CReward(CReward::REWARD_CARBON, block.vtx[0]->vout[coinbaseVoutSize-2]));
                 AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[coinbaseVoutSize-1]));
             } else if (coinbaseVoutSize > 3) {
-                AddReward(CReward(CReward::REWARD_CARBON, block.vtx[0]->vout[1]));
                 AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[2]));
                 for (int i = 3; i < coinbaseVoutSize; i++) {
                     AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[0]->vout[i]));
@@ -151,15 +147,13 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
             int nTx = 0;
             GetTxPayload(*block.vtx[nTx], cbTx);
 
-            bool fCarbonOffset;
             bool fMasternodeTx;
             bool fOperatorTx;
-            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
-            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx));
+            GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx);
+            assert(CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx));
 
             int nOutput = 0;
             AddReward(CReward(CReward::REWARD_COINBASE, block.vtx[nTx]->vout[nOutput]));
-            if (fCarbonOffset) AddReward(CReward(CReward::REWARD_CARBON, block.vtx[nTx]->vout[++nOutput]));
             if (fMasternodeTx) AddReward(CReward(CReward::REWARD_MASTERNODE, block.vtx[nTx]->vout[++nOutput]));
             if (fOperatorTx) AddReward(CReward(CReward::REWARD_OPERATOR, block.vtx[nTx]->vout[++nOutput]));
         }
@@ -167,14 +161,14 @@ CBlockReward::CBlockReward(const CBlock& block, const bool fLegacy, const CAmoun
 }
 
 // fSplitCoinstake is not set after calling this constructor
-CBlockReward::CBlockReward(const int nHeight, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fPosIn, const Consensus::Params& consensusParams) {
+CBlockReward::CBlockReward(const int nHeight, const CAmount nFees, const bool fPosIn, const Consensus::Params& consensusParams) {
     rewards.clear();
     fBurnUnpaidMasternodeReward = false;
     fPos = fPosIn;
     fSplitCoinstake = false;
-    CAmount nBlockValue = GetBlockSubsidyBytz(nHeight - 1, fPos, consensusParams);
+    CAmount nBlockValue = GetBlockSubsidyWagerr(nHeight - 1, fPos, consensusParams);
     CAmount mnRewardAmount = GetMasternodePayment(nHeight, nBlockValue, false, consensusParams);
-    SetRewards(nBlockValue, mnRewardAmount, 0, nMinerFees, nCarbonFeesEscrow, nHeight < consensusParams.DIP0003Height, fPos);
+    SetRewards(nBlockValue, mnRewardAmount, 0, nFees, nHeight < consensusParams.DIP0003Height, fPos);
 }
 
 int CBlockReward::CompareTo(const CBlockReward& rhs) const {
@@ -204,7 +198,6 @@ CReward CBlockReward::GetTotalRewards() {
     CReward totalRewards(CReward::REWARD_TOTAL);
     totalRewards += GetCoinbaseReward();
     totalRewards += GetCoinstakeReward();
-    totalRewards += GetCarbonReward();
     totalRewards += GetMasternodeReward();
     totalRewards += GetOperatorReward();
     return totalRewards;
@@ -251,9 +244,6 @@ CReward CBlockReward::GetCoinbaseReward() {
 CReward CBlockReward::GetCoinstakeReward() {
     return GetReward(CReward::REWARD_COINSTAKE);
 }
-CReward CBlockReward::GetCarbonReward() {
-    return GetReward(CReward::REWARD_CARBON);
-}
 CReward CBlockReward::GetMasternodeReward() {
     return GetReward(CReward::REWARD_MASTERNODE);
 }
@@ -270,11 +260,6 @@ void CBlockReward::SetCoinstakeReward(const CAmount amount, const CTokenGroupID 
     CReward coinstakeReward(CReward::REWARD_COINSTAKE);
     SetReward(coinstakeReward, amount, tokenID, tokenAmount);
     rewards[CReward::REWARD_COINSTAKE] = coinstakeReward;
-}
-void CBlockReward::SetCarbonReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
-    CReward carbonReward(CReward::REWARD_COINSTAKE);
-    SetReward(carbonReward, amount, tokenID, tokenAmount);
-    rewards[CReward::REWARD_CARBON] = carbonReward;
 }
 void CBlockReward::SetMasternodeReward(const CAmount amount, const CTokenGroupID tokenID, const CAmount tokenAmount) {
     CReward masternodeReward(CReward::REWARD_MASTERNODE);
@@ -328,13 +313,11 @@ void CBlockReward::RemoveMasternodeReward() {
     }
 }
 
-void CBlockReward::AddFees(const CAmount nMinerFees, const CAmount nCarbonFeesEscrow) {
-    // Add CarbonFees as a separate parameter
-    AddReward(CReward::RewardType::REWARD_CARBON, nCarbonFeesEscrow);
-    AddReward(CReward::RewardType::REWARD_BURN, nMinerFees);
+void CBlockReward::AddFees(const CAmount nFees) {
+    AddReward(CReward::RewardType::REWARD_BURN, nFees);
 }
 
-void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nMinerFees, const CAmount nCarbonFeesEscrow, const bool fLegacy, const bool fPOS) {
+void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnRewardAmount, const CAmount opRewardAmount, const CAmount nFees, const bool fLegacy, const bool fPOS) {
     if (!fLegacy) {
         SetMasternodeReward(mnRewardAmount);
         SetOperatorReward(opRewardAmount);
@@ -343,36 +326,15 @@ void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnReward
         } else {
             SetCoinbaseReward(blockSubsidy - mnRewardAmount - opRewardAmount);
         }
-        AddFees(nMinerFees, nCarbonFeesEscrow);
+        AddFees(nFees);
     } else {
         SetMasternodeReward(mnRewardAmount);
         if (fPOS) {
             SetCoinstakeReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_MASTERNODE, nMinerFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
         } else {
             SetCoinbaseReward(blockSubsidy - GetMasternodeReward().amount);
-            AddReward(CReward::RewardType::REWARD_MASTERNODE, nMinerFees);
+            AddReward(CReward::RewardType::REWARD_MASTERNODE, nFees);
         }
     }
-}
-
-bool GetCarbonPayments(CBlockIndex* pindexPrev, const int nHeight, const Consensus::Params& consensus_params, const CAmount nFees, CAmount& nMinerFees, CAmount& nCarbonFeesEscrow, CAmount& nCarbonFeesPayable) {
-    const bool fCarbonOffsetting = nHeight >= consensus_params.V17DeploymentHeight;
-
-    nMinerFees = fCarbonOffsetting ? nFees * 0.5 : nFees;
-    const CAmount nCarbonFees = nFees - nMinerFees;
-
-    const bool fAccruedCarbonOffsetting = (nHeight >= consensus_params.AccruedCarbonOffsetStartHeight);
-    const int nAccruedCarbonWindow = fAccruedCarbonOffsetting ? consensus_params.AccruedCarbonOffsetWindow : 1;
-    const bool fIsCarbonPaymentsBlock = (fCarbonOffsetting && (nHeight % nAccruedCarbonWindow) == 0);
-
-    nCarbonFeesEscrow = fCarbonOffsetting ? ((pindexPrev ? pindexPrev->nCarbonFeesEscrow : 0) + nCarbonFees) : 0;
-
-    if (fIsCarbonPaymentsBlock) {
-        nCarbonFeesPayable = nCarbonFeesEscrow;
-        nCarbonFeesEscrow = 0;
-    } else {
-        nCarbonFeesPayable = 0;
-    }
-    return fIsCarbonPaymentsBlock;
 }

@@ -155,13 +155,13 @@ UniValue getnewaddress(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 1)
         throw std::runtime_error(
             "getnewaddress ( \"label\" )\n"
-            "\nReturns a new Bytz address for receiving payments.\n"
+            "\nReturns a new Wagerr address for receiving payments.\n"
             "If 'label' is specified, it is added to the address book \n"
             "so payments received with the address will be associated with 'label'.\n"
             "\nArguments:\n"
             "1. \"label\"        (string, optional) The label name for the address to be linked to. If not provided, the default label \"\" is used. It can also be set to the empty string \"\" to represent the default label. The label does not need to exist, it will be created if there is no label by the given name.\n"
             "\nResult:\n"
-            "\"address\"    (string) The new bytz address\n"
+            "\"address\"    (string) The new wagerr address\n"
             "\nExamples:\n"
             + HelpExampleCli("getnewaddress", "")
             + HelpExampleRpc("getnewaddress", "")
@@ -211,19 +211,19 @@ UniValue getaccountaddress(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("getaccountaddress (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("getaccountaddress (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaccountaddress is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaccountaddress is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             "getaccountaddress \"account\"\n"
-            "\n\nDEPRECATED. Returns the current Bytz address for receiving payments to this account.\n"
+            "\n\nDEPRECATED. Returns the current Wagerr address for receiving payments to this account.\n"
             "\nArguments:\n"
             "1. \"account\"       (string, required) The account for the address. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created and a new address created  if there is no account by the given name.\n"
             "\nResult:\n"
-            "\"address\"          (string) The account bytz address\n"
+            "\"address\"          (string) The account wagerr address\n"
             "\nExamples:\n"
             + HelpExampleCli("getaccountaddress", "")
             + HelpExampleCli("getaccountaddress", "\"\"")
@@ -255,7 +255,7 @@ UniValue getrawchangeaddress(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 0)
         throw std::runtime_error(
             "getrawchangeaddress\n"
-            "\nReturns a new Bytz address, for receiving change.\n"
+            "\nReturns a new Wagerr address, for receiving change.\n"
             "This is for use with raw transactions, NOT normal use.\n"
             "\nResult:\n"
             "\"address\"    (string) The address\n"
@@ -294,9 +294,9 @@ UniValue setlabel(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts") && request.strMethod == "setaccount") {
         if (request.fHelp) {
-            throw std::runtime_error("setaccount (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("setaccount (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "setaccount is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "setaccount is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() != 2)
@@ -304,7 +304,7 @@ UniValue setlabel(const JSONRPCRequest& request)
             "setlabel \"address\" \"label\"\n"
             "\nSets the label associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"address\"         (string, required) The bytz address to be associated with a label.\n"
+            "1. \"address\"         (string, required) The wagerr address to be associated with a label.\n"
             "2. \"label\"           (string, required) The label to assign to the address.\n"
             "\nExamples:\n"
             + HelpExampleCli("setlabel", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\" \"tabby\"")
@@ -315,7 +315,7 @@ UniValue setlabel(const JSONRPCRequest& request)
 
     CTxDestination dest = DecodeDestination(request.params[0].get_str());
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
 
     std::string old_label = pwallet->mapAddressBook[dest].name;
@@ -360,9 +360,9 @@ UniValue getaccount(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("getaccount (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("getaccount (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaccount is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaccount is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() != 1)
@@ -370,7 +370,7 @@ UniValue getaccount(const JSONRPCRequest& request)
             "getaccount \"address\"\n"
             "\nDEPRECATED. Returns the account associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"address\"         (string, required) The bytz address for account lookup.\n"
+            "1. \"address\"         (string, required) The wagerr address for account lookup.\n"
             "\nResult:\n"
             "\"accountname\"        (string) the account address\n"
             "\nExamples:\n"
@@ -382,7 +382,7 @@ UniValue getaccount(const JSONRPCRequest& request)
 
     CTxDestination dest = DecodeDestination(request.params[0].get_str());
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
 
     std::string strAccount;
@@ -405,9 +405,9 @@ UniValue getaddressesbyaccount(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("getaddressbyaccount (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("getaddressbyaccount (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaddressesbyaccount is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getaddressesbyaccount is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() != 1)
@@ -418,7 +418,7 @@ UniValue getaddressesbyaccount(const JSONRPCRequest& request)
             "1. \"account\"        (string, required) The account name.\n"
             "\nResult:\n"
             "[                     (json array of string)\n"
-            "  \"address\"         (string) a bytz address associated with the given account\n"
+            "  \"address\"         (string) a wagerr address associated with the given account\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
@@ -461,7 +461,7 @@ static CTransactionRef SendMoney(CWallet * const pwallet, const CTxDestination &
         mapValue["DS"] = "1";
     }
 
-    // Parse Bytz address
+    // Parse Wagerr address
     CScript scriptPubKey = GetScriptForDestination(address);
 
     // Create and send the transaction
@@ -501,7 +501,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
             "\nSend an amount to a given address.\n"
             + HelpRequiringPassphrase(pwallet) +
             "\nArguments:\n"
-            "1. \"address\"            (string, required) The bytz address to send to.\n"
+            "1. \"address\"            (string, required) The wagerr address to send to.\n"
             "2. \"amount\"             (numeric or string, required) The amount in " + CURRENCY_UNIT + " to send. eg 0.1\n"
             "3. \"comment\"            (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
@@ -509,7 +509,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
             "5. subtractfeefromamount  (boolean, optional, default=false) The fee will be deducted from the amount being sent.\n"
-            "                             The recipient will receive less amount of Bytz than you enter in the amount field.\n"
+            "                             The recipient will receive less amount of Wagerr than you enter in the amount field.\n"
             "6. \"use_is\"             (bool, optional, default=false) Deprecated and ignored\n"
             "7. \"use_cj\"             (bool, optional, default=false) Use CoinJoin funds only\n"
             "8. conf_target            (numeric, optional) Confirmation target (in blocks)\n"
@@ -606,7 +606,7 @@ UniValue listaddressgroupings(const JSONRPCRequest& request)
             "[\n"
             "  [\n"
             "    [\n"
-            "      \"address\",            (string) The bytz address\n"
+            "      \"address\",            (string) The wagerr address\n"
             "      amount,                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
             "      \"label\"               (string, optional) The label\n"
             "    ]\n"
@@ -661,7 +661,7 @@ UniValue listaddressbalances(const JSONRPCRequest& request)
             "1. minamount               (numeric, optional, default=0) Minimum balance in " + CURRENCY_UNIT + " an address should have to be shown in the list\n"
             "\nResult:\n"
             "{\n"
-            "  \"address\": amount,       (string) The bytz address and the amount in " + CURRENCY_UNIT + "\n"
+            "  \"address\": amount,       (string) The wagerr address and the amount in " + CURRENCY_UNIT + "\n"
             "  ,...\n"
             "}\n"
             "\nExamples:\n"
@@ -704,7 +704,7 @@ UniValue signmessage(const JSONRPCRequest& request)
             "\nSign a message with the private key of an address"
             + HelpRequiringPassphrase(pwallet) + "\n"
             "\nArguments:\n"
-            "1. \"address\"         (string, required) The bytz address to use for the private key.\n"
+            "1. \"address\"         (string, required) The wagerr address to use for the private key.\n"
             "2. \"message\"         (string, required) The message to create a signature of.\n"
             "\nResult:\n"
             "\"signature\"          (string) The signature of the message encoded in base 64\n"
@@ -766,7 +766,7 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
             "getreceivedbyaddress \"address\" ( minconf addlocked )\n"
             "\nReturns the total amount received by the given address in transactions with at least minconf confirmations.\n"
             "\nArguments:\n"
-            "1. \"address\"         (string, required) The bytz address for transactions.\n"
+            "1. \"address\"         (string, required) The wagerr address for transactions.\n"
             "2. minconf             (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "3. addlocked           (bool, optional, default=false) Whether to include transactions locked via InstantSend.\n"
             "\nResult:\n"
@@ -788,10 +788,10 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
-    // Bytz address
+    // Wagerr address
     CTxDestination dest = DecodeDestination(request.params[0].get_str());
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
     CScript scriptPubKey = GetScriptForDestination(dest);
     if (!IsMine(*pwallet, scriptPubKey)) {
@@ -832,9 +832,9 @@ UniValue getreceivedbylabel(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts") && request.strMethod == "getreceivedbyaccount") {
         if (request.fHelp) {
-            throw std::runtime_error("getreceivedbyaccount (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("getreceivedbyaccount (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getreceivedbyaccount is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "getreceivedbyaccount is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
@@ -916,7 +916,7 @@ UniValue getbalance(const JSONRPCRequest& request)
             "The server total may be different to the balance in the default \"\" account.\n"
             "\nArguments:\n"
             "1. \"account\"        (string, optional) DEPRECATED. This argument will be removed in V0.18. \n"
-            "                     To use this deprecated argument, start bytzd with -deprecatedrpc=accounts.\n"
+            "                     To use this deprecated argument, start wagerrd with -deprecatedrpc=accounts.\n"
             "                     The selected account, or \"*\" for entire wallet. It may be the default account using \"\".\n"
             "2. minconf           (numeric, optional) Only include transactions confirmed at least this many times.\n"
             "                     The default is 1 if an account is provided or 0 if no account is provided\n")
@@ -1048,9 +1048,9 @@ UniValue movecmd(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("move (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("move (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "move is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "move is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() < 3 || request.params.size() > 5)
@@ -1107,23 +1107,23 @@ UniValue sendfrom(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("sendfrom (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("sendfrom (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "sendfrom is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "sendfrom is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
 
     if (request.fHelp || request.params.size() < 3 || request.params.size() > 7)
         throw std::runtime_error(
             "sendfrom \"fromaccount\" \"toaddress\" amount ( minconf addlocked \"comment\" \"comment_to\" )\n"
-            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a bytz address."
+            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a wagerr address."
             + HelpRequiringPassphrase(pwallet) + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) The name of the account to send funds from. May be the default account using \"\".\n"
             "                       Specifying an account does not influence coin selection, but it does associate the newly created\n"
             "                       transaction with the account, so the account's balance computation and transaction history can reflect\n"
             "                       the spend.\n"
-            "2. \"toaddress\"         (string, required) The bytz address to send funds to.\n"
+            "2. \"toaddress\"         (string, required) The wagerr address to send funds to.\n"
             "3. amount              (numeric or string, required) The amount in " + CURRENCY_UNIT + " (transaction fee is added on top).\n"
             "4. minconf             (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. addlocked         (bool, optional, default=false) Whether to include transactions locked via InstantSend.\n"
@@ -1153,7 +1153,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
     std::string strAccount = LabelFromValue(request.params[0]);
     CTxDestination dest = DecodeDestination(request.params[1].get_str());
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
     CAmount nAmount = AmountFromValue(request.params[2]);
     if (nAmount <= 0)
@@ -1196,13 +1196,13 @@ UniValue sendmany(const JSONRPCRequest& request)
         help_text = "sendmany \"\" {\"address\":amount,...} ( minconf addlocked \"comment\" [\"address\",...] subtractfeefrom use_is use_cj conf_target \"estimate_mode\")\n"
             "\nSend multiple times. Amounts are double-precision floating point numbers."
             "Note that the \"fromaccount\" argument has been removed in V0.17. To use this RPC with a \"fromaccount\" argument, restart\n"
-            "bytzd with -deprecatedrpc=accounts\n"
+            "wagerrd with -deprecatedrpc=accounts\n"
             + HelpRequiringPassphrase(pwallet) + "\n"
             "\nArguments:\n"
             "1. \"dummy\"           (string, required) Must be set to \"\" for backwards compatibility.\n"
             "2. \"amounts\"               (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount     (numeric or string) The bytz address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
+            "      \"address\":amount     (numeric or string) The wagerr address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
@@ -1210,7 +1210,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "5. \"comment\"               (string, optional) A comment\n"
             "6. subtractfeefrom         (array, optional) A json array with addresses.\n"
             "                           The fee will be equally deducted from the amount of each selected address.\n"
-            "                           Those recipients will receive less bytzs than you enter in their corresponding amount field.\n"
+            "                           Those recipients will receive less wagerrs than you enter in their corresponding amount field.\n"
             "                           If no addresses are specified here, the sender pays the fee.\n"
             "    [\n"
             "      \"address\"          (string) Subtract fee from this address\n"
@@ -1241,7 +1241,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "1. \"fromaccount\"           (string, required) DEPRECATED. The account to send the funds from. Should be \"\" for the default account\n"
             "2. \"amounts\"               (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount     (numeric or string) The bytz address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
+            "      \"address\":amount     (numeric or string) The wagerr address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
@@ -1249,7 +1249,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "5. \"comment\"               (string, optional) A comment\n"
             "6. subtractfeefrom         (array, optional) A json array with addresses.\n"
             "                           The fee will be equally deducted from the amount of each selected address.\n"
-            "                           Those recipients will receive less bytzs than you enter in their corresponding amount field.\n"
+            "                           Those recipients will receive less wagerrs than you enter in their corresponding amount field.\n"
             "                           If no addresses are specified here, the sender pays the fee.\n"
             "    [\n"
             "      \"address\"          (string) Subtract fee from this address\n"
@@ -1335,7 +1335,7 @@ UniValue sendmany(const JSONRPCRequest& request)
     for (const std::string& name_ : keys) {
         CTxDestination dest = DecodeDestination(name_);
         if (!IsValidDestination(dest)) {
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Bytz address: ") + name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Wagerr address: ") + name_);
         }
 
         if (destinations.count(dest)) {
@@ -1400,16 +1400,16 @@ UniValue addmultisigaddress(const JSONRPCRequest& request)
     {
         std::string msg = "addmultisigaddress nrequired [\"key\",...] ( \"label\" )\n"
             "\nAdd a nrequired-to-sign multisignature address to the wallet. Requires a new wallet backup.\n"
-            "Each key is a Bytz address or hex-encoded public key.\n"
+            "Each key is a Wagerr address or hex-encoded public key.\n"
             "This functionality is only intended for use with non-watchonly addresses.\n"
             "See `importaddress` for watchonly p2sh address support.\n"
             "If 'label' is specified, assign address to that label.\n"
 
             "\nArguments:\n"
             "1. nrequired                      (numeric, required) The number of required signatures out of the n keys or addresses.\n"
-            "2. \"keys\"                         (string, required) A json array of bytz addresses or hex-encoded public keys\n"
+            "2. \"keys\"                         (string, required) A json array of wagerr addresses or hex-encoded public keys\n"
             "     [\n"
-            "       \"address\"                  (string) bytz address or hex-encoded public key\n"
+            "       \"address\"                  (string) wagerr address or hex-encoded public key\n"
             "       ...,\n"
             "     ]\n"
             "3. \"label\"                        (string, optional) A label to assign the addresses to.\n"
@@ -1693,9 +1693,9 @@ UniValue listreceivedbylabel(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts") && request.strMethod == "listreceivedbyaccount") {
         if (request.fHelp) {
-            throw std::runtime_error("listreceivedbyaccount (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("listreceivedbyaccount (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "listreceivedbyaccount is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "listreceivedbyaccount is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() > 4)
@@ -1871,7 +1871,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "\nIf a label name is provided, this will return only incoming transactions paying to addresses with the specified label.\n"
             "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions.\n"
             "Note that the \"account\" argument and \"otheraccount\" return value have been removed in V0.17. To use this RPC with an \"account\" argument, restart\n"
-            "bytzd with -deprecatedrpc=accounts\n"
+            "wagerrd with -deprecatedrpc=accounts\n"
             "\nArguments:\n"
             "1. \"label\"    (string, optional) If set, should be a valid label name to return only incoming transactions\n"
             "              with the specified label, or \"*\" to disable filtering and return all transactions.\n"
@@ -1881,7 +1881,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "\nResult:\n"
             "[\n"
             "  {\n"
-            "    \"address\":\"address\",    (string) The bytz address of the transaction. Not present for \n"
+            "    \"address\":\"address\",    (string) The wagerr address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off blockchain)\n"
             "                                                transaction between accounts, and not associated with an address,\n"
@@ -1936,7 +1936,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "  {\n"
             "    \"account\":\"accountname\",       (string) DEPRECATED. This field will be removed in V0.18. The account name associated with the transaction. \n"
             "                                                It will be \"\" for the default account.\n"
-            "    \"address\":\"address\",    (string) The bytz address of the transaction. Not present for \n"
+            "    \"address\":\"address\",    (string) The wagerr address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off blockchain)\n"
             "                                                transaction between accounts, and not associated with an address,\n"
@@ -2070,9 +2070,9 @@ UniValue listaccounts(const JSONRPCRequest& request)
 
     if (!IsDeprecatedRPCEnabled("accounts")) {
         if (request.fHelp) {
-            throw std::runtime_error("listaccounts (Deprecated, will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts)");
+            throw std::runtime_error("listaccounts (Deprecated, will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts)");
         }
-        throw JSONRPCError(RPC_METHOD_DEPRECATED, "listaccounts is deprecated and will be removed in V0.18. To use this command, start bytzd with -deprecatedrpc=accounts.");
+        throw JSONRPCError(RPC_METHOD_DEPRECATED, "listaccounts is deprecated and will be removed in V0.18. To use this command, start wagerrd with -deprecatedrpc=accounts.");
     }
 
     if (request.fHelp || request.params.size() > 3)
@@ -2182,8 +2182,8 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             "\nResult:\n"
             "{\n"
             "  \"transactions\": [\n"
-            "    \"account\":\"accountname\",  (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start bytzd with -deprecatedrpc=accounts. The account name associated with the transaction. Will be \"\" for the default account.\n"
-            "    \"address\":\"address\",    (string) The bytz address of the transaction. Not present for move transactions (category = move).\n"
+            "    \"account\":\"accountname\",  (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start wagerrd with -deprecatedrpc=accounts. The account name associated with the transaction. Will be \"\" for the default account.\n"
+            "    \"address\":\"address\",    (string) The wagerr address of the transaction. Not present for move transactions (category = move).\n"
             "    \"category\":\"send|receive\",  (string) The transaction category. 'send' has negative amounts, 'receive' has positive amounts.\n"
             "    \"amount\": x.xxx,          (numeric) The amount in " + CURRENCY_UNIT + ". This is negative for the 'send' category, and for the 'move' category for moves \n"
             "                                          outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.\n"
@@ -2333,8 +2333,8 @@ UniValue gettransaction(const JSONRPCRequest& request)
             "  \"timereceived\" : ttt,    (numeric) The time received in seconds since epoch (1 Jan 1970 GMT)\n"
             "  \"details\" : [\n"
             "    {\n"
-            "      \"account\" : \"accountname\",      (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start bytzd with -deprecatedrpc=accounts. The account name involved in the transaction, can be \"\" for the default account.\n"
-            "      \"address\" : \"address\",          (string) The bytz address involved in the transaction\n"
+            "      \"account\" : \"accountname\",      (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start wagerrd with -deprecatedrpc=accounts. The account name involved in the transaction, can be \"\" for the default account.\n"
+            "      \"address\" : \"address\",          (string) The wagerr address involved in the transaction\n"
             "      \"category\" : \"send|receive\",    (string) The category, either 'send' or 'receive'\n"
             "      \"amount\" : x.xxx,               (numeric) The amount in " + CURRENCY_UNIT + "\n"
             "      \"label\" : \"label\",              (string) A comment for the address/transaction, if any\n"
@@ -2540,7 +2540,7 @@ UniValue walletpassphrase(const JSONRPCRequest& request)
         throw std::runtime_error(
             "walletpassphrase \"passphrase\" timeout ( stakingonly )\n"
             "\nStores the wallet decryption key in memory for 'timeout' seconds.\n"
-            "This is needed prior to performing transactions related to private keys such as sending bytzs\n"
+            "This is needed prior to performing transactions related to private keys such as sending wagerrs\n"
             "\nArguments:\n"
             "1. \"passphrase\"        (string, required) The wallet passphrase\n"
             "2. timeout             (numeric, required) The time to keep the decryption key in seconds; capped at 100000000 (~3 years).\n"
@@ -2724,7 +2724,7 @@ UniValue encryptwallet(const JSONRPCRequest& request)
             "\nExamples:\n"
             "\nEncrypt your wallet\n"
             + HelpExampleCli("encryptwallet", "\"my pass phrase\"") +
-            "\nNow set the passphrase to use the wallet, such as for signing or sending bytz\n"
+            "\nNow set the passphrase to use the wallet, such as for signing or sending wagerr\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
             "\nNow we can do something like sign\n"
             + HelpExampleCli("signmessage", "\"address\" \"test message\"") +
@@ -2774,7 +2774,7 @@ UniValue lockunspent(const JSONRPCRequest& request)
             "\nUpdates list of temporarily unspendable outputs.\n"
             "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
             "If no transaction outputs are specified when unlocking then all current locked transaction outputs are unlocked.\n"
-            "A locked transaction output will not be chosen by automatic coin selection, when spending bytzs.\n"
+            "A locked transaction output will not be chosen by automatic coin selection, when spending wagerrs.\n"
             "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
             "is always cleared (by virtue of process exit) when a node stops or fails.\n"
             "Also see the listunspent call\n"
@@ -3271,7 +3271,7 @@ static UniValue loadwallet(const JSONRPCRequest& request)
         throw std::runtime_error(
             "loadwallet \"filename\"\n"
             "\nLoads a wallet from a wallet file or directory."
-            "\nNote that all wallet command-line options used when starting bytzd will be"
+            "\nNote that all wallet command-line options used when starting wagerrd will be"
             "\napplied to the new wallet (eg -zapwallettxes, upgradewallet, rescan, etc).\n"
             "\nArguments:\n"
             "1. \"filename\"    (string, required) The wallet directory or .dat file.\n"
@@ -3468,9 +3468,9 @@ UniValue listunspent(const JSONRPCRequest& request)
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"      (string) A json array of bytz addresses to filter\n"
+            "3. \"addresses\"      (string) A json array of wagerr addresses to filter\n"
             "    [\n"
-            "      \"address\"     (string) bytz address\n"
+            "      \"address\"     (string) wagerr address\n"
             "      ,...\n"
             "    ]\n"
             "4. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
@@ -3490,9 +3490,9 @@ UniValue listunspent(const JSONRPCRequest& request)
             "  {\n"
             "    \"txid\" : \"txid\",          (string) the transaction id \n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the bytz address\n"
+            "    \"address\" : \"address\",    (string) the wagerr address\n"
             "    \"label\" : \"label\",        (string) The associated label, or \"\" for the default label\n"
-            "    \"account\" : \"account\",    (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start bytzd with -deprecatedrpc=accounts. The associated account, or \"\" for the default account\n"
+            "    \"account\" : \"account\",    (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start wagerrd with -deprecatedrpc=accounts. The associated account, or \"\" for the default account\n"
             "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
             "    \"confirmations\" : n,      (numeric) The number of confirmations\n"
@@ -3535,7 +3535,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             const UniValue& input = inputs[idx];
             CTxDestination dest = DecodeDestination(input.get_str());
             if (!IsValidDestination(dest)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Bytz address: ") + input.get_str());
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Wagerr address: ") + input.get_str());
             }
             if (!destinations.insert(dest).second) {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ") + input.get_str());
@@ -3676,7 +3676,7 @@ UniValue fundrawtransaction(const JSONRPCRequest& request)
                             "1. \"hexstring\"           (string, required) The hex string of the raw transaction\n"
                             "2. options                 (object, optional)\n"
                             "   {\n"
-                            "     \"changeAddress\"          (string, optional, default pool address) The bytz address to receive the change\n"
+                            "     \"changeAddress\"          (string, optional, default pool address) The wagerr address to receive the change\n"
                             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
                             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
                             "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
@@ -3684,7 +3684,7 @@ UniValue fundrawtransaction(const JSONRPCRequest& request)
                             "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
                             "                              The fee will be equally deducted from the amount of each specified output.\n"
                             "                              The outputs are specified by their zero-based index, before any change output is added.\n"
-                            "                              Those recipients will receive less bytz than you enter in their corresponding amount field.\n"
+                            "                              Those recipients will receive less wagerr than you enter in their corresponding amount field.\n"
                             "                              If no outputs are specified here, the sender pays the fee.\n"
                             "                                  [vout_index,...]\n"
                             "     \"conf_target\"            (numeric, optional) Confirmation target (in blocks)\n"
@@ -3750,7 +3750,7 @@ UniValue fundrawtransaction(const JSONRPCRequest& request)
             CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
 
             if (!IsValidDestination(dest)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid bytz address");
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid wagerr address");
             }
 
             coinControl.destChange = dest;
@@ -3963,7 +3963,7 @@ UniValue autocombinedust(const JSONRPCRequest& request)
     if (request.fHelp || nParamsSize < 1 || (!fEnable && nParamsSize > 1) || nParamsSize > 2)
         throw std::runtime_error(
             "autocombinedust enable ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Bytz address\n"
+            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Wagerr address\n"
             "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees.\n"
 
             "\nArguments:\n"
@@ -4260,13 +4260,13 @@ UniValue getaddressinfo(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 1) {
         throw std::runtime_error(
             "getaddressinfo \"address\"\n"
-            "\nReturn information about the given bytz address. Some information requires the address\n"
+            "\nReturn information about the given wagerr address. Some information requires the address\n"
             "to be in the wallet.\n"
             "\nArguments:\n"
-            "1. \"address\"                    (string, required) The bytz address to get the information of.\n"
+            "1. \"address\"                    (string, required) The wagerr address to get the information of.\n"
             "\nResult:\n"
             "{\n"
-            "  \"address\" : \"address\",        (string) The bytz address validated\n"
+            "  \"address\" : \"address\",        (string) The wagerr address validated\n"
             "  \"scriptPubKey\" : \"hex\",       (string) The hex encoded scriptPubKey generated by the address\n"
             "  \"ismine\" : true|false,        (boolean) If the address is yours or not\n"
             "  \"iswatchonly\" : true|false,   (boolean) If the address is watchonly\n"
@@ -4283,7 +4283,7 @@ UniValue getaddressinfo(const JSONRPCRequest& request)
             "  \"embedded\" : {...},           (object, optional) Information about the address embedded in P2SH, if relevant and known. It includes all getaddressinfo output fields for the embedded address, excluding metadata (\"timestamp\", \"hdkeypath\") and relation to the wallet (\"ismine\", \"iswatchonly\", \"account\").\n"
             "  \"iscompressed\" : true|false,  (boolean) If the address is compressed\n"
             "  \"label\" :  \"label\"         (string) The label associated with the address, \"\" is the default account\n"
-            "  \"account\" : \"account\"         (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start bytzd with -deprecatedrpc=accounts. The account associated with the address, \"\" is the default account\n"
+            "  \"account\" : \"account\"         (string) DEPRECATED. This field will be removed in V0.18. To see this deprecated field, start wagerrd with -deprecatedrpc=accounts. The account associated with the address, \"\" is the default account\n"
             "  \"timestamp\" : timestamp,      (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
             "  \"hdkeypath\" : \"keypath\"       (string, optional) The HD keypath if the key is HD and available\n"
             "  \"hdchainid\" : \"<hash>\"        (string, optional) The ID of the HD chain\n"

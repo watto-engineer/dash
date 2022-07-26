@@ -19,9 +19,9 @@ BitcoinUnits::BitcoinUnits(QObject *parent):
 QList<BitcoinUnits::Unit> BitcoinUnits::availableUnits()
 {
     QList<BitcoinUnits::Unit> unitlist;
-    unitlist.append(BYTZ);
-    unitlist.append(mBYTZ);
-    unitlist.append(uBYTZ);
+    unitlist.append(WAGERR);
+    unitlist.append(mWAGERR);
+    unitlist.append(uWAGERR);
     unitlist.append(sats);
     return unitlist;
 }
@@ -30,9 +30,9 @@ bool BitcoinUnits::valid(int unit)
 {
     switch(unit)
     {
-    case BYTZ:
-    case mBYTZ:
-    case uBYTZ:
+    case WAGERR:
+    case mWAGERR:
+    case uWAGERR:
     case sats:
         return true;
     default:
@@ -46,9 +46,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case BYTZ: return QString("BYTZ");
-            case mBYTZ: return QString("mBYTZ");
-            case uBYTZ: return QString::fromUtf8("μBYTZ");
+            case WAGERR: return QString("WAGERR");
+            case mWAGERR: return QString("mWAGERR");
+            case uWAGERR: return QString::fromUtf8("μWAGERR");
             case sats: return QString("sats");
             default: return QString("???");
         }
@@ -57,9 +57,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case BYTZ: return QString("tBYTZ");
-            case mBYTZ: return QString("mtBYTZ");
-            case uBYTZ: return QString::fromUtf8("μtBYTZ");
+            case WAGERR: return QString("tWAGERR");
+            case mWAGERR: return QString("mtWAGERR");
+            case uWAGERR: return QString::fromUtf8("μtWAGERR");
             case sats: return QString("tsats");
             default: return QString("???");
         }
@@ -72,10 +72,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case BYTZ: return QString("Bytz");
-            case mBYTZ: return QString("Milli-Bytz (1 / 1" THIN_SP_UTF8 "000)");
-            case uBYTZ: return QString("Micro-Bytz (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case sats: return QString("Ten Nano-Bytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case WAGERR: return QString("Wagerr");
+            case mWAGERR: return QString("Milli-Wagerr (1 / 1" THIN_SP_UTF8 "000)");
+            case uWAGERR: return QString("Micro-Wagerr (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case sats: return QString("Ten Nano-Wagerr (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -83,10 +83,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case BYTZ: return QString("TestBytzs");
-            case mBYTZ: return QString("Milli-TestBytz (1 / 1" THIN_SP_UTF8 "000)");
-            case uBYTZ: return QString("Micro-TestBytz (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case sats: return QString("Ten Nano-TestBytz (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case WAGERR: return QString("TestWagerrs");
+            case mWAGERR: return QString("Milli-TestWagerr (1 / 1" THIN_SP_UTF8 "000)");
+            case uWAGERR: return QString("Micro-TestWagerr (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case sats: return QString("Ten Nano-TestWagerr (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -96,9 +96,9 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case BYTZ:  return 100000000;
-    case mBYTZ: return 100000;
-    case uBYTZ: return 100;
+    case WAGERR:  return 100000000;
+    case mWAGERR: return 100000;
+    case uWAGERR: return 100;
     case sats: return 1;
     default:   return 100000000;
     }
@@ -108,9 +108,9 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case BYTZ: return 8;
-    case mBYTZ: return 5;
-    case uBYTZ: return 2;
+    case WAGERR: return 8;
+    case mWAGERR: return 5;
+    case uWAGERR: return 2;
     case sats: return 0;
     default: return 0;
     }

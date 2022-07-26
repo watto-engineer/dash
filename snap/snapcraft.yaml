@@ -1,105 +1,105 @@
-# Copyright (c) 2018-2021 The Bytz Core developers
-name: bytz
+# Copyright (c) 2018-2021 The Wagerr developers
+name: wagerr
 base: core18
-version: 0.2.0.1
-summary:   bytz, digital currency for media content
+version: 5.0.0
+summary:   wagerr, digital currency for media content
 description: |
-  BYTZ is an open-source decentralized peer-to-peer currency featuring a Delegated Proof of Stake algorithm
+  WAGERR is an open-source decentralized peer-to-peer currency featuring a Delegated Proof of Stake algorithm
   designed to empower content creators through transparent media analytics and blockchain tokenization.
 
-  - The BYTZ network features three layers.
-    - The first is the core code that makes BYTZ a decentralized currency. It is composed of all users and powered by the permissionless staking network.
-    - The second is the Guardian Validator Node network which consists of enterprise companies partnering with BYTZ to operate validator nodes to help secure,
+  - The WAGERR network features three layers.
+    - The first is the core code that makes WAGERR a decentralized currency. It is composed of all users and powered by the permissionless staking network.
+    - The second is the Guardian Validator Node network which consists of enterprise companies partnering with WAGERR to operate validator nodes to help secure,
     guide, and grow the network.
     - The third is the Token layer, designed for creators and users alike to help deliver a powerful and new way of sharing and collecting content.
-  - BYTZ will allow creators to tokenize their media, regulate access to it, and track every view. User engagement data is the basis for effective advertising.
+  - WAGERR will allow creators to tokenize their media, regulate access to it, and track every view. User engagement data is the basis for effective advertising.
     - Transparent Media Analytics means that advertisers can track their ad spend and returns with precision and allocate their advertising budget 
     to the greatest advantage.
     - It also means that creators who attract attention can get paid proportionally for the value they contribute.
     - TMAP transforms the model from content ownership and consumption to one of true incentivized partnership
     in which content creation, distribution, and engagement all earn proportionate rewards.
 
-  Homepage: https://bytz.gg/
-  Blockexplorer (main): https://chainz.cryptoid.info/bytz/
-  Github: https://github.com/bytzcurrencycurrency/bytz/
-  Wiki: https://github.com/bytzcurrency/bytz/wiki
+  Homepage: https://wagerr.com/
+  Blockexplorer (main): https://chainz.cryptoid.info/wagerr/
+  Github: https://github.com/wagerr/wagerr/
+  Wiki: https://github.com/wagerr/wagerr/wiki
 
   Social networks/forums:
-  - Telegram (https://t.me/bytzcurrency)
-  - twitter (https://twitter.com/bytzcurrency)
-  - instagram (https://www.instagram.com/bytzcurrency/)
-  - facebook (https://www.facebook.com/bytzcurrency)
-grade: stable
+  - Telegram (https://t.me/wagerr)
+  - twitter (https://twitter.com/wagerr)
+  - instagram (https://www.instagram.com/wagerr/)
+  - facebook (https://www.facebook.com/wagerr)
+grade: devel
 confinement: strict
 apps:
   daemon:
-    command: bytzd
+    command: wagerrd
     plugs: [network, network-bind, home, removable-media]
-    #desktop: bytzd.desktop
+    #desktop: wagerrd.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-testnet:
-    command: bytzd --testnet
+    command: wagerrd --testnet
     plugs: [network, network-bind, home, removable-media]
-    #desktop: bytzd_testnet.desktop
+    #desktop: wagerrd_testnet.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-regtest:
-    command: bytzd --regtest
+    command: wagerrd --regtest
     plugs: [network, network-bind, home, removable-media]
-    #desktop: bytzd_regtest.desktop
+    #desktop: wagerrd_regtest.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt:
-    command: bytz-qt
+    command: wagerr-qt
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: bytz-qt.desktop
+    desktop: wagerr-qt.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-testnet:
-    command: bytz-qt --testnet
+    command: wagerr-qt --testnet
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: bytz-qt_testnet.desktop
+    desktop: wagerr-qt_testnet.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-regtest:
-    command: bytz-qt --regtest
+    command: wagerr-qt --regtest
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: bytz-qt_regtest.desktop
+    desktop: wagerr-qt_regtest.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli:
-    command: bytz-cli
+    command: wagerr-cli
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-testnet:
-    command: bytz-cli --testnet
+    command: wagerr-cli --testnet
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-regtest:
-    command: bytz-cli --regtest
+    command: wagerr-cli --regtest
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   tx:
-    command: bytz-tx
+    command: wagerr-tx
     plugs: [home]
   test:
-    command: test_bytz
+    command: test_wagerr
     plugs: [home]
   testqt:
-    command: test_bytz-qt
+    command: test_wagerr-qt
     plugs: [home]
 parts:
-  bytz:
-    source: http://github.com/bytzcurrency/bytz
+  wagerr:
+    source: http://github.com/wagerr/wagerr
     source-type: git
-    source-tag: v0.2.0.1
+    source-tag: v5.0.0
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
@@ -245,7 +245,7 @@ parts:
       fi
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "CONFIG FILE" # create .bytz folder and copy example config - !!!warning!!!: do not copy as bytz.conf
+      echo "CONFIG FILE" # create .wagerr folder and copy example config - !!!warning!!!: do not copy as wagerr.conf
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       mkdir -p ${SNAP_USER_COMMON}/.${DATADIR}
       if [ $COPYCONF = 1 ]; then
@@ -265,7 +265,7 @@ parts:
       fi
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "BYTZ SPECIFIC"
+      echo "WAGERR SPECIFIC"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
     build-packages:
       - curl

@@ -6,7 +6,7 @@
 // Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -14,7 +14,7 @@
 #include <validation.h>
 
 #include <arith_uint256.h>
-#include <bytzaddrenc.h>
+#include <wagerraddrenc.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <checkpoints.h>
@@ -68,9 +68,9 @@
 #include <tokens/tokengroupwallet.h>
 
 #include <libzerocoin/bignum.h>
-#include <zbytz/accumulators.h>
-#include <zbytz/zbytzchain.h>
-#include <zbytz/zerocoindb.h>
+#include <zwgr/accumulators.h>
+#include <zwgr/zwgrchain.h>
+#include <zwgr/zerocoindb.h>
 
 #include <future>
 #include <sstream>
@@ -79,7 +79,7 @@
 #include <boost/thread.hpp>
 
 #if defined(NDEBUG)
-# error "BYTZ Core cannot be compiled without assertions."
+# error "WAGERR Core cannot be compiled without assertions."
 #endif
 
 #define MICRO 0.000001
@@ -675,7 +675,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
     bool fV17Active_context = (unsigned int)chainActive.Height() >= Params().GetConsensus().V17DeploymentHeight;
     if (fV17Active_context && tx.ContainsZerocoins()) {
-        return state.DoS(30, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xbytz");
+        return state.DoS(30, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
     }
 
     if (!CheckTransaction(tx, state, true))
@@ -763,7 +763,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         {
             const CTransaction *ptxConflicting = itConflicting->second;
 
-            // Transaction conflicts with mempool and RBF doesn't exist in Bytz
+            // Transaction conflicts with mempool and RBF doesn't exist in Wagerr
             return state.Invalid(false, REJECT_DUPLICATE, "txn-mempool-conflict");
         }
     }
@@ -1203,7 +1203,7 @@ NOTE:   unlike bitcoin we are using PREVIOUS block height here,
 */
 CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, const bool fPos, bool fSuperblockPartOnly)
 {
-    return GetBlockSubsidyBytz(nPrevHeight, fPos, consensusParams);
+    return GetBlockSubsidyWagerr(nPrevHeight, fPos, consensusParams);
 }
 
 bool IsInitialBlockDownload()
@@ -1938,7 +1938,7 @@ static bool WriteTxIndexDataForBlock(const CBlock& block, CValidationState& stat
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck() {
-    RenameThread("bytz-scriptch");
+    RenameThread("wagerr-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -2052,7 +2052,7 @@ static int64_t nTimeSubsidy = 0;
 static int64_t nTimeValueValid = 0;
 static int64_t nTimePayeeValid = 0;
 static int64_t nTimeProcessSpecial = 0;
-static int64_t nTimeBytzSpecific = 0;
+static int64_t nTimeWagerrSpecific = 0;
 static int64_t nTimeConnect = 0;
 static int64_t nTimeIndex = 0;
 static int64_t nTimeCallbacks = 0;
@@ -2187,7 +2187,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
     }
 
-    /// BYTZ: Check superblock start
+    /// WAGERR: Check superblock start
 
     // make sure old budget is the real one
     if (pindex->nHeight == chainparams.GetConsensus().nSuperblockStartBlock &&
@@ -2196,7 +2196,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             return state.DoS(100, error("ConnectBlock(): invalid superblock start"),
                              REJECT_INVALID, "bad-sb-start");
 
-    /// END BYTZ
+    /// END WAGERR
 
     // Start enforcing BIP68 (sequence locks) and BIP112 (CHECKSEQUENCEVERIFY) using versionbits logic.
     int nLockTimeFlags = 0;
@@ -2253,7 +2253,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
     if (!ProcessSpecialTxsInBlock(block, pindex, state, view, fJustCheck, fScriptChecks)) {
-        return error("ConnectBlock(BYTZ): ProcessSpecialTxsInBlock for block %s failed with %s",
+        return error("ConnectBlock(WAGERR): ProcessSpecialTxsInBlock for block %s failed with %s",
                      pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
 
@@ -2273,7 +2273,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         nInputs += tx->vin.size();
 
         if (fV17Active_context && tx->ContainsZerocoins()) {
-            return state.DoS(100, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xbytz");
+            return state.DoS(100, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
         }
 
         if (tx->HasZerocoinSpendInputs())
@@ -2367,7 +2367,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 }
             }
 
-            // Check that zBYTZ mints are not already known
+            // Check that zWAGERR mints are not already known
             if (tx->HasZerocoinMintOutputs()) {
                 for (auto& out : tx->vout) {
                     if (!out.IsZerocoinMint())
@@ -2453,7 +2453,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     LogPrint(BCLog::BENCHMARK, "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs (%.2fms/blk)]\n", nInputs - 1, MILLI * (nTime4 - nTime2), nInputs <= 1 ? 0 : MILLI * (nTime4 - nTime2) / (nInputs-1), nTimeVerify * MICRO, nTimeVerify * MILLI / nBlocksTotal);
 
 
-    // BYTZ
+    // WAGERR
 
     // It's possible that we simply don't have enough data and this could fail
     // (i.e. block itself could be a correct one and we need to store it),
@@ -2461,7 +2461,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // the peer who sent us this block is missing some data and wasn't able
     // to recognize that block is actually invalid.
 
-    // BYTZ : CHECK TRANSACTIONS FOR INSTANTSEND
+    // WAGERR : CHECK TRANSACTIONS FOR INSTANTSEND
 
     if (llmq::RejectConflictingBlocks()) {
         // Require other nodes to comply, send them some data in case they are missing it.
@@ -2479,58 +2479,50 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 // The node which relayed this should switch to correct chain.
                 // TODO: relay instantsend data/proof.
                 LOCK(cs_main);
-                return state.DoS(10, error("ConnectBlock(BYTZ): transaction %s conflicts with transaction lock %s", tx->GetHash().ToString(), conflictLock->txid.ToString()),
+                return state.DoS(10, error("ConnectBlock(WAGERR): transaction %s conflicts with transaction lock %s", tx->GetHash().ToString(), conflictLock->txid.ToString()),
                                  REJECT_INVALID, "conflict-tx-lock");
             }
         }
     } else if (!fReindex && !fImporting) {
-        LogPrintf("ConnectBlock(BYTZ): spork is off, skipping transaction locking checks\n");
+        LogPrintf("ConnectBlock(WAGERR): spork is off, skipping transaction locking checks\n");
     }
 
     int64_t nTime5_1 = GetTimeMicros(); nTimeISFilter += nTime5_1 - nTime4;
     LogPrint(BCLog::BENCHMARK, "      - IS filter: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_1 - nTime4), nTimeISFilter * MICRO, nTimeISFilter * MILLI / nBlocksTotal);
 
-    // Aggregate carbon fees
-    CAmount nMinerFees;
-    CAmount nCarbonFeesEscrow;
-    CAmount nCarbonFeesPayable;
-    const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindex->pprev, pindex->nHeight, chainparams.GetConsensus(), nFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
+    // WAGERR : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
 
-    CBlockReward blockReward(pindex->nHeight, nMinerFees, nCarbonFeesPayable, block.IsProofOfStake(), chainparams.GetConsensus());
-
-    // BYTZ : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
-
+    // TODO: resync data (both ways?) and try to reprocess this block later.
+    CBlockReward blockReward(pindex->nHeight, nFees, block.IsProofOfStake(), Params().GetConsensus());
     std::string strError = "";
 
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
     LogPrint(BCLog::BENCHMARK, "      - GetBlockSubsidy: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_2 - nTime5_1), nTimeSubsidy * MICRO, nTimeSubsidy * MILLI / nBlocksTotal);
 
     if (!IsBlockValueValid(block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
-        return state.DoS(0, error("ConnectBlock(BYTZ): %s", strError), REJECT_INVALID, "bad-cb-amount");
+        return state.DoS(0, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
     }
 
     int64_t nTime5_3 = GetTimeMicros(); nTimeValueValid += nTime5_3 - nTime5_2;
     LogPrint(BCLog::BENCHMARK, "      - IsBlockValueValid: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3 - nTime5_2), nTimeValueValid * MICRO, nTimeValueValid * MILLI / nBlocksTotal);
 
     if (!IsBlockPayeeValid(block.vtx[0], block.IsProofOfStake() ? block.vtx[1] : nullptr, pindex->nHeight, blockReward)) {
-        return state.DoS(0, error("ConnectBlock(BYTZ): couldn't find masternode or superblock payments"),
+        return state.DoS(0, error("ConnectBlock(WAGERR): couldn't find masternode or superblock payments"),
                                 REJECT_INVALID, "bad-cb-payee");
     }
 
     int64_t nTime5_4 = GetTimeMicros(); nTimePayeeValid += nTime5_4 - nTime5_3;
     LogPrint(BCLog::BENCHMARK, "      - IsBlockPayeeValid: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_4 - nTime5_3), nTimePayeeValid * MICRO, nTimePayeeValid * MILLI / nBlocksTotal);
 
-    int64_t nTime5 = GetTimeMicros(); nTimeBytzSpecific += nTime5 - nTime4;
-    LogPrint(BCLog::BENCHMARK, "    - Bytz specific: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5 - nTime4), nTimeBytzSpecific * MICRO, nTimeBytzSpecific * MILLI / nBlocksTotal);
+    int64_t nTime5 = GetTimeMicros(); nTimeWagerrSpecific += nTime5 - nTime4;
+    LogPrint(BCLog::BENCHMARK, "    - Wagerr specific: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5 - nTime4), nTimeWagerrSpecific * MICRO, nTimeWagerrSpecific * MILLI / nBlocksTotal);
 
-    // END BYTZ
+    // END WAGERR
 
-    //Track zBYTZ money supply in the block index
-    if (!UpdateZBYTZSupply(block, pindex, fJustCheck))
-        return state.DoS(100, error("%s: Failed to calculate new zBYTZ supply for block=%s height=%d", __func__,
+    //Track zWAGERR money supply in the block index
+    if (!UpdateZWGRSupply(block, pindex, fJustCheck))
+        return state.DoS(100, error("%s: Failed to calculate new zWAGERR supply for block=%s height=%d", __func__,
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
-
-    pindex->nCarbonFeesEscrow = nCarbonFeesEscrow;
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().GetConsensus().nBlockZerocoinV2));
@@ -2813,9 +2805,9 @@ void static UpdateTip(const CBlockIndex *pindexNew, const CChainParams& chainPar
             DoWarning(strWarning);
         }
     }
-    std::string strMessage = strprintf("%s: new best=%s height=%d version=0x%08x log2_work=%.8f tx=%lu fee_escrow='%lu' date='%s' progress=%f cache=%.1fMiB(%utxo)", __func__,
+    std::string strMessage = strprintf("%s: new best=%s height=%d version=0x%08x log2_work=%.8f tx=%lu date='%s' progress=%f cache=%.1fMiB(%utxo)", __func__,
       pindexNew->GetBlockHash().ToString(), pindexNew->nHeight, pindexNew->nVersion,
-      log(pindexNew->nChainWork.getdouble())/log(2.0), (unsigned long)pindexNew->nChainTx, (unsigned long)pindexNew->nCarbonFeesEscrow,
+      log(pindexNew->nChainWork.getdouble())/log(2.0), (unsigned long)pindexNew->nChainTx,
       FormatISO8601DateTime(pindexNew->GetBlockTime()),
       GuessVerificationProgress(chainParams.TxData(), pindexNew), pcoinsTip->DynamicMemoryUsage() * (1.0 / (1<<20)), pcoinsTip->GetCacheSize());
     strMessage += strprintf(" evodb_cache=%.1fMiB", evoDb->GetMemoryUsage() * (1.0 / (1<<20)));
@@ -3617,7 +3609,6 @@ void CChainState::ReceivedBlockTransactions(const CBlock& block, CBlockIndex* pi
     }
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
-    pindexNew->nCarbonFeesEscrow = 0;
     pindexNew->nFile = pos.nFile;
     pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;
@@ -4772,7 +4763,7 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
     CValidationState state;
     if (!ProcessSpecialTxsInBlock(block, pindex, state, inputs, false /*fJustCheck*/, false /*fScriptChecks*/)) {
-        return error("RollforwardBlock(BYTZ): ProcessSpecialTxsInBlock for block %s failed with %s",
+        return error("RollforwardBlock(WAGERR): ProcessSpecialTxsInBlock for block %s failed with %s",
             pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
 

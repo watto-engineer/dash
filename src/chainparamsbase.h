@@ -10,8 +10,8 @@
 #include <vector>
 
 /**
- * CBaseChainParams defines the base parameters (shared between bytz-cli and bytzd)
- * of a given instance of the Bytz system.
+ * CBaseChainParams defines the base parameters (shared between wagerr-cli and wagerrd)
+ * of a given instance of the Wagerr system.
  */
 class CBaseChainParams
 {

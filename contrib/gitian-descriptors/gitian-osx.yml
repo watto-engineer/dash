@@ -1,5 +1,5 @@
 ---
-name: "bytz-osx-0.2"
+name: "wagerr-osx-5.0.0"
 enable_cache: true
 distro: "ubuntu"
 suites:
@@ -29,8 +29,8 @@ packages:
 - "fonts-tuffy"
 - "doxygen"
 remotes:
-- "url": "https://github.com/bytzcurrency/bytz.git"
-  "dir": "bytz"
+- "url": "https://github.com/wagerr/wagerr.git"
+  "dir": "wagerr"
 files:
 - "MacOSX10.11.sdk.tar.xz"
 script: |
@@ -87,7 +87,7 @@ script: |
   create_per-host_faketime_wrappers "2000-01-01 12:00:00"
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd bytz
+  cd wagerr
   BASEPREFIX=`pwd`/depends
 
   mkdir -p ${BASEPREFIX}/SDKs
@@ -108,14 +108,14 @@ script: |
   ./autogen.sh
   CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
   make dist
-  SOURCEDIST=`echo bytz-*.tar.gz`
+  SOURCEDIST=`echo wagerr-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
 
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find bytz-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find wagerr-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
   # Workaround for tarball not building with the bare tag version (prep)

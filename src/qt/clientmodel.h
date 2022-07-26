@@ -40,7 +40,7 @@ enum NumConnections {
     CONNECTIONS_ALL  = (CONNECTIONS_IN | CONNECTIONS_OUT),
 };
 
-/** Model for Bytz network client. */
+/** Model for Wagerr network client. */
 class ClientModel : public QObject
 {
     Q_OBJECT

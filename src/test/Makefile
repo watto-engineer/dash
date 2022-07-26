@@ -1,6 +1,6 @@
 all:
-	$(MAKE) -C .. bytz_test
+	$(MAKE) -C .. wagerr_test
 clean:
-	$(MAKE) -C .. bytz_test_clean
+	$(MAKE) -C .. wagerr_test_clean
 check:
-	$(MAKE) -C .. bytz_test_check
+	$(MAKE) -C .. wagerr_test_check

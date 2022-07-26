@@ -5,7 +5,7 @@
 #include <chainparams.h>
 #include <validation.h>
 
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <boost/test/unit_test.hpp>
 

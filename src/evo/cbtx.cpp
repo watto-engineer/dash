@@ -1,5 +1,5 @@
 // Copyright (c) 2017-2021 The Dash Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -107,21 +107,19 @@ bool CheckCbTxCoinstakeFlags(const CCbTx& cbTx, const CBlock& block, CValidation
 
     bool fPos;
     bool fSplitCoinstake;
-    bool fCarbonOffset;
     bool fMasternodeTx;
     bool fOperatorTx;
-    GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx);
-    if (!CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fCarbonOffset, fMasternodeTx, fOperatorTx)) {
+    GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx);
+    if (!CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx)) {
         return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-cs-outputs");
     }
     return true;
 }
 
-bool CheckCoinstakeOutputs(const CBlock& block, const bool fPos, const bool fSplitCoinstake, const bool fCarbonOffset, const bool fMasternodeTx, const bool fOperatorTx) {
+bool CheckCoinstakeOutputs(const CBlock& block, const bool fPos, const bool fSplitCoinstake, const bool fMasternodeTx, const bool fOperatorTx) {
     int nOutputs = 1; // Always at least 1
     if (fPos) nOutputs++;
     if (fSplitCoinstake) nOutputs++;
-    if (fCarbonOffset) nOutputs++;
     if (fMasternodeTx) nOutputs++;
     if (fOperatorTx) nOutputs++;
 
@@ -135,20 +133,18 @@ bool CheckCoinstakeOutputs(const CBlock& block, const bool fPos, const bool fSpl
     return true;
 }
 
-void GetCbTxCoinstakeFlags(const uint8_t nCoinstakeFlags, bool& fPos, bool& fSplitCoinstake, bool& fCarbonOffset, bool& fMasternodeTx, bool& fOperatorTx)
+void GetCbTxCoinstakeFlags(const uint8_t nCoinstakeFlags, bool& fPos, bool& fSplitCoinstake, bool& fMasternodeTx, bool& fOperatorTx)
 {
     fPos = (nCoinstakeFlags & CSTX_POS) != 0;
     fSplitCoinstake = (nCoinstakeFlags & CSTX_SPLIT_COINSTAKE) != 0;
-    fCarbonOffset = (nCoinstakeFlags & CSTX_CARBON_OUTPUT) != 0;
     fMasternodeTx = (nCoinstakeFlags & CSTX_MASTERNODE_OUTPUT) != 0;
     fOperatorTx = (nCoinstakeFlags & CSTX_OPERATOR_OUTPUT) != 0;
 }
 
-void CalcCbTxCoinstakeFlags(uint8_t& nCoinstakeFlags, const bool fPos, const bool fSplitCoinstake, const bool fCarbonOffset, const bool fMasternodeTx, const bool fOperatorTx)
+void CalcCbTxCoinstakeFlags(uint8_t& nCoinstakeFlags, const bool fPos, const bool fSplitCoinstake, const bool fMasternodeTx, const bool fOperatorTx)
 {
     nCoinstakeFlags = fPos ? CSTX_POS : 0;
     nCoinstakeFlags |= fSplitCoinstake ? CSTX_SPLIT_COINSTAKE : 0;
-    nCoinstakeFlags |= fCarbonOffset ? CSTX_CARBON_OUTPUT : 0;
     nCoinstakeFlags |= fMasternodeTx ? CSTX_MASTERNODE_OUTPUT : 0;
     nCoinstakeFlags |= fOperatorTx ? CSTX_OPERATOR_OUTPUT : 0;
 }
@@ -158,7 +154,6 @@ void CalcCbTxCoinstakeFlags(uint8_t& nCoinstakeFlags, CBlockReward blockReward)
     CalcCbTxCoinstakeFlags(nCoinstakeFlags,
         blockReward.fPos,
         blockReward.fSplitCoinstake,
-        blockReward.GetCarbonReward().amount > 0,
         blockReward.GetMasternodeReward().amount > 0,
         blockReward.GetOperatorReward().amount > 0
     );

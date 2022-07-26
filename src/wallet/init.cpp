@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2017 The Bitcoin Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -56,7 +56,7 @@ public:
     //! Close all wallets.
     void Close() const override;
 
-    // Bytz Specific Wallet Init
+    // Wagerr Specific Wallet Init
     void AutoLockMasternodeCollaterals() const override;
     void InitCoinJoinSettings() const override;
     void InitStaking() const override;
@@ -508,11 +508,11 @@ void WalletInit::InitStaking() const
     if (!HasWallets() || wallets.size() < 1) {
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
         stakingManager->fEnableStaking = false;
-        stakingManager->fEnableBYTZStaking = false;
+        stakingManager->fEnableWAGERRStaking = false;
     } else {
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager(wallets[0]));
         stakingManager->fEnableStaking = gArgs.GetBoolArg("-staking", true);
-        stakingManager->fEnableBYTZStaking = gArgs.GetBoolArg("-staking", true);
+        stakingManager->fEnableWAGERRStaking = gArgs.GetBoolArg("-staking", true);
     }
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
         stakingManager->fEnableStaking = false;

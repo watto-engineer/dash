@@ -5,7 +5,7 @@
 #include <util.h>
 
 #include <support/allocators/secure.h>
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <memory>
 

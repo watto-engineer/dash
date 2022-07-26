@@ -29,7 +29,7 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) :
 
     setButtonIcons();
 
-    // normal bytz address field
+    // normal wagerr address field
     GUIUtil::setupAddressWidget(ui->payTo, this, true);
 
     GUIUtil::setFont({ui->payToLabel,

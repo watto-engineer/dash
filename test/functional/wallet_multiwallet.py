@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # Copyright (c) 2017 The Bitcoin Core developers
-# Copyright (c) 2021 The Bytz Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test multiwallet.
 
-Verify that a bytzd node can load multiple wallet files
+Verify that a wagerrd node can load multiple wallet files
 """
 import os
 import re

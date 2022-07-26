@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # Copyright (c) 2021 The Dash Core developers
-# Copyright (c) 2021 The Bytz Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 import time
 from test_framework.mininode import logger
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import force_finish_mnsync, connect_nodes
 
 '''
@@ -23,11 +23,11 @@ llmq_test_v17 = 102
 llmq_type_strings = {llmq_test: 'llmq_test', llmq_test_v17: 'llmq_test_v17'}
 
 
-class QuorumDataRecoveryTest(BytzTestFramework):
+class QuorumDataRecoveryTest(WagerrTestFramework):
     def set_test_params(self):
-        extra_args = [["-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG"] for _ in range(9)]
-        self.set_bytz_test_params(9, 7, fast_dip3_enforcement=True, extra_args=extra_args)
-        self.set_bytz_llmq_test_params(4, 3)
+        extra_args = [["-sporkkey=TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH"] for _ in range(9)]
+        self.set_wagerr_test_params(9, 7, fast_dip3_enforcement=True, extra_args=extra_args)
+        self.set_wagerr_llmq_test_params(4, 3)
 
     def restart_mn(self, mn, reindex=False, qvvec_sync=[], qdata_recovery_enabled=True):
         args = self.extra_args[mn.nodeIdx] + ['-masternodeblsprivkey=%s' % mn.keyOperator,

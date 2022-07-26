@@ -6,7 +6,7 @@
 // Copyright (c) 2015-2019 The PIVX developers
 // Copyright (c) 2014-2021 The Dash Core developers
 // Copyright (c) 2020-2021 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -240,14 +240,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (!fPos)
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
 
-    // Aggregate carbon fees
-    CAmount nMinerFees;
-    CAmount nCarbonFeesEscrow;
-    CAmount nCarbonFeesPayable;
-    const bool fIsCarbonPaymentsBlock = GetCarbonPayments(pindexPrev, nHeight, chainparams.GetConsensus(), nFees, nMinerFees, nCarbonFeesEscrow, nCarbonFeesPayable);
-
-    CBlockReward blockReward(nHeight, nMinerFees, nCarbonFeesPayable, fPos, chainparams.GetConsensus());
-
+    CBlockReward blockReward(nHeight, nFees, fPos, Params().GetConsensus());
     CCbTx cbTx;
 
     // Update coinbase transaction with additional info about masternode and governance payments,
@@ -262,12 +255,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         coinbaseTx.vout[0].nValue = 0;
         pCoinstakeTx->vout[1].nValue += blockReward.GetCoinstakeReward().amount;
         bool fSplit = SplitCoinstakeVouts(pCoinstakeTx, blockReward, nSplitValue);
-        if (blockReward.GetCarbonReward().amount > 0) {
-            pCoinstakeTx->vout.emplace_back(CTxOut(blockReward.GetCarbonReward().amount, GetScriptForDestination(DecodeDestination(chainparams.GetConsensus().strCarbonOffsetAddress))));
-        }
         pCoinstakeTx->vout.insert(pCoinstakeTx->vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
 
-        // Sign for Bytz
+        // Sign for Wagerr
         int nIn = 0;
         for (CTxIn txIn : pCoinstakeTx->vin) {
             CScript coinstakeInScript;
@@ -285,9 +275,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             nMasternodePaymentAmount += txout.nValue;
         }
         coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
-        if (blockReward.GetCarbonReward().amount > 0) {
-            coinbaseTx.vout.emplace_back(CTxOut(blockReward.GetCarbonReward().amount, GetScriptForDestination(DecodeDestination(chainparams.GetConsensus().strCarbonOffsetAddress))));
-        }
         coinbaseTx.vout.insert(coinbaseTx.vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
     }
 

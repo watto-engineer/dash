@@ -1,5 +1,5 @@
 ---
-name: "bytz-linux-0.2"
+name: "wagerr-linux-5.0.0"
 enable_cache: true
 distro: "ubuntu"
 suites:
@@ -44,8 +44,8 @@ packages:
 - "linux-libc-dev"
 - "doxygen"
 remotes:
-- "url": "https://github.com/bytzcurrency/bytz.git"
-  "dir": "bytz"
+- "url": "https://github.com/wagerr/wagerr.git"
+  "dir": "wagerr"
 files: []
 script: |
   set -e -o pipefail
@@ -134,7 +134,7 @@ script: |
   chmod +x ${WRAP_DIR}/${prog}
   done
 
-  cd bytz
+  cd wagerr
   BASEPREFIX=`pwd`/depends
   # Build dependencies for each host
   for i in $HOSTS; do
@@ -156,13 +156,13 @@ script: |
   ./autogen.sh
   CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
   make dist
-  SOURCEDIST=`echo bytz-*.tar.gz`
+  SOURCEDIST=`echo wagerr-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find bytz-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find wagerr-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
   # Workaround for tarball not building with the bare tag version (prep)

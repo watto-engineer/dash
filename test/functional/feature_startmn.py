@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
-# Copyright (c) 2021 The Bytz Core developers
+# Copyright (c) 2021 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the wallet."""
 import sys
 
-from test_framework.test_framework import BytzTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from test_framework.blocktools import *
 
-BYTZ_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
-class WalletTest(BytzTestFramework):
+class WalletTest(WagerrTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True
-        self.extra_args = [['-sporkkey=5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG'],[]]
+        self.extra_args = [['-sporkkey=TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH'],[]]
 
     def setup_network(self):
         self.add_nodes(2, self.extra_args, stderr=sys.stdout)
@@ -27,9 +27,9 @@ class WalletTest(BytzTestFramework):
 
     def run_test(self):
         self.log.info("Importing token management privkey...")
-        self.nodes[0].importprivkey("5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
+        self.nodes[0].importprivkey("TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
         privkey = self.nodes[0].dumpprivkey("TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U")
-        assert_equal(privkey, "5rE5LTDq3tRhaPW3RT1De35MocGc9wD8foaBGioxSXJsn45XaFG")
+        assert_equal(privkey, "TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH")
 
         self.log.info("Mining blocks...")
         self.nodes[0].generate(16)
@@ -68,7 +68,7 @@ class WalletTest(BytzTestFramework):
         gvtBLSKey = self.nodes[0].bls("generate")
         self.log.info("gvtBLSKey:")
         self.log.info(gvtBLSKey)
-        self.nodes[0].sendtoaddress(BYTZ_AUTH_ADDR, 10)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         gvtConfig = self.nodes[0].configuremanagementtoken("GVT", "GuardianValidatorToken", "0", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", gvtBLSKey['public'], "true", "true")
         self.nodes[0].generate(1)

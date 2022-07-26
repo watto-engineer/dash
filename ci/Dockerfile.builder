@@ -17,9 +17,9 @@ RUN pip3 install pyzmq # really needed?
 RUN pip3 install jinja2
 RUN pip3 install flake8
 
-# bytz_hash
-RUN git clone https://github.com/bytzcurrency/bytz_hash
-RUN cd bytz_hash && python3 setup.py install
+# wagerr_hash
+RUN git clone https://github.com/wagerr/wagerr_hash
+RUN cd wagerr_hash && python3 setup.py install
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -27,8 +27,8 @@ ARG GROUP_ID=1000
 # add user with specified (or default) user/group ids
 ENV USER_ID ${USER_ID}
 ENV GROUP_ID ${GROUP_ID}
-RUN groupadd -g ${GROUP_ID} bytz
-RUN useradd -u ${USER_ID} -g bytz -s /bin/bash -m -d /bytz bytz
+RUN groupadd -g ${GROUP_ID} wagerr
+RUN useradd -u ${USER_ID} -g wagerr -s /bin/bash -m -d /wagerr wagerr
 
 # Packages needed for all target builds
 RUN dpkg --add-architecture i386
@@ -55,13 +55,13 @@ RUN \
   update-alternatives --set x86_64-w64-mingw32-g++  /usr/bin/x86_64-w64-mingw32-g++-posix; \
   exit 0
 
-RUN mkdir /bytz-src && \
+RUN mkdir /wagerr-src && \
   mkdir -p /cache/ccache && \
   mkdir /cache/depends && \
   mkdir /cache/sdk-sources && \
-  chown $USER_ID:$GROUP_ID /bytz-src && \
+  chown $USER_ID:$GROUP_ID /wagerr-src && \
   chown $USER_ID:$GROUP_ID /cache && \
   chown $USER_ID:$GROUP_ID /cache -R
-WORKDIR /bytz-src
+WORKDIR /wagerr-src
 
-USER bytz
+USER wagerr

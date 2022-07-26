@@ -1,6 +1,6 @@
 // Copyright (c) 2015-2018 The Bitcoin Unlimited developers
 // Copyright (c) 2019-2020 The ION Core developers
-// Copyright (c) 2021 The Bytz Core developers
+// Copyright (c) 2021 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,7 +9,7 @@
 #include "dstencode.h"
 #include <evo/specialtx.h>
 #include "init.h"
-#include "bytzaddrenc.h"
+#include "wagerraddrenc.h"
 #include "rpc/protocol.h"
 #include "rpc/server.h"
 #include "script/tokengroup.h"
@@ -80,7 +80,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             "'creation_data'  (bool, optional) show token creation data'\n"
             "'nft_data'       (bool, optional) show base64 encoded data of NFT tokens'\n"
             "\n" +
-            HelpExampleCli("tokeninfo", "ticker \"BYTZ\"") +
+            HelpExampleCli("tokeninfo", "ticker \"WAGERR\"") +
             "\n"
         );
 
@@ -557,11 +557,11 @@ UniValue createrawtokentransaction(const JSONRPCRequest& request)
             "      \"data\": \"hex\"      (string, required) The key is \"data\", the value is hex encoded data\n"
             "      ,...\n"
             "    }\n"
-            "3. \"token_outputs\"         (string, required) a json object with addresses as keys and a json objects with the BYTZ and tokens to send\n"
+            "3. \"token_outputs\"         (string, required) a json object with addresses as keys and a json objects with the WAGERR and tokens to send\n"
             "    {\n"
-            "      \"address\":           (numeric, required) The key is the Bytz address, the value is a json object with an BYTZ amount, tokengroup ID and token value as values\n"
+            "      \"address\":           (numeric, required) The key is the Wagerr address, the value is a json object with an WAGERR amount, tokengroup ID and token value as values\n"
             "      {\n"
-            "        \"amount\":\"x.xxx\"       (numeric, required) The BYTZ amount\n"
+            "        \"amount\":\"x.xxx\"       (numeric, required) The WAGERR amount\n"
             "        \"group_id\":\"hex\"       (string, required) The tokengroup ID\n"
             "        \"token_amount\":\"x.xxx\" (numeric, required) The token amount\n"
             "      },...\n"
@@ -707,7 +707,7 @@ UniValue encodetokenmetadata(const JSONRPCRequest& request)
             "       }\n"
             "       \"ticker\":\"ticker\",           (string) The ticker. Required for regular tokens and management tokens\n"
             "       \"name\":\"name\",               (string, required) The token name\n"
-            "       \"chain\":\"chain\",             (string, required) Chain identifier, e.g. \"BYTZ\" (for mainnet) or \"BYTZ.testnet\" or \"BYTZ.regtest\"\n"
+            "       \"chain\":\"chain\",             (string, required) Chain identifier, e.g. \"WAGERR\" (for mainnet) or \"WAGERR.testnet\" or \"WAGERR.regtest\"\n"
             "       \"summary\":\"summary\",         (string, optional) Short introduction to the token.\n"
             "       \"description\":\"description\", (string, optional) Description of the token\n"
             "       \"creator\":\"creator\",         (string, optional) Token creator\n"
@@ -730,7 +730,7 @@ UniValue encodetokenmetadata(const JSONRPCRequest& request)
             "\nCreate the MGT testnet document\n"
             + HelpExampleCli("encodetokenmetadata",
                 "\"{\\\"atp\\\":{\\\"version\\\":1,\\\"type\\\":\\\"nft\\\"},\\\"name\\\":\\\"John Doe concert tickets - Garden of Eden"
-                " tour\\\",\\\"chain\\\":\\\"BYTZ.testnet\\\",\\\"creator\\\":\\\"DoeTours Ltd.\\\",\\\"description\\\":\\\"From April "
+                " tour\\\",\\\"chain\\\":\\\"WAGERR.testnet\\\",\\\"creator\\\":\\\"DoeTours Ltd.\\\",\\\"description\\\":\\\"From April "
                 "1st through April 9th, John Doe will visit Eden, NC. This booking grants you access.\\\",\\\"external_url\\\":\\\"http"
                 "s://yourtickettomusic.com/nft/{id}/\\\",\\\"image\\\":\\\"https://www.stockvault.net/data/2018/10/09/255077/preview16."
                 "jpg\\\",\\\"attributes\\\":[{\\\"trait_type\\\":\\\"Ticket class\\\",\\\"value\\\":\\\"Gold\\\"},{\\\"display_type\\\""
@@ -772,7 +772,7 @@ UniValue decodetokenmetadata(const JSONRPCRequest& request)
             "       }\n"
             "       \"ticker\":\"ticker\",           (string) The ticker. Required for regular tokens and management tokens\n"
             "       \"name\":\"name\",               (string, required) The token name\n"
-            "       \"chain\":\"chain\",             (string, required) Chain identifier, e.g. \"BYTZ\" (for mainnet) or \"BYTZ.testnet\" or \"BYTZ.regtest\"\n"
+            "       \"chain\":\"chain\",             (string, required) Chain identifier, e.g. \"WAGERR\" (for mainnet) or \"WAGERR.testnet\" or \"WAGERR.regtest\"\n"
             "       \"summary\":\"summary\",         (string, optional) Short introduction to the token.\n"
             "       \"description\":\"description\", (string, optional) Description of the token\n"
             "       \"creator\":\"creator\",         (string, optional) Token creator\n"
@@ -869,7 +869,7 @@ UniValue verifytokenmetadata(const JSONRPCRequest& request)
     std::string strSignature = request.params[2].get_str();
     CTxDestination dest = DecodeDestination(strAddress);
     if (!IsValidDestination(dest)) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bytz address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
     }
     const CKeyID *keyID = boost::get<CKeyID>(&dest);
     if (!keyID) {

@@ -5,7 +5,7 @@
 #include <random.h>
 #include <scheduler.h>
 
-#include <test/test_bytz.h>
+#include <test/test_wagerr.h>
 
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
