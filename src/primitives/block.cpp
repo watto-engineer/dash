@@ -18,6 +18,8 @@ uint256 CBlockHeader::GetHash() const
     std::vector<unsigned char> vch(80);
     CVectorWriter ss(SER_GETHASH, PROTOCOL_VERSION, vch, 0);
     ss << *this;
+    if (this->nVersion >= 4)
+        return Hash((const char *)vch.data(), (const char *)vch.data() + vch.size());
     return HashQuark((const char *)vch.data(), (const char *)vch.data() + vch.size());
 }
 

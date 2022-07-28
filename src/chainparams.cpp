@@ -381,7 +381,7 @@ public:
 
         // Wagerr specific parameters
         // Proof of Stake parameters
-        consensus.nPosStartHeight = 201;
+        consensus.nPosStartHeight = 1002;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
@@ -567,7 +567,7 @@ public:
 
         // Wagerr specific parameters
         // Proof of Stake parameters
-        consensus.nPosStartHeight = 201;
+        consensus.nPosStartHeight = 301;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
@@ -739,7 +739,7 @@ public:
 
         // Wagerr specific parameters
         // Proof of Stake parameters
-        consensus.nPosStartHeight = 201;
+        consensus.nPosStartHeight = 301;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
@@ -903,7 +903,7 @@ public:
 
         // Wagerr specific parameters
         // Proof of Stake parameters
-        consensus.nPosStartHeight = 201;
+        consensus.nPosStartHeight = 251;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1

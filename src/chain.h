@@ -288,7 +288,8 @@ public:
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
-        if(block.nVersion == BLOCKHEADER_LEGACY_VERSION)
+        //zerocoin active, header changes to include accumulator checksum
+        if(block.nVersion > 3 && block.nVersion < 7)
             nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
     }
 
@@ -526,13 +527,13 @@ public:
         READWRITE(nNonce);
 
         READWRITE(VARINT(nFlags));
-        if(this->nVersion == BLOCKHEADER_LEGACY_VERSION) {
+        if(this->nVersion > 3 && this->nVersion < 7) {
             READWRITE(nAccumulatorCheckpoint);
             READWRITE(mapZerocoinSupply);
             READWRITE(vMintDenominationsInBlock);
         }
         // v1/v2 modifier selection.
-        if (this->nVersion > BLOCKHEADER_LEGACY_VERSION) {
+        if (this->nVersion > 5) {
             READWRITE(nStakeModifierV2);
         } else {
             READWRITE(nStakeModifier);
