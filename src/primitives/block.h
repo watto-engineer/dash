@@ -11,7 +11,6 @@
 #include <uint256.h>
 
 #define BLOCKHEADER_INITIAL_VERSION 1
-#define BLOCKHEADER_LEGACY_VERSION 2
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -48,7 +47,7 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion == BLOCKHEADER_LEGACY_VERSION)
+        if (nVersion > 3 && nVersion < 7)
             READWRITE(nAccumulatorCheckpoint);
     }
 
