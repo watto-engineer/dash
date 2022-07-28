@@ -251,9 +251,10 @@ public:
           nBits{block.nBits},
           nNonce{block.nNonce}
          {
-            if(block.nVersion > BLOCKHEADER_LEGACY_VERSION)
-                nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
-         }
+        //zerocoin active, header changes to include accumulator checksum
+        if(block.nVersion > 3 && block.nVersion < 7)
+            nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
+        }
 
     FlatFilePos GetBlockPos() const {
         FlatFilePos ret;
@@ -491,13 +492,13 @@ public:
         READWRITE(obj.nBits);
         READWRITE(obj.nNonce);
         READWRITE(VARINT(obj.nFlags));
-        if(obj.nVersion > BLOCKHEADER_LEGACY_VERSION) {
+        if(obj.nVersion > 3 && obj.nVersion < 7) {
             READWRITE(obj.nAccumulatorCheckpoint);
             READWRITE(obj.mapZerocoinSupply);
             READWRITE(obj.vMintDenominationsInBlock);
         }
         // v1/v2 modifier selection.
-        if (obj.nVersion > BLOCKHEADER_LEGACY_VERSION) {
+        if (obj.nVersion > 5) {
             READWRITE(obj.nStakeModifierV2);
         } else {
             READWRITE(obj.nStakeModifier);

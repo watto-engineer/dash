@@ -16,32 +16,31 @@ CAmount GetBlockSubsidyWagerr(const int nPrevHeight, const bool fPos, const Cons
     CAmount nSubsidy = 0;
     int nHeight = nPrevHeight + 1;
 
-    if (nHeight >= consensusParams.V17DeploymentHeight + 4 * 513000) return 260 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 3 * 513000) return 520 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 2 * 513000) return 770 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 513000) return 1000 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight) return 1210 * COIN;
-    if (nHeight >= 107624) return 2710 * COIN;
-    if (nHeight >= 67004) return 0 * COIN;
-    if (nHeight >= 67001) return 2850000000 * COIN;
-    if (nHeight >= 312) return 0 * COIN;
-    if (nHeight >= 12) return 10000 * COIN;
-    if (nHeight >= 2) return 0 * COIN;
-    if (nHeight == 1) return 947000000 * COIN;
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        if (nHeight > 10001) return 3.8 * COIN;
+        if (nHeight > 102) return 0 * COIN;
+        if (nHeight > 2) return 250000 * COIN;
+        if (nHeight == 2) return 173360471 * COIN;
+        return 0 * COIN;
+    }
+    if (nHeight > consensusParams.nBlockZerocoinV2 + 1) return 3.8 * COIN;
+    if (nHeight > consensusParams.nPosStartHeight + 1) return 3.8 / 90 * 100 * COIN;
+    if (nHeight > 201) return 100000 * COIN;
+    if (nHeight > 2) return 250000 * COIN;
+    if (nHeight == 2) return 173360471 * COIN;
     return 0 * COIN;
 }
 
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue, bool isZWGRStake, const Consensus::Params& consensusParams) {
-    if (nHeight >= consensusParams.V17DeploymentHeight + 4 * 513000) return 156 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 3 * 513000) return 312 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 2 * 513000) return 462 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight + 513000) return 600 * COIN;
-    if (nHeight >= consensusParams.V17DeploymentHeight) return 726 * COIN;
-    if (nHeight >= consensusParams.nBlockZerocoinV2 && !isZWGRStake) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
-    if (nHeight >= consensusParams.nBlockZerocoinV2 && isZWGRStake) return blockValue > 2410 * COIN ? 2410 * COIN : 0;
-    if (nHeight >= consensusParams.nPosStartHeight) return blockValue > 2440 * COIN ? 2440 * COIN : 0;
-    if (Params().NetworkIDString() == CBaseChainParams::REGTEST) return 0.4 * blockValue;
-    return 0 * COIN;
+    if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        if (nHeight < 200) return 0;
+    }
+
+    if (nHeight < consensusParams.nPosStartHeight) return 0 * COIN;
+    if (nHeight < consensusParams.nBlockZerocoinV2) return blockValue * .75;
+
+    if (isZWGRStake) return blockValue - (1 * COIN); // 3.8 zWGR - 1 zWGR = 2.8 zWGR for MNs instead of 2.85 zWGR for MNs
+    return blockValue * 0.75;
 }
 
 CReward::CReward(const RewardType typeIn, const CAmount amountIn, const CTokenGroupID group, const CAmount tokenAmount) : type(typeIn), amount(amountIn) {
