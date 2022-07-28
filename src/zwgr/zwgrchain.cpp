@@ -374,7 +374,7 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 bool UpdateZWGRSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
 {
     // Only update zWAGERR supply when zerocoin mint amount can change
-    if (pindex->nVersion != BLOCKHEADER_LEGACY_VERSION) return true;
+    if (!(pindex->nVersion > 3 && pindex->nVersion < 7)) return true;
 
     std::list<CZerocoinMint> listMints;
     bool fFilterInvalid = false;//pindex->nHeight >= Params().Zerocoin_Block_RecalculateAccumulators();
@@ -382,7 +382,7 @@ bool UpdateZWGRSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck)
     std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
 
     // Initialize zerocoin supply to the supply from previous block
-    if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion == BLOCKHEADER_LEGACY_VERSION) {
+    if (pindex->pprev && pindex->pprev->GetBlockHeader().nVersion > 3) {
         for (auto& denom : libzerocoin::zerocoinDenomList) {
             uint16_t nMints = pindex->pprev->GetZcMints(denom);
             if (nMints != 0) pindex->mapZerocoinSupply[denom] = nMints;

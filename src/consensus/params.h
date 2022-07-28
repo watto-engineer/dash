@@ -123,6 +123,7 @@ struct Params {
     int32_t nStakeMinAge;
     int64_t nBlockStakeModifierV1A;
     int64_t nBlockStakeModifierV2;
+    bool IsStakeModifierV2(const int nHeight) const { return nHeight >= nBlockStakeModifierV2; }
 
     /** Time Protocol V2 **/
     int nBlockTimeProtocolV2;
