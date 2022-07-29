@@ -7,7 +7,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "net.h"
-#include "main.h"
+#include "validation.h"
 #include "betting/bet.h"
 #include "betting/bet_db.h"
 #include "rpc/server.h"
