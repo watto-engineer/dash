@@ -6,7 +6,7 @@
 #include <betting/bet_v3.h>
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
-#include <main.h>
+#include <validation.h>
 #include <util.h>
 #include <base58.h>
 #include <kernel.h>
