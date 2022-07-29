@@ -129,6 +129,16 @@ BITCOIN_CORE_H = \
   base58.h \
   batchedlogger.h \
   bech32.h \
+  betting/bet.h \
+  betting/bet_common.h \
+  betting/bet_tx.h \
+  betting/bet_db.h \
+  betting/bet_v2.h \
+  betting/bet_v3.h \
+  betting/bet_v4.h \
+ betting/oracles.h \
+  betting/quickgames/dice.h \
+  betting/quickgames/qgview.h \
   bip39.h \
   bip39_english.h \
   blockencodings.h \
@@ -175,6 +185,7 @@ BITCOIN_CORE_H = \
   evo/providertx.h \
   evo/simplifiedmns.h \
   evo/specialtx.h \
+  flushablestorage/flushablestorage.h \
   evo/specialtxman.h \
   dsnotificationinterface.h \
   governance/governance.h \
@@ -395,6 +406,14 @@ libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   banman.cpp \
   batchedlogger.cpp \
+  betting/bet_common.cpp \
+  betting/bet_tx.cpp \
+  betting/bet_db.cpp \
+  betting/bet.cpp \
+  betting/bet_v2.cpp \
+  betting/bet_v3.cpp \
+  betting/bet_v4.cpp \
+  betting/oracles.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
   chain.cpp \
@@ -470,6 +489,7 @@ libbitcoin_server_a_SOURCES = \
   pos/stakeinput.cpp \
   pow.cpp \
   rest.cpp \
+  rpc/bet.cpp \
   rpc/blockchain.cpp \
   rpc/masternode.cpp \
   rpc/governance.cpp \
@@ -758,6 +778,7 @@ libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
+  betting/quickgames/dice.cpp \
   bip39.cpp \
   wagerraddrenc.cpp \
   bloom.cpp \
