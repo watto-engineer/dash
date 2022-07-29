@@ -108,7 +108,12 @@ struct Params {
     int64_t nPowTargetTimespan;
     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
-    uint16_t nCoinbaseMaturity;
+    int COINBASE_MATURITY(const int contextHeight) const {
+        return contextHeight < nMaturityV2StartHeight ? nMaturityV1 : nMaturityV2;
+    }
+    uint64_t nMaturityV2StartHeight;
+    uint16_t nMaturityV1;
+    uint16_t nMaturityV2;
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
 
