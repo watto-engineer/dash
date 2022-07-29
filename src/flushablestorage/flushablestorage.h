@@ -7,7 +7,7 @@
 
 #include <util.h>
 #include <memory>
-#include "leveldbwrapper.h"
+#include "dbwrapper.h"
 #include <boost/optional.hpp>
 
 using MapKV = std::map<std::vector<unsigned char>, boost::optional<std::vector<unsigned char>>>;
@@ -87,7 +87,7 @@ public:
         return MakeUnique<CStorageLevelDBIterator>(std::unique_ptr<leveldb::Iterator>(db.NewIterator()));
     }
 private:
-    CLevelDBWrapper db;
+    CDBWrapper db;
 };
 
 // Flashable storage

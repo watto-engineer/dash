@@ -7,7 +7,7 @@
 #include <betting/bet_db.h>
 #include <betting/bet_common.h>
 #include <amount.h>
-#include <main.h>
+#include <validation.h>
 
 /**
  * Takes a payout vector and aggregates the total WGR that is required to pay out all bets.
