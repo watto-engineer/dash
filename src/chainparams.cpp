@@ -5,6 +5,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <betting/quickgames/dice.h>
 #include <chainparams.h>
 #include <consensus/merkle.h>
 
@@ -496,6 +497,50 @@ public:
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
+        /** Betting related parameters **/
+        strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
+        strDevPayoutAddrNew = "Shqrs3mz3i65BiTEKPgnxoqJqMw5b726m5";     // Development fund payout address (new).
+        strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address (old).
+        strOMNOPayoutAddrNew = "SNCNYcDyXPCLHpG9AyyhnPcLNpxCpGZ2X6";    // OMNO fund payout address (new).
+        vOracles = {
+            { "WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "WdAo2Xk8r1MVx7ZmxARpJJkgzaFeumDcCS", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WhW3dmThz2hWEfpagfbdBQ7hMfqf6MkfHR", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
+
+        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
+        nWagerrProtocolV1StartHeight = 298386;                          // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = nBlockTimeProtocolV2;            // Betting protocol v3 activation block
+        nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max(); // Betting protocol v4 activation block
+        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
+        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = nBlockTimeProtocolV2;   // Rotate spork key, oracle keys and fee payout keys
+
+        quickGamesArr.clear();
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
+
+        // Workarounds
+        nSkipBetValidationStart = 5577;
+        nSkipBetValidationEnd = 35619;
+
         checkpointData = {
             {
                 {1, uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b")},     // First PoW premine block
@@ -676,6 +721,46 @@ public:
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
+        /** Betting related parameters **/
+        strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strDevPayoutAddrNew = "sUihJctn8P4wDVRU3SgSYbJkG8ajV68kmx";     // Development fund payout address (Testnet).
+        strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
+        strOMNOPayoutAddrNew = "sMF9ejP1QMcoQnzURrSenRrFMznCfQfWgd";    // OMNO fund payout address (Testnet).
+        vOracles = {
+            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
+
+        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
+        nWagerrProtocolV1StartHeight = 1100;                            // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
+        nWagerrProtocolV4StartHeight = 405000;                          // Betting protocol v4 activation block
+        nQuickGamesEndHeight = 101650;
+        nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = 102000;                                     // Rotate spork key, oracle keys and fee payout keys
+
+        quickGamesArr.clear();
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
+
         checkpointData = {
             {
                 {0, uint256S("00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5")},
@@ -822,6 +907,45 @@ public:
         // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
 
+        /** Betting related parameters **/
+        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        vOracles = {
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
+
+        nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
+        nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
+        nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
+        nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
+        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
+        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
+        quickGamesArr.clear();
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
+
         checkpointData = {
             {
                 {0,uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
@@ -921,7 +1045,8 @@ public:
         consensus.strTokenManagementKey = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
-        consensus.nCoinbaseMaturity = 15;
+        consensus.nMaturityV1 = 100;
+        consensus.nMaturityV2 = 60;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
@@ -986,6 +1111,46 @@ public:
         nMinSporkKeys = 1;
         // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
+
+        /** Betting related parameters **/
+        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        vOracles = {
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
+
+        nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
+        nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
+        nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
+        nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
+        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
+        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
+
+        quickGamesArr.clear();
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
 
         checkpointData = {
             {

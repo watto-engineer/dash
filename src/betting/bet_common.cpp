@@ -6,7 +6,7 @@
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
-#include <main.h>
+#include <validation.h>
 
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
