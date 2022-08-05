@@ -473,10 +473,13 @@ void SetupServerArgs()
     const auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
     const auto testnetChainParams = CreateChainParams(CBaseChainParams::TESTNET);
 
-    Consensus::Params devnetConsensus = CreateChainParams(CBaseChainParams::DEVNET, true)->GetConsensus();
+    const auto devnetChainParams = CreateChainParams(CBaseChainParams::DEVNET, true);
+    Consensus::Params devnetConsensus = devnetChainParams->GetConsensus();
     Consensus::LLMQParams devnetLLMQ = devnetConsensus.llmqs.at(Consensus::LLMQ_DEVNET);
 
-    const auto regtestLLMQ = CreateChainParams(CBaseChainParams::REGTEST)->GetConsensus().llmqs.at(Consensus::LLMQ_TEST);
+    const auto regtestChainParams = CreateChainParams(CBaseChainParams::REGTEST);
+    Consensus::Params regtestConsensus = regtestChainParams->GetConsensus();
+    const auto regtestLLMQ = regtestConsensus.llmqs.at(Consensus::LLMQ_TEST);
 
 
     // Set all of the args and their help

@@ -272,6 +272,13 @@ public:
      */
     unsigned int bits() const;
 
+    // Unsafe
+    uint64_t Get64(int n = 0) const
+    {
+        return pn[2 * n] | (uint64_t)pn[2 * n + 1] << 32;
+    }
+
+    // Unsafe
     uint32_t Get32(int n = 0) const
     {
         return pn[2 * n];

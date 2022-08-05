@@ -5,7 +5,7 @@
 #ifndef WAGERR_QUICKGAMESVIEW_H
 #define WAGERR_QUICKGAMESVIEW_H
 
-#include "uint256.h"
+#include "arith_uint256.h"
 #include <map>
 
 typedef enum QuickGamesType {
@@ -16,13 +16,13 @@ typedef enum QuickGamesType {
  * a quick game bet with an incoming seed (pos hash)
  * and returns the odds factor which indicate win (more than odds divisor), lose (0) or refund (odds divisor).
  */
-typedef uint32_t (*const BetHandler)(std::vector<unsigned char>& betInfo, uint256 seed);
+typedef uint32_t (*const BetHandler)(std::vector<unsigned char>& betInfo, arith_uint256 seed);
 
 /*
  * The quick game bet info parser for RPC
  * Ret value is KV map with paramName: paramValue
  */
-typedef std::map<std::string, std::string> (*const BetInfoParser)(std::vector<unsigned char>& betInfo, uint256 seed);
+typedef std::map<std::string, std::string> (*const BetInfoParser)(std::vector<unsigned char>& betInfo, arith_uint256 seed);
 
 /* The quick games framework model */
 class CQuickGamesView

@@ -45,7 +45,7 @@ QuickGamesDiceBetType StrToDiceGameType(std::string strType)
     return qgDiceUndefined;
 }
 
-std::map<std::string, std::string> DiceBetInfoParser(std::vector<unsigned char>& betInfo, uint256 seed)
+std::map<std::string, std::string> DiceBetInfoParser(std::vector<unsigned char>& betInfo, arith_uint256 seed)
 {
     CDataStream ss{betInfo, SER_NETWORK, CLIENT_VERSION};
     DiceBetInfo info;
@@ -66,7 +66,7 @@ std::map<std::string, std::string> DiceBetInfoParser(std::vector<unsigned char>&
         std::make_pair("odds", std::to_string(DiceHandler(betInfo, seed)))};
 }
 
-uint32_t DiceHandler(std::vector<unsigned char>& betInfo, uint256 seed)
+uint32_t DiceHandler(std::vector<unsigned char>& betInfo, arith_uint256 seed)
 {
     static const uint32_t NUMBER_OF_OUTCOMES = 36;
     CDataStream ss{betInfo, SER_NETWORK, CLIENT_VERSION};

@@ -5,7 +5,10 @@
 #ifndef WAGERR_BET_DB_H
 #define WAGERR_BET_DB_H
 
+#include <chainparams.h>
+#include <dstencode.h>
 #include <util.h>
+#include <script/standard.h>
 #include <serialize.h>
 #include <betting/bet_common.h>
 #include <betting/bet_tx.h>
@@ -29,7 +32,7 @@ typedef struct MappingKey {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint32_t be_val;
         if (ser_action.ForRead()) {
             READWRITE(be_val);
@@ -61,7 +64,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(sName);
     }
 };
@@ -77,7 +80,7 @@ typedef struct EventKey {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint32_t be_val;
         if (ser_action.ForRead()) {
             READWRITE(be_val);
@@ -156,7 +159,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nSport);
@@ -175,7 +178,7 @@ public:
         READWRITE(nTotalUnderOdds);
 
         READWRITE(nEventCreationHeight);
-        if (nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
+        if (nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
             READWRITE(fLegacyInitialHomeFavorite);
         }
     }
@@ -210,7 +213,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nSport);
@@ -247,7 +250,7 @@ public:
         READWRITE(nTotalPushBets);
 
         READWRITE(nEventCreationHeight);
-        if (nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
+        if (nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
             READWRITE(fLegacyInitialHomeFavorite);
         }
     }
@@ -274,7 +277,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nResultType);
         READWRITE(nHomeScore);
@@ -321,7 +324,7 @@ typedef struct ContenderInfo {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nInputOdds);
 
         READWRITE(nOutrightOdds);
@@ -372,7 +375,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nGroupType);
@@ -429,7 +432,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nResultType);
         READWRITE(contendersResults);
@@ -453,7 +456,7 @@ typedef struct PeerlessBetKey {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint32_t be_val;
         if (ser_action.ForRead()) {
             READWRITE(be_val);
@@ -480,7 +483,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint8_t outcome;
         READWRITE(nEventId);
         if (ser_action.ForRead()) {
@@ -499,7 +502,7 @@ class CPeerlessBetDB
 {
 public:
     CAmount betAmount;
-    CBitcoinAddress playerAddress;
+    CTxDestination playerAddress;
     // one elem means single bet, else it is parlay bet, max size = 5
     std::vector<CPeerlessLegDB> legs;
     // vector for member event condition
@@ -510,7 +513,7 @@ public:
     uint32_t payoutHeight = 0;
 
     explicit CPeerlessBetDB() { }
-    explicit CPeerlessBetDB(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessLegDB> vLegs, const std::vector<CPeerlessBaseEventDB> vEvents, const int64_t time) :
+    explicit CPeerlessBetDB(const CAmount amount, const CTxDestination address, const std::vector<CPeerlessLegDB> vLegs, const std::vector<CPeerlessBaseEventDB> vEvents, const int64_t time) :
         betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betTime(time) { }
     explicit CPeerlessBetDB(const CPeerlessBetDB& bet)
     {
@@ -533,15 +536,15 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         std::string addrStr;
         READWRITE(betAmount);
         if (ser_action.ForRead()) {
             READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
+            playerAddress = DecodeDestination(addrStr);
         }
         else {
-            addrStr = playerAddress.ToString();
+            addrStr = EncodeDestination(playerAddress);
             READWRITE(addrStr);
         }
         READWRITE(legs);
@@ -586,7 +589,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint8_t market;
         READWRITE(nEventId);
         if (ser_action.ForRead()) {
@@ -605,7 +608,7 @@ class CFieldBetDB
 {
 public:
     CAmount betAmount;
-    CBitcoinAddress playerAddress;
+    CTxDestination playerAddress;
     // one elem means single bet, else it is parlay bet, max size = 5
     std::vector<CFieldLegDB> legs;
     // vector for member event condition, max size = 5
@@ -618,7 +621,7 @@ public:
     // Default Constructor.
     explicit CFieldBetDB() {}
     explicit CFieldBetDB(const CAmount amount,
-                         const CBitcoinAddress address,
+                         const CTxDestination address,
                          const std::vector<CFieldLegDB> vLegs,
                          const std::vector<CFieldEventDB> vEvents,
                          const int64_t time
@@ -637,15 +640,15 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         std::string addrStr;
         READWRITE(betAmount);
         if (ser_action.ForRead()) {
             READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
+            playerAddress = DecodeDestination(addrStr);
         }
         else {
-            addrStr = playerAddress.ToString();
+            addrStr = EncodeDestination(playerAddress);
             READWRITE(addrStr);
         }
         READWRITE(legs);
@@ -686,7 +689,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nEntryFee);
     }
@@ -699,7 +702,7 @@ class CChainGamesBetDB
 public:
     uint32_t nEventId;
     CAmount betAmount;
-    CBitcoinAddress playerAddress;
+    CTxDestination playerAddress;
     int64_t betTime;
     CAmount payout = 0;
     uint32_t payoutHeight = 0;
@@ -708,23 +711,23 @@ public:
     explicit CChainGamesBetDB() {}
 
     // Parametrized Constructor.
-    explicit CChainGamesBetDB(uint32_t eventId, CAmount amount, CBitcoinAddress address, int64_t time) :
+    explicit CChainGamesBetDB(uint32_t eventId, CAmount amount, CTxDestination address, int64_t time) :
         nEventId(eventId), betAmount(amount), playerAddress(address), betTime(time) { }
 
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(completed);
         READWRITE(betAmount);
         std::string addrStr;
         if (ser_action.ForRead()) {
             READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
+            playerAddress = DecodeDestination(addrStr);
         }
         else {
-            addrStr = playerAddress.ToString();
+            addrStr = EncodeDestination(playerAddress);
             READWRITE(addrStr);
         }
         READWRITE(betTime);
@@ -754,7 +757,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nEventId);
     }
@@ -772,13 +775,13 @@ public:
     QuickGamesType gameType;
     std::vector<unsigned char> vBetInfo;
     CAmount betAmount;
-    CBitcoinAddress playerAddress;
+    CTxDestination playerAddress;
     int64_t betTime;
     BetResultType resultType = BetResultType::betResultUnknown;
     CAmount payout = 0;
 
     explicit CQuickGamesBetDB() { }
-    explicit CQuickGamesBetDB(const QuickGamesType gameType, const std::vector<unsigned char>& vBetInfo, const CAmount betAmount, const CBitcoinAddress& playerAddress, const int64_t betTime) :
+    explicit CQuickGamesBetDB(const QuickGamesType gameType, const std::vector<unsigned char>& vBetInfo, const CAmount betAmount, const CTxDestination& playerAddress, const int64_t betTime) :
         gameType(gameType), vBetInfo(vBetInfo), betAmount(betAmount), playerAddress(playerAddress), betTime(betTime) { }
     explicit CQuickGamesBetDB(const CQuickGamesBetDB& cgBet) :
         gameType(cgBet.gameType), vBetInfo(cgBet.vBetInfo), betAmount(cgBet.betAmount), playerAddress(cgBet.playerAddress), betTime(cgBet.betTime), resultType(cgBet.resultType), payout(cgBet.payout), completed(cgBet.completed) { }
@@ -791,7 +794,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint8_t type;
         std::string addrStr;
         if (ser_action.ForRead()) {
@@ -807,10 +810,10 @@ public:
         READWRITE(betAmount);
         if (ser_action.ForRead()) {
             READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
+            playerAddress = DecodeDestination(addrStr);
         }
         else {
-            addrStr = playerAddress.ToString();
+            addrStr = EncodeDestination(playerAddress);
             READWRITE(addrStr);
         }
         READWRITE(betTime);
@@ -863,7 +866,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(height);
         int undoType;
         if (ser_action.ForRead()) {
@@ -933,7 +936,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(betKey);
         uint8_t type;
         if (ser_action.ForRead()) {

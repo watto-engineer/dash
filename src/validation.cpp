@@ -2493,7 +2493,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     // WAGERR : MODIFIED TO CHECK MASTERNODE PAYMENTS AND SUPERBLOCKS
 
     // TODO: resync data (both ways?) and try to reprocess this block later.
-    CBlockReward blockReward(pindex->nHeight, nFees, block.IsProofOfStake(), Params().GetConsensus());
+    CBlockReward blockReward(pindex->nHeight, nFees, block.IsProofOfStake(), chainparams.GetConsensus());
     std::string strError = "";
 
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;

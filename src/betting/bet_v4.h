@@ -14,7 +14,7 @@ class CPayoutInfoDB;
  *
  * @return payout vector, payouts info vector.
  */
-void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 /**
  * Undo only bet payout mark as completed in DB.
