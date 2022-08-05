@@ -6,6 +6,8 @@
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
+#include <chainparams.h>
+#include <script/standard.h>
 #include <validation.h>
 
 /**
@@ -20,11 +22,10 @@ bool IsValidOracleTx(const CTxIn &txin, int nHeight)
     std::vector<COracle> oracles = Params().Oracles();
 
     uint256 hashBlock;
-    CTransaction txPrev;
-    if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+    CTransactionRef txPrev;
+    if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
 
-        const CTxOut &prevTxOut = txPrev.vout[prevout.n];
-        std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
+        const CTxOut &prevTxOut = txPrev->vout[prevout.n];
 
         txnouttype type;
         std::vector<CTxDestination> prevAddrs;
@@ -32,7 +33,7 @@ bool IsValidOracleTx(const CTxIn &txin, int nHeight)
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
             for (const CTxDestination &prevAddr : prevAddrs) {
-                const std::string strPrevAddr = CBitcoinAddress(prevAddr).ToString();
+                const std::string strPrevAddr = EncodeDestination(prevAddr, Params());
                 if (std::find_if(oracles.begin(), oracles.end(), [strPrevAddr, nHeight](COracle oracle){
                     return oracle.IsMyOracleTx(strPrevAddr, nHeight);
                 }) != oracles.end()) {
@@ -57,16 +58,16 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
         return true;
     }
     // Events with odds > 92 can cause an overflow with winnings calculations when using uint64_t
-    const CBigNum bBetAmount = CBigNum(uint256(betAmount));
-    const CBigNum bOdds = CBigNum(uint256(odds));
+    const CBigNum bBetAmount = CBigNum(arith_uint256(betAmount));
+    const CBigNum bOdds = CBigNum(arith_uint256(odds));
 
     CBigNum bWinningsT = bBetAmount * bOdds;
     CBigNum bPayout = (bWinningsT - (((bWinningsT - bBetAmount * BET_ODDSDIVISOR) / 1000) * 60)) / BET_ODDSDIVISOR;
     CBigNum bBurn = bPayout - (bWinningsT / BET_ODDSDIVISOR);
 
-    nPayout = bPayout.getuint256().Get64();
-    nBurn = bBurn.getuint256().Get64();
-    LogPrint("wagerr", "Winnings: %d Payout: %d Burn: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
+    nPayout = bPayout.getuint256().GetLow64();
+    nBurn = bBurn.getuint256().GetLow64();
+    LogPrint(BCLog::BETTING, "Winnings: %d Payout: %d Burn: %d\n", bWinningsT.getuint256().GetLow64(), nPayout, nBurn);
     return true;
 }
 
@@ -79,23 +80,23 @@ std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
 {
     std::vector<CPeerlessResultDB> results;
 
-    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().WagerrProtocolV3StartHeight());
+    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
     resultsBocksIndex = chainActive[nLastBlockHeight];
 
     CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex);
+    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
 
-    for (CTransaction& tx : block.vtx) {
+    for (CTransactionRef tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
-        const CTxIn &txin  = tx.vin[0];
+        const CTxIn &txin  = tx->vin[0];
         bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
-            for (const CTxOut &txOut : tx.vout) {
+            for (const CTxOut &txOut : tx->vout) {
 
                 auto bettingTx = ParseBettingTx(txOut);
 
@@ -103,7 +104,7 @@ std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
 
                 CPeerlessResultTx* resultTx = (CPeerlessResultTx *)bettingTx.get();
 
-                LogPrint("wagerr", "Result for event %lu was found...\n", resultTx->nEventId);
+                LogPrint(BCLog::BETTING, "Result for event %lu was found...\n", resultTx->nEventId);
 
                 // Store the result if its a valid result OP CODE.
                 results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->nHomeScore, resultTx->nAwayScore);
@@ -124,23 +125,23 @@ std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
 {
     std::vector<CFieldResultDB> results;
 
-    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().WagerrProtocolV3StartHeight());
+    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
     resultsBocksIndex = chainActive[nLastBlockHeight];
 
     CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex);
+    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
 
-    for (CTransaction& tx : block.vtx) {
+    for (CTransactionRef tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
-        const CTxIn &txin  = tx.vin[0];
+        const CTxIn &txin  = tx->vin[0];
         bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
-            for (const CTxOut &txOut : tx.vout) {
+            for (const CTxOut &txOut : tx->vout) {
 
                 auto bettingTx = ParseBettingTx(txOut);
 
@@ -148,7 +149,7 @@ std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
 
                 CFieldResultTx* resultTx = (CFieldResultTx *)bettingTx.get();
 
-                LogPrint("wagerr", "Result for field event %lu was found...\n", resultTx->nEventId);
+                LogPrint(BCLog::BETTING, "Result for field event %lu was found...\n", resultTx->nEventId);
 
                 // Store the result if its a valid result OP CODE.
                 results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->contendersResults);
@@ -174,19 +175,17 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
     CBlockIndex *resultsBocksIndex = chainActive[nLastBlockHeight];
 
     CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex);
+    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
 
-    for (CTransaction& tx : block.vtx) {
+    for (CTransactionRef tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
-        const CTxIn &txin = tx.vin[0];
-        uint256 hashBlock;
-        CTransaction txPrev;
+        const CTxIn &txin = tx->vin[0];
 
         bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
-            for (const CTxOut& txOut : tx.vout) {
+            for (const CTxOut& txOut : tx->vout) {
 
                 auto bettingTx = ParseBettingTx(txOut);
 

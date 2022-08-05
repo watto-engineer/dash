@@ -4,6 +4,7 @@
 
 #include <betting/oracles.h>
 #include <chainparams.h>
+#include <dstencode.h>
 #include <script/standard.h>
 #include <base58.h>
 
@@ -24,8 +25,8 @@ bool GetFeePayoutScripts(const int& nHeight, CScript& DevPayoutScript, CScript& 
 {
     for (auto oracle : Params().Oracles()) {
         if (oracle.IsActive(nHeight)) {
-            DevPayoutScript = GetScriptForDestination(CBitcoinAddress(oracle.getDevPayoutAddress()).Get());
-            OMNOPayoutScript = GetScriptForDestination(CBitcoinAddress(oracle.getOMNOPayoutAddress()).Get());
+            DevPayoutScript = GetScriptForDestination(DecodeDestination(oracle.getDevPayoutAddress()));
+            OMNOPayoutScript = GetScriptForDestination(DecodeDestination(oracle.getOMNOPayoutAddress()));
             return true;
         }
     }

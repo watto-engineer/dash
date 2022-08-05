@@ -9,8 +9,10 @@
 #include <betting/bet_v3.h>
 #include <betting/bet_v4.h>
 
+#include <core_io.h>
 #include "spork.h"
 #include "uint256.h"
+#include <validation.h>
 #include "wallet/wallet.h"
 #include <boost/filesystem.hpp>
 #include <boost/signals2/signal.hpp>
@@ -20,10 +22,10 @@ CBettingsView* bettingsView = nullptr;
 
 bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward)
 {
-    const CTransaction &tx = block.vtx[1];
+    const CTransactionRef &tx = block.vtx[1];
 
     // Get the vin staking value so we can use it to find out how many staking TX in the vouts.
-    COutPoint prevout         = tx.vin[0].prevout;
+    COutPoint prevout         = tx->vin[0].prevout;
     CAmount stakeAmount       = 0;
     bool fStakesFound         = false;
 
@@ -31,10 +33,10 @@ bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CT
     nWinnerPayments = 0;
 
     uint256 hashBlock;
-    CTransaction txPrev;
+    CTransactionRef txPrev;
 
-    if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-        stakeAmount = txPrev.vout[prevout.n].nValue + nExpectedMint;
+    if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+        stakeAmount = txPrev->vout[prevout.n].nValue + nExpectedMint;
     } else {
         return false;
     }
@@ -49,17 +51,17 @@ bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CT
 
     // Count the coinbase and staking vouts in the current block TX.
     CAmount totalStakeAcc = 0;
-    const size_t txVoutSize = tx.vout.size();
+    const size_t txVoutSize = tx->vout.size();
 
     size_t nMaxVoutI = txVoutSize;
     CAmount nMNReward = 0;
-    if (txVoutSize > 2 && tx.vout[txVoutSize - 1].nValue == nExpectedMNReward) {
+    if (txVoutSize > 2 && tx->vout[txVoutSize - 1].nValue == nExpectedMNReward) {
         nMaxVoutI--;
         nMNReward = nExpectedMNReward;
     }
 
     for (size_t i = 0; i < nMaxVoutI; i++) {
-        const CTxOut &txout = tx.vout[i];
+        const CTxOut &txout = tx->vout[i];
         CAmount voutValue   = txout.nValue;
         CScript voutScript = txout.scriptPubKey;
         if (fStakesFound) {
@@ -82,7 +84,7 @@ bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CT
 
 bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayoutsIn, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward)
 {
-    const CTransaction &tx = block.vtx[1];
+    const CTransactionRef &tx = block.vtx[1];
     std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts = mExpectedPayoutsIn;
 
     std::vector<CTxOut> vFoundPayouts;
@@ -107,11 +109,11 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     if (setExpectedPayouts != setFoundPayouts) {
         LogPrintf("%s - Expected payouts:\n", __func__);
         for (auto expectedPayout : setExpectedPayouts) {
-            LogPrintf("%s %d %d\n", expectedPayout.nRounds, expectedPayout.nValue, expectedPayout.scriptPubKey.ToString());
+            LogPrintf("%d %s\n", expectedPayout.nValue, ScriptToAsmStr(expectedPayout.scriptPubKey));
         }
         LogPrintf("%s - Found payouts:\n", __func__);
         for (auto foundPayouts : setFoundPayouts) {
-            LogPrintf("%s %d %d\n", foundPayouts.nRounds, foundPayouts.nValue, foundPayouts.scriptPubKey.ToString());
+            LogPrintf("%d %s\n", foundPayouts.nValue, ScriptToAsmStr(foundPayouts.scriptPubKey));
         }
         LogPrintf("%s - Not all payouts validate - %s\n", __func__, block.GetHash().ToString());
         return false;
@@ -125,7 +127,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
                             return eP.second.nValue == vFoundPayouts[i].nValue && eP.second.scriptPubKey == vFoundPayouts[i].scriptPubKey;
                         });
         if (expectedPayout != mExpectedPayouts.end()) {
-            PayoutInfoKey payoutInfoKey{static_cast<uint32_t>(nBlockHeight), COutPoint{tx.GetHash(), i+nPayoutOffset}};
+            PayoutInfoKey payoutInfoKey{static_cast<uint32_t>(nBlockHeight), COutPoint{tx->GetHash(), i+nPayoutOffset}};
             bettingsViewCache.payoutsInfo->Write(payoutInfoKey, expectedPayout->first);
 
             mExpectedPayouts.erase(expectedPayout);
@@ -142,21 +144,21 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
     // if is not wagerr v3 - do not check tx
-    if (height < Params().WagerrProtocolV3StartHeight()) return true;
+    if (height < Params().GetConsensus().WagerrProtocolV3StartHeight()) return true;
 
     // Get player address
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
     uint256 hashBlock;
-    CTransaction txPrev;
-    CBitcoinAddress address;
+    CTransactionRef txPrev;
+    CTxDestination address;
     CTxDestination prevAddr;
     // if we cant extract playerAddress - skip tx
-    if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true) ||
-            !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+    if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true) ||
+            !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
         return true;
     }
-    address = CBitcoinAddress(prevAddr);
+    address = prevAddr;
 
     for (const CTxOut &txOut : tx.vout) {
         // parse betting TX
@@ -176,7 +178,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 CPeerlessBetTx* betTx = (CPeerlessBetTx*) bettingTx.get();
                 CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
-                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
                 CPeerlessExtendedEventDB plEvent;
@@ -186,7 +188,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
                     }
 
-                    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+                    if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
                         if (GetBetPotentialOdds(plBet, plEvent) == 0) {
                             return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
                         }
@@ -202,11 +204,11 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 CPeerlessParlayBetTx* parlayBetTx = (CPeerlessParlayBetTx*) bettingTx.get();
                 std::vector<CPeerlessBetTx> &legs = parlayBetTx->legs;
 
-                if (legs.size() > Params().MaxParlayLegs())
+                if (legs.size() > Params().GetConsensus().MaxParlayLegs())
                     return error("CheckBettingTX: The invalid parlay bet count of legs!");
 
                 // Validate parlay bet amount so its between 25 - 4000 WGR inclusive.
-                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxParlayBetPayoutRange() * COIN)) {
+                if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxParlayBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
                 // check event ids in legs and deny if some is equal
@@ -228,7 +230,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
                         }
 
-                        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+                        if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
                             if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
                                 return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
                             }
@@ -245,10 +247,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldBetTx");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldBetTx");
 
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
-                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
 
@@ -279,17 +281,17 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fParlayBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldParlayBetTx");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldParlayBetTx");
 
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
-                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
 
                 CFieldParlayBetTx* betTx = (CFieldParlayBetTx*) bettingTx.get();
                 std::vector<CFieldBetTx> &legs = betTx->legs;
 
-                if (legs.size() > Params().MaxParlayLegs()) {
+                if (legs.size() > Params().GetConsensus().MaxParlayLegs()) {
                     return error("CheckBettingTX: The invalid field parlay bet count of legs!");
                 }
 
@@ -336,7 +338,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgBetTxType:
             {
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     return error("CheckBettingTX : Chain games transactions are disabled");
                 }
                 CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
@@ -358,7 +360,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case qgBetTxType:
             {
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     return error("CheckBettingTX : Quick games transactions are disabled");
                 }
 
@@ -367,7 +369,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     return error("CheckBettingTX: Invalid game type (%d)", qgBetTx->gameType);
                 }
                 // Validate quick game bet amount so its between 25 - 10000 WGR inclusive.
-                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
                 break;
@@ -379,7 +381,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
                 auto mappingType = MappingType(mapTx->nMType);
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
                    (mappingType == individualSportMapping || mappingType == contenderMapping ) )
                 {
                     return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
@@ -428,7 +430,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fEventTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
@@ -460,7 +462,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
@@ -477,7 +479,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateModifiersTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateModifiersTx* fUpdateOddsTx = (CFieldUpdateModifiersTx*) bettingTx.get();
@@ -494,7 +496,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateMarginTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
@@ -506,7 +508,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
@@ -518,7 +520,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
@@ -595,7 +597,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgEventTxType:
             {
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     return error("CheckBettingTX : Chain games transactions are disabled");
                 }
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
@@ -609,7 +611,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgResultTxType:
             {
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     return error("CheckBettingTX : Chain games transactions are disabled");
                 }
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
@@ -675,7 +677,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case plEventZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -696,22 +698,22 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
 void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
 {
-    LogPrint("wagerr", "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
+    LogPrint(BCLog::BETTING, "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
 
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
     // Get player address
     uint256 hashBlock;
-    CTransaction txPrev;
-    CBitcoinAddress address;
+    CTransactionRef txPrev;
+    CTxDestination address;
     CTxDestination prevAddr;
     // if we cant extract playerAddress - skip vout
-    if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true) ||
-            !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+    if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true) ||
+            !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
         return;
     }
-    address = CBitcoinAddress(prevAddr);
+    address = prevAddr;
 
     for (size_t i = 0; i < tx.vout.size(); i++) {
         const CTxOut &txOut = tx.vout[i];
@@ -732,7 +734,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
                 CPeerlessExtendedEventDB plEvent, plCachedEvent;
 
-                LogPrint("wagerr", "CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
+                LogPrint(BCLog::BETTING, "CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 // Find the event in DB
                 EventKey eventKey{plBet.nEventId};
                 // get locked event from upper level cache for getting correct odds
@@ -741,7 +743,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     CAmount payout = 0 * COIN;
                     CAmount burn = 0;
 
-                    LogPrint("wagerr", "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                    LogPrint(BCLog::BETTING, "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
                         plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
 
                     // save prev event state to undo
@@ -823,12 +825,12 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 std::vector<CPeerlessBaseEventDB> lockedEvents;
                 std::vector<CPeerlessLegDB> legs;
                 // convert tx legs format to db
-                LogPrint("wagerr", "ParlayBet: legs: ");
+                LogPrint(BCLog::BETTING, "ParlayBet: legs: ");
                 for (auto leg : parlayBetTx->legs) {
-                    LogPrint("wagerr", "(id: %lu, outcome: %lu), ", leg.nEventId, leg.nOutcome);
+                    LogPrint(BCLog::BETTING, "(id: %lu, outcome: %lu), ", leg.nEventId, leg.nOutcome);
                     legs.emplace_back(leg.nEventId, (OutcomeType) leg.nOutcome);
                 }
-                LogPrint("wagerr", "\n");
+                LogPrint(BCLog::BETTING, "\n");
 
                 std::vector<CBettingUndoDB> vUndos;
                 for (const CPeerlessLegDB& leg : legs) {
@@ -839,7 +841,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     if (bettingsView->events->Read(eventKey, plCachedEvent) &&
                             bettingsViewCache.events->Read(eventKey, plEvent)) {
 
-                        LogPrint("wagerr", "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                        LogPrint(BCLog::BETTING, "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
                             plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
 
                         vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
@@ -890,28 +892,28 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                LogPrint(BCLog::BETTING, "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                     fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
 
                 CFieldEventDB fEvent, fCachedEvent;
                 FieldEventKey fEventKey{fBetTx->nEventId};
                 // get locked event from upper level cache for getting correct odds
                 if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
-                    LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", fBetTx->nEventId);
+                    LogPrint(BCLog::BETTING, "Failed to find field event %lu in upper level cache!", fBetTx->nEventId);
                     break;
                 }
 
                 if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    LogPrint("wagerr", "Failed to find field event %lu!", fBetTx->nEventId);
+                    LogPrint(BCLog::BETTING, "Failed to find field event %lu!", fBetTx->nEventId);
                     break;
                 }
 
-                LogPrint("wagerr", "fCachedEvent:\n");
+                LogPrint(BCLog::BETTING, "fCachedEvent:\n");
                 for (const auto& contender : fCachedEvent.contenders) {
-                    LogPrint("wagerr", "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
+                    LogPrint(BCLog::BETTING, "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
                         contender.first, contender.second.nOutrightOdds, contender.second.nPlaceOdds, contender.second.nShowOdds);
                 }
 
@@ -965,16 +967,16 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fParlayBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
 
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
                 std::vector<CFieldEventDB> lockedEvents;
                 std::vector<CFieldLegDB> legs;
 
                 // convert tx legs format to db
-                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                LogPrint(BCLog::BETTING, "FieldParlayBet: legs: ");
                 for (const auto& leg : fParlayBetTx->legs) {
-                    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                    LogPrint(BCLog::BETTING, "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                         leg.nEventId, leg.nContenderId, leg.nOutcome);
                     legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
                 }
@@ -985,18 +987,18 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     FieldEventKey fEventKey{leg.nEventId};
                     // get locked event from upper level cache for getting correct odds
                     if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
-                        LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", leg.nEventId);
+                        LogPrint(BCLog::BETTING, "Failed to find field event %lu in upper level cache!", leg.nEventId);
                         continue;
                     }
 
                     if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                        LogPrint("wagerr", "Failed to find field event %lu!", leg.nEventId);
+                        LogPrint(BCLog::BETTING, "Failed to find field event %lu!", leg.nEventId);
                         continue;
                     }
 
-                    LogPrint("wagerr", "fCachedEvent:\n");
+                    LogPrint(BCLog::BETTING, "fCachedEvent:\n");
                     for (const auto& contender : fCachedEvent.contenders) {
-                        LogPrint("wagerr", "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
+                        LogPrint(BCLog::BETTING, "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
                             contender.first, contender.second.nOutrightOdds, contender.second.nPlaceOdds, contender.second.nShowOdds);
                     }
 
@@ -1038,14 +1040,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgBetTxType:
             {
                 if (!wagerrProtocolV3) break;
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
                     break;
                 }
 
                 CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CChainGamesBetTx: nEventId: %lu,", cgBetTx->nEventId);
+                LogPrint(BCLog::BETTING, "CChainGamesBetTx: nEventId: %lu,", cgBetTx->nEventId);
                 if (!bettingsView->chainGamesLottoEvents->Exists(EventKey{cgBetTx->nEventId})) {
                     LogPrintf("Failed to find event!\n");
                     continue;
@@ -1062,14 +1064,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case qgBetTxType:
             {
                 if (!wagerrProtocolV3) break;
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
                     break;
                 }
 
                 CQuickGamesBetTx* qgBetTx = (CQuickGamesBetTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CQuickGamesBetTx: gameType: %d, betInfo: %s\n", qgBetTx->gameType, std::string(qgBetTx->vBetInfo.begin(), qgBetTx->vBetInfo.end()));
+                LogPrint(BCLog::BETTING, "CQuickGamesBetTx: gameType: %d, betInfo: %s\n", qgBetTx->gameType, std::string(qgBetTx->vBetInfo.begin(), qgBetTx->vBetInfo.end()));
                 if (!bettingsViewCache.quickGamesBets->Write(
                         QuickGamesBetKey{static_cast<uint32_t>(height), outPoint},
                         CQuickGamesBetDB{ (QuickGamesType) qgBetTx->gameType, qgBetTx->vBetInfo, betAmount, address, blockTime})) {
@@ -1087,13 +1089,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
                 auto mappingType = MappingType(mapTx->nMType);
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
                    (mappingType == individualSportMapping || mappingType == contenderMapping ) )
                 {
                     break;
                 }
 
-                LogPrint("wagerr", "CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
+                LogPrint(BCLog::BETTING, "CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
                 if (!bettingsViewCache.mappings->Write(MappingKey{mappingType, mapTx->nId}, CMappingDB{mapTx->sName})) {
                     if (!wagerrProtocolV3) {
                         // save failed tx to db, for avoiding undo issues
@@ -1109,7 +1111,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                LogPrint(BCLog::BETTING, "CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
                     plEventTx->nEventId,
                     plEventTx->nSport,
                     plEventTx->nTournament,
@@ -1134,7 +1136,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     CPeerlessExtendedEventDB plEventToPatch;
                     if (!wagerrProtocolV3 &&
                             bettingsViewCache.events->Read(eventKey, plEventToPatch)) {
-                        LogPrint("wagerr", "CPeerlessEvent - Legacy - try to patch with new event data: id: %lu, time: %lu\n", plEvent.nEventId, plEvent.nStartTime);
+                        LogPrint(BCLog::BETTING, "CPeerlessEvent - Legacy - try to patch with new event data: id: %lu, time: %lu\n", plEvent.nEventId, plEvent.nStartTime);
                         // save prev event state to undo
                         bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEventToPatch}, (uint32_t)height}});
 
@@ -1164,11 +1166,11 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fEventTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu, marketType: %lu\n",
+                LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu, marketType: %lu\n",
                     fEventTx->nEventId,
                     fEventTx->nSport,
                     fEventTx->nTournament,
@@ -1177,7 +1179,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     fEventTx->nMarketType
                 );
                 for (auto& contender : fEventTx->mContendersInputOdds) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 CFieldEventDB fEvent;
@@ -1192,13 +1194,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fUpdateOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
                 for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 FieldEventKey fEventKey{fUpdateOddsTx->nEventId};
@@ -1221,13 +1223,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fUpdateModifiersTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
                 for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 FieldEventKey fEventKey{fUpdateModifiersTx->nEventId};
@@ -1250,7 +1252,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fUpdateMarginTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
@@ -1275,11 +1277,11 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
 
                 FieldEventKey fEventKey{fZeroingOddsTx->nEventId};
                 CFieldEventDB fEvent;
@@ -1305,14 +1307,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
                 for (auto& contender : fResultTx->contendersResults) {
-                    LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
                 }
 
                 CFieldEventDB fieldEvent;
@@ -1344,7 +1346,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
+                LogPrint(BCLog::BETTING, "CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
                     plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore);
 
                 CPeerlessResultDB plResult{plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore};
@@ -1374,7 +1376,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
+                LogPrint(BCLog::BETTING, "CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
 
                 EventKey eventKey{plUpdateOddsTx->nEventId};
                 CPeerlessExtendedEventDB plEvent;
@@ -1401,13 +1403,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgEventTxType:
             {
                 if (!wagerrProtocolV3) break;
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
                     break;
                 }
                 CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
+                LogPrint(BCLog::BETTING, "CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
 
                 EventKey eventKey{cgEventTx->nEventId};
                 if (!bettingsViewCache.chainGamesLottoEvents->Write(
@@ -1421,14 +1423,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgResultTxType:
             {
                 if (!wagerrProtocolV3) break;
-                if (height >= Params().QuickGamesEndHeight()) {
+                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
                     LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
                     break;
                 }
 
                 CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CChainGamesResultTx: nEventId: %d\n", cgResultTx->nEventId);
+                LogPrint(BCLog::BETTING, "CChainGamesResultTx: nEventId: %d\n", cgResultTx->nEventId);
 
                 if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
                     LogPrintf("Failed to find event!\n");
@@ -1448,7 +1450,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
+                LogPrint(BCLog::BETTING, "CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
                     plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
 
                 CPeerlessExtendedEventDB plEvent;
@@ -1478,7 +1480,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
 
-                LogPrint("wagerr", "CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
+                LogPrint(BCLog::BETTING, "CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
                     plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
 
                 CPeerlessExtendedEventDB plEvent;
@@ -1508,7 +1510,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 if (!validOracleTx) break;
 
                 CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
-                LogPrint("wagerr", "CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
+                LogPrint(BCLog::BETTING, "CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
                 CPeerlessExtendedEventDB plEvent;
                 EventKey eventKey{plEventPatchTx->nEventId};
                 // First check a peerless event exists in DB
@@ -1532,7 +1534,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case plEventZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -1562,7 +1564,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     }
                 }
 
-                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+                LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
 
                 if (!vUndos.empty()) {
                     bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
@@ -1574,19 +1576,19 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 break;
         }
     }
-    LogPrint("wagerr", "ProcessBettingTx: end\n");
+    LogPrint(BCLog::BETTING, "ProcessBettingTx: end\n");
 }
 
 CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
 {
-    if (nNewBlockHeight < Params().WagerrProtocolV2StartHeight()) return 0;
+    if (nNewBlockHeight < Params().GetConsensus().WagerrProtocolV2StartHeight()) return 0;
 
     CAmount expectedMint = 0;
     std::vector<CBetOut> vExpectedPayouts;
     std::vector<CPayoutInfoDB> vPayoutsInfo;
 
     // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-    if (nNewBlockHeight >= Params().WagerrProtocolV3StartHeight()) {
+    if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
 
         GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
@@ -1594,9 +1596,9 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
 
         GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
-        if (nNewBlockHeight >= Params().WagerrProtocolV4StartHeight()) {
+        if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
             // collect field bets payouts
-            GetFeildBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetFieldBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
         }
     }
     else {
@@ -1635,7 +1637,7 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
             case UndoPeerlessEvent:
             {
                 CPeerlessExtendedEventDB event = boost::get<CPeerlessExtendedEventDB>(undo.Get());
-                LogPrint("wagerr", "UndoEventChanges: CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu favorite: %s\n",
+                LogPrint(BCLog::BETTING, "UndoEventChanges: CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu favorite: %s\n",
                     event.nEventId,
                     event.nSport,
                     event.nTournament,
@@ -1657,7 +1659,7 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
             case UndoFieldEvent:
             {
                 CFieldEventDB event = boost::get<CFieldEventDB>(undo.Get());
-                LogPrint("wagerr", "UndoFieldEventChanges: CFieldEventDB: id: %lu, group: %lu, sport: %lu, tournament: %lu, stage: %lu\n",
+                LogPrint(BCLog::BETTING, "UndoFieldEventChanges: CFieldEventDB: id: %lu, group: %lu, sport: %lu, tournament: %lu, stage: %lu\n",
                     event.nEventId,
                     event.nGroupType,
                     event.nSport,
@@ -1687,8 +1689,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
-    bool wagerrProtocolV3 = height >= (uint32_t)Params().WagerrProtocolV3StartHeight();
-    bool wagerrProtocolV4 = height >= (uint32_t)Params().WagerrProtocolV4StartHeight();
+    bool wagerrProtocolV3 = height >= (uint32_t)Params().GetConsensus().WagerrProtocolV3StartHeight();
+    bool wagerrProtocolV4 = height >= (uint32_t)Params().GetConsensus().WagerrProtocolV4StartHeight();
 
     // undo changes in back order
     for (int i = tx.vout.size() - 1; i >= 0 ; i--) {
@@ -1772,7 +1774,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!wagerrProtocolV4) break;
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                LogPrint(BCLog::BETTING, "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                     fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
 
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
@@ -1796,9 +1798,9 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
                 std::vector<CFieldLegDB> legs;
 
-                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                LogPrint(BCLog::BETTING, "FieldParlayBet: legs: ");
                 for (const auto& leg : fParlayBetTx->legs) {
-                    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                    LogPrint(BCLog::BETTING, "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                         leg.nEventId, leg.nContenderId, leg.nOutcome);
                     legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
                 }
@@ -1806,7 +1808,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 bool allEventsExist = true;
                 for (const auto& leg : legs) {
                     if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{leg.nEventId})) {
-                        LogPrint("wagerr", "Failed to find event %lu!\n", leg.nEventId);
+                        LogPrint(BCLog::BETTING, "Failed to find event %lu!\n", leg.nEventId);
                         allEventsExist = false;
                         break;
                     }
@@ -1924,7 +1926,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!validOracleTx) break;
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
+                LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
                     fEventTx->nEventId,
                     fEventTx->nSport,
                     fEventTx->nTournament,
@@ -1932,7 +1934,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     fEventTx->nGroupType
                 );
                 for (auto& contender : fEventTx->mContendersInputOdds) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId})) {
@@ -1953,9 +1955,9 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!validOracleTx) break;
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
                 for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateOddsTx->nEventId})) {
@@ -1976,9 +1978,9 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!validOracleTx) break;
 
                 CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
                 for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
-                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
                 }
 
                 if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateModifiersTx->nEventId})) {
@@ -2017,7 +2019,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!validOracleTx) break;
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+                LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
 
                 if (bettingsViewCache.fieldEvents->Exists(EventKey{fZeroingOddsTx->nEventId})) {
                     if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
@@ -2045,9 +2047,9 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
                     break;
 
-                LogPrint("wagerr", "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
                 for (auto& contender : fResultTx->contendersResults) {
-                    LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
+                    LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
                 }
 
                 if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId})) {
@@ -2204,7 +2206,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
                     eventIdsStream << eventId << " ";
                 }
-                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+                LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
 
                 bool isEventsExists = true;
                 for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
@@ -2262,7 +2264,7 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
 bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransaction>& vtx)
 {
         // Revert betting dats
-    if (height > Params().WagerrProtocolV2StartHeight()) {
+    if (height > Params().GetConsensus().WagerrProtocolV2StartHeight()) {
         // revert complete bet payouts marker
         if (!UndoPLBetPayouts(bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data is inconsistent");
@@ -2272,7 +2274,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
             error("DisconnectBlock(): undo payout data for quick games bets is inconsistent");
             return false;
         }
-        if (height > Params().WagerrProtocolV4StartHeight()) {
+        if (height > Params().GetConsensus().WagerrProtocolV4StartHeight()) {
             if (!UndoFieldBetPayouts(bettingsViewCache, height)) {
                 error("DisconnectBlock(): undo payout data for field bets is inconsistent");
                 return false;

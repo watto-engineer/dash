@@ -146,7 +146,7 @@ void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& mContendersF
         it++;
     } while (delta != 0 && it < 200);
 
-    LogPrint("wagerr", "CalcFairOdds: X = %f, lastMargin = %f, delta = %f, it = %d\n", X, debugStepMargin, delta, it);
+    LogPrint(BCLog::BETTING, "CalcFairOdds: X = %f, lastMargin = %f, delta = %f, it = %d\n", X, debugStepMargin, delta, it);
 
     // create map of fair odds
     for (const auto& contender : contenders) {
@@ -195,7 +195,7 @@ void CFieldEventDB::CalculateOutrightOdds(const std::map<uint32_t, uint32_t>& mC
 
     } while (delta != 0 && it < 200);
 
-    LogPrint("wagerr", "CalcFairOdds: X = %f, lastMargin = %f, delta = %f, it = %d\n", X, debugStepMargin, delta, it);
+    LogPrint(BCLog::BETTING, "CalcFairOdds: X = %f, lastMargin = %f, delta = %f, it = %d\n", X, debugStepMargin, delta, it);
 
     // create map of outrights odds
     for (const auto& contender : contenders) {
@@ -275,7 +275,7 @@ void CFieldEventDB::CalcOdds()
         mPlace = CalculateM(vContendersPlaceOddsMods, realMarginIn);
         XPlace = CalculateX(vContendersPlaceOddsMods, realMarginIn);
 
-        LogPrint("wagerr", "Place m = %f X = %f\n", mShow, XShow);
+        LogPrint(BCLog::BETTING, "Place m = %f X = %f\n", mShow, XShow);
     }
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
@@ -322,7 +322,7 @@ void CFieldEventDB::CalcOdds()
         mShow = CalculateM(vContendersShowOddsMods, realMarginIn);
         XShow = CalculateX(vContendersShowOddsMods, realMarginIn);
 
-        LogPrint("wagerr", "Show m = %f X = %f\n", mShow, XShow);
+        LogPrint(BCLog::BETTING, "Show m = %f X = %f\n", mShow, XShow);
     }
 
     // Update all contenders odds
