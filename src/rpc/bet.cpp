@@ -63,7 +63,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
         CMappingDB mapping{};
         CBettingDB::BytesToDbType(it->Value(), mapping);
-        LogPrint("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
+        LogPrint(BCLog::BETTING, "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
                 mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
@@ -226,15 +226,15 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
     for (uint32_t i = 0; i < paramsArr.size(); i++) {
         const UniValue obj = paramsArr[i].get_obj();
         RPCTypeCheckObj(obj, boost::assign::map_list_of("txHash", UniValue::VSTR)("nOut", UniValue::VNUM));
-        uint256 txHash = uint256(find_value(obj, "txHash").get_str());
+        uint256 txHash = uint256S(find_value(obj, "txHash").get_str());
         uint32_t nOut = find_value(obj, "nOut").get_int();
         uint256 hashBlock;
-        CTransaction tx;
-        if (!GetTransaction(txHash, tx, hashBlock, true)) {
+        CTransactionRef tx;
+        if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock, true)) {
             vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
-        if (hashBlock == 0) { // uncomfirmed tx
+        if (hashBlock == uint256()) { // uncomfirmed tx
             vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }

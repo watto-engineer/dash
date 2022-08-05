@@ -188,6 +188,11 @@ public:
         return !(a == b);
     }
 
+    friend bool operator<(const CTxOut& a, const CTxOut& b)
+    {
+        return (a.nValue < b.nValue || (a.nValue == b.nValue && a.scriptPubKey < b.scriptPubKey));
+    }
+
     std::string ToString() const;
 };
 

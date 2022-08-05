@@ -106,19 +106,27 @@ struct Params {
     bool fPowNoRetargeting;
     int64_t nPowTargetSpacing;
     int64_t nPowTargetTimespan;
-    int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
-    int COINBASE_MATURITY(const int contextHeight) const {
-        return contextHeight < nMaturityV2StartHeight ? nMaturityV1 : nMaturityV2;
-    }
-    uint64_t nMaturityV2StartHeight;
     uint16_t nMaturityV1;
     uint16_t nMaturityV2;
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
 
+    /** Wagerr specific deployment heights */
+    int nWagerrProtocolV1StartHeight;
+    int nWagerrProtocolV2StartHeight;
+    int nWagerrProtocolV3StartHeight;
+    int nWagerrProtocolV4StartHeight;
+    int nQuickGamesEndHeight;
+    int nMaturityV2StartHeight;
+    int nKeysRotateHeight;
+    int nPosStartHeight;
+    int nBlockStakeModifierV1A;
+    int nBlockStakeModifierV2;
+    int nBlockTimeProtocolV2;
+    int ATPStartHeight;
+
     /** Proof of stake parameters */
-    int64_t nPosStartHeight;
     uint256 posLimit;
     uint256 posLimit_V2;
     int64_t nPosTargetSpacing;
@@ -126,13 +134,8 @@ struct Params {
     int64_t nPosTargetTimespan_V2;
     int32_t nStakeMinDepth;
     int32_t nStakeMinAge;
-    int64_t nBlockStakeModifierV1A;
-    int64_t nBlockStakeModifierV2;
-    bool IsStakeModifierV2(const int nHeight) const { return nHeight >= nBlockStakeModifierV2; }
 
     /** Time Protocol V2 **/
-    int nBlockTimeProtocolV2;
-    bool IsTimeProtocolV2(const int nHeight) const { return nHeight >= nBlockTimeProtocolV2; }
     int nTimeSlotLength;
 
     /** ATP parameters */
@@ -152,6 +155,18 @@ struct Params {
     int nMintRequiredConfirmations;
     int nRequiredAccumulation;
 
+    /** Betting */
+    int nBetBlocksIndexTimespanV2;
+    int nBetBlocksIndexTimespanV3;
+    uint64_t nOMNORewardPermille;
+    uint64_t nDevRewardPermille;
+    uint64_t nBetBlockPayoutAmount;
+    int64_t nMinBetPayoutRange;
+    int64_t nMaxBetPayoutRange;
+    int64_t nMaxParlayBetPayoutRange;
+    int nBetPlaceTimeoutBlocks;
+    uint32_t nMaxParlayLegs;
+
     /** these parameters are only used on devnet and can be configured from the outside */
     int nMinimumDifficultyBlocks{0};
     int nHighSubsidyBlocks{0};
@@ -163,6 +178,29 @@ struct Params {
     LLMQType llmqTypeDIP0024InstantSend{LLMQType::LLMQ_NONE};
     LLMQType llmqTypePlatform{LLMQType::LLMQ_NONE};
     LLMQType llmqTypeMnhf{LLMQType::LLMQ_NONE};
+
+    bool IsStakeModifierV2(const int64_t nHeight) const { return nHeight >= nBlockStakeModifierV2; }
+    bool IsTimeProtocolV2(const int64_t nHeight) const { return nHeight >= nBlockTimeProtocolV2; }
+    int COINBASE_MATURITY(const int contextHeight) const {
+        return contextHeight < nMaturityV2StartHeight ? nMaturityV1 : nMaturityV2;
+    }
+    int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
+
+    int BetBlocksIndexTimespanV2() const { return nBetBlocksIndexTimespanV2; }
+    int BetBlocksIndexTimespanV3() const { return nBetBlocksIndexTimespanV3; }
+    uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
+    uint64_t DevRewardPermille() const { return nDevRewardPermille; }
+    int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
+    int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
+    int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
+    int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
+    int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
+    uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
+    int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; }
+    int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; }
+    int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
+    int WagerrProtocolV4StartHeight() const { return nWagerrProtocolV4StartHeight; }
+    int QuickGamesEndHeight() const { return nQuickGamesEndHeight; }
 };
 } // namespace Consensus
 

@@ -117,21 +117,6 @@ public:
 
     /** Betting on blockchain **/
     std::vector<COracle> Oracles() const { return vOracles; }
-    int BetBlocksIndexTimespanV2() const { return nBetBlocksIndexTimespanV2; }
-    int BetBlocksIndexTimespanV3() const { return nBetBlocksIndexTimespanV3; }
-    uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
-    uint64_t DevRewardPermille() const { return nDevRewardPermille; }
-    int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
-    int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
-    int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
-    int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
-    int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
-    uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
-    int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; }
-    int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; }
-    int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
-    int WagerrProtocolV4StartHeight() const { return nWagerrProtocolV4StartHeight; }
-    int QuickGamesEndHeight() const { return nQuickGamesEndHeight; }
     const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
     /** temp worarounds **/
@@ -175,28 +160,6 @@ protected:
     bool fBIP9CheckMasternodesUpgraded;
 
     std::vector<COracle> vOracles;
-
-    int nBetBlocksIndexTimespanV2;
-    int nBetBlocksIndexTimespanV3;
-    std::string strDevPayoutAddrOld;
-    std::string strDevPayoutAddrNew;
-    std::string strOMNOPayoutAddrOld;
-    std::string strOMNOPayoutAddrNew;
-    uint64_t nOMNORewardPermille;
-    uint64_t nDevRewardPermille;
-    uint64_t nBetBlockPayoutAmount;
-    int64_t nMinBetPayoutRange;
-    int64_t nMaxBetPayoutRange;
-    int64_t nMaxParlayBetPayoutRange;
-    int nBetPlaceTimeoutBlocks;
-    uint32_t nMaxParlayLegs;
-    int nWagerrProtocolV1StartHeight;
-    int nWagerrProtocolV2StartHeight;
-    int nWagerrProtocolV3StartHeight;
-    int nWagerrProtocolV4StartHeight;
-    int nQuickGamesEndHeight;
-    int nMaturityV2StartHeight;
-    int nKeysRotateHeight;
 
     std::vector<CQuickGamesView> quickGamesArr;
 

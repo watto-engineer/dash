@@ -9,13 +9,12 @@
 #include <validation.h>
 #include <util.h>
 #include <base58.h>
-#include <kernel.h>
 
-void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
-    bool fWagerrProtocolV4 = nLastBlockHeight >= Params().WagerrProtocolV4StartHeight();
+    bool fWagerrProtocolV4 = nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV4StartHeight();
 
     if (!fWagerrProtocolV4)
         return;
@@ -27,14 +26,14 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
 
     CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
-    LogPrint("wagerr", "Start generating field bets payouts...\n");
+    LogPrint(BCLog::BETTING, "Start generating field bets payouts...\n");
 
     for (auto result : results) {
 
         if (result.nResultType == ResultType::eventClosed)
             continue;
 
-        LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
+        LogPrint(BCLog::BETTING, "Looking for bets of eventId: %lu\n", result.nEventId);
 
         // look bets during the bet interval
         uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
@@ -80,7 +79,7 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
                             // {onchainOdds, effectiveOdds}
                             std::pair<uint32_t, uint32_t> betOdds;
                             // if bet placed before 2 mins of event started - refund this bet
-                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
                                 betOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
                             }
                             else {
@@ -124,7 +123,7 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
                     completedBet = true;
 
                     // if bet placed before 2 mins of event started - refund this bet
-                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
 
                         finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
                     }
@@ -146,7 +145,7 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
             }
 
             if (completedBet) {
-                if (uniBet.betAmount < (Params().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (uniBet.betAmount < (Params().GetConsensus().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
                 }
 
@@ -160,7 +159,7 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
                 if (effectivePayout > 0) {
                     // Add winning payout to the payouts vector.
                     CPayoutInfoDB payoutInfo(uniBetKey, finalOdds.second <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
-                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress), uniBet.betAmount);
                     vPayoutsInfo.emplace_back(payoutInfo);
 
                     if (effectivePayout < uniBet.betAmount) {
@@ -183,11 +182,11 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
                     uniBet.resultType = BetResultType::betResultLose;
                 }
                 uniBet.payout = effectivePayout;
-                LogPrint("wagerr", "\nField bet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
-                    uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), finalOdds.first, finalOdds.second, effectivePayout);
-                LogPrint("wagerr", "Legs:");
+                LogPrint(BCLog::BETTING, "\nField bet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
+                    uniBetKey.outPoint.ToStringShort(), EncodeDestination(uniBet.playerAddress), finalOdds.first, finalOdds.second, effectivePayout);
+                LogPrint(BCLog::BETTING, "Legs:");
                 for (auto &leg : uniBet.legs) {
-                    LogPrint("wagerr", " (eventId: %lu, OutcomeType: %lu, contenderId: %lu)\n", leg.nEventId, leg.nOutcome, leg.nContenderId);
+                    LogPrint(BCLog::BETTING, " (eventId: %lu, OutcomeType: %lu, contenderId: %lu)\n", leg.nEventId, leg.nOutcome, leg.nContenderId);
                 }
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();

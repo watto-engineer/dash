@@ -173,7 +173,7 @@ class CBetOut : public CTxOut {
             return 1;
         if (scriptPubKey < rhs.scriptPubKey)
             return -1;
-        if (scriptPubKey > rhs.scriptPubKey)
+        if (scriptPubKey != rhs.scriptPubKey)
             return 1;
         if (nEventId < rhs.nEventId)
             return -1;
