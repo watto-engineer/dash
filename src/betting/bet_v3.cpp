@@ -7,10 +7,10 @@
 #include <betting/bet_v3.h>
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
+#include <dstencode.h>
 #include <validation.h>
 #include <util.h>
 #include <base58.h>
-#include <kernel.h>
 
 void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
@@ -46,10 +46,10 @@ void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std
 }
 
 uint32_t GetBetSearchStartHeight(int nHeight) {
-    if (nHeight >= Params().WagerrProtocolV3StartHeight()) {
-        return nHeight >= Params().BetBlocksIndexTimespanV3() ? nHeight - Params().BetBlocksIndexTimespanV3() : Params().WagerrProtocolV3StartHeight();
+    if (nHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+        return nHeight >= Params().GetConsensus().BetBlocksIndexTimespanV3() ? nHeight - Params().GetConsensus().BetBlocksIndexTimespanV3() : Params().GetConsensus().WagerrProtocolV3StartHeight();
     } else {
-        return nHeight >= Params().BetBlocksIndexTimespanV2() ? nHeight - Params().BetBlocksIndexTimespanV2() : 0;
+        return nHeight >= Params().GetConsensus().BetBlocksIndexTimespanV2() ? nHeight - Params().GetConsensus().BetBlocksIndexTimespanV2() : 0;
     }
 }
 
@@ -67,18 +67,18 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
     // Get all the results posted in the prev block.
     std::vector<CPeerlessResultDB> results = GetPLResults(nLastBlockHeight);
 
-    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
+    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight();
 
     CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
-    LogPrint("wagerr", "Start generating peerless bets payouts...\n");
+    LogPrint(BCLog::BETTING, "Start generating peerless bets payouts...\n");
 
     for (auto result : results) {
 
         if (result.nResultType == ResultType::eventClosed)
             continue;
 
-        LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
+        LogPrint(BCLog::BETTING, "Looking for bets of eventId: %lu\n", result.nEventId);
 
         // look bets during the bet interval
         uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
@@ -124,7 +124,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                             // {onchainOdds, effectiveOdds}
                             std::pair<uint32_t, uint32_t> betOdds;
                             // if bet placed before 2 mins of event started - refund this bet
-                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
                                 betOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                             }
                             else {
@@ -168,13 +168,13 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     completedBet = true;
 
                     // if bet placed before 2 mins of event started - refund this bet
-                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
                         if (fWagerrProtocolV3) {
                             finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
                         } else {
                             finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                         }
-                    } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespanV2()) {
+                    } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().GetConsensus().BetBlocksIndexTimespanV2()) {
                         finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                     }
                     else {
@@ -195,7 +195,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
             }
 
             if (completedBet) {
-                if (uniBet.betAmount < (Params().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                if (uniBet.betAmount < (Params().GetConsensus().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
                     finalOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                 }
 
@@ -214,7 +214,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                 if (effectivePayout > 0) {
                     // Add winning payout to the payouts vector.
                     CPayoutInfoDB payoutInfo(uniBetKey, finalOdds.second <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
-                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress), uniBet.betAmount);
                     vPayoutsInfo.emplace_back(payoutInfo);
 
                     if (effectivePayout < uniBet.betAmount) {
@@ -237,11 +237,11 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     uniBet.resultType = BetResultType::betResultLose;
                 }
                 uniBet.payout = effectivePayout;
-                LogPrint("wagerr", "\nBet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
-                    uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), finalOdds.first, finalOdds.second, effectivePayout);
-                LogPrint("wagerr", "Legs:");
+                LogPrint(BCLog::BETTING, "\nBet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
+                    uniBetKey.outPoint.ToStringShort(), EncodeDestination(uniBet.playerAddress), finalOdds.first, finalOdds.second, effectivePayout);
+                LogPrint(BCLog::BETTING, "Legs:");
                 for (auto &leg : uniBet.legs) {
-                    LogPrint("wagerr", " (eventId: %lu, outcome: %lu) ", leg.nEventId, leg.nOutcome);
+                    LogPrint(BCLog::BETTING, " (eventId: %lu, outcome: %lu) ", leg.nEventId, leg.nOutcome);
                 }
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();
@@ -260,7 +260,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
         GetPLRewardPayoutsV3(nNewBlockHeight, grossPayoutsSum - effectivePayoutsSum, vExpectedPayouts, vPayoutsInfo);
     }
 
-    LogPrint("wagerr", "Finished generating payouts...\n");
+    LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
 
 }
 
@@ -273,11 +273,11 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
-    if (nLastBlockHeight >= Params().QuickGamesEndHeight()){
+    if (nLastBlockHeight >= Params().GetConsensus().QuickGamesEndHeight()){
         return;
     }
 
-    LogPrint("wagerr", "Start generating quick games bets payouts...\n");
+    LogPrint(BCLog::BETTING, "Start generating quick games bets payouts...\n");
 
     CBlockIndex *blockIndex = chainActive[nLastBlockHeight];
     std::map<std::string, CAmount> mExpectedRewards;
@@ -305,7 +305,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         // handle bet by specific game handler from quick games framework
         const CQuickGamesView& gameView = Params().QuickGamesArr()[qgBet.gameType];
         // if odds == 0 - bet lose, if odds > OddsDivisor - bet win, if odds == BET_ODDSDIVISOR - bet refunded
-        uint32_t odds = gameView.handler(qgBet.vBetInfo, blockIndex->hashProofOfStake);
+        uint32_t odds = gameView.handler(qgBet.vBetInfo, UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]));
         CAmount winningsPermille = qgBet.betAmount * odds;
         CAmount feePermille = winningsPermille > 0 ? (qgBet.betAmount * (odds - BET_ODDSDIVISOR) / 1000 * gameView.nFeePermille) : 0;
         CAmount payout = winningsPermille > 0 ? (winningsPermille - feePermille) / BET_ODDSDIVISOR : 0;
@@ -320,7 +320,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
             qgBet.resultType = odds == BET_ODDSDIVISOR ? BetResultType::betResultRefund : BetResultType::betResultWin;
             // Add winning payout to the payouts vector.
             CPayoutInfoDB payoutInfo(qgKey, odds == BET_ODDSDIVISOR ? PayoutType::quickGamesRefund : PayoutType::quickGamesPayout);
-            CBetOut betOut(payout, GetScriptForDestination(qgBet.playerAddress.Get()), qgBet.betAmount);
+            CBetOut betOut(payout, GetScriptForDestination(qgBet.playerAddress), qgBet.betAmount);
             vExpectedPayouts.emplace_back(betOut);
             vPayoutsInfo.emplace_back(payoutInfo);
 
@@ -341,7 +341,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         else {
             qgBet.resultType = BetResultType::betResultLose;
         }
-        LogPrint("wagerr", "\nQuick game: %s, bet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", gameView.name, qgKey.outPoint.ToStringShort(), qgBet.playerAddress.ToString(), payout);
+        LogPrint(BCLog::BETTING, "\nQuick game: %s, bet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", gameView.name, qgKey.outPoint.ToStringShort(), EncodeDestination(qgBet.playerAddress), payout);
         // if handling bet is completed - mark it
         qgBet.SetCompleted();
         qgBet.payout = payout;
@@ -350,10 +350,10 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
     // fill reward outputs
     PayoutInfoKey zeroKey{(uint32_t) nNewBlockHeight, COutPoint()};
     CPayoutInfoDB rewardInfo(zeroKey, PayoutType::quickGamesReward);
-    LogPrint("wagerr", "Quick game rewards:\n");
+    LogPrint(BCLog::BETTING, "Quick game rewards:\n");
     for (auto& reward : mExpectedRewards) {
-        LogPrint("wagerr", "address: %s, reward: %ll\n", reward.first, reward.second);
-        CBetOut rewardOut(reward.second, GetScriptForDestination(CBitcoinAddress(reward.first).Get()), 0);
+        LogPrint(BCLog::BETTING, "address: %s, reward: %ll\n", reward.first, reward.second);
+        CBetOut rewardOut(reward.second, GetScriptForDestination(DecodeDestination(reward.first)), 0);
         vExpectedPayouts.emplace_back(rewardOut);
         vPayoutsInfo.emplace_back(rewardInfo);
     }
@@ -361,7 +361,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
     }
 
-    LogPrint("wagerr", "Finished generating payouts...\n");
+    LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
 }
 
 void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
@@ -377,11 +377,11 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
     PeerlessBetKey zeroKey{(uint32_t) nNewBlockHeight, COutPoint()};
 
-    LogPrint("wagerr", "Start generating chain games bets payouts...\n");
+    LogPrint(BCLog::BETTING, "Start generating chain games bets payouts...\n");
 
     for (auto result : results) {
 
-        LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
+        LogPrint(BCLog::BETTING, "Looking for bets of eventId: %lu\n", result.nEventId);
 
         CChainGamesEventDB cgEvent;
         if (!bettingsViewCache.chainGamesLottoEvents->Read(EventKey{result.nEventId}, cgEvent)) {
@@ -412,7 +412,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
             cgBet.SetCompleted();
             // Add a bet of each candidate to array
-            LogPrintf("wagerr", "Candidate found, address: %s\n", cgBet.playerAddress.ToString().c_str());
+            LogPrint(BCLog::BETTING, "Candidate found, address: %s\n", EncodeDestination(cgBet.playerAddress).c_str());
             candidates.push_back(std::pair<ChainGamesBetKey, CChainGamesBetDB>{cgBetKey, cgBet});
         }
 
@@ -420,17 +420,17 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
         if (candidates.size() == 1) {
             // Refund the single entrant.
             CAmount noOfBets = candidates.size();
-            CBitcoinAddress winnerAddress = candidates[0].second.playerAddress;
+            CTxDestination winnerAddress = candidates[0].second.playerAddress;
             CAmount winnerPayout = entranceFee;
 
-            LogPrint("wagerr", "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrint("wagerr", "Winner Address: %s \n", winnerAddress.ToString().c_str());
-            LogPrint("wagerr", " This Lotto was refunded as only one person bought a ticket.\n" );
+            LogPrint(BCLog::BETTING, "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrint(BCLog::BETTING, "Winner Address: %s \n", EncodeDestination(winnerAddress).c_str());
+            LogPrint(BCLog::BETTING, " This Lotto was refunded as only one person bought a ticket.\n" );
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
                 vPayoutsInfo.emplace_back(candidates[0].first, PayoutType::chainGamesRefund);
-                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(winnerAddress.Get()), entranceFee, result.nEventId);
+                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(winnerAddress), entranceFee, result.nEventId);
             }
         }
         else if (candidates.size() >= 2) {
@@ -438,23 +438,23 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
             auto noOfBets    = candidates.size();
 
             CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
-            uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
-            if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
-            uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
+            arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
+            if (hashProofOfStake == 0) hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+            arith_uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
             tempVal = tempVal * noOfBets;
             tempVal = hashProofOfStake - tempVal;           // remainder
-            uint64_t winnerNr = tempVal.Get64();
+            uint64_t winnerNr = tempVal.GetLow64();
 
             // Split the pot and calculate winnings.
-            CBitcoinAddress winnerAddress = candidates[winnerNr].second.playerAddress;
+            CTxDestination winnerAddress = candidates[winnerNr].second.playerAddress;
             CAmount totalPot = hashProofOfStake == 0 ? 0 : (noOfBets * entranceFee);
             CAmount winnerPayout = totalPot / 10 * 8;
             candidates[winnerNr].second.payout = winnerPayout;
             CAmount fee = totalPot / 50;
 
-            LogPrint("wagerr", "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrint("wagerr", "Winner Address: %s (index no %u) \n", winnerAddress.ToString().c_str(), winnerNr);
-            LogPrint("wagerr", "Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+            LogPrint(BCLog::BETTING, "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrint(BCLog::BETTING, "Winner Address: %s (index no %u) \n", EncodeDestination(winnerAddress).c_str(), winnerNr);
+            LogPrint(BCLog::BETTING, "Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
@@ -465,8 +465,8 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
                     continue;
                 }
                 vPayoutsInfo.emplace_back(candidates[winnerNr].first, PayoutType::chainGamesPayout);
-                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, result.nEventId);
-                LogPrint("wagerr", "Reward address: %s, reward: %ll\n", payoutScriptOMNO.ToString(), fee);
+                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(winnerAddress), entranceFee, result.nEventId);
+                LogPrint(BCLog::BETTING, "Reward address: %s, reward: %ll\n", EncodeDestination(payoutScriptOMNO), fee);
                 vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesReward);
                 vExpectedPayouts.emplace_back(fee, payoutScriptOMNO, 0);
             }
@@ -478,7 +478,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
         bettingsViewCache.chainGamesLottoBets->Update(pair.first, pair.second);
     }
 
-    LogPrint("wagerr", "Finished generating payouts...\n");
+    LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
 }
 
 /**

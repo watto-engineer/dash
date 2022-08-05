@@ -49,8 +49,11 @@ public:
 
     ADD_SERIALIZE_METHODS;
 
+    size_t GetSerializeSize(int nType, int nVersion) const {
+        return 3;
+    }
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(prefix);
         READWRITE(version);
         READWRITE(txType);
@@ -79,7 +82,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nMType);
         // if mapping type is teamMapping (0x03) or contenderMapping (0x06) nId is 4 bytes, else - 2 bytes
         if (nMType == 0x03 || nMType == 0x06) {
@@ -148,7 +151,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nSport);
@@ -184,7 +187,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nSport);
@@ -212,7 +215,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(mContendersInputOdds);
     }
@@ -233,7 +236,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(mContendersModifires);
     }
@@ -253,7 +256,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nMarginPercent);
     }
@@ -272,7 +275,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
     }
 };
@@ -293,7 +296,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nResultType);
         READWRITE(contendersResults);
@@ -320,7 +323,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nOutcome);
         READWRITE(nContenderId);
@@ -340,7 +343,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(legs);
     }
 };
@@ -360,7 +363,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nOutcome);
     }
@@ -383,7 +386,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nResultType);
         READWRITE(nHomeScore);
@@ -407,7 +410,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nHomeOdds);
         READWRITE(nAwayOdds);
@@ -431,7 +434,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nEventId);
         READWRITE(nPoints);
@@ -457,7 +460,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nEventId);
         READWRITE(nPoints);
@@ -479,7 +482,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
     }
@@ -498,7 +501,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(legs);
     }
 };
@@ -521,7 +524,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(nEventId);
         READWRITE(nEntryFee);
     }
@@ -541,7 +544,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nEventId);
     }
@@ -561,7 +564,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nEventId);
     }
@@ -586,7 +589,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(gameType);
         READWRITE(vBetInfo);
     }
@@ -605,7 +608,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         READWRITE(vEventIds);
     }
 };

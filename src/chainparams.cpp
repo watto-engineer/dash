@@ -197,6 +197,14 @@ public:
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V17DeploymentHeight;
+
+        consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
+        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
+
+        // Proof of work parameters
         consensus.BRRHeight = 1374912; // 000000000000000c5a124f3eccfbe6e17876dca79cec9e63dfa70d269113c926
         consensus.MinBIP9WarningHeight = 1090656; // dip8 activation height + miner confirmation window
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
@@ -204,10 +212,25 @@ public:
         consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
+        consensus.nMaturityV1 = 100;
+        consensus.nMaturityV2 = 60;
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000009db835052f74f73219"); // 1623262
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x0");
 
-        // Wagerr specific parameters
-        // Proof of Stake parameters
+        // Wagerr specific deployment heights
+        consensus.nWagerrProtocolV1StartHeight = 298386;                            // Betting protocol v1 activation block
+        consensus.nWagerrProtocolV2StartHeight = 763350;                            // Betting protocol v2 activation block
+        consensus.nWagerrProtocolV3StartHeight = consensus.nBlockTimeProtocolV2;    // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max();   // Betting protocol v4 activation block
+        consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;    // Quick games: retired functionality
+        consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;  // Reduced block maturity required for spending coinstakes and betting payouts
+        consensus.nKeysRotateHeight = consensus.nBlockTimeProtocolV2;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 1002;
+        consensus.nBlockStakeModifierV1A = 1000;
+        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
         consensus.nPivxProtocolV2StartHeight = std::numeric_limits<int>::max();
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
@@ -216,6 +239,19 @@ public:
         consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         // ATP parameters
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
+
+        // Proof of Stake parameters
+        consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
+        consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
+        consensus.nPosTargetSpacing = 1 * 60; // 1 minute
+        consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
+        consensus.nTimeSlotLength = 15;
+        consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
+        consensus.nStakeMinDepth = 600;
+        consensus.nStakeMinAge = 60 * 60; // 1 hour
+        // Time protocol V2
+        consensus.nTimeSlotLength = 15;
+
         consensus.WagerrAddrPrefix = "wagerr";
         consensus.strTokenManagementKey = "WdFESJpjnXBjq4xahEsbHYeD8yoHfSHLCh"; // 04d449cc1ac45d327c34d8b116797ad9ed287980a9199ea48dc4c8beab90ae2ded738e826ba0b27b5571d63884d985e2a50afbe8eef2925fc280af51a2a2d5e0e0
         consensus.nOpGroupNewRequiredConfirmations = 1;
@@ -238,17 +274,17 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
-        consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
-        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000549cd3ccb81a55892330"); // 1450000
-
-        // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000000000000000fd8af332029688d4ccb227f481efa6aff1d662358cc4f76c1"); // 1756000
+        // Betting
+        consensus.nBetBlocksIndexTimespanV2 = 23040;                                // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nBetBlocksIndexTimespanV3 = 90050;                                // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nOMNORewardPermille = 24;                                         // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        consensus.nDevRewardPermille = 6;                                           // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        consensus.nBetBlockPayoutAmount = 1440;                                     // Set the number of blocks we want to look back for results already paid out.
+        consensus.nMinBetPayoutRange = 25;                                          // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxBetPayoutRange = 10000;                                       // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxParlayBetPayoutRange = 4000;                                  // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        consensus.nBetPlaceTimeoutBlocks = 120;                                     // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
+        consensus.nMaxParlayLegs = 5;                                               // Minimizes maximum legs in parlay bet
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -270,11 +306,14 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079"));
         assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
+
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
+        vSeeds.clear();
         vSeeds.emplace_back("main.seederv1.wgr.host");       // Wagerr's official seed 1
         vSeeds.emplace_back("main.seederv2.wgr.host");       // Wagerr's official seed 2
         vSeeds.emplace_back("main.devseeder1.wgr.host");     // Wagerr's dev1 testseed
@@ -292,8 +331,6 @@ public:
 
         // Wagerr BIP44 coin type is '0x776772'
         nExtCoinType = 7825266;
-
-        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // long living quorum params
         AddLLMQ(Consensus::LLMQType::LLMQ_20_60);
@@ -324,34 +361,16 @@ public:
         fBIP9CheckMasternodesUpgraded = true;
 
         /** Betting related parameters **/
-        strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
-        strDevPayoutAddrNew = "Shqrs3mz3i65BiTEKPgnxoqJqMw5b726m5";     // Development fund payout address (new).
-        strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address (old).
-        strOMNOPayoutAddrNew = "SNCNYcDyXPCLHpG9AyyhnPcLNpxCpGZ2X6";    // OMNO fund payout address (new).
+        std::string strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
+        std::string strDevPayoutAddrNew = "Shqrs3mz3i65BiTEKPgnxoqJqMw5b726m5";     // Development fund payout address (new).
+        std::string strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address (old).
+        std::string strOMNOPayoutAddrNew = "SNCNYcDyXPCLHpG9AyyhnPcLNpxCpGZ2X6";    // OMNO fund payout address (new).
         vOracles = {
-            { "WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "WdAo2Xk8r1MVx7ZmxARpJJkgzaFeumDcCS", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "WhW3dmThz2hWEfpagfbdBQ7hMfqf6MkfHR", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "WdAo2Xk8r1MVx7ZmxARpJJkgzaFeumDcCS", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WhW3dmThz2hWEfpagfbdBQ7hMfqf6MkfHR", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
-
-        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
-        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
-        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV1StartHeight = 298386;                          // Betting protocol v1 activation block
-        nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
-        nWagerrProtocolV3StartHeight = nBlockTimeProtocolV2;            // Betting protocol v3 activation block
-        nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max(); // Betting protocol v4 activation block
-        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
-        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
-        nKeysRotateHeight = nBlockTimeProtocolV2;   // Rotate spork key, oracle keys and fee payout keys
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -431,35 +450,54 @@ public:
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V17DeploymentHeight;
+
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
+
         consensus.BRRHeight = 387500; // 0000001537dbfd09dea69f61c1f8b2afa27c8dc91c934e144797761c9f10367b
         consensus.MinBIP9WarningHeight = 80816;  // dip8 activation height + miner confirmation window
+        // Proof of work parameters
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
         consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
+        consensus.nMaturityV1 = 15;
+        consensus.nMaturityV2 = 10;
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"); // 0
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x0000009303aeadf8cf3812f5c869691dbd4cb118ad20e9bf553be434bafe6a52"); // 470000
 
-        // Wagerr specific parameters
-        // Proof of Stake parameters
+        // Wagerr specific deployment heights
+        consensus.nWagerrProtocolV1StartHeight = 1100;      // Betting protocol v1 activation block
+        consensus.nWagerrProtocolV2StartHeight = 1100;      // Betting protocol v2 activation block
+        consensus.nWagerrProtocolV3StartHeight = 2000;      // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV4StartHeight = 405000;    // Betting protocol v4 activation block
+        consensus.nQuickGamesEndHeight = 101650;
+        consensus.nMaturityV2StartHeight = 38000;           // Reduced block maturity required for spending coinstakes and betting payouts
+        consensus.nKeysRotateHeight = 102000;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
+        consensus.nBlockStakeModifierV1A = 51197;
+        consensus.nBlockStakeModifierV2 = 826130;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
+
+        // Proof of stake parameters
         consensus.posLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 24
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 0;
-        consensus.nBlockStakeModifierV1A = 51197;
-        consensus.nBlockStakeModifierV2 = 826130;
         // ATP parameters
-        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TNPPuVRwCbBtNtWG9dBtv1fYDC8PFEeQ6y";
         consensus.nOpGroupNewRequiredConfirmations = 1;
-        // Other
-        consensus.nCoinbaseMaturity = 15;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
@@ -476,19 +514,19 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
+        // Betting
+        consensus.nBetBlocksIndexTimespanV2 = 23040;        // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nBetBlocksIndexTimespanV3 = 90050;        // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nOMNORewardPermille = 24;                 // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        consensus.nDevRewardPermille = 6;                   // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        consensus.nBetBlockPayoutAmount = 1440;             // Set the number of blocks we want to look back for results already paid out.
+        consensus.nMinBetPayoutRange = 25;                  // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxBetPayoutRange = 10000;               // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxParlayBetPayoutRange = 4000;          // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        consensus.nBetPlaceTimeoutBlocks = 120;             // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        consensus.nMaxParlayLegs = 5;                       // Minimizes maximum legs in parlay bet
 
-        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000009db835052f74f73219"); // 1427000
-
-        // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0");
-
+        // Chain parameters
         pchMessageStart[0] = 0x87;
         pchMessageStart[1] = 0x9e;
         pchMessageStart[2] = 0xd1;
@@ -503,11 +541,10 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"));
         //assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
-        vFixedSeeds.clear();
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 
-        vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
+        vSeeds.clear();
         vSeeds.emplace_back("testnet-seeder-01.wgr.host");
         vSeeds.emplace_back("testnet-seedr-02.wgr.host");
         vSeeds.emplace_back("testnet.testnet-seeder-01.wgr.host");
@@ -560,34 +597,16 @@ public:
         fBIP9CheckMasternodesUpgraded = true;
 
         /** Betting related parameters **/
-        strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
-        strDevPayoutAddrNew = "sUihJctn8P4wDVRU3SgSYbJkG8ajV68kmx";     // Development fund payout address (Testnet).
-        strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
-        strOMNOPayoutAddrNew = "sMF9ejP1QMcoQnzURrSenRrFMznCfQfWgd";    // OMNO fund payout address (Testnet).
+        std::string strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        std::string strDevPayoutAddrNew = "sUihJctn8P4wDVRU3SgSYbJkG8ajV68kmx";     // Development fund payout address (Testnet).
+        std::string strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
+        std::string strOMNOPayoutAddrNew = "sMF9ejP1QMcoQnzURrSenRrFMznCfQfWgd";    // OMNO fund payout address (Testnet).
         vOracles = {
-            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
-
-        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
-        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
-        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV1StartHeight = 1100;                            // Betting protocol v1 activation block
-        nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
-        nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
-        nWagerrProtocolV4StartHeight = 405000;                          // Betting protocol v4 activation block
-        nQuickGamesEndHeight = 101650;
-        nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
-        nKeysRotateHeight = 102000;                                     // Rotate spork key, oracle keys and fee payout keys
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -655,33 +674,55 @@ public:
         consensus.DIP0008Height = 2; // DIP0008 activated immediately on devnet
         consensus.BRRHeight = 300;
         consensus.MinBIP9WarningHeight = 2018; // dip8 activation height + miner confirmation window
+
+        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
+
+        // Proof of work parameters
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
+        consensus.nMaturityV1 = 100;
+        consensus.nMaturityV2 = 60;
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x00");
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x00");
 
-        // Wagerr specific parameters
-        // Proof of Stake parameters
+        // Wagerr specific deployment heights
+        consensus.nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
+        consensus.nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
+        consensus.nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
+        consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
+        consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
+        consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
+        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
         consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
+
+        // Proof of Stake parameters
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
-        consensus.nBlockStakeModifierV1A = 1000;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
+        // Time protocol V2
+        consensus.nTimeSlotLength = 15;
+
         // ATP parameters
-        consensus.ATPStartHeight = consensus.V17DeploymentHeight;
         consensus.WagerrAddrPrefix = "wagerrtest";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
-        // Other
-        consensus.nCoinbaseMaturity = 15;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = 25;
@@ -698,17 +739,17 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
-        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
-
-        // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
-
-        // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
+        //Betting
+        consensus.nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
+        consensus.nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        consensus.nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        consensus.nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        consensus.nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        consensus.nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        consensus.nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
 
         pchMessageStart[0] = 0xc5;
         pchMessageStart[1] = 0x2a;
@@ -784,34 +825,17 @@ public:
         fBIP9CheckMasternodesUpgraded = false;
 
         /** Betting related parameters **/
-        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
-        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        std::string strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        std::string strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        std::string strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        std::string strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
         vOracles = {
-            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
 
-        nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
-        nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
-        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
-        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
-        nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
-        nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
-        nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
-        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
-        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
-        nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
             std::string("Dice"), // Game name
@@ -979,18 +1003,16 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
 
-
-        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
-
-        // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00");
-
-        // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x00");
+        consensus.nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
+        consensus.nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        consensus.nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        consensus.nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        consensus.nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        consensus.nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        consensus.nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
+        consensus.nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        consensus.nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
 
         pchMessageStart[0] = 0x12;
         pchMessageStart[1] = 0x76;
@@ -1013,6 +1035,27 @@ public:
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
+
+        // Testnet Wagerr addresses start with 'y'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
+        // Testnet Wagerr script addresses start with '8' or '9'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,125);
+        // Testnet private keys start with '9' or 'c'
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,177);
+        // Testnet Wagerr BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
+        // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
+        base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
+
+        // Regtest Wagerr BIP44 coin type is '1' (All coin's testnet default)
+        nExtCoinType = 1;
+
+        // long living quorum params
+        consensus.llmqs[Consensus::LLMQ_TEST] = llmq_test;
+        consensus.llmqs[Consensus::LLMQ_TEST_V17] = llmq_test_v17;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_TEST;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_TEST;
+        consensus.llmqTypePlatform = Consensus::LLMQ_TEST;
 
         fDefaultConsistencyChecks = true;
         fRequireStandard = true;
@@ -1037,34 +1080,16 @@ public:
         fBIP9CheckMasternodesUpgraded = false;
 
         /** Betting related parameters **/
-        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
-        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        std::string strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        std::string strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        std::string strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        std::string strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
         vOracles = {
-            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
-
-        nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
-        nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
-        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
-        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
-        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
-        nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
-        nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
-        nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
-        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
-        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
-        nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -1087,30 +1112,6 @@ public:
             0,
             0
         };
-
-        // Regtest Wagerr addresses start with 'T'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,65);
-        // Testnet Wagerr script addresses start with '8' or '9'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,125);
-        // Testnet private keys start with '9' or 'c'
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,177);
-        // Testnet Wagerr BIP32 pubkeys start with 'DRKV' (Bitcoin defaults)
-        base58Prefixes[EXT_PUBLIC_KEY] = {0x3A, 0x80, 0x61, 0xA0};
-        // Testnet Wagerr BIP32 prvkeys start with 'DRKP' (Bitcoin defaults)
-        base58Prefixes[EXT_SECRET_KEY] = {0x3A, 0x80, 0x58, 0x37};
-        // Regtest Wagerr BIP44 coin type is '1' (All coin's testnet default)
-        nExtCoinType = 1;
-
-        // long living quorum params
-        AddLLMQ(Consensus::LLMQType::LLMQ_TEST);
-        AddLLMQ(Consensus::LLMQType::LLMQ_TEST_INSTANTSEND);
-        AddLLMQ(Consensus::LLMQType::LLMQ_TEST_V17);
-        AddLLMQ(Consensus::LLMQType::LLMQ_TEST_DIP0024);
-        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_TEST;
-        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_TEST_INSTANTSEND;
-        consensus.llmqTypeDIP0024InstantSend = Consensus::LLMQType::LLMQ_TEST_DIP0024;
-        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_TEST;
-        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_TEST;
 
         UpdateLLMQTestParametersFromArgs(args, Consensus::LLMQType::LLMQ_TEST);
         UpdateLLMQTestParametersFromArgs(args, Consensus::LLMQType::LLMQ_TEST_INSTANTSEND);
