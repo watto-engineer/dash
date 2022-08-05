@@ -5918,7 +5918,7 @@ int CMerkleTx::GetBlocksToMaturity() const
     int minBlocksToMaturity = 0;
     if (fAuthority)
         minBlocksToMaturity = std::max(0, (Params().GetConsensus().nOpGroupNewRequiredConfirmations) - depth);
-    return fGenerated ? std::max(minBlocksToMaturity, (Params().GetConsensus().nCoinbaseMaturity + 1) - depth) : minBlocksToMaturity;
+    return fGenerated ? std::max(minBlocksToMaturity, (Params().GetConsensus().COINBASE_MATURITY(chainActive.Height()) + 1) - depth) : minBlocksToMaturity;
 }
 
 bool CWalletTx::AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state)

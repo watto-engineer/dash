@@ -44,7 +44,7 @@ public:
     ~CStorageLevelDBIterator() override { }
     void Seek(const std::vector<unsigned char>& key) override {
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
-        ssKey.reserve(ssKey.GetSerializeSize(key));
+        ssKey.reserve(::GetSerializeSize(key, SER_DISK, CLIENT_VERSION));
         ssKey << key;
         leveldb::Slice slKey(&ssKey[0], ssKey.size());
         it->Seek(slKey);
@@ -84,7 +84,7 @@ public:
     bool Erase(const std::vector<unsigned char>& key) override { return db.Erase(key, true); }
     bool Read(const std::vector<unsigned char>& key, std::vector<unsigned char>& value) override { return db.Read(key, value); }
     std::unique_ptr<CStorageKVIterator> NewIterator() override {
-        return MakeUnique<CStorageLevelDBIterator>(std::unique_ptr<leveldb::Iterator>(db.NewIterator()));
+        return MakeUnique<CStorageLevelDBIterator>(std::unique_ptr<leveldb::Iterator>(db.NewRawIterator()));
     }
 private:
     CDBWrapper db;

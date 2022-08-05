@@ -143,6 +143,7 @@ const CLogCategoryDesc LogCategories[] =
     //End Dash
 
     //Start Wagerr
+    {BCLog::BETTING, "betting"},
     {BCLog::ZEROCOIN, "zerocoin"},
     {BCLog::STAKING, "staking"},
     {BCLog::TOKEN, "token"},

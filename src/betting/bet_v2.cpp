@@ -2,6 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <dstencode.h>
 #include <util.h>
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
@@ -44,8 +45,8 @@ void GetPLRewardPayoutsV2(const uint32_t nNewBlockHeight, std::vector<CBetOut>& 
     }
 
     // Calculate the OMNO reward and the Dev reward.
-    CAmount nOMNOReward = (CAmount)(profitAcc * Params().OMNORewardPermille() / (1000.0 - BET_BURNXPERMILLE));
-    CAmount nDevReward  = (CAmount)(profitAcc * Params().DevRewardPermille() / (1000.0 - BET_BURNXPERMILLE));
+    CAmount nOMNOReward = (CAmount)(profitAcc * Params().GetConsensus().OMNORewardPermille() / (1000.0 - BET_BURNXPERMILLE));
+    CAmount nDevReward  = (CAmount)(profitAcc * Params().GetConsensus().DevRewardPermille() / (1000.0 - BET_BURNXPERMILLE));
     if (nDevReward > 0) {
         // Add both reward payouts to the payout vector.
         CBetOut betOutDev(nDevReward, payoutScriptDev, profitAcc);
@@ -97,8 +98,8 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
     for (const auto& result : results) {
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        int startHeight = nLastBlockHeight - Params().BetBlocksIndexTimespanV2();
-        startHeight = startHeight < Params().WagerrProtocolV2StartHeight() ? Params().WagerrProtocolV2StartHeight() : startHeight;
+        int startHeight = nLastBlockHeight - Params().GetConsensus().BetBlocksIndexTimespanV2();
+        startHeight = startHeight < Params().GetConsensus().WagerrProtocolV2StartHeight() ? Params().GetConsensus().WagerrProtocolV2StartHeight() : startHeight;
         BlocksIndex = chainActive[startHeight];
 
         OutcomeType nMoneylineResult = (OutcomeType) 0;
@@ -144,18 +145,18 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
         // Traverse the block chain to find events and bets.
         while (BlocksIndex) {
             CBlock block;
-            ReadBlockFromDisk(block, BlocksIndex);
+            ReadBlockFromDisk(block, BlocksIndex, Params().GetConsensus());
             time_t transactionTime = block.nTime;
             uint32_t nHeight = BlocksIndex->nHeight;
 
-            for (CTransaction &tx : block.vtx) {
+            for (CTransactionRef &tx : block.vtx) {
                 // Ensure TX has it been posted by Oracle wallet.
-                const CTxIn &txin = tx.vin[0];
+                const CTxIn &txin = tx->vin[0];
                 bool validOracleTx = IsValidOracleTx(txin, nHeight);
                 // Check all TX vouts for an OP RETURN.
-                for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                for (unsigned int i = 0; i < tx->vout.size(); i++) {
 
-                    const CTxOut &txout = tx.vout[i];
+                    const CTxOut &txout = tx->vout[i];
                     CAmount betAmount = txout.nValue;
 
                     auto bettingTx = ParseBettingTx(txout);
@@ -325,19 +326,19 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                     }
 
                     // Only payout bets that are between 25 - 10000 WRG inclusive (MaxBetPayoutRange).
-                    if (eventFound && betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN)) {
+                    if (eventFound && betAmount >= (Params().GetConsensus().MinBetPayoutRange() * COIN) && betAmount <= (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
 
                         // Bet OP RETURN transaction.
                         if (txType == plBetTxType) {
 
                             CPeerlessBetTx* pb = (CPeerlessBetTx*) bettingTx.get();
 
-                            PeerlessBetKey betKey{nHeight, COutPoint(tx.GetHash(), i)};
+                            PeerlessBetKey betKey{nHeight, COutPoint(tx->GetHash(), i)};
 
                             CAmount payout = 0 * COIN;
 
                             // If bet was placed less than 20 mins before event start or after event start discard it.
-                            if (latestEventStartTime > 0 && (unsigned int) transactionTime > (latestEventStartTime - Params().BetPlaceTimeoutBlocks())) {
+                            if (latestEventStartTime > 0 && (unsigned int) transactionTime > (latestEventStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
                                 continue;
                             }
 
@@ -403,25 +404,25 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
 
                                 // Get the users payout address from the vin of the bet TX they used to place the bet.
                                 CTxDestination payoutAddress;
-                                const CTxIn &txin = tx.vin[0];
+                                const CTxIn &txin = tx->vin[0];
                                 COutPoint prevout = txin.prevout;
 
                                 uint256 hashBlock;
-                                CTransaction txPrev;
-                                if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-                                    ExtractDestination( txPrev.vout[prevout.n].scriptPubKey, payoutAddress );
+                                CTransactionRef txPrev;
+                                if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+                                    ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
 
-                                LogPrint("wagerr", "MoneyLine Refund - PAYOUT\n");
-                                LogPrint("wagerr", "AMOUNT: %li \n", payout);
-                                LogPrint("wagerr", "ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
+                                LogPrint(BCLog::BETTING, "MoneyLine Refund - PAYOUT\n");
+                                LogPrint(BCLog::BETTING, "AMOUNT: %li \n", payout);
+                                LogPrint(BCLog::BETTING, "ADDRESS: %s \n", EncodeDestination(CTxDestination( payoutAddress )).c_str());
 
                                 // Only add valid payouts to the vector.
                                 if (payout > 0) {
                                     // Add winning bet payout to the bet vector.
                                     bool refund = (payout == betAmount * BET_ODDSDIVISOR) ? true : false;
                                     vPayoutsInfo.emplace_back(betKey, refund ? PayoutType::bettingRefund : PayoutType::bettingPayout);
-                                    vExpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
+                                    vExpectedPayouts.emplace_back(payout, GetScriptForDestination(payoutAddress), betAmount);
                                 }
                             }
                         }
@@ -531,26 +532,23 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
         while (BlocksIndex) {
 
             CBlock block;
-            ReadBlockFromDisk(block, BlocksIndex);
+            ReadBlockFromDisk(block, BlocksIndex, Params().GetConsensus());
             time_t transactionTime = block.nTime;
 
-            for (CTransaction &tx : block.vtx) {
+            for (CTransactionRef &tx : block.vtx) {
 
                 // Ensure if event TX that has it been posted by Oracle wallet.
-                const CTxIn &txin = tx.vin[0];
+                const CTxIn &txin = tx->vin[0];
                 COutPoint prevout = txin.prevout;
 
-                uint256 hashBlock;
-                CTransaction txPrev;
-
-                uint256 txHash = tx.GetHash();
+                uint256 txHash = tx->GetHash();
 
                 bool validTX = IsValidOracleTx(txin, BlocksIndex->nHeight);
 
                 // Check all TX vouts for an OP RETURN.
-                for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                for (unsigned int i = 0; i < tx->vout.size(); i++) {
 
-                    const CTxOut &txout = tx.vout[i];
+                    const CTxOut &txout = tx->vout[i];
                     CAmount betAmount = txout.nValue;
 
                     PeerlessBetKey betKey{static_cast<uint32_t>(BlocksIndex->nHeight), COutPoint{txHash, static_cast<uint32_t>(i)}};
@@ -559,7 +557,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                     if (cgBettingTx == nullptr) continue;
 
                     // If bet was placed less than 20 mins before event start or after event start discard it.
-                    if (eventStart > 0 && transactionTime > (eventStart - Params().BetPlaceTimeoutBlocks())) {
+                    if (eventStart > 0 && transactionTime > (eventStart - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
                         eventStartedFlag = true;
                         break;
                     }
@@ -587,20 +585,22 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                         if (eventId == currentEventID) {
 
                             CTxDestination address;
-                            ExtractDestination(tx.vout[0].scriptPubKey, address);
+                            ExtractDestination(tx->vout[0].scriptPubKey, address);
 
                             //Check Entry fee matches the bet amount
                             if (eventFee == betAmount) {
 
                                 totalBetAmount = totalBetAmount + betAmount;
                                 CTxDestination payoutAddress;
+                                uint256 hashBlock;
+                                CTransactionRef txPrev;
 
-                                if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-                                    ExtractDestination( txPrev.vout[prevout.n].scriptPubKey, payoutAddress );
+                                if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+                                    ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
 
                                 // Add the payout address of each candidate to array
-                                candidates.push_back(std::pair<std::string, PeerlessBetKey>{CBitcoinAddress( payoutAddress ).ToString().c_str(), betKey});
+                                candidates.push_back(std::pair<std::string, PeerlessBetKey>{EncodeDestination(payoutAddress).c_str(), betKey});
                             }
                         }
                     }
@@ -626,15 +626,15 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
              CAmount entranceFee = eventFee;
              CAmount winnerPayout = eventFee;
 
-             LogPrint("wagerr", "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-             LogPrint("wagerr", "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-             LogPrint("wagerr", "Winner Address: %u \n", winnerAddress);
-             LogPrint("wagerr", " This Lotto was refunded as only one person bought a ticket.\n" );
+             LogPrint(BCLog::BETTING, "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+             LogPrint(BCLog::BETTING, "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+             LogPrint(BCLog::BETTING, "Winner Address: %u \n", winnerAddress);
+             LogPrint(BCLog::BETTING, " This Lotto was refunded as only one person bought a ticket.\n" );
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
                  vPayoutsInfo.emplace_back(candidates[0].second, PayoutType::chainGamesRefund);
-                 vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
+                 vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(DecodeDestination(winnerAddress)), entranceFee, allChainGames[currResult].nEventId);
              }
         }
         else if (candidates.size() >= 2) {
@@ -642,12 +642,12 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
             auto noOfBets    = candidates.size();
 
             CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
-            uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
-            if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
-            uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
+            arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
+            if (hashProofOfStake == 0) hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+            arith_uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
             tempVal = tempVal * noOfBets;
             tempVal = hashProofOfStake - tempVal;           // remainder
-            uint64_t winnerNr = tempVal.Get64();
+            uint64_t winnerNr = tempVal.GetLow64();
 
             // Split the pot and calculate winnings.
             std::string winnerAddress = candidates[winnerNr].first;
@@ -656,10 +656,10 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
             CAmount winnerPayout = totalPot / 10 * 8;
             CAmount fee = totalPot / 50;
 
-            LogPrint("wagerr", "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-            LogPrint("wagerr", "Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrint("wagerr", "Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
-            LogPrint("wagerr", "Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+            LogPrint(BCLog::BETTING, "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+            LogPrint(BCLog::BETTING, "Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrint(BCLog::BETTING, "Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
+            LogPrint(BCLog::BETTING, "Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
@@ -671,7 +671,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                 }
                 PeerlessBetKey zeroKey{0, COutPoint()};
                 vPayoutsInfo.emplace_back(candidates[winnerNr].second, PayoutType::chainGamesPayout);
-                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
+                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(DecodeDestination(winnerAddress)), entranceFee, allChainGames[currResult].nEventId);
                 vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesPayout);
                 vExpectedPayouts.emplace_back(fee, payoutScriptOMNO, entranceFee);
             }

@@ -7,7 +7,8 @@
 #define WAGERR_DICE_H
 
 #include "serialize.h"
-#include "uint256.h"
+
+class arith_uint256;
 
 namespace quickgames {
 
@@ -28,7 +29,7 @@ struct DiceBetInfo {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp (Stream& s, Operation ser_action) {
         uint8_t type;
         if (ser_action.ForRead()) {
             READWRITE(type);
@@ -44,9 +45,9 @@ struct DiceBetInfo {
     }
 };
 
-std::map<std::string, std::string> DiceBetInfoParser(std::vector<unsigned char>& betInfo, uint256 seed);
+std::map<std::string, std::string> DiceBetInfoParser(std::vector<unsigned char>& betInfo, arith_uint256 seed);
 
-uint32_t DiceHandler(std::vector<unsigned char>& betInfo, uint256 seed);
+uint32_t DiceHandler(std::vector<unsigned char>& betInfo, arith_uint256 seed);
 
 std::string DiceGameTypeToStr(QuickGamesDiceBetType type);
 QuickGamesDiceBetType StrToDiceGameType(std::string strType);
