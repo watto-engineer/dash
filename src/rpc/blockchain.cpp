@@ -1467,6 +1467,9 @@ static UniValue verifychain(const JSONRPCRequest& request)
     if (!request.params[1].isNull())
         nCheckDepth = request.params[1].get_int();
 
+    // Zerocoin and betting do not fully support caching
+    nCheckLevel = nCheckLevel == 3 ? 4 : nCheckLevel;
+
     return CVerifyDB().VerifyDB(
         Params(), &::ChainstateActive().CoinsTip(), nCheckLevel, nCheckDepth);
 }
