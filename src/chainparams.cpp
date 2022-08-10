@@ -260,11 +260,11 @@ public:
 
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
-        consensus.nZerocoinStartHeight = 25;
-        consensus.nZerocoinStartTime = 1524496462;
-        consensus.nBlockZerocoinV2 = 60;
-        consensus.nPublicZCSpends = std::numeric_limits<int>::max();
-        consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nZerocoinStartHeight = 700;
+        consensus.nZerocoinStartTime = 1518696182; // GMT: Thursday, 15. February 2018 12:03:02
+        consensus.nBlockZerocoinV2 = 298386;
+        consensus.nPublicZCSpends = 752800;
+        consensus.nFakeSerialBlockheightEnd = 556623;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -297,6 +297,7 @@ public:
         pchMessageStart[3] = 0xfd;
         nDefaultPort = 55002;
         nPruneAfterHeight = 100000;
+        nMaxBettingUndoDepth = 101;
         m_assumed_blockchain_size = 45;
         m_assumed_chain_state_size = 1;
 
@@ -533,6 +534,7 @@ public:
         pchMessageStart[3] = 0x99;
         nDefaultPort = 55004;
         nPruneAfterHeight = 1000;
+        nMaxBettingUndoDepth = 101;
         m_assumed_blockchain_size = 4;
         m_assumed_chain_state_size = 1;
 
@@ -757,6 +759,7 @@ public:
         pchMessageStart[3] = 0xeb;
         nDefaultPort = 55008;
         nPruneAfterHeight = 1000;
+        nMaxBettingUndoDepth = 101;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
 
@@ -1020,6 +1023,7 @@ public:
         pchMessageStart[3] = 0xfa;
         nDefaultPort = 55006;
         nPruneAfterHeight = 1000;
+        nMaxBettingUndoDepth = 101;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
 

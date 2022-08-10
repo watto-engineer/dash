@@ -31,6 +31,8 @@
 #include <versionbits.h>
 #include <serialize.h>
 #include <spentindex.h>
+#include <betting/bet.h>
+#include "betting/bet_db.h"
 
 #include <atomic>
 #include <map>
@@ -53,6 +55,7 @@ class CBlockUndo;
 class CChainParams;
 class CZerocoinDB;
 class CTokenDB;
+class CBettingsView;
 class CInv;
 class CConnman;
 class CScriptCheck;
@@ -677,7 +680,7 @@ public:
     bool AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex, bool fRequested, const FlatFilePos* dbp, bool* fNewBlock) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
     // Block (dis)connection on a given view:
-    DisconnectResult DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+    DisconnectResult DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache, bool fDisconnectTokens = true);
     bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck = false) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
     // Apply the effects of a block disconnection on the UTXO set.
@@ -980,6 +983,9 @@ extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CTokenDB> pTokenDB;
+
+/** Global variable that points to the betting view */
+extern std::unique_ptr<CBettingsView> bettingsView;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().

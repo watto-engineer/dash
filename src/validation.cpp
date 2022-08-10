@@ -74,6 +74,9 @@
 
 #include <statsd_client.h>
 
+#include <betting/bet.h>
+#include "betting/bet_db.h"
+
 #include <tokens/tokendb.h>
 #include <tokens/tokengroupmanager.h>
 #include <tokens/tokengroupwallet.h>
@@ -165,6 +168,7 @@ bool fPruneMode = false;
 bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
 bool fCheckpointsEnabled = DEFAULT_CHECKPOINTS_ENABLED;
+size_t nBettingCacheSize = 1000;
 uint64_t nPruneTarget = 0;
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 
@@ -228,6 +232,7 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 std::unique_ptr<CBlockTreeDB> pblocktree;
 std::unique_ptr<CZerocoinDB> zerocoinDB;
 std::unique_ptr<CTokenDB> pTokenDB;
+std::unique_ptr<CBettingsView> bettingsView;
 
 // See definition for documentation
 static void FindFilesToPruneManual(ChainstateManager& chainman, std::set<int>& setFilesToPrune, int nManualPruneHeight);
@@ -661,6 +666,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     {
         CCoinsView dummy;
         CCoinsViewCache view(&dummy);
+        CBettingsView bettingsViewCache(bettingsView.get());
 
         LockPoints lp;
         CCoinsViewCache& coins_cache = ::ChainstateActive().CoinsTip();
@@ -822,6 +828,10 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         if (!CheckInputsFromMempoolAndCache(tx, state, view, pool, currentBlockScriptVerifyFlags, txdata)) {
             return error("%s: BUG! PLEASE REPORT THIS! CheckInputs failed against latest-block but not STANDARD flags %s, %s",
                     __func__, hash.ToString(), FormatStateMessage(state));
+        }
+
+        if (!CheckBettingTx(bettingsViewCache, tx, chainActive.Height())) {
+            return error("AcceptToMemoryPool: Error when betting TX checking!");
         }
 
         if (test_accept) {
@@ -1634,7 +1644,7 @@ int ApplyTxInUndo(Coin&& undo, CCoinsViewCache& view, const COutPoint& out)
 
 /** Undo the effects of this block (with given index) on the UTXO set represented by coins.
  *  When FAILED is returned, view is left in an indeterminate state. */
-DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view)
+DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache, bool fDisconnectTokens)
 {
     std::vector<CTokenGroupID> toRemoveTokenGroupIDs;
 
@@ -1820,9 +1830,15 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
         }
     }
 
+    /* Undo betting data */
+    if (!BettingUndo(bettingsViewCache, pindex->nHeight, block.vtx))
+        return DISCONNECT_FAILED;
+
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
     evoDb->WriteBestBlock(pindex->pprev->GetBlockHash());
+
+    bettingsViewCache.SetLastHeight(pindex->pprev->nHeight);
 
     boost::posix_time::ptime finish = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration diff = finish - start;
@@ -2012,7 +2028,7 @@ static int64_t nBlocksTotal = 0;
  *  Validity checks that depend on the UTXO set are also done; ConnectBlock()
  *  can fail if those validity checks fail (among other reasons). */
 bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex,
-                  CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
+                  CCoinsViewCache& view, CBettingsView& bettingsViewCache, const CChainParams& chainparams, bool fJustCheck)
 {
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
 
@@ -2064,11 +2080,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     }
     nBlocksTotal++;
 
+    if (pindex->nHeight != 0) {
+        if (bettingsViewCache.GetLastHeight() != (uint32_t)pindex->nHeight - 1)
+            return AbortNode(state, "ConnectBlock() : Bettings database is corrupted (height mismatch)! Bettings DB prev block = " + std::to_string(bettingsViewCache.GetLastHeight()) + ", current block = " + std::to_string(pindex->nHeight) + ". Please restart with -reindex to recover.");
+    }
+
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
     if (block.GetHash() == chainparams.GetConsensus().hashGenesisBlock) {
-        if (!fJustCheck)
+        if (!fJustCheck) {
             view.SetBestBlock(pindex->GetBlockHash());
+            bettingsViewCache.SetLastHeight(pindex->nHeight);
+        }
         return true;
     }
 
@@ -2361,6 +2384,14 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             control.Add(vChecks);
         }
 
+        if (!CheckBettingTx(bettingsViewCache, *tx, pindex->nHeight)) {
+            if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().SkipBetValidationStart() && pindex->nHeight < Params().SkipBetValidationEnd())) {
+                LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
+            } else  {
+                return state.DoS(100, error("ConnectBlock() : error when betting TX checking"), REJECT_INVALID, "bad-tx-bet");
+            }
+        }
+
         if (fAddressIndex) {
             for (unsigned int k = 0; k < tx->vout.size(); k++) {
                 const CTxOut &out = tx->vout[k];
@@ -2450,9 +2481,23 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
     LogPrint(BCLog::BENCHMARK, "      - GetBlockSubsidy: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_2 - nTime5_1), nTimeSubsidy * MICRO, nTimeSubsidy * MILLI / nBlocksTotal);
 
-    if (!IsBlockValueValid(*sporkManager, *governance, block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
-        // NOTE: Do not punish, the node might be missing governance data
-        return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
+    if (pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV2StartHeight()) {
+        // Validation of V2 and V3 betting mints
+
+        std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
+        CAmount nExpectedBetMint = GetBettingPayouts(bettingsViewCache, pindex->nHeight, mExpectedPayouts);
+
+        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetCoinstakeReward().amount, blockReward.GetMasternodeReward().amount)) {
+             return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
+        }
+        blockReward.AddReward(CReward::REWARD_BETTING, nExpectedBetMint);
+    }
+    if (pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV1StartHeight()) {
+        // Protocol V1 has been retired
+    } else {
+        if (!IsBlockValueValid(block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
+            return state.DoS(0, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
+        }
     }
 
     int64_t nTime5_3 = GetTimeMicros(); nTimeValueValid += nTime5_3 - nTime5_2;
@@ -2541,6 +2586,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     evoDb->WriteBestBlock(pindex->GetBlockHash());
 
+    // Look through the block for any events, results or mapping TX.
+    if (pindex->nHeight > chainparams.GetConsensus().WagerrProtocolV2StartHeight()) {
+        for (const CTransactionRef& tx : block.vtx) {
+            ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV3StartHeight());
+        }
+        if (!(pindex->nHeight % (chainparams.MaxBettingUndoDepth() - 1))) {
+            int heightLimit = pindex->nHeight - chainparams.MaxBettingUndoDepth();
+            bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
+        }
+    }
+    bettingsViewCache.SetLastHeight(pindex->nHeight);
+
     int64_t nTime7 = GetTimeMicros(); nTimeCallbacks += nTime7 - nTime6;
     LogPrint(BCLog::BENCHMARK, "    - Callbacks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime7 - nTime6), nTimeCallbacks * MICRO, nTimeCallbacks * MILLI / nBlocksTotal);
 
@@ -2571,6 +2628,7 @@ CoinsCacheSizeState CChainState::GetCoinsCacheSizeState(
 {
     const int64_t nMempoolUsage = tx_pool ? tx_pool->DynamicMemoryUsage() : 0;
     int64_t cacheSize = CoinsTip().DynamicMemoryUsage();
+    cacheSize += bettingsView->GetCacheSize();
     int64_t nTotalSpace =
         max_coins_cache_size_bytes + std::max<int64_t>(max_mempool_size_bytes - nMempoolUsage, 0);
 
@@ -2641,6 +2699,8 @@ bool CChainState::FlushStateToDisk(
         bool fCacheLarge = mode == FlushStateMode::PERIODIC && cache_state >= CoinsCacheSizeState::LARGE;
         // The cache is over the limit, we have to write now.
         bool fCacheCritical = mode == FlushStateMode::IF_NEEDED && cache_state >= CoinsCacheSizeState::CRITICAL;
+        // The betting cache size is over the limit, we have to write now
+        bool fBettingCacheCritical = (mode == FlushStateMode::PERIODIC || mode == FlushStateMode::IF_NEEDED) && bettingsView->GetCacheSize() > nBettingCacheSize;
         // The evodb cache is too large
         bool fEvoDbCacheCritical = mode == FlushStateMode::IF_NEEDED && evoDb != nullptr && evoDb->GetMemoryUsage() >= (64 << 20);
         // It's been a while since we wrote the block index to disk. Do this frequently, so we don't need to redownload after a crash.
@@ -2648,7 +2708,7 @@ bool CChainState::FlushStateToDisk(
         // It's been very long since we flushed the cache. Do this infrequently, to optimize cache usage.
         bool fPeriodicFlush = mode == FlushStateMode::PERIODIC && nNow > nLastFlush + DATABASE_FLUSH_INTERVAL;
         // Combine all conditions that result in a full cache flush.
-        fDoFullFlush = (mode == FlushStateMode::ALWAYS) || fCacheLarge || fCacheCritical || fEvoDbCacheCritical || fPeriodicFlush || fFlushForPrune;
+        fDoFullFlush = (mode == FlushStateMode::ALWAYS) || fCacheLarge || fCacheCritical || fBettingCacheCritical || fPeriodicFlush || fFlushForPrune;
         // Write blocks and block index to disk.
         if (fDoFullFlush || fPeriodicWrite) {
             // Depend on nMinDiskSpace to ensure we can write block index
@@ -2701,7 +2761,7 @@ bool CChainState::FlushStateToDisk(
             // twice (once in the log, and once in the tables). This is already
             // an overestimation, as most will delete an existing entry or
             // overwrite one. Still, use a conservative safety factor of 2.
-            if (!CheckDiskSpace(GetDataDir(), 48 * 2 * 2 * CoinsTip().GetCacheSize())) {
+            if (!CheckDiskSpace(48 * 2 * 2 * CoinsTip().GetCacheSize() + 2 * bettingsView->GetCacheSizeBytesToWrite())) {
                 return AbortNode(state, "Disk space is too low!", _("Disk space is too low!"));
             }
             // Flush the chainstate (which may refer to block index entries).
@@ -2710,6 +2770,10 @@ bool CChainState::FlushStateToDisk(
             if (!evoDb->CommitRootTransaction()) {
                 return AbortNode(state, "Failed to commit EvoDB");
             }
+            // Flush global betting database to persistent storage (LevelDB)
+            LogPrintf("bettingsView->Flush(), %lu entries\n", bettingsView->GetCacheSize());
+            if (!bettingsView->Flush())
+                return AbortNode(state, "Failed to write to betting database");
             nLastFlush = nNow;
             full_flush_completed = true;
         }
@@ -2838,10 +2902,14 @@ bool CChainState::DisconnectTip(CValidationState& state, const CChainParams& cha
 
         CCoinsViewCache view(&CoinsTip());
         assert(view.GetBestBlock() == pindexDelete->GetBlockHash());
-        if (DisconnectBlock(block, pindexDelete, view) != DISCONNECT_OK)
+
+        CBettingsView bettingsViewCache(bettingsView.get());
+        if (DisconnectBlock(block, pindexDelete, view, bettingsViewCache) != DISCONNECT_OK)
             return error("DisconnectTip(): DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
         bool flushed = view.Flush();
         assert(flushed);
+        bool betsFlushed = bettingsViewCache.Flush();
+        assert(betsFlushed);
         dbTx->Commit();
     }
     LogPrint(BCLog::BENCHMARK, "- Disconnect block: %.2fms\n", (GetTimeMicros() - nStart) * MILLI);
@@ -2970,7 +3038,8 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
         auto dbTx = evoDb->BeginTransaction();
 
         CCoinsViewCache view(&CoinsTip());
-        bool rv = ConnectBlock(blockConnecting, state, pindexNew, view, chainparams);
+        CBettingsView bettingsViewCache(bettingsView.get());
+        bool rv = ConnectBlock(blockConnecting, state, pindexNew, view, bettingsViewCache, chainparams);
         GetMainSignals().BlockChecked(blockConnecting, state);
         if (!rv) {
             if (state.IsInvalid())
@@ -2982,6 +3051,8 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
         LogPrint(BCLog::BENCHMARK, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime3 - nTime2) * MILLI, nTimeConnectTotal * MICRO, nTimeConnectTotal * MILLI / nBlocksTotal);
         bool flushed = view.Flush();
         assert(flushed);
+        bool betsFlushed = bettingsViewCache.Flush();
+        assert(betsFlushed);
         dbTx->Commit();
     }
     int64_t nTime4 = GetTimeMicros(); nTimeFlush += nTime4 - nTime3;
@@ -4394,6 +4465,7 @@ bool TestBlockValidity(CValidationState& state, llmq::CChainLocksHandler& clhand
     }
 
     CCoinsViewCache viewNew(&::ChainstateActive().CoinsTip());
+    CBettingsView bettingsViewNew(bettingsView.get());
     uint256 block_hash(block.GetHash());
     CBlockIndex indexDummy(block);
     indexDummy.pprev = pindexPrev;
@@ -4410,7 +4482,7 @@ bool TestBlockValidity(CValidationState& state, llmq::CChainLocksHandler& clhand
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     if (!ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindexPrev))
         return error("%s: Consensus::ContextualCheckBlock: %s", __func__, FormatStateMessage(state));
-    if (!::ChainstateActive().ConnectBlock(block, state, &indexDummy, viewNew, chainparams, true))
+    if (!::ChainstateActive().ConnectBlock(block, state, &indexDummy, viewNew, bettingsViewNew, chainparams, true))
         return false;
     assert(state.IsValid());
 
@@ -4820,6 +4892,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
     nCheckLevel = std::max(0, std::min(4, nCheckLevel));
     LogPrintf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
     CCoinsViewCache coins(coinsview);
+    CBettingsView bettingsViewCache(bettingsView.get());
     CBlockIndex* pindex;
     CBlockIndex* pindexFailure = nullptr;
     int nGoodTransactions = 0;
@@ -4862,7 +4935,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
         if (nCheckLevel >= 3 && (coins.DynamicMemoryUsage() + ::ChainstateActive().CoinsTip().DynamicMemoryUsage()) <= ::ChainstateActive().m_coinstip_cache_size_bytes) {
             assert(coins.GetBestBlock() == pindex->GetBlockHash());
-            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins);
+            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins, bettingsViewCache);
             if (res == DISCONNECT_FAILED) {
                 return error("VerifyDB(): *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
@@ -4872,6 +4945,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
             } else {
                 nGoodTransactions += block.vtx.size();
             }
+            bettingsViewCache.Flush();
         }
         if (ShutdownRequested())
             return true;
@@ -4897,8 +4971,9 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus()))
                 return error("VerifyDB(): *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
-            if (!::ChainstateActive().ConnectBlock(block, state, pindex, coins, chainparams))
+            if (!::ChainstateActive().ConnectBlock(block, state, pindex, coins, bettingsViewCache, chainparams))
                 return error("VerifyDB(): *** found unconnectable block at %d, hash=%s (%s)", pindex->nHeight, pindex->GetBlockHash().ToString(), FormatStateMessage(state));
+            bettingsViewCache.Flush();
         }
     }
 
@@ -4945,6 +5020,7 @@ bool CChainState::ReplayBlocks(const CChainParams& params)
 
     CCoinsView& db = this->CoinsDB();
     CCoinsViewCache cache(&db);
+    CBettingsView bettingsViewCache(bettingsView.get());
 
     std::vector<uint256> hashHeads = db.GetHeadBlocks();
     if (hashHeads.empty()) return true; // We're already in a consistent state.
@@ -4984,7 +5060,7 @@ bool CChainState::ReplayBlocks(const CChainParams& params)
                 return error("RollbackBlock(): ReadBlockFromDisk() failed at %d, hash=%s", pindexOld->nHeight, pindexOld->GetBlockHash().ToString());
             }
             LogPrintf("Rolling back %s (%i)\n", pindexOld->GetBlockHash().ToString(), pindexOld->nHeight);
-            DisconnectResult res = DisconnectBlock(block, pindexOld, cache);
+            DisconnectResult res = DisconnectBlock(block, pindexOld, cache, bettingsViewCache);
             if (res == DISCONNECT_FAILED) {
                 return error("RollbackBlock(): DisconnectBlock failed at %d, hash=%s", pindexOld->nHeight, pindexOld->GetBlockHash().ToString());
             }
@@ -5007,9 +5083,11 @@ bool CChainState::ReplayBlocks(const CChainParams& params)
 
     cache.SetBestBlock(pindexNew->GetBlockHash());
     evoDb->WriteBestBlock(pindexNew->GetBlockHash());
+    bettingsViewCache.SetLastHeight(pindexNew->nHeight);
     bool flushed = cache.Flush();
     assert(flushed);
     dbTx->Commit();
+    bettingsViewCache.Flush();
     uiInterface.ShowProgress("", 100, false);
     return true;
 }

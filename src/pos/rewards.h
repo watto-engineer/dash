@@ -18,6 +18,7 @@ public:
         REWARD_COINSTAKE,
         REWARD_MASTERNODE,
         REWARD_OPERATOR,
+        REWARD_BETTING,
 
         REWARD_BURN,
         REWARD_TOTAL,
