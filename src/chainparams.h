@@ -73,6 +73,9 @@ public:
     /** Require addresses specified with "-externalip" parameter to be routable */
     bool RequireRoutableExternalIP() const { return fRequireRoutableExternalIP; }
     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
+    /** Betting undo data is used to check blocks during init      **/
+    /** Hence, the max undo depth is also the max for -checkblocks **/
+    uint64_t MaxBettingUndoDepth() const { return nMaxBettingUndoDepth; }
     /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
     bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
     /** Allow multiple addresses to be selected from the same network group (e.g. 192.168.x.x) */
@@ -122,6 +125,7 @@ protected:
     CMessageHeader::MessageStartChars pchMessageStart;
     int nDefaultPort;
     uint64_t nPruneAfterHeight;
+    uint64_t nMaxBettingUndoDepth;
     std::vector<std::string> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     int nExtCoinType;

@@ -18,8 +18,6 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/exception/to_string.hpp>
 
-CBettingsView* bettingsView = nullptr;
-
 bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward)
 {
     const CTransactionRef &tx = block.vtx[1];
@@ -696,12 +694,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     return true;
 }
 
-void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
+void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
 {
-    LogPrint(BCLog::BETTING, "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
+    LogPrint(BCLog::BETTING, "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx->GetHash().GetHex());
 
     // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx.vin[0]};
+    const CTxIn& txin{tx->vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
     // Get player address
     uint256 hashBlock;
@@ -715,15 +713,15 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
     }
     address = prevAddr;
 
-    for (size_t i = 0; i < tx.vout.size(); i++) {
-        const CTxOut &txOut = tx.vout[i];
+    for (size_t i = 0; i < tx->vout.size(); i++) {
+        const CTxOut &txOut = tx->vout[i];
         // parse betting TX
         auto bettingTx = ParseBettingTx(txOut);
 
         if (bettingTx == nullptr) continue;
 
         CAmount betAmount{txOut.nValue};
-        COutPoint outPoint{tx.GetHash(), (uint32_t) i};
+        COutPoint outPoint{tx->GetHash(), (uint32_t) i};
         uint256 bettingTxId = SerializeHash(outPoint);
 
         switch(bettingTx->GetTxType()) {
@@ -1681,26 +1679,26 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
     return bettingsViewCache.EraseBettingUndo(undoKey);
 }
 
-bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height)
+bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const uint32_t height)
 {
     // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx.vin[0]};
+    const CTxIn& txin{tx->vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
 
-    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
+    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx->GetHash().GetHex());
 
     bool wagerrProtocolV3 = height >= (uint32_t)Params().GetConsensus().WagerrProtocolV3StartHeight();
     bool wagerrProtocolV4 = height >= (uint32_t)Params().GetConsensus().WagerrProtocolV4StartHeight();
 
     // undo changes in back order
-    for (int i = tx.vout.size() - 1; i >= 0 ; i--) {
-        const CTxOut &txOut = tx.vout[i];
+    for (int i = tx->vout.size() - 1; i >= 0 ; i--) {
+        const CTxOut &txOut = tx->vout[i];
         // parse betting TX
         auto bettingTx = ParseBettingTx(txOut);
 
         if (bettingTx == nullptr) continue;
 
-        COutPoint outPoint{tx.GetHash(), (uint32_t) i};
+        COutPoint outPoint{tx->GetHash(), (uint32_t) i};
         uint256 bettingTxId = SerializeHash(outPoint);
 
         if (!wagerrProtocolV3 && bettingsViewCache.ExistFailedTx(bettingTxId)) {
@@ -2261,7 +2259,7 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     return true;
 }
 
-bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransaction>& vtx)
+bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx)
 {
         // Revert betting dats
     if (height > Params().GetConsensus().WagerrProtocolV2StartHeight()) {

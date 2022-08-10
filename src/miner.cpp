@@ -13,6 +13,9 @@
 #include <miner.h>
 
 #include <amount.h>
+#include "betting/bet.h"
+#include "betting/bet_v2.h"
+#include "betting/bet_db.h"
 #include <chain.h>
 #include <chainparams.h>
 #include <coins.h>
@@ -38,6 +41,7 @@
 #include <utilmoneystr.h>
 #include <masternode/masternode-payments.h>
 #include <masternode/masternode-sync.h>
+#include <validation.h>
 #include <validationinterface.h>
 
 #ifdef ENABLE_WALLET
@@ -247,6 +251,51 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // get some info back to pass to getblocktemplate
     CAmount nMasternodePaymentAmount = 0;
     if (fPos) {
+        // Calculate the bet payouts.
+        std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
+        std::vector<CTxOut> vExpectedTxOuts;
+
+        CAmount nBetPayout = 0;
+
+        CCoinsViewCache view(pcoinsTip.get());
+        CBettingsView bettingsViewCache(bettingsView.get());
+        nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
+
+        if (nHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+            for (auto payout : mExpectedPayouts) {
+                vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
+            }
+        } else {
+            /*
+                In V3, payouts are ordered by 1) blockheight, 2) outpoint (tx hash, output nr), 3) payout type.
+                Before V3, payouts were ordered by 1) bet type (first betting then chain games), 2) blockheight, 3) tx index nr
+            */
+            std::vector<LegacyPayout> vExpectedLegacyPayouts;
+            for (auto payout : mExpectedPayouts) {
+
+                int nHeight = payout.first.betKey.blockHeight;
+
+                CBlock block;
+                int vtxNr = -1;
+                if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, chainActive[nHeight], Params().GetConsensus())) {
+                    for (size_t i = 0; i < block.vtx.size(); i++) {
+                        const CTransactionRef& tx = block.vtx[i];
+                        if (tx->GetHash() == payout.first.betKey.outPoint.hash) {
+                            vtxNr = i;
+                            break;
+                        }
+                    }
+                } else {
+                    LogPrintf("%s: failed locate bet\n", __func__);
+                }
+                vExpectedLegacyPayouts.emplace_back((uint16_t)payout.first.payoutType, payout.first.betKey.blockHeight, vtxNr, payout.second);
+            }
+            std::sort(vExpectedLegacyPayouts.begin(), vExpectedLegacyPayouts.end());
+            for (auto payout : vExpectedLegacyPayouts) {
+                vExpectedTxOuts.emplace_back(payout.txOut.nValue, payout.txOut.scriptPubKey);
+            }
+        }
+
         FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
         // Unpaid masternode rewards default to the staking node
         for (const auto& txout : pblocktemplate->voutMasternodePayments) {
