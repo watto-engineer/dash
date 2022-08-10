@@ -757,6 +757,7 @@ void CBettingsView::SetLastHeight(uint32_t height) {
     else {
         undos->Update(std::string("LastHeight"), height);
     }
+    LogPrint(BCLog::BETTING, "SetLastHeight: %d\n", height);
 }
 
 uint32_t CBettingsView::GetLastHeight() {

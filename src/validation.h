@@ -45,6 +45,7 @@ class CChainParams;
 class CCoinsViewDB;
 class CZerocoinDB;
 class CTokenDB;
+class CBettingsView;
 class CInv;
 class CConnman;
 class CScriptCheck;
@@ -494,6 +495,9 @@ extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CTokenDB> pTokenDB;
+
+/** Global variable that points to the betting view */
+extern std::unique_ptr<CBettingsView> bettingsView;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().
