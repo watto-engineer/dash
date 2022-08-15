@@ -15,10 +15,21 @@ ifeq ($(strip $(FORCE_USE_SYSTEM_CLANG)),)
 # Clang is a dependency of native_cctools when FORCE_USE_SYSTEM_CLANG is empty
 darwin_native_toolchain=native_cctools
 
-clang_prog=$(build_prefix)/bin/clang
+clang_prog=clang
 clangxx_prog=$(clang_prog)++
 
 clang_resource_dir=$(build_prefix)/lib/clang/$(native_clang_version)
+
+cctools_TOOLS=AR RANLIB STRIP NM LIBTOOL OTOOL INSTALL_NAME_TOOL
+
+# Make-only lowercase function
+lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
+
+# For well-known tools provided by cctools, make sure that their well-known
+# variable is set to the full path of the tool, just like how AC_PATH_{TOO,PROG}
+# would.
+$(foreach TOOL,$(cctools_TOOLS),$(eval darwin_$(TOOL) = $$(host)-$(call lc,$(TOOL))))
+
 else
 # FORCE_USE_SYSTEM_CLANG is non-empty, so we use the clang from the user's
 # system
@@ -36,7 +47,6 @@ clang_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang")
 clangxx_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang++")
 
 clang_resource_dir=$(shell clang -print-resource-dir)
-endif
 
 cctools_TOOLS=AR RANLIB STRIP NM LIBTOOL OTOOL INSTALL_NAME_TOOL
 
@@ -47,6 +57,7 @@ lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(s
 # variable is set to the full path of the tool, just like how AC_PATH_{TOO,PROG}
 # would.
 $(foreach TOOL,$(cctools_TOOLS),$(eval darwin_$(TOOL) = $$(build_prefix)/bin/$$(host)-$(call lc,$(TOOL))))
+endif
 
 # Flag explanations:
 #
@@ -90,7 +101,22 @@ $(foreach TOOL,$(cctools_TOOLS),$(eval darwin_$(TOOL) = $$(build_prefix)/bin/$$(
 #         include search paths, as that would be wrong in general but would also
 #         break #include_next's.
 #
-darwin_CC=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
+
+ifeq ($(strip $(FORCE_USE_SYSTEM_CLANG)),)
+  darwin_CC=$(clang_prog) --target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
+              -B$(build_prefix)/bin -mlinker-version=$(LD64_VERSION) \
+              -isysroot$(OSX_SDK) \
+              -Xclang -internal-externc-isystem$(clang_resource_dir)/include \
+              -Xclang -internal-externc-isystem$(OSX_SDK)/usr/include
+  darwin_CXX=$(clangxx_prog) --target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
+               -B$(build_prefix)/bin -mlinker-version=$(LD64_VERSION) \
+               -isysroot$(OSX_SDK) \
+               -stdlib=libc++ \
+               -stdlib++-isystem$(OSX_SDK)/usr/include/c++/v1 \
+               -Xclang -internal-externc-isystem$(clang_resource_dir)/include \
+               -Xclang -internal-externc-isystem$(OSX_SDK)/usr/include
+else
+  darwin_CC=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
               -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH \
               -u LIBRARY_PATH \
             $(clang_prog) --target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
@@ -98,7 +124,7 @@ darwin_CC=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
               -isysroot$(OSX_SDK) \
               -Xclang -internal-externc-isystem$(clang_resource_dir)/include \
               -Xclang -internal-externc-isystem$(OSX_SDK)/usr/include
-darwin_CXX=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
+  darwin_CXX=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
                -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH \
                -u LIBRARY_PATH \
              $(clangxx_prog) --target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
@@ -108,6 +134,7 @@ darwin_CXX=`which env` -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
                -stdlib++-isystem$(OSX_SDK)/usr/include/c++/v1 \
                -Xclang -internal-externc-isystem$(clang_resource_dir)/include \
                -Xclang -internal-externc-isystem$(OSX_SDK)/usr/include
+endif
 
 darwin_CFLAGS=-pipe
 darwin_CXXFLAGS=$(darwin_CFLAGS)

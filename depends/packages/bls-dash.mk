@@ -37,8 +37,13 @@ define $(package)_set_vars
   $(package)_config_opts+= -DBUILD_BLS_PYTHON_BINDINGS=0 -DBUILD_BLS_TESTS=0 -DBUILD_BLS_BENCHMARKS=0
   $(package)_config_opts_linux=-DOPSYS=LINUX -DCMAKE_SYSTEM_NAME=Linux
   $(package)_config_opts_darwin=-DOPSYS=MACOSX -DCMAKE_SYSTEM_NAME=Darwin
-  $(package)_config_opts_darwin+= -DCMAKE_AR="$($(package)_ar)"
-  $(package)_config_opts_darwin+= -DCMAKE_RANLIB="$($(package)_ranlib)"
+  ifeq ($(strip $(FORCE_USE_SYSTEM_CLANG)),)
+    $(package)_config_opts_darwin+= -DCMAKE_AR=$(host_prefix)/native/bin/$(host)-ar
+    $(package)_config_opts_darwin+= -DCMAKE_RANLIB=$(host_prefix)/native/bin/$(host)-ranlib
+  else
+    $(package)_config_opts_darwin+= -DCMAKE_AR="$($(package)_ar)"
+    $(package)_config_opts_darwin+= -DCMAKE_RANLIB="$($(package)_ranlib)"
+  endif
   $(package)_config_opts_mingw32=-DOPSYS=WINDOWS -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SHARED_LIBRARY_LINK_C_FLAGS=""
   $(package)_config_opts_i686+= -DWSIZE=32
   $(package)_config_opts_x86_64+= -DWSIZE=64
