@@ -7,7 +7,7 @@
 #include <config/wagerr-config.h>
 #endif
 
-#include <qt/bitcoingui.h>
+/* #include <qt/bitcoingui.h>
 
 #include <chainparams.h>
 #include <qt/clientmodel.h>
@@ -25,8 +25,27 @@
 #ifdef ENABLE_WALLET
 #include <qt/paymentserver.h>
 #include <qt/walletmodel.h>
-#endif
+#endif */
 
+#include "bitcoingui.h"
+
+#include "chainparams.h"
+#include "clientmodel.h"
+#include "fs.h"
+#include "guiconstants.h"
+#include "guiutil.h"
+#include "intro.h"
+#include "net.h"
+#include "networkstyle.h"
+#include "optionsmodel.h"
+#include "splashscreen.h"
+#include "utilitydialog.h"
+#include "winshutdownmonitor.h"
+
+#ifdef ENABLE_WALLET
+#include "paymentserver.h"
+#include "walletmodel.h"
+#endif
 #include <init.h>
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
