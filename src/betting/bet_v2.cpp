@@ -8,6 +8,7 @@
 #include <betting/bet_db.h>
 #include <betting/bet_common.h>
 #include <amount.h>
+#include <pos/kernel.h>
 #include <validation.h>
 
 /**
@@ -643,7 +644,19 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
             CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
             arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
-            if (hashProofOfStake == 0) hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+            if (hashProofOfStake == 0) {
+                CBlock block;
+                ReadBlockFromDisk(block, winBlockIndex, Params().GetConsensus());
+                if (block.IsProofOfStake()) {
+                    uint256 calculatedHashProofOfStake;
+
+                    if (CheckProofOfStake(block, calculatedHashProofOfStake, winBlockIndex)) {
+                        hashProofOfStake = UintToArith256(calculatedHashProofOfStake);
+                    } else {
+                        hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+                    }
+                }
+            }
             arith_uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
             tempVal = tempVal * noOfBets;
             tempVal = hashProofOfStake - tempVal;           // remainder

@@ -155,6 +155,11 @@ size_t CCoinsViewDB::EstimateSize() const
 CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "blocks" / "index", nCacheSize, fMemory, fWipe) {
 }
 
+bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
+{
+    return Write(std::make_pair('b', blockindex.GetBlockHash()), blockindex);
+}
+
 bool CBlockTreeDB::ReadBlockFileInfo(int nFile, CBlockFileInfo &info) {
     return Read(std::make_pair(DB_BLOCK_FILES, nFile), info);
 }
@@ -409,6 +414,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nNonce         = diskindex.nNonce;
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
+                pindexNew->nMint          = diskindex.nMint;
+                pindexNew->nMoneySupply   = diskindex.nMoneySupply;
 
                 // POS
                 pindexNew->nFlags         = diskindex.nFlags;
