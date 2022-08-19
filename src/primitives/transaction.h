@@ -263,6 +263,9 @@ public:
 
     // Return sum of txouts.
     CAmount GetValueOut() const;
+
+    CAmount AddVoutValues(CAmount& nValueOut, CAmount& nValueBurned) const;
+    CAmount GetValueBurned() const;
     // GetValueIn() is a method on CCoinsViewCache, because
     // inputs must be known to compute value in.
 

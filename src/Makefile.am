@@ -206,6 +206,8 @@ BITCOIN_CORE_H = \
   index/disktxpos.h \
   index/txindex.h \
   indirectmap.h \
+  invalid.h \
+  invalid_scripts.json.h \
   init.h \
   interfaces/chain.h \
   interfaces/handler.h \
@@ -790,6 +792,7 @@ libbitcoin_common_a_SOURCES = \
   core_write.cpp \
   dstencode.cpp \
   hdchain.cpp \
+  invalid.cpp \
   key.cpp \
   key_io.cpp \
   merkleblock.cpp \

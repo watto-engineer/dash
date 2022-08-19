@@ -32,6 +32,7 @@
 #include <index/blockfilterindex.h>
 #include <index/txindex.h>
 #include <interfaces/node.h>
+#include <invalid.h>
 #include <key.h>
 #include <mapport.h>
 #include <miner.h>
@@ -89,6 +90,7 @@
 #include <tokens/tokendb.h>
 #include <zwgr/accumulatorcheckpoints.h>
 #include <zwgr/zerocoindb.h>
+#include <zwgr/zwgrchain.h>
 
 #include <evo/deterministicmns.h>
 #include <llmq/blockprocessor.h>
@@ -2208,6 +2210,53 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
                 // At this point we're either in reindex or we've loaded a useful
                 // block tree into BlockIndex()!
+
+                // Populate list of invalid/fraudulent outpoints that are banned from the chain
+                invalid_out::LoadScripts();
+
+                // Wrapped serials inflation check
+                bool reindexDueWrappedSerials = false;
+                bool reindexZerocoinSupply = false;
+                int chainHeight = chainActive.Height();
+                if(Params().NetworkIDString() == CBaseChainParams::MAIN && chainHeight > Params().GetConsensus().nFakeSerialBlockheightEnd) {
+
+                    // Supply needs to be exactly GetSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount
+                    CBlockIndex* pblockindex = chainActive[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
+                    CAmount zwgrSupplyCheckpoint = Params().GetConsensus().nSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount();
+
+                    if (pblockindex->GetZerocoinSupply() < zwgrSupplyCheckpoint) {
+                        // Trigger reindex due wrapping serials
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zwgrSupplyCheckpoint/COIN);
+                        reindexDueWrappedSerials = true;
+                    } else if (pblockindex->GetZerocoinSupply() > zwgrSupplyCheckpoint) {
+                        // Trigger global zWGR reindex
+                        reindexZerocoinSupply = true;
+                        LogPrintf("Current GetZerocoinSupply: %d vs %d\n", pblockindex->GetZerocoinSupply()/COIN , zwgrSupplyCheckpoint/COIN);
+                    }
+
+                }
+
+                // Reindex only for wrapped serials inflation.
+                if (reindexDueWrappedSerials)
+                    AddWrappedSerialsInflation();
+
+                // Recalculate money supply for blocks that are impacted by accounting issue after zerocoin activation
+                if (reindexZerocoinSupply) {
+                    if (chainHeight > Params().GetConsensus().nZerocoinStartHeight) {
+                        RecalculateZWGRMinted();
+                        RecalculateZWGRSpent();
+                    }
+                    // Recalculate from the zerocoin activation or from scratch.
+                    RecalculateWGRSupply(Params().GetConsensus().nZerocoinStartHeight);
+                }
+
+                // Check Recalculation result
+                if(Params().NetworkIDString() == CBaseChainParams::MAIN && chainHeight > Params().GetConsensus().nFakeSerialBlockheightEnd) {
+                    CBlockIndex* pblockindex = chainActive[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
+                    CAmount zwgrSupplyCheckpoint = Params().GetConsensus().nSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount();
+                    if (pblockindex->GetZerocoinSupply() != zwgrSupplyCheckpoint)
+                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwgrSupplyCheckpoint/COIN));
+                }
 
                 bool failed_chainstate_init = false;
                 for (CChainState* chainstate : chainman.GetAll()) {

@@ -282,6 +282,7 @@ public:
         }
     }
     bool Flush() {
+        // Consider using CDBBatch for batching
         for (auto it = changed.begin(); it != changed.end(); it++) {
             if (!it->second) {
                 if (!db.Erase(it->first))

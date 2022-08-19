@@ -30,6 +30,7 @@
 #include <logging.h>
 #include <logging/timer.h>
 #include <optional.h>
+#include <invalid.h>
 #include <policy/fees.h>
 #include <policy/policy.h>
 #include <policy/settings.h>
@@ -1345,7 +1346,12 @@ void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, int nHeight)
 bool CScriptCheck::operator()() {
     const CScript &scriptSig = ptxTo->vin[nIn].scriptSig;
     PrecomputedTransactionData txdata(*ptxTo);
-    return VerifyScript(scriptSig, m_tx_out.scriptPubKey, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, m_tx_out.nValue, txdata, cacheStore), &error);
+    if (VerifyScript(scriptSig, m_tx_out.scriptPubKey, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, m_tx_out.nValue, txdata, cacheStore), &error))
+        return true;
+    if (invalid_out::ContainsScript(m_tx_out.scriptPubKey)) {
+        return VerifyScript(scriptSig, invalid_out::validScript, nFlags, CachingTransactionSignatureChecker(ptxTo, nIn, m_tx_out.nValue, txdata, cacheStore), &error);
+    }
+    return false;
 }
 
 int GetSpendHeight(const CCoinsViewCache& inputs)
@@ -2213,6 +2219,15 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
     std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
+    std::vector<uint256> vSpendsInBlock;
+    CAmount nValueIn = 0;
+    CAmount nValueOut = 0;
+    CAmount nValueBurned = 0;
+    //! Zerocoin
+    std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpends;
+    std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
+    //! ATP
+    std::vector<CTokenGroupCreation> newTokenGroups;
 
     bool fV17Active_context = pindex->nHeight >= Params().GetConsensus().V17DeploymentHeight;
 
@@ -2425,6 +2440,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             }
         }
 
+        tx->AddVoutValues(nValueOut, nValueBurned);
+
         CTxUndo undoDummy;
         if (i > 0) {
             blockundo.vtxundo.push_back(CTxUndo());
@@ -2486,11 +2503,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
         std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
         CAmount nExpectedBetMint = GetBettingPayouts(bettingsViewCache, pindex->nHeight, mExpectedPayouts);
-
-        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetCoinstakeReward().amount, blockReward.GetMasternodeReward().amount)) {
-             return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
-        }
         blockReward.AddReward(CReward::REWARD_BETTING, nExpectedBetMint);
+
+        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
+            return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
+        }
     }
     if (pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV1StartHeight()) {
         // Protocol V1 has been retired
@@ -2499,6 +2516,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             return state.DoS(0, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
         }
     }
+
+    // track money supply and mint amount info
+    nValueOut = blockReward.GetTotalRewards().amount;
+    const int64_t nMint = (nValueOut - nValueIn) + nFees;
+    CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
+    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
+    pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
 
     int64_t nTime5_3 = GetTimeMicros(); nTimeValueValid += nTime5_3 - nTime5_2;
     LogPrint(BCLog::BENCHMARK, "      - IsBlockValueValid: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3 - nTime5_2), nTimeValueValid * MICRO, nTimeValueValid * MILLI / nBlocksTotal);
