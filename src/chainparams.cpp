@@ -362,7 +362,7 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.V17DeploymentHeight = 1669300;
+        consensus.V17DeploymentHeight = std::numeric_limits<int>::max();
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b");
         consensus.BIP65Height = consensus.V17DeploymentHeight;
@@ -397,15 +397,15 @@ public:
         // Wagerr specific deployment heights
         consensus.nWagerrProtocolV1StartHeight = 298386;                            // Betting protocol v1 activation block
         consensus.nWagerrProtocolV2StartHeight = 763350;                            // Betting protocol v2 activation block
-        consensus.nWagerrProtocolV3StartHeight = consensus.nBlockTimeProtocolV2;    // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV3StartHeight = 1501000;                           // Betting protocol v3 activation block
         consensus.nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max();   // Betting protocol v4 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;    // Quick games: retired functionality
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;  // Reduced block maturity required for spending coinstakes and betting payouts
-        consensus.nKeysRotateHeight = consensus.nBlockTimeProtocolV2;               // Rotate spork key, oracle keys and fee payout keys
+        consensus.nKeysRotateHeight = consensus.nWagerrProtocolV3StartHeight;       // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 1002;
         consensus.nBlockStakeModifierV1A = 1000;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 891276;
+        consensus.nBlockTimeProtocolV2 = consensus.nWagerrProtocolV3StartHeight;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of Stake parameters
@@ -413,11 +413,10 @@ public:
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
+        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 600;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
-        // Time protocol V2
-        consensus.nTimeSlotLength = 15;
 
         // ATP parameters
         consensus.WagerrAddrPrefix = "wagerr";
@@ -431,6 +430,7 @@ public:
         consensus.nBlockZerocoinV2 = 298386;
         consensus.nPublicZCSpends = 752800;
         consensus.nFakeSerialBlockheightEnd = 556623;
+        consensus.nSupplyBeforeFakeSerial = 3703597*COIN;   // zerocoin supply at block nFakeSerialBlockheightEnd
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -640,8 +640,8 @@ public:
         consensus.nKeysRotateHeight = 102000;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
         consensus.nBlockStakeModifierV1A = 51197;
-        consensus.nBlockStakeModifierV2 = 826130;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 92500;
+        consensus.nBlockTimeProtocolV2 = 139550;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of stake parameters
@@ -649,11 +649,10 @@ public:
         consensus.posLimit_V2 = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
+        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinAge = 60 * 60; // 1 hour
-        // Time protocol V2
-        consensus.nTimeSlotLength = 15;
 
         // ATP parameters
         consensus.WagerrAddrPrefix = "wagerrtest";
@@ -667,6 +666,7 @@ public:
         consensus.nBlockZerocoinV2 = 60;
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -858,8 +858,8 @@ public:
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 400;
+        consensus.nBlockTimeProtocolV2 = 500;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of Stake parameters
@@ -867,11 +867,10 @@ public:
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
+        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 1;
         consensus.nStakeMinAge = 0;
-        // Time protocol V2
-        consensus.nTimeSlotLength = 15;
 
         // ATP parameters
         consensus.WagerrAddrPrefix = "wagerrdev";
@@ -885,6 +884,7 @@ public:
         consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -1068,8 +1068,8 @@ public:
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 251;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 400;
+        consensus.nBlockTimeProtocolV2 = 500;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of stake parameters
@@ -1077,11 +1077,10 @@ public:
         consensus.posLimit_V2 = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
         consensus.nPosTargetSpacing = 1 * 60; // 1 minute
         consensus.nPosTargetTimespan = 40 * 60; // 40 minutes
+        consensus.nTimeSlotLength = 15;
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 1;
         consensus.nStakeMinAge = 0;
-        // Time protocol V2
-        consensus.nTimeSlotLength = 15;
 
         // ATP parameters
         consensus.WagerrAddrPrefix = "wagerrreg";
@@ -1095,6 +1094,7 @@ public:
         consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
