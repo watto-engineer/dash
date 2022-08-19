@@ -2563,8 +2563,8 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
                 if (!state) {
                     continue;
                 }
-                // Get the block when we receive an unknown INV while connected to a legacy node
-                if (pfrom->nVersion < GETHEADERS_VERSION && state->fSyncStarted) {
+                // Get the block when we receive an unknown INV while connected to a legacy node during sync or if it is the only connected node
+                if (pfrom->nVersion < GETHEADERS_VERSION && (state->fSyncStarted || (state->fPreferredDownload && nPreferredDownload == 1))) {
                     LOCK(cs_main);
                     std::vector<CInv> vInv(1);
                     vInv[0] = CInv(MSG_BLOCK, inv.hash);

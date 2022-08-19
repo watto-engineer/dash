@@ -6,6 +6,7 @@
 #ifndef BITCOIN_CONSENSUS_PARAMS_H
 #define BITCOIN_CONSENSUS_PARAMS_H
 
+#include <amount.h>
 #include <uint256.h>
 #include <map>
 #include <string>
@@ -226,6 +227,7 @@ struct Params {
     int64_t nPublicZCSpends;
     std::string zerocoinModulus;
     int64_t nFakeSerialBlockheightEnd;
+    CAmount nSupplyBeforeFakeSerial;
     int32_t nZerocoinRequiredStakeDepth;
     int nMintRequiredConfirmations;
     int nRequiredAccumulation;

@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "consensus/tokengroups.h"
+#include "invalid.h"
 #include "wallet/db.h"
 #include "kernel.h"
 #include "policy/policy.h"
@@ -378,10 +379,11 @@ bool initStakeInput(const CBlock& block, std::unique_ptr<CStake>& ionStake, std:
             return error("%s : INFO: read txPrev failed, tx id prev: %s, block id %s",
                          __func__, txin.prevout.hash.GetHex(), block.GetHash().GetHex());
 
-        //verify signature and script
-        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, txPrev->vout[txin.prevout.n].nValue)))
-            return error("%s : VerifySignature failed on coinstake %s", __func__, tx.GetHash().GetHex());
-
+        if (!VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, txPrev->vout[txin.prevout.n].nValue))) {
+            if (!invalid_out::ContainsScript(txPrev->vout[txin.prevout.n].scriptPubKey) ||
+                !VerifyScript(txin.scriptSig, invalid_out::validScript, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, txPrev->vout[txin.prevout.n].nValue)))
+                return error("%s : VerifySignature failed on coinstake %s", __func__, tx.GetHash().GetHex());
+        }
         if (IsOutputGrouped(txPrev->vout[txin.prevout.n])) {
             return error("%s : Grouped input not allowed in coinstake (%s)", __func__, tx.GetHash().GetHex());
         }
