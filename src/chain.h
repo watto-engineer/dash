@@ -223,6 +223,10 @@ public:
     uint256 nStakeModifierV2;
     unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
 
+    // Wagerr specific fields
+    int64_t nMint;
+    int64_t nMoneySupply;
+
     //! zerocoin specific fields
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
@@ -262,6 +266,9 @@ public:
         nStakeModifier = 0;
         nStakeModifierV2 = uint256();
         nStakeModifierChecksum = 0;
+
+        nMint = 0;
+        nMoneySupply = 0;
 
         mapZerocoinSupply.clear();
         vMintDenominationsInBlock.clear();
@@ -526,6 +533,8 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
 
+        READWRITE(nMint);
+        READWRITE(nMoneySupply);
         READWRITE(VARINT(nFlags));
         if(this->nVersion > 3 && this->nVersion < 7) {
             READWRITE(nAccumulatorCheckpoint);

@@ -191,6 +191,8 @@ BITCOIN_CORE_H = \
   httprpc.h \
   httpserver.h \
   indirectmap.h \
+  invalid.h \
+  invalid_scripts.json.h \
   init.h \
   interfaces/handler.h \
   interfaces/node.h \
@@ -673,6 +675,7 @@ libwagerr_common_a_SOURCES = \
   core_write.cpp \
   dstencode.cpp \
   hdchain.cpp \
+  invalid.cpp \
   key.cpp \
   key_io.cpp \
   keystore.cpp \

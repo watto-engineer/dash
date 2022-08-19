@@ -45,4 +45,9 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 
 bool UpdateZWGRSupply(const CBlock& block, CBlockIndex* pindex, bool fJustCheck);
 
+void AddWrappedSerialsInflation();
+void RecalculateZWGRSpent();
+void RecalculateZWGRMinted();
+bool RecalculateWGRSupply(int nHeightStart);
+
 #endif //PIVX_ZWGRCHAIN_H

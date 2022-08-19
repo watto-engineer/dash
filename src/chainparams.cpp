@@ -404,8 +404,8 @@ public:
         consensus.nKeysRotateHeight = consensus.nBlockTimeProtocolV2;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 1002;
         consensus.nBlockStakeModifierV1A = 1000;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 891276;
+        consensus.nBlockTimeProtocolV2 = 1501000;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of Stake parameters
@@ -431,6 +431,7 @@ public:
         consensus.nBlockZerocoinV2 = 298386;
         consensus.nPublicZCSpends = 752800;
         consensus.nFakeSerialBlockheightEnd = 556623;
+        consensus.nSupplyBeforeFakeSerial = 3703597*COIN;   // zerocoin supply at block nFakeSerialBlockheightEnd
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -640,8 +641,8 @@ public:
         consensus.nKeysRotateHeight = 102000;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
         consensus.nBlockStakeModifierV1A = 51197;
-        consensus.nBlockStakeModifierV2 = 826130;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 92500;
+        consensus.nBlockTimeProtocolV2 = 139550;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of stake parameters
@@ -667,6 +668,7 @@ public:
         consensus.nBlockZerocoinV2 = 60;
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -858,8 +860,8 @@ public:
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 400;
+        consensus.nBlockTimeProtocolV2 = 500;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of Stake parameters
@@ -885,6 +887,7 @@ public:
         consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -1068,8 +1071,8 @@ public:
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 251;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = consensus.V17DeploymentHeight;
-        consensus.nBlockTimeProtocolV2 = consensus.V17DeploymentHeight;
+        consensus.nBlockStakeModifierV2 = 400;
+        consensus.nBlockTimeProtocolV2 = 500;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
 
         // Proof of stake parameters
@@ -1095,6 +1098,7 @@ public:
         consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
+        consensus.nSupplyBeforeFakeSerial = 0;
         consensus.nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         consensus.nRequiredAccumulation = 1;
         consensus.zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
