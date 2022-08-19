@@ -95,6 +95,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     // If we have payouts to validate. Note: bets can only happen in blocks with MN payments.
     if (!ExtractPayouts(block, nBlockHeight, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nExpectedMNReward)) {
         LogPrintf("%s - Not all payouts found - %s\n", __func__, block.GetHash().ToString());
+        ExtractPayouts(block, nBlockHeight, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nExpectedMNReward);
         return false;
     }
     setFoundPayouts = std::multiset<CTxOut>(vFoundPayouts.begin(), vFoundPayouts.end());

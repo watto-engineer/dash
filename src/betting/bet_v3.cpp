@@ -8,6 +8,7 @@
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
 #include <dstencode.h>
+#include <pos/kernel.h>
 #include <validation.h>
 #include <util.h>
 #include <base58.h>
@@ -305,6 +306,20 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         // handle bet by specific game handler from quick games framework
         const CQuickGamesView& gameView = Params().QuickGamesArr()[qgBet.gameType];
         // if odds == 0 - bet lose, if odds > OddsDivisor - bet win, if odds == BET_ODDSDIVISOR - bet refunded
+        arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]);
+        if (hashProofOfStake == 0) {
+            CBlock block;
+            ReadBlockFromDisk(block, blockIndex, Params().GetConsensus());
+            if (block.IsProofOfStake()) {
+                uint256 calculatedHashProofOfStake;
+
+                if (CheckProofOfStake(block, calculatedHashProofOfStake, blockIndex)) {
+                    hashProofOfStake = UintToArith256(calculatedHashProofOfStake);
+                } else {
+                    hashProofOfStake = UintToArith256(blockIndex->GetBlockHash());
+                }
+            }
+        }
         uint32_t odds = gameView.handler(qgBet.vBetInfo, UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]));
         CAmount winningsPermille = qgBet.betAmount * odds;
         CAmount feePermille = winningsPermille > 0 ? (qgBet.betAmount * (odds - BET_ODDSDIVISOR) / 1000 * gameView.nFeePermille) : 0;
