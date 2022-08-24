@@ -275,16 +275,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QCheckBox" name="coinJoinEnabled">
-            <property name="toolTip">
-             <string>Show mixing interface on Overview screen and reveal an additional screen which allows to spend fully mixed coins only.&lt;br/&gt;A new tab with more settings will also appear in this dialog, please make sure to check them before mixing your coins.</string>
-            </property>
-            <property name="text">
-             <string notr="true">Enable CoinJoin features</string>
-            </property>
-           </widget>
-          </item>
          </layout>
        </item>
        <item>

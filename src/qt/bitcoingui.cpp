@@ -383,15 +383,15 @@ void BitcoinGUI::stopConnectingAnimation()
 
 void BitcoinGUI::createActions()
 {
-    sendCoinsMenuAction = new QAction(tr("&Send"), this);
+    sendCoinsMenuAction = new QAction(tr("Send"), this);
     sendCoinsMenuAction->setStatusTip(tr("Send coins to a Wagerr address"));
     sendCoinsMenuAction->setToolTip(sendCoinsMenuAction->statusTip());
 
-    coinJoinCoinsMenuAction = new QAction("&CoinJoin", this);
+    coinJoinCoinsMenuAction = new QAction("CoinJoin", this);
     coinJoinCoinsMenuAction->setStatusTip(tr("Send %1 funds to a Wagerr address").arg("CoinJoin"));
     coinJoinCoinsMenuAction->setToolTip(coinJoinCoinsMenuAction->statusTip());
 
-    receiveCoinsMenuAction = new QAction(tr("&Receive"), this);
+    receiveCoinsMenuAction = new QAction(tr("Receive"), this);
     receiveCoinsMenuAction->setStatusTip(tr("Request payments (generates QR codes and wagerr: URIs)"));
     receiveCoinsMenuAction->setToolTip(receiveCoinsMenuAction->statusTip());
 
@@ -595,40 +595,52 @@ void BitcoinGUI::createToolBars()
         appToolBar = toolbar;
         toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
         toolbar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        toolbar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         toolbar->setMovable(false); // remove unused icon in upper left corner
 
         tabGroup = new QButtonGroup(this);
 
         overviewButton = new QToolButton(this);
-        overviewButton->setText(tr("&Overview"));
+        overviewButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
+        overviewButton->setText(tr("Overview"));
+        overviewButton->setIcon(QIcon(":/icons/overview"));
         overviewButton->setStatusTip(tr("Show general overview of wallet"));
         tabGroup->addButton(overviewButton);
 
         sendCoinsButton = new QToolButton(this);
+        sendCoinsButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
         sendCoinsButton->setText(sendCoinsMenuAction->text());
+        sendCoinsButton->setIcon(QIcon(":/icons/send"));
         sendCoinsButton->setStatusTip(sendCoinsMenuAction->statusTip());
         tabGroup->addButton(sendCoinsButton);
 
         receiveCoinsButton = new QToolButton(this);
+        receiveCoinsButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
         receiveCoinsButton->setText(receiveCoinsMenuAction->text());
+        receiveCoinsButton->setIcon(QIcon(":/icons/receive"));
         receiveCoinsButton->setStatusTip(receiveCoinsMenuAction->statusTip());
         tabGroup->addButton(receiveCoinsButton);
 
         historyButton = new QToolButton(this);
-        historyButton->setText(tr("&Transactions"));
+        historyButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
+        historyButton->setText(tr("Transactions"));
+        historyButton->setIcon(QIcon(":/icons/history"));
         historyButton->setStatusTip(tr("Browse transaction history"));
         tabGroup->addButton(historyButton);
 
         coinJoinCoinsButton = new QToolButton(this);
+        coinJoinCoinsButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
         coinJoinCoinsButton->setText(coinJoinCoinsMenuAction->text());
+        coinJoinCoinsButton->setIcon(QIcon(":/icons/coinjoin"));
         coinJoinCoinsButton->setStatusTip(coinJoinCoinsMenuAction->statusTip());
         tabGroup->addButton(coinJoinCoinsButton);
 
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             masternodeButton = new QToolButton(this);
-            masternodeButton->setText(tr("&Masternodes"));
+            masternodeButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
+            masternodeButton->setText(tr("Masternodes"));
+            masternodeButton->setIcon(QIcon(":/icons/masternodes"));
             masternodeButton->setStatusTip(tr("Browse masternodes"));
             tabGroup->addButton(masternodeButton);
             connect(masternodeButton, SIGNAL(clicked()), this, SLOT(gotoMasternodePage()));
