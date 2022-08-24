@@ -20,7 +20,7 @@ To replace <theme.css> there are currently the following themes available:
 *   Traditional (traditional.css)
 
 NOTE: This file is only the base layout which is getting
-shab70000 between all full themes (e.g. Dark or Light). It may contain
+shared between all full themes (e.g. Dark or Light). It may contain
 color changes as long as they fit into all other themes. If an ui element
 requires theme based coloring the appropriate css element can be picked
 here to overwrite its colors (background-color, border-color, color)
@@ -461,10 +461,10 @@ QMenu::item:selected {
     color:#330;
 }
 
-/*QMenu::separator {
+QMenu::separator {
     height: 1px;
     background-color: #b70000;
-}*/
+}
 
 /******************************************************
 QMenuBar
@@ -877,49 +877,25 @@ QTextEdit {
 QToolBar / QToolButton
 ******************************************************/
 
-/* QToolBar {
-    background-color: #212121;
-    border:0px solid #330;
-    padding:1;
-    margin:0
-    width: 70px;
-};
-
-QToolBar > QToolButton {
-    Alignment: left;
-    background-color: #212121;
-    selection-background-color:transparent;
-    border:0px solid #330;
-    border-left: 0px;
-    border-right: 0px;
-    border-top: 0px;
-    min-height:2.5em;
-    padding: 0em 0em;
-    color:#f8f6f6;
-}
-
-QToolBar > QToolButton:hover:!checked {
-    background-color: #b70000;
-    color: #f8f6f6;
-}
-
-QToolBar > QToolButton:checked {
-    background-color: #b70000;
-    color: #f8f6f6;
-}
-
-QToolBar > QToolButton:disabled {
-    color: #b70000;
-} */
 QToolBar {
     background-color: #212121;
-    border:0px
+    border: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    spacing: 0;
+    min-height: 50px;
+    max-height: 50px;
 }
 
 QToolBar > QToolButton {
     background-color: #212121;
-    color: #f8f6f6;
-    border:0px
+    border: none;
+    min-height: 50px;
+    max-height: 50px;
+    width: 100%;
+    padding: 1px;
+    text-align: center;
 }
 
 QToolBar > QToolButton:hover:!checked {
@@ -1720,7 +1696,7 @@ QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLabel#labelCoinControlInsuffF
 }
 
 QDialog#SendCoinsDialog .QScrollArea#scrollArea .QWidget#scrollAreaWidgetContents { /* Send To Widget */
-    background-color: #00000000;
+    background:transparent;
 }
 
 QDialog#SendCoinsDialog QLabel#labelBalanceText,
@@ -1754,14 +1730,14 @@ QStackedWidget#SendCoinsEntry .QFrame#SendCoins > .QLabel { /* Send Coin Entry L
     padding-right: 5px;
 }
 
-QStackedWidget#SendCoinsEntry .QFrame#SendCoins .QLabel#amountLabel {
+ QStackedWidget#SendCoinsEntry .QFrame#SendCoins .QLabel#amountLabel {
 }
 
 QStackedWidget#SendCoinsEntry .QValidatedLineEdit#payTo { /* Pay To Input Field */
 }
 
 QStackedWidget#SendCoinsEntry .QToolButton { /* General Settings for Pay To Icons */
-    background-color: #00000000;
+    background-color:transparent;
     margin-left: 5px;
     margin-right: 5px;
     border: 0;
