@@ -1,0 +1,24 @@
+--- a/build-aux/config.sub	2020-07-05 13:04:14.000000000 +0100
++++ b/build-aux/config.sub	2022-10-05 11:00:59.669389275 +0100
+@@ -1101,6 +1101,9 @@
+ 	xscale-* | xscalee[bl]-*)
+ 		cpu=`echo "$cpu" | sed 's/^xscale/arm/'`
+ 		;;
++	arm64-*)
++		cpu=aarch64
++ 		;;
+ 
+ 	# Recognize the canonical CPU Types that limit and/or modify the
+ 	# company names they are paired with.
+--- a/build-aux/config.guess	2020-07-05 13:04:14.000000000 +0100
++++ b/build-aux/config.guess	2022-10-05 11:04:29.257487758 +0100
+@@ -1332,6 +1332,9 @@
+     *:Rhapsody:*:*)
+ 	echo "$UNAME_MACHINE"-apple-rhapsody"$UNAME_RELEASE"
+ 	exit ;;
++    arm64:Darwin:*:*)
++	echo aarch64-apple-darwin"$UNAME_RELEASE"
++	exit ;;
+     *:Darwin:*:*)
+ 	UNAME_PROCESSOR=`uname -p`
+ 	case $UNAME_PROCESSOR in

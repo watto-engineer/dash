@@ -82,6 +82,12 @@ $(package)_config_opts_darwin += -device-option CROSS_COMPILE="$(host)-"
 $(package)_config_opts_darwin += -device-option MAC_MIN_VERSION=$(OSX_MIN_VERSION)
 $(package)_config_opts_darwin += -device-option MAC_TARGET=$(host)
 $(package)_config_opts_darwin += -device-option MAC_LD64_VERSION=$(LD64_VERSION)
+$(package)_config_opts_darwin += -device-option XCODE_VERSION=$(XCODE_VERSION)
+ifneq ($(build_arch),$(host_arch))
+$(package)_config_opts_aarch64_darwin += -device-option QMAKE_APPLE_DEVICE_ARCHS=arm64
+else
+$(package)_config_opts_darwin += -device-option QMAKE_APPLE_DEVICE_ARCHS=x86_64
+endif
 endif
 
 $(package)_config_opts_linux  = -qt-xkbcommon-x11

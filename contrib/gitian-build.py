@@ -61,11 +61,11 @@ def build():
     os.chdir('gitian-builder')
     os.makedirs('inputs', exist_ok=True)
 
-    if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
-    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/wagerr/macosx-sdks/downloads/MacOSX10.11.sdk.tar.xz'])
+    if args.macos and not os.path.isfile('inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'):
+    	subprocess.check_call(['wget', '-O', 'inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz', '-N', '-P', 'inputs', 'https://github.com/wagerr/macosx-sdks/downloads/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'])
 
-    if args.macos and not os.path.isfile('inputs/MacOSX10.11.sdk.tar.xz'):
-    	subprocess.check_call(['wget', '-O', 'inputs/MacOSX10.11.sdk.tar.xz', '-N', '-P', 'inputs', 'https://github.com/gitianuser/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz'])
+    if args.macos and not os.path.isfile('inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'):
+    	subprocess.check_call(['wget', '-O', 'inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz', '-N', '-P', 'inputs', 'https://github.com/gitianuser/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'])
 
     if not os.path.isfile('inputs/osslsigncode-2.0.tar.gz'):
         subprocess.check_call(['wget', '-O', 'inputs/osslsigncode-2.0.tar.gz', 'https://github.com/mtrojnar/osslsigncode/archive/2.0.tar.gz'])
@@ -299,7 +299,7 @@ def main():
     args.macos = 'm' in args.os
 
     # Disable for MacOS if no SDK found
-    if args.macos and not os.path.isfile('gitian-builder/inputs/MacOSX10.11.sdk.tar.xz'):
+    if args.macos and not os.path.isfile('gitian-builder/inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'):
         print('Cannot build for MacOS, SDK does not exist. Will build for other OSes')
         args.macos = False
 
