@@ -85,6 +85,8 @@ enum RPCErrorCode
     RPC_WALLET_ALREADY_UNLOCKED     = -17, //!< Wallet is already unlocked
     RPC_WALLET_NOT_FOUND            = -18, //!< Invalid wallet specified
     RPC_WALLET_NOT_SPECIFIED        = -19, //!< No wallet specified (error when there are multiple wallets loaded)
+    //! Bet errors
+    RPC_BET_DETAILS_ERROR 		    = -131, //! Error: Incorrect bet details. Please ensure your team and event are correct.
 
 
      //! Backwards compatible aliases

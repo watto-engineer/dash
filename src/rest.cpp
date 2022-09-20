@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <attributes.h>
+#include <betting/bet.h>
 #include <chain.h>
 #include <chainparams.h>
 #include <core_io.h>
@@ -572,6 +573,141 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
     }
     }
 }
+/*
+static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIPart) {
+    if (!CheckWarmup(req))
+        return false;
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
+
+    switch (rf) {
+        case RetFormat::JSON: {
+            UniValue rpcParams(UniValue::VARR);
+            UniValue chainInfoObject = listtransactionrecords(rpcParams, false);
+            std::string strJSON = chainInfoObject.write() + "\n";
+            req->WriteHeader("Content-Type", "application/json");
+            req->WriteReply(HTTP_OK, strJSON);
+            return true;
+        }
+        default: {
+            return RESTERR(req, HTTP_NOT_FOUND, "output format not found (available: json)");
+        }
+    }
+
+    // not reached
+    return true; // continue to process further HTTP reqs on this cxn
+}
+*/
+static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart) {
+    if (!CheckWarmup(req))
+        return false;
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
+    std::string height_str = param;
+
+    int32_t blockheight = -1; // Initialization done only to prevent valgrind false positive, see https://github.com/bitcoin/bitcoin/pull/18785
+    if (!ParseInt32(height_str, &blockheight) || blockheight < 0) {
+        return RESTERR(req, HTTP_BAD_REQUEST, "Invalid height: " + SanitizeString(height_str));
+    }
+
+    std::string hashStr;
+    CBlock block;
+    {
+        LOCK(cs_main);
+        if (blockheight > chainActive.Height()) {
+            return RESTERR(req, HTTP_NOT_FOUND, "Block height out of range");
+        }
+        hashStr = chainActive[blockheight]->GetBlockHash().GetHex();
+    }
+
+    uint256 hash;
+    if (!ParseHashStr(hashStr, hash))
+        return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
+
+
+    CBlockIndex *pblockindex = NULL;
+    {
+        LOCK(cs_main);
+        if (mapBlockIndex.count(hash) == 0)
+            return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
+
+        pblockindex = mapBlockIndex[hash];
+        if (!(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0)
+            return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not available (pruned data)");
+
+        if (!ReadBlockFromDisk(block, pblockindex, Params().GetConsensus()))
+            return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
+    }
+
+    CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
+    ssBlock << block;
+
+    switch (rf) {
+        case RetFormat::BINARY: {
+            std::string binaryBlock = ssBlock.str();
+            req->WriteHeader("Content-Type", "application/octet-stream");
+            req->WriteReply(HTTP_OK, binaryBlock);
+            return true;
+        }
+
+        case RetFormat::HEX: {
+            std::string strHex = HexStr(ssBlock.begin(), ssBlock.end()) + "\n";
+            req->WriteHeader("Content-Type", "text/plain");
+            req->WriteReply(HTTP_OK, strHex);
+            return true;
+        }
+
+        case RetFormat::JSON: {
+            UniValue objBlock = blockToJSON(block, pblockindex, true);
+            std::string strJSON = objBlock.write() + "\n";
+            req->WriteHeader("Content-Type", "application/json");
+            req->WriteReply(HTTP_OK, strJSON);
+            return true;
+        }
+
+        default: {
+            return RESTERR(req, HTTP_NOT_FOUND,
+                           "output format not found (available: " + AvailableDataFormatsString() + ")");
+        }
+    }
+
+    // not reached
+    return true; // continue to process further HTTP reqs on this cxn
+}
+
+static bool rest_bet_by_txid(HTTPRequest* req, const std::string &strURIPart) {
+    if (!CheckWarmup(req))
+        return false;
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
+
+    std::string hashStr = param;
+    uint256 hash;
+    if (!ParseHashStr(hashStr, hash))
+        return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
+
+    UniValue params{UniValue::VARR};
+    params.push_back(hashStr);
+    JSONRPCRequest request = JSONRPCRequest();
+    request.params = params;
+
+    UniValue chainInfoObject = getbetbytxid(request);
+
+    switch (rf) {
+        case RetFormat::JSON: {
+            std::string strJSON = chainInfoObject.write() + "\n";
+            req->WriteHeader("Content-Type", "application/json");
+            req->WriteReply(HTTP_OK, strJSON);
+            return true;
+        }
+        default: {
+            return RESTERR(req, HTTP_NOT_FOUND, "output format not found (available: json)");
+        }
+    }
+
+    // not reached
+    return true; // continue to process further HTTP reqs on this cxn
+}
 
 static const struct {
     const char* prefix;
@@ -580,6 +716,9 @@ static const struct {
       {"/rest/tx/", rest_tx},
       {"/rest/block/notxdetails/", rest_block_notxdetails},
       {"/rest/block/", rest_block_extended},
+      {"/rest/blockbyheight/", rest_block_by_height},
+      {"/rest/betbytxid/", rest_bet_by_txid},
+//      {"/rest/transactionrecords", rest_transactionrecords},
       {"/rest/chaininfo", rest_chaininfo},
       {"/rest/mempool/info", rest_mempool_info},
       {"/rest/mempool/contents", rest_mempool_contents},
