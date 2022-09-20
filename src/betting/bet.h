@@ -14,6 +14,8 @@ class CPayoutInfoDB;
 class CBetOut;
 class CTransaction;
 class CBlock;
+class UniValue;
+class JSONRPCRequest;
 
 /** Validating the payout block using the payout vector. **/
 bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayoutsIn, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward);
@@ -27,5 +29,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
 CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts);
 
 bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx);
+
+UniValue getbetbytxid(const JSONRPCRequest& request);
 
 #endif // WAGERR_BET_H
