@@ -37,7 +37,7 @@ public:
     };
 
     CTokenGroupDocument(const std::vector<unsigned char>& vchDataIn) :
-            nVersion(CURRENT_VERSION), nSpecialTxType(nSpecialTxType), vchData(vchDataIn), vchSig(), fUnparsable(false), fJsonLoaded(false), fRawLoaded(true), fParsed(false), fValidated(false) {
+            nVersion(CURRENT_VERSION), nSpecialTxType(), vchData(vchDataIn), vchSig(), fUnparsable(false), fJsonLoaded(false), fRawLoaded(true), fParsed(false), fValidated(false) {
         fJsonLoaded = LoadJSONData();
         if (!fJsonLoaded) {
             fUnparsable = true;
