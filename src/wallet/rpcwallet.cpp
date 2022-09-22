@@ -4568,7 +4568,7 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
     }
 
-    CFieldBetTx fBetTx{eventId, marketType, contenderId};
+    CFieldBetTx fBetTx{eventId, static_cast<uint8_t>(marketType), contenderId};
 
     // TODO `address` isn't used when adding the following transaction to the
     // blockchain, so ideally it would not need to be supplied to `SendMoney`.
