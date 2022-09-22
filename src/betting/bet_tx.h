@@ -64,6 +64,7 @@ public:
 class CBettingTx
 {
 public:
+    virtual ~CBettingTx() = default;
     virtual BetTxTypes GetTxType() const = 0;
 };
 
