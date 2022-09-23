@@ -40,4 +40,6 @@ WalletContext& EnsureWalletContext(const util::Ref& context);
 
 UniValue getaddressinfo(const JSONRPCRequest& request);
 UniValue signrawtransactionwithwallet(const JSONRPCRequest& request);
+UniValue listtransactionrecords(const JSONRPCRequest& request);
+
 #endif //BITCOIN_WALLET_RPCWALLET_H

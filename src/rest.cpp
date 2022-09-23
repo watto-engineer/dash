@@ -23,6 +23,7 @@
 #include <util/strencodings.h>
 #include <validation.h>
 #include <version.h>
+#include <wallet/rpcwallet.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -620,7 +621,6 @@ static bool rest_getutxos(const util::Ref& context, HTTPRequest* req, const std:
     }
     }
 }
-/*
 static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIPart) {
     if (!CheckWarmup(req))
         return false;
@@ -629,8 +629,11 @@ static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIP
 
     switch (rf) {
         case RetFormat::JSON: {
-            UniValue rpcParams(UniValue::VARR);
-            UniValue chainInfoObject = listtransactionrecords(rpcParams, false);
+            UniValue params{UniValue::VARR};
+            JSONRPCRequest request = JSONRPCRequest();
+            request.params = params;
+
+            UniValue chainInfoObject = listtransactionrecords(request);
             std::string strJSON = chainInfoObject.write() + "\n";
             req->WriteHeader("Content-Type", "application/json");
             req->WriteReply(HTTP_OK, strJSON);
@@ -644,7 +647,7 @@ static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIP
     // not reached
     return true; // continue to process further HTTP reqs on this cxn
 }
-*/
+
 static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart) {
     if (!CheckWarmup(req))
         return false;
@@ -811,7 +814,7 @@ static const struct {
       {"/rest/block/", rest_block_extended},
       {"/rest/blockbyheight/", rest_block_by_height},
       {"/rest/betbytxid/", rest_bet_by_txid},
-//      {"/rest/transactionrecords", rest_transactionrecords},
+      {"/rest/transactionrecords", rest_transactionrecords},
       {"/rest/chaininfo", rest_chaininfo},
       {"/rest/mempool/info", rest_mempool_info},
       {"/rest/mempool/contents", rest_mempool_contents},

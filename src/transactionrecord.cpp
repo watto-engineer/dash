@@ -5,17 +5,19 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <qt/transactionrecord.h>
+#include <transactionrecord.h>
 
 #include <chain.h>
 #include <interfaces/wallet.h>
-#include <interfaces/node.h>
 
 #include <wallet/ismine.h>
+#include <timedata.h>
+#include <univalue.h>
+#include <validation.h>
+
+#include <llmq/quorums_chainlocks.h>
 
 #include <stdint.h>
-
-#include <QDateTime>
 
 /* Return positive answer if transaction should be shown in list.
  */
@@ -29,17 +31,15 @@ bool TransactionRecord::showTransaction()
 /*
  * Decompose CWallet transaction to model transaction records.
  */
-QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wallet& wallet, const interfaces::WalletTx& wtx)
+std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wallet& wallet, const interfaces::WalletTx& wtx)
 {
-    QList<TransactionRecord> parts;
+    std::vector<TransactionRecord> parts;
     int64_t nTime = wtx.time;
     CAmount nCredit = wtx.credit;
     CAmount nDebit = wtx.debit;
     CAmount nNet = nCredit - nDebit;
     uint256 hash = wtx.tx->GetHash();
     std::map<std::string, std::string> mapValue = wtx.value_map;
-    auto node = interfaces::MakeNode();
-    auto& coinJoinOptions = node->coinJoinOptions();
 
     if (wtx.tx->IsCoinStake()) {
         TransactionRecord sub(hash, nTime);
@@ -107,7 +107,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                     sub.type = TransactionRecord::Generated;
                 }
 
-                parts.append(sub);
+                parts.push_back(sub);
             }
         }
     }
@@ -129,8 +129,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
         }
 
         if(wtx.is_denominate) {
-            parts.append(TransactionRecord(hash, nTime, TransactionRecord::CoinJoinMixing, "", -nDebit, nCredit));
-            parts.last().involvesWatchAddress = false;   // maybe pass to TransactionRecord as constructor argument
+            parts.push_back(TransactionRecord(hash, nTime, TransactionRecord::CoinJoinMixing, "", -nDebit, nCredit));
+            parts.back().involvesWatchAddress = false;   // maybe pass to TransactionRecord as constructor argument
         }
         else if (fAllFromMe && fAllToMe)
         {
@@ -165,48 +165,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                     sub.txDest = DecodeDestination(sub.strAddress);
                 }
             }
-            else
-            {
-                sub.idx = parts.size();
-                if(wtx.tx->vin.size() == 1 && wtx.tx->vout.size() == 1
-                    && coinJoinOptions.isCollateralAmount(nDebit)
-                    && coinJoinOptions.isCollateralAmount(nCredit)
-                    && coinJoinOptions.isCollateralAmount(-nNet))
-                {
-                    sub.type = TransactionRecord::CoinJoinCollateralPayment;
-                } else {
-                    bool fMakeCollateral{false};
-                    if (wtx.tx->vout.size() == 2) {
-                        CAmount nAmount0 = wtx.tx->vout[0].nValue;
-                        CAmount nAmount1 = wtx.tx->vout[1].nValue;
-                        // <case1>, see CCoinJoinClientSession::MakeCollateralAmounts
-                        fMakeCollateral = (nAmount0 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount1) && nAmount1 >= coinJoinOptions.getMinCollateralAmount()) ||
-                                          (nAmount1 == coinJoinOptions.getMaxCollateralAmount() && !coinJoinOptions.isDenominated(nAmount0) && nAmount0 >= coinJoinOptions.getMinCollateralAmount()) ||
-                        // <case2>, see CCoinJoinClientSession::MakeCollateralAmounts
-                                          (nAmount0 == nAmount1 && coinJoinOptions.isCollateralAmount(nAmount0));
-                    } else if (wtx.tx->vout.size() == 1) {
-                        // <case3>, see CCoinJoinClientSession::MakeCollateralAmounts
-                        fMakeCollateral = coinJoinOptions.isCollateralAmount(wtx.tx->vout[0].nValue);
-                    }
-                    if (fMakeCollateral) {
-                        sub.type = TransactionRecord::CoinJoinMakeCollaterals;
-                    } else {
-                        for (const auto& txout : wtx.tx->vout) {
-                            if (coinJoinOptions.isDenominated(txout.nValue)) {
-                                sub.type = TransactionRecord::CoinJoinCreateDenominations;
-                                break; // Done, it's definitely a tx creating mixing denoms, no need to look any further
-                            }
-                        }
-                    }
-                }
-            }
 
             CAmount nChange = wtx.change;
 
             sub.debit = -(nDebit - nChange);
             sub.credit = nCredit - nChange;
-            parts.append(sub);
-            parts.last().involvesWatchAddress = involvesWatchAddress;   // maybe pass to TransactionRecord as constructor argument
+            parts.push_back(sub);
+            parts.back().involvesWatchAddress = involvesWatchAddress;   // maybe pass to TransactionRecord as constructor argument
         }
         else if (fAllFromMe)
         {
@@ -215,21 +180,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
             //
             CAmount nTxFee = nDebit - wtx.tx->GetValueOut();
 
-            bool fDone = false;
-            if(wtx.tx->vin.size() == 1 && wtx.tx->vout.size() == 1
-                && coinJoinOptions.isCollateralAmount(nDebit)
-                && nCredit == 0 // OP_RETURN
-                && coinJoinOptions.isCollateralAmount(-nNet))
-            {
-                TransactionRecord sub(hash, nTime);
-                sub.idx = 0;
-                sub.type = TransactionRecord::CoinJoinCollateralPayment;
-                sub.debit = -nDebit;
-                parts.append(sub);
-                fDone = true;
-            }
-
-            for (unsigned int nOut = 0; nOut < wtx.tx->vout.size() && !fDone; nOut++)
+            for (unsigned int nOut = 0; nOut < wtx.tx->vout.size(); nOut++)
             {
                 const CTxOut& txout = wtx.tx->vout[nOut];
                 TransactionRecord sub(hash, nTime);
@@ -273,7 +224,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
                 }
                 sub.debit = -nValue;
 
-                parts.append(sub);
+                parts.push_back(sub);
             }
         }
         else
@@ -281,8 +232,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(interfaces::Wal
             //
             // Mixed debit transaction, can't break down payees
             //
-            parts.append(TransactionRecord(hash, nTime, TransactionRecord::Other, "", nNet, 0));
-            parts.last().involvesWatchAddress = involvesWatchAddress;
+            parts.push_back(TransactionRecord(hash, nTime, TransactionRecord::Other, "", nNet, 0));
+            parts.back().involvesWatchAddress = involvesWatchAddress;
         }
     }
 
@@ -375,19 +326,117 @@ void TransactionRecord::updateLabel(interfaces::Wallet& wallet)
     if (IsValidDestination(txDest)) {
         std::string name;
         if (wallet.getAddress(txDest, &name, /* is_mine= */ nullptr, /* purpose= */ nullptr)) {
-            label = QString::fromStdString(name);
+            label = name;
         } else {
             label = "";
         }
     }
 }
 
-QString TransactionRecord::getTxHash() const
+std::string TransactionRecord::getTxHash() const
 {
-    return QString::fromStdString(hash.ToString());
+    return hash.ToString();
 }
 
 int TransactionRecord::getOutputIndex() const
 {
     return idx;
+}
+
+std::string TransactionRecord::GetTransactionRecordType() const
+{
+    return GetTransactionRecordType(type);
+}
+
+std::string TransactionRecord::GetTransactionRecordType(Type type) const
+{
+    switch (type)
+    {
+        case Other: return "Other";
+        case Generated: return "Generated";
+        case StakeMint: return "StakeMint";
+        case MNReward: return "MNReward";
+        case SendToAddress: return "SendToAddress";
+        case SendToOther: return "SendToOther";
+        case RecvWithAddress: return "RecvWithAddress";
+        case RecvFromOther: return "RecvFromOther";
+        case SendToSelf: return "SendToSelf";
+        case RecvWithCoinJoin: return "RecvWithCoinJoin";
+        case CoinJoinMixing: return "CoinJoinMixing";
+        case CoinJoinCollateralPayment: return "CoinJoinCollateralPayment";
+        case CoinJoinMakeCollaterals: return "CoinJoinMakeCollaterals";
+        case CoinJoinCreateDenominations: return "CoinJoinCreateDenominations";
+        case CoinJoinSend: return "CoinJoinSend";
+    }
+    return NULL;
+}
+
+std::string TransactionRecord::GetTransactionStatus() const
+{
+    return GetTransactionStatus(status.status);
+}
+std::string TransactionRecord::GetTransactionStatus(TransactionStatus::Status status) const
+{
+    switch (status)
+    {
+        case TransactionStatus::Confirmed: return "Confirmed";           /**< Have 6 or more confirmations (normal tx) or fully mature (mined tx) **/
+            /// Normal (sent/received) transactions
+        case TransactionStatus::OpenUntilDate: return "OpenUntilDate";   /**< Transaction not yet final, waiting for date */
+        case TransactionStatus::OpenUntilBlock: return "OpenUntilBlock"; /**< Transaction not yet final, waiting for block */
+        case TransactionStatus::Unconfirmed: return "Unconfirmed";       /**< Not yet mined into a block **/
+        case TransactionStatus::Confirming: return "Confirmed";          /**< Confirmed, but waiting for the recommended number of confirmations **/
+        case TransactionStatus::Conflicted: return "Conflicted";         /**< Conflicts with other transaction or mempool **/
+        case TransactionStatus::Abandoned: return "Abandoned";           /**< Abandoned from the wallet **/
+            /// Generated (mined) transactions
+        case TransactionStatus::Immature: return "Immature";             /**< Mined but waiting for maturity */
+        case TransactionStatus::NotAccepted: return "NotAccepted";       /**< Mined but not accepted */
+    }
+    return NULL;
+}
+
+void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& hash, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
+{
+    auto wallet = interfaces::MakeWallet(pwallet);
+
+    interfaces::WalletTxStatus iStatus;
+    interfaces::WalletOrderForm iOrderForm;
+    bool inMempool;
+    int numBlocks;
+    int64_t adjustedTime;
+    interfaces::WalletTx iWtx = wallet->getWalletTxDetails(hash, iStatus, iOrderForm, inMempool, numBlocks, adjustedTime);
+
+    std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(*wallet, iWtx);
+    for(auto&& vRec: vRecs) {
+        UniValue entry(UniValue::VOBJ);
+        entry.push_back(Pair("type", vRec.GetTransactionRecordType()));
+        entry.push_back(Pair("transactionid", vRec.getTxHash()));
+        entry.push_back(Pair("outputindex", vRec.getOutputIndex()));
+        entry.push_back(Pair("time", vRec.time));
+        entry.push_back(Pair("debit", vRec.debit));
+        entry.push_back(Pair("credit", vRec.credit));
+        entry.push_back(Pair("involvesWatchonly", vRec.involvesWatchAddress));
+
+        if (fLong) {
+            int chainlockHeight;
+            llmq::CChainLockSig clsig = llmq::chainLocksHandler->GetBestChainLock();
+            if (clsig.IsNull()) {
+                chainlockHeight = 0;
+            } else {
+                chainlockHeight = clsig.nHeight;
+            }
+            if (vRec.statusUpdateNeeded(::chainActive.Height(), chainlockHeight))
+                vRec.updateStatus(iStatus, numBlocks, adjustedTime, chainlockHeight);
+
+            entry.push_back(Pair("depth", vRec.status.depth));
+            entry.push_back(Pair("status", vRec.GetTransactionStatus()));
+            entry.push_back(Pair("countsForBalance", vRec.status.countsForBalance));
+            entry.push_back(Pair("lockedByInstantSend", vRec.status.lockedByInstantSend));
+            entry.push_back(Pair("lockedByChainLocks", vRec.status.lockedByChainLocks));
+            entry.push_back(Pair("matures_in", vRec.status.matures_in));
+            entry.push_back(Pair("open_for", vRec.status.open_for));
+            entry.push_back(Pair("cur_num_blocks", vRec.status.cur_num_blocks));
+            entry.push_back(Pair("chainLockHeight", vRec.status.cachedChainLockHeight)); // TODO: identify chainLockHeight / cachedChainLockHeight
+        }
+        ret.push_back(entry);
+    }
 }

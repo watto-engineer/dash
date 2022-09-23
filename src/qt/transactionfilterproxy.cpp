@@ -5,7 +5,7 @@
 #include <qt/transactionfilterproxy.h>
 
 #include <qt/transactiontablemodel.h>
-#include <qt/transactionrecord.h>
+#include <transactionrecord.h>
 
 #include <cstdlib>
 

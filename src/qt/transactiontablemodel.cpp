@@ -7,7 +7,7 @@
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>
 #include <qt/transactiondesc.h>
-#include <qt/transactionrecord.h>
+#include <transactionrecord.h>
 #include <qt/walletmodel.h>
 
 #include <core_io.h>
@@ -77,7 +77,11 @@ public:
         {
             for (const auto& wtx : wallet.getWalletTxs()) {
                 if (TransactionRecord::showTransaction()) {
-                    cachedWallet.append(TransactionRecord::decomposeTransaction(wallet, wtx));
+                    std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(wallet, wtx);
+                    QList<TransactionRecord> QLRecs;
+                    QLRecs.reserve(vRecs.size());
+                    std::copy(vRecs.begin(), vRecs.end(), std::back_inserter(QLRecs));
+                    cachedWallet.append(QLRecs);
                 }
             }
         }
@@ -131,8 +135,10 @@ public:
                     break;
                 }
                 // Added -- insert at the right position
-                QList<TransactionRecord> toInsert =
-                        TransactionRecord::decomposeTransaction(wallet, wtx);
+                std::vector<TransactionRecord> vToInsert = TransactionRecord::decomposeTransaction(wallet, wtx);
+                QList<TransactionRecord> toInsert;
+                toInsert.reserve(vToInsert.size());
+                std::copy(vToInsert.begin(), vToInsert.end(), std::back_inserter(toInsert));
                 if(!toInsert.isEmpty()) /* only if something to insert */
                 {
                     parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex+toInsert.size()-1);
@@ -436,7 +442,7 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, b
     case TransactionRecord::StakeMint:
     case TransactionRecord::MNReward:
     case TransactionRecord::CoinJoinSend:
-        return formatAddressLabel(wtx->strAddress, wtx->label, tooltip) + watchAddress;
+        return formatAddressLabel(wtx->strAddress, QString::fromStdString(wtx->label), tooltip) + watchAddress;
     case TransactionRecord::SendToOther:
         return QString::fromStdString(wtx->strAddress) + watchAddress;
     case TransactionRecord::SendToSelf:
@@ -459,7 +465,7 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
     case TransactionRecord::MNReward:
     case TransactionRecord::RecvWithCoinJoin:
         {
-        if (wtx->label.isEmpty()) {
+        if (wtx->label == "") {
             return GUIUtil::getThemedQColor(GUIUtil::ThemedColor::BAREADDRESS);
         }
         } break;
@@ -609,7 +615,7 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
         case Status:
             return QString::fromStdString(rec->status.sortKey);
         case Date:
-            return rec->time;
+            return qint64(rec->time);
         case Type:
             return formatTxType(rec);
         case Watchonly:
@@ -653,17 +659,17 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
     case AddressRole:
         return QString::fromStdString(rec->strAddress);
     case LabelRole:
-        return rec->label;
+        return QString::fromStdString(rec->label);
     case AmountRole:
         return qint64(rec->credit + rec->debit);
     case TxHashRole:
-        return rec->getTxHash();
+        return QString::fromStdString(rec->getTxHash());
     case TxHexRole:
         return priv->getTxHex(walletModel->wallet(), rec);
     case TxPlainTextRole:
         {
             QString details;
-            QString txLabel = rec->label;
+            QString txLabel = QString::fromStdString(rec->label);
 
             details.append(formatTxDate(rec));
             details.append(" ");
