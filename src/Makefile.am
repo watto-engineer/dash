@@ -321,6 +321,7 @@ BITCOIN_CORE_H = \
   tokens/tokengroupwallet.h \
   tokens/rpctokenwallet.h \
   torcontrol.h \
+  transactionrecord.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \
@@ -591,6 +592,7 @@ libbitcoin_wallet_a_SOURCES = \
   reward-manager.cpp \
   tokens/rpctokenwallet.cpp \
   tokens/tokengroupwallet.cpp \
+  transactionrecord.cpp \
   wallet/crypter.cpp \
   wallet/db.cpp \
   wallet/fees.cpp \

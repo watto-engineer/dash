@@ -7,10 +7,9 @@
 
 #include <amount.h>
 #include <dstencode.h>
+#include <script/ismine.h>
 #include <uint256.h>
 
-#include <QList>
-#include <QString>
 
 namespace interfaces {
 class Node;
@@ -18,6 +17,10 @@ class Wallet;
 struct WalletTx;
 struct WalletTxStatus;
 }
+
+class UniValue;
+class CWallet;
+class CWalletTx;
 
 /** UI model for transaction status. The transaction status is the part of a transaction that will change over time.
  */
@@ -61,8 +64,8 @@ public:
     /** @name Reported status
        @{*/
     Status status;
-    qint64 depth;
-    qint64 open_for; /**< Timestamp if status==OpenUntilDate, otherwise number
+    int64_t depth;
+    int64_t open_for; /**< Timestamp if status==OpenUntilDate, otherwise number
                       of additional blocks that need to be mined before
                       finalization */
     /**@}*/
@@ -79,8 +82,7 @@ public:
 /** UI model for a transaction. A core transaction can be represented by multiple UI transactions if it has
     multiple outputs.
  */
-class TransactionRecord
-{
+class TransactionRecord{
 public:
     enum Type
     {
@@ -110,14 +112,14 @@ public:
         txDest = DecodeDestination(strAddress);
     }
 
-    TransactionRecord(uint256 _hash, qint64 _time):
+    TransactionRecord(uint256 _hash, int64_t _time):
             hash(_hash), time(_time), type(Other), strAddress(""), debit(0),
             credit(0), idx(0)
     {
         txDest = DecodeDestination(strAddress);
     }
 
-    TransactionRecord(uint256 _hash, qint64 _time,
+    TransactionRecord(uint256 _hash, int64_t _time,
                 Type _type, const std::string &_strAddress,
                 const CAmount& _debit, const CAmount& _credit):
             hash(_hash), time(_time), type(_type), strAddress(_strAddress), debit(_debit), credit(_credit),
@@ -129,12 +131,12 @@ public:
     /** Decompose CWallet transaction to model transaction records.
      */
     static bool showTransaction();
-    static QList<TransactionRecord> decomposeTransaction(interfaces::Wallet& wallet, const interfaces::WalletTx& wtx);
+    static std::vector<TransactionRecord> decomposeTransaction(interfaces::Wallet& wallet, const interfaces::WalletTx& wtx);
 
     /** @name Immutable transaction attributes
       @{*/
     uint256 hash;
-    qint64 time;
+    int64_t time;
     Type type;
     std::string strAddress;
     CTxDestination txDest;
@@ -153,10 +155,10 @@ public:
     bool involvesWatchAddress;
 
     /// Label
-    QString label;
+    std::string label;
 
     /** Return the unique identifier for this transaction (part) */
-    QString getTxHash() const;
+    std::string getTxHash() const;
 
     /** Return the output index of the subtransaction  */
     int getOutputIndex() const;
@@ -172,6 +174,20 @@ public:
     /** Update label from address book.
      */
     void updateLabel(interfaces::Wallet& wallet);
+
+    /**
+     * Return stringified transaction record type
+     */
+    std::string GetTransactionRecordType() const;
+    std::string GetTransactionRecordType(Type type) const;
+
+    /**
+     * Return stringified transaction status
+     */
+    std::string GetTransactionStatus() const;
+    std::string GetTransactionStatus(TransactionStatus::Status status) const;
 };
+
+void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& hash, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter);
 
 #endif // BITCOIN_QT_TRANSACTIONRECORD_H
