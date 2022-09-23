@@ -29,11 +29,13 @@
 #include <rpc/server.h>
 #include <rpc/util.h>
 #include <timedata.h>
+#include <transactionrecord.h>
 #include <txmempool.h>
 #include <tokens/tokengroupwallet.h>
 #include <util.h>
 #include <utilmoneystr.h>
 #include <validation.h>
+#include <interfaces/wallet.h>
 #include <wallet/coincontrol.h>
 #include <wallet/rpcwallet.h>
 #include <wallet/wallet.h>
@@ -2115,37 +2117,15 @@ UniValue listtransactions(const JSONRPCRequest& request)
     return ret;
 }
 
-/*
-void ListTransactionRecords(const CWalletTx& wtx, const std::string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
+UniValue listtransactionrecords(const JSONRPCRequest& request)
 {
-    std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(pwallet, wtx);
-    for(auto&& vRec: vRecs) {
-        UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("type", vRec.GetTransactionRecordType()));
-        entry.push_back(Pair("transactionid", vRec.getTxID()));
-        entry.push_back(Pair("outputindex", vRec.getOutputIndex()));
-        entry.push_back(Pair("time", vRec.time));
-        entry.push_back(Pair("debit", ValueFromAmount(vRec.debit)));
-        entry.push_back(Pair("credit", ValueFromAmount(vRec.credit)));
-        entry.push_back(Pair("involvesWatchonly", vRec.involvesWatchAddress));
+    std::shared_ptr<CWallet> wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* pwallet = wallet.get();
 
-        if (fLong) {
-            if (vRec.statusUpdateNeeded()) vRec.updateStatus(wtx);
-
-            entry.push_back(Pair("depth", vRec.status.depth));
-            entry.push_back(Pair("status", vRec.GetTransactionStatus()));
-            entry.push_back(Pair("countsForBalance", vRec.status.countsForBalance));
-            entry.push_back(Pair("matures_in", vRec.status.matures_in));
-            entry.push_back(Pair("open_for", vRec.status.open_for));
-            entry.push_back(Pair("cur_num_blocks", vRec.status.cur_num_blocks));
-            entry.push_back(Pair("cur_num_ix_locks", vRec.status.cur_num_ix_locks));
-        }
-        ret.push_back(entry);
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
     }
-}
 
-extern UniValue listtransactionrecords(const JSONRPCRequest& request)
-{
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
                 "listtransactionrecords ( \"account\" count from includeWatchonly)\n"
@@ -2219,7 +2199,7 @@ extern UniValue listtransactionrecords(const JSONRPCRequest& request)
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
         CWalletTx* const pwtx = (*it).second.first;
         if (pwtx != 0){}
-            ListTransactionRecords(*pwtx, strAccount, 0, true, ret, filter);
+            ListTransactionRecords(wallet, pwtx->GetHash(), strAccount, 0, true, ret, filter);
         CAccountingEntry* const pacentry = (*it).second.second;
         if (pacentry != 0)
             AcentryToJSON(*pacentry, strAccount, ret);
@@ -2251,7 +2231,6 @@ extern UniValue listtransactionrecords(const JSONRPCRequest& request)
 
     return ret;
 }
-*/
 
 UniValue listaccounts(const JSONRPCRequest& request)
 {
@@ -6520,7 +6499,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "listreceivedbyaddress",            &listreceivedbyaddress,         {"minconf","addlocked","include_empty","include_watchonly","address_filter"} },
     { "wallet",             "listsinceblock",           &listsinceblock,           {"blockhash","target_confirmations","include_watchonly","include_removed"} },
     { "wallet",             "listtransactions",         &listtransactions,         {"account|label|dummy","count","skip","include_watchonly"} },
-//    { "wallet",             "listtransactionrecords",   &listtransactionrecords, {} },
+    { "wallet",             "listtransactionrecords",   &listtransactionrecords,   {} },
     { "wallet",             "listunspent",              &listunspent,              {"minconf","maxconf","addresses","include_unsafe","query_options"} },
     { "wallet",             "listwallets",              &listwallets,              {} },
     { "wallet",             "loadwallet",               &loadwallet,               {"filename"} },
