@@ -221,7 +221,6 @@ public:
     };
     uint64_t nStakeModifier;             // hash modifier for proof-of-stake
     uint256 nStakeModifierV2;
-    unsigned int nStakeModifierChecksum; // checksum of index; in-memeory only
 
     // Wagerr specific fields
     int64_t nMint;
@@ -265,7 +264,6 @@ public:
 
         nStakeModifier = 0;
         nStakeModifierV2 = uint256();
-        nStakeModifierChecksum = 0;
 
         nMint = 0;
         nMoneySupply = 0;

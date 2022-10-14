@@ -114,10 +114,6 @@ public:
     std::vector<COracle> Oracles() const { return vOracles; }
     const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
-    /** temp worarounds **/
-    int SkipBetValidationStart() const { return nSkipBetValidationStart; }
-    int SkipBetValidationEnd() const { return nSkipBetValidationEnd; }
-
 protected:
     CChainParams() {}
 
@@ -152,10 +148,6 @@ protected:
     std::vector<COracle> vOracles;
 
     std::vector<CQuickGamesView> quickGamesArr;
-
-    // workarounds
-    int nSkipBetValidationEnd;
-    int nSkipBetValidationStart;
 };
 
 /**

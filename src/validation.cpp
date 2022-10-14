@@ -2437,7 +2437,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
 
         if (!CheckBettingTx(bettingsViewCache, *tx, pindex->nHeight)) {
-            if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().SkipBetValidationStart() && pindex->nHeight < Params().SkipBetValidationEnd())) {
+            if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
                 LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
             } else  {
                 return state.DoS(100, error("ConnectBlock() : error when betting TX checking"), REJECT_INVALID, "bad-tx-bet");

@@ -365,7 +365,7 @@ public:
         consensus.V17DeploymentHeight = std::numeric_limits<int>::max();
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b");
-        consensus.BIP65Height = consensus.V17DeploymentHeight;
+        consensus.BIP65Height = 751858;
         consensus.BIP66Height = 1; // 000002f68dbbf1fcfacb8f0b4e64083efdd2f07a906728ee068d573ffa5bcb4e
         consensus.CSVHeight = consensus.V17DeploymentHeight;
         consensus.BIP147Height = consensus.V17DeploymentHeight;
@@ -399,6 +399,7 @@ public:
         consensus.nWagerrProtocolV2StartHeight = 763350;                            // Betting protocol v2 activation block
         consensus.nWagerrProtocolV3StartHeight = 1501000;                           // Betting protocol v3 activation block
         consensus.nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max();   // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV5StartHeight = consensus.V17DeploymentHeight;     // Betting protocol v5 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;    // Quick games: retired functionality
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;  // Reduced block maturity required for spending coinstakes and betting payouts
         consensus.nKeysRotateHeight = consensus.nWagerrProtocolV3StartHeight;       // Rotate spork key, oracle keys and fee payout keys
@@ -543,10 +544,6 @@ public:
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 
-        // Workarounds
-        nSkipBetValidationStart = 5577;
-        nSkipBetValidationEnd = 35619;
-
         checkpointData = {
             {
                 {1, uint256S("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b")},     // First PoW premine block
@@ -598,10 +595,10 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V17DeploymentHeight = 826130;
-        consensus.BIP34Height = 1;
+        consensus.V17DeploymentHeight = std::numeric_limits<int>::max();
+        consensus.BIP34Height = 3963;
         consensus.BIP34Hash = uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12");
-        consensus.BIP65Height = consensus.V17DeploymentHeight;
+        consensus.BIP65Height = 600;
         consensus.BIP66Height = 1; // 0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12
         consensus.CSVHeight = consensus.V17DeploymentHeight;
         consensus.BIP147Height = consensus.V17DeploymentHeight;
@@ -631,15 +628,16 @@ public:
         consensus.defaultAssumeValid = uint256S("0x0000009303aeadf8cf3812f5c869691dbd4cb118ad20e9bf553be434bafe6a52"); // 470000
 
         // Wagerr specific deployment heights
-        consensus.nWagerrProtocolV1StartHeight = 1100;      // Betting protocol v1 activation block
-        consensus.nWagerrProtocolV2StartHeight = 1100;      // Betting protocol v2 activation block
-        consensus.nWagerrProtocolV3StartHeight = 2000;      // Betting protocol v3 activation block
-        consensus.nWagerrProtocolV4StartHeight = 405000;    // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV1StartHeight = 1100;                          // Betting protocol v1 activation block
+        consensus.nWagerrProtocolV2StartHeight = 1100;                          // Betting protocol v2 activation block
+        consensus.nWagerrProtocolV3StartHeight = 2000;                          // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV4StartHeight = 405000;                        // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV5StartHeight = consensus.V17DeploymentHeight; // Betting protocol v5 activation block
         consensus.nQuickGamesEndHeight = 101650;
         consensus.nMaturityV2StartHeight = 38000;           // Reduced block maturity required for spending coinstakes and betting payouts
         consensus.nKeysRotateHeight = 102000;               // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 301;
-        consensus.nBlockStakeModifierV1A = 51197;
+        consensus.nBlockStakeModifierV1A = 1;
         consensus.nBlockStakeModifierV2 = 92500;
         consensus.nBlockTimeProtocolV2 = 139550;
         consensus.ATPStartHeight = consensus.V17DeploymentHeight;
@@ -661,9 +659,9 @@ public:
 
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
-        consensus.nZerocoinStartHeight = 25;
-        consensus.nZerocoinStartTime = 1524496462;
-        consensus.nBlockZerocoinV2 = 60;
+        consensus.nZerocoinStartHeight = 50;
+        consensus.nZerocoinStartTime = 1518696183;
+        consensus.nBlockZerocoinV2 = 600;
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
         consensus.nSupplyBeforeFakeSerial = 0;
@@ -687,6 +685,10 @@ public:
         consensus.nMaxParlayBetPayoutRange = 4000;          // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         consensus.nBetPlaceTimeoutBlocks = 120;             // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         consensus.nMaxParlayLegs = 5;                       // Minimizes maximum legs in parlay bet
+
+        // Workarounds
+        consensus.nSkipBetValidationStart = 5577;
+        consensus.nSkipBetValidationEnd = 35619;
 
         // Chain parameters
         pchMessageStart[0] = 0x87;
@@ -816,10 +818,10 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V17DeploymentHeight = 300;
+        consensus.V17DeploymentHeight = std::numeric_limits<int>::max();
         consensus.BIP34Height = 100000000; // BIP34 has not activated on regtest (far in the future so block v1 are not rejected in tests)
         consensus.BIP34Hash = uint256();
-        consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
+        consensus.BIP65Height = 1; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
         consensus.CSVHeight = consensus.V17DeploymentHeight;
         consensus.BIP147Height = consensus.V17DeploymentHeight;
@@ -852,7 +854,8 @@ public:
         consensus.nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
         consensus.nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
         consensus.nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
-        consensus.nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max(); // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV5StartHeight = consensus.V17DeploymentHeight;   // Betting protocol v5 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
@@ -1029,7 +1032,7 @@ public:
         consensus.V17DeploymentHeight = 300;
         consensus.BIP34Height = 100000000; // BIP34 has not activated on regtest (far in the future so block v1 are not rejected in tests)
         consensus.BIP34Hash = uint256();
-        consensus.BIP65Height = consensus.V17DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
+        consensus.BIP65Height = 1; // BIP65 activated on regtest (Used in rpc activation tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
         consensus.CSVHeight = consensus.V17DeploymentHeight;
         consensus.BIP147Height = consensus.V17DeploymentHeight;
@@ -1062,7 +1065,8 @@ public:
         consensus.nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
         consensus.nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
         consensus.nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
-        consensus.nWagerrProtocolV4StartHeight = 300;                             // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max(); // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV5StartHeight = consensus.V17DeploymentHeight;   // Betting protocol v4 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
         consensus.nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys

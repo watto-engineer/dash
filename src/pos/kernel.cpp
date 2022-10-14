@@ -175,7 +175,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     if (pindexPrev->nHeight == 0) {
         //Give a stake modifier to the first block
         fGeneratedStakeModifier = true;
-        nStakeModifier = 94944044292878;
+        nStakeModifier = 93825017647567; // 94944044292878;
         return true;
     }
 
@@ -184,6 +184,8 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     int64_t nModifierTime = 0;
     if (!GetLastStakeModifier(pindexPrev, nStakeModifier, nModifierTime))
         return error("%s : unable to get last modifier", __func__);
+
+    LogPrintf("%s : prev modifier= %s time=%s\n", __func__, std::to_string(nStakeModifier).c_str(), DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nModifierTime).c_str());
 
     if (nModifierTime / MODIFIER_INTERVAL >= pindexPrev->GetBlockTime() / MODIFIER_INTERVAL)
         return true;
@@ -196,6 +198,8 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart) {
         vSortedByTimestamp.push_back(std::make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
+        LogPrintf("%s : added block at height=%d with time=%s and hash=%s\n", __func__,
+            pindex->nHeight, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", pindex->GetBlockTime()).c_str(), pindex->GetBlockHash().GetHex());
         pindex = pindex->pprev;
     }
 
@@ -224,7 +228,27 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
         // add the selected block from candidates to selected list
         mapSelectedBlocks.insert(std::make_pair(pindex->GetBlockHash(), pindex));
+        LogPrintf("%s : selected round %d stop=%s height=%d bit=%d\n", __func__,
+            nRound, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nSelectionIntervalStop).c_str(), pindex->nHeight, pindex->GetStakeEntropyBit());
     }
+
+    std::string strSelectionMap = "";
+    // '-' indicates proof-of-work blocks not selected
+    strSelectionMap.insert(0, pindexPrev->nHeight - nHeightFirstCandidate + 1, '-');
+    pindex = pindexPrev;
+    while (pindex && pindex->nHeight >= nHeightFirstCandidate) {
+        // '=' indicates proof-of-stake blocks not selected
+        if (pindex->IsProofOfStake())
+            strSelectionMap.replace(pindex->nHeight - nHeightFirstCandidate, 1, "=");
+        pindex = pindex->pprev;
+    }
+    for (const std::pair<const uint256, const CBlockIndex*> &item : mapSelectedBlocks) {
+        // 'S' indicates selected proof-of-stake blocks
+        // 'W' indicates selected proof-of-work blocks
+        strSelectionMap.replace(item.second->nHeight - nHeightFirstCandidate, 1, item.second->IsProofOfStake() ? "S" : "W");
+    }
+    LogPrintf("%s : selection height [%d, %d] map %s\n", __func__, nHeightFirstCandidate, pindexPrev->nHeight, strSelectionMap.c_str());
+    LogPrintf("%s : new modifier=%s time=%s\n", __func__, std::to_string(nStakeModifierNew).c_str(), DateTimeStrFormat("%Y-%m-%d %H:%M:%S", pindexPrev->GetBlockTime()).c_str());
 
     nStakeModifier = nStakeModifierNew;
     fGeneratedStakeModifier = true;
@@ -239,6 +263,9 @@ bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifi
     if (!mapBlockIndex.count(hashBlockFrom))
         return error("%s : block not indexed", __func__);
     const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
+
+    bool fLog = (pindexFrom->nHeight == 276);
+
     nStakeModifierHeight = pindexFrom->nHeight;
     nStakeModifierTime = pindexFrom->GetBlockTime();
     // Fixed stake modifier only for regtest
@@ -272,6 +299,7 @@ bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, const unsigned int nBit
     if (!GetHashProofOfStake(pindexPrev, stake, nTimeTx, fVerify, hashProofOfStake)) {
         return error("%s : Failed to calculate the proof of stake hash", __func__);
     }
+    LogPrintf("%s - pIndexPrev->nHeight[%d] stake-height[%d] nTimeTx[%d] hashProofOfStake[%s]\n", __func__, pindexPrev->nHeight, stake->GetIndexFrom()->nHeight, nTimeTx, hashProofOfStake.GetHex());
 
     // Base target
     arith_uint256 bnTarget;
@@ -312,6 +340,12 @@ bool GetHashProofOfStake(const CBlockIndex* pindexPrev, CStakeInput* stake, cons
     // Calculate hash
     ss << nTimeBlockFrom << ssUniqueID << nTimeTx;
     hashProofOfStakeRet = Hash(ss.begin(), ss.end());
+
+    if (fVerify) {
+        LogPrintf("%s - nStakeModifier=[%s] ssUniqueID[%s] nStakeModifierHeight[%s]\n",
+            __func__, HexStr(modifier_ss), HexStr(ssUniqueID), ((stake->IsZWGR()) ? "Not available" : std::to_string(stake->getStakeModifierHeight())));
+    }
+
     return true;
 }
 
@@ -437,32 +471,6 @@ bool CheckProofOfStake(const CBlock& block, uint256& hashProofOfStake, const CBl
     return true;
 }
 
-// Get stake modifier checksum
-unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
-{
-    assert(pindex->pprev || pindex->GetBlockHash() == Params().GetConsensus().hashGenesisBlock);
-    // Hash previous checksum with flags, hashProofOfStake and nStakeModifier
-    CDataStream ss(SER_GETHASH, 0);
-    if (pindex->pprev)
-        ss << pindex->pprev->nStakeModifierChecksum;
-    uint256 hashProofOfStake = mapProofOfStake[pindex->GetBlockHash()];
-    ss << pindex->nFlags << hashProofOfStake << pindex->nStakeModifier;
-    uint256 hashChecksum = Hash(ss.begin(), ss.end());
-    arith_uint256 arithHashChecksum = UintToArith256(hashChecksum);
-    arithHashChecksum >>= (256 - 32);
-    return arithHashChecksum.GetLow64();
-}
-
-// Check stake modifier hard checkpoints
-bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
-{
-    if (Params().NetworkIDString() != CBaseChainParams::MAIN) return true; // Testnet has no checkpoints
-    if (mapStakeModifierCheckpoints.count(nHeight)) {
-        return nStakeModifierChecksum == mapStakeModifierCheckpoints[nHeight];
-    }
-    return true;
-}
-
 // Timestamp for time protocol V2: slot duration 15 seconds
 int64_t GetTimeSlot(const int64_t nTime)
 {
@@ -479,9 +487,6 @@ bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex*
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
             return state.Invalid(error("%s : ComputeNextStakeModifier() failed", __func__));
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            return state.DoS(20, error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__));
     } else {
         // compute v2 stake modifier
         ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);
