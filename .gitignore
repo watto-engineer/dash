@@ -152,6 +152,9 @@ make
 .idea
 cmake-build-debug
 
+# VScode
+.vscode
+
 # clang-check
 *.plist
 
