@@ -23,7 +23,6 @@ class CNode;
 
 class UniValue;
 
-
 // The main object for accessing mixing
 extern std::map<const std::string, std::shared_ptr<CCoinJoinClientManager>> coinJoinClientManagers;
 

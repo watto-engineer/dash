@@ -970,7 +970,7 @@ CChain& ChainActive();
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern std::unique_ptr<CBlockTreeDB> pblocktree;
 /** Global variable that points to the zerocoin database (protected by cs_main) */
-extern CZerocoinDB *zerocoinDB;
+extern std::unique_ptr<CZerocoinDB> zerocoinDB;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().

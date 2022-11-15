@@ -199,7 +199,7 @@ public:
 
     //! (memory only) Maximum nTime in the chain up to and including this block.
     unsigned int nTimeMax{0};
-        void SetNull()
+    void SetNull()
     {
         phashBlock = nullptr;
         pprev = nullptr;
@@ -247,7 +247,7 @@ public:
           nBits{block.nBits},
           nNonce{block.nNonce}
          {
-            if(block.nVersion > 7)
+            if(block.nVersion > BLOCKHEADER_LEGACY_VERSION)
                 nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
          }
 
@@ -479,7 +479,7 @@ public:
         READWRITE(obj.nBits);
         READWRITE(obj.nNonce);
         READWRITE(VARINT(obj.nFlags));
-        if(obj.nVersion > 7) {
+        if(obj.nVersion > BLOCKHEADER_LEGACY_VERSION) {
             READWRITE(obj.nAccumulatorCheckpoint);
             READWRITE(obj.mapZerocoinSupply);
             READWRITE(obj.vMintDenominationsInBlock);

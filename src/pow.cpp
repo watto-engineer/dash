@@ -84,7 +84,7 @@ unsigned int static GetNextWorkRequiredOrig(const CBlockIndex* pindexLast, const
     }
 
     arith_uint256 bnTargetLimit = fProofOfStake ? UintToArith256(params.posLimit) : UintToArith256(params.powLimit);
-    if (pindexLast->nHeight > params.nPosStartHeight) {
+    if (pindexLast->nHeight >= params.nPosStartHeight) {
         int64_t nTargetSpacing = 60;
         int64_t nTargetTimespan = 60 * 40;
 
@@ -212,7 +212,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     }
 
     bool fProofOfStake = pindexLast->nHeight + 1 >= params.nPosStartHeight;
-    if (pindexLast->nHeight + 1 < params.nPivxProtocolV2) {
+    if (pindexLast->nHeight + 1 < params.nPivxProtocolV2StartHeight) {
         return GetNextWorkRequiredOrig(pindexLast, params, fProofOfStake);
     }
 

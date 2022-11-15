@@ -260,13 +260,9 @@ bool CStake::GetModifier(uint64_t& nStakeModifier)
         if (!pindexFrom)
             return error("%s: failed to get index from", __func__);
         // TODO: This method must be removed from here in the short terms.. it's a call to an static method in kernel.cpp when this class method is only called from kernel.cpp, no comments..
-        if (pindexFrom->nHeight >= Params().GetConsensus().DGWStartHeight) {
-            if (!GetKernelStakeModifier(pindexFrom->GetBlockHash(), this->nStakeModifier, this->nStakeModifierHeight, this->nStakeModifierTime, false))
-                return error("CheckStakeKernelHash(): failed to get kernel stake modifier");
-        } else {
-            if (!GetKernelStakeModifierPreDGW(pindexFrom->GetBlockHash(), this->nStakeModifier, this->nStakeModifierHeight, this->nStakeModifierTime, false))
-                return error("CheckStakeKernelHash(): failed to get kernel stake modifier");
-        }
+
+        if (!GetKernelStakeModifier(pindexFrom->GetBlockHash(), this->nStakeModifier, this->nStakeModifierHeight, this->nStakeModifierTime, false))
+            return error("CheckStakeKernelHash(): failed to get kernel stake modifier");
     }
     nStakeModifier = this->nStakeModifier;
 
@@ -276,14 +272,9 @@ bool CStake::GetModifier(uint64_t& nStakeModifier)
 CDataStream CStake::GetUniqueness()
 {
     //The unique identifier for a stake is the outpoint
-    if (chainActive.Height() >= Params().GetConsensus().DGWStartHeight) {
-        CDataStream ss(SER_NETWORK, 0);
-        ss << nPosition << txFrom->GetHash();
-        return ss;
-    } else {
-        CDataStream ss(SER_GETHASH, 0);
-        return ss;
-    }
+    CDataStream ss(SER_NETWORK, 0);
+    ss << nPosition << txFrom->GetHash();
+    return ss;
 }
 
 //The block that the UTXO was added to the chain

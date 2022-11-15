@@ -234,13 +234,13 @@ std::string ReindexZerocoinDB()
         return _("Failed to wipe zerocoinDB");
     }
 
-    uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0);
+    uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0, false);
 
     CBlockIndex* pindex = chainActive[Params().GetConsensus().nBlockZerocoinV2];
     std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpendInfo;
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMintInfo;
     while (pindex) {
-        uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().nBlockZerocoinV2) / (double)(chainActive.Height() - Params().GetConsensus().nBlockZerocoinV2) * 100))));
+        uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().nBlockZerocoinV2) / (double)(chainActive.Height() - Params().GetConsensus().nBlockZerocoinV2) * 100))), false);
 
         if (pindex->nHeight % 1000 == 0)
             LogPrintf("Reindexing zerocoin : block %d...\n", pindex->nHeight);
@@ -304,13 +304,13 @@ std::string ReindexZerocoinDB()
 
         pindex = chainActive.Next(pindex);
     }
-    uiInterface.ShowProgress("", 100);
+    uiInterface.ShowProgress("", 100, false);
 
     // Final flush to disk in case any remaining information exists
     if ((!vSpendInfo.empty() && !zerocoinDB->WriteCoinSpendBatch(vSpendInfo)) || (!vMintInfo.empty() && !zerocoinDB->WriteCoinMintBatch(vMintInfo)))
         return _("Error writing zerocoinDB to disk");
 
-    uiInterface.ShowProgress("", 100);
+    uiInterface.ShowProgress("", 100, false);
 
     return "";
 }
