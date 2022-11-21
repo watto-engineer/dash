@@ -815,6 +815,9 @@ private:
      */
     void InitCoinJoinSalt();
 
+    // Staking and POS
+    uint64_t nStakeSplitThreshold = 2000;
+
     /* Height of last block processed is used by wallet to know depth of transactions
      * without relying on Chain interface beyond asynchronous updates. For safety, we
      * initialize it to -1. Height is a pointer on node's tip and doesn't imply
@@ -1258,6 +1261,13 @@ public:
     bool AutoBackupWallet(const fs::path& wallet_path, bilingual_str& error_string, std::vector<bilingual_str>& warnings);
 
     bool BackupWallet(const std::string& strDest);
+
+    /**
+     * Staking and POS
+     */
+    bool SetStakeSplitThreshold(uint64_t newThreshold);
+    void LoadStakeSplitThreshold(uint64_t newThreshold);
+    uint64_t GetStakeSplitThreshold();
 
     /**
      * HD Wallet Functions

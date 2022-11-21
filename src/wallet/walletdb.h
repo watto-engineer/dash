@@ -196,6 +196,9 @@ public:
 
     bool WriteMinVersion(int nVersion);
 
+    bool WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold);
+    bool LoadStakeSplitThreshold(uint64_t nStakeSplitThreshold);
+
     bool ReadCoinJoinSalt(uint256& salt, bool fLegacy = false);
     bool WriteCoinJoinSalt(const uint256& salt);
 

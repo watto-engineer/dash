@@ -48,6 +48,7 @@ const std::string ORDERPOSNEXT{"orderposnext"};
 const std::string POOL{"pool"};
 const std::string PURPOSE{"purpose"};
 const std::string PRIVATESEND_SALT{"ps_salt"};
+const std::string STAKE_SPLIT_THRESHOLD{"stakesplitthreshold"};
 const std::string TX{"tx"};
 const std::string VERSION{"version"};
 const std::string WATCHMETA{"watchmeta"};
@@ -186,6 +187,11 @@ bool WalletBatch::ErasePool(int64_t nPool)
 bool WalletBatch::WriteMinVersion(int nVersion)
 {
     return WriteIC(DBKeys::MINVERSION, nVersion);
+}
+
+bool WalletBatch::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
+{
+    return WriteIC(DBKeys::STAKE_SPLIT_THRESHOLD), nStakeSplitThreshold);
 }
 
 bool WalletBatch::ReadCoinJoinSalt(uint256& salt, bool fLegacy)
@@ -481,6 +487,11 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         } else if (strType != DBKeys::BESTBLOCK && strType != DBKeys::BESTBLOCK_NOMERKLE &&
                    strType != DBKeys::MINVERSION && strType != DBKeys::ACENTRY && strType != DBKeys::VERSION) {
             wss.m_unknown_records++;
+        else if (strType == DBKeys::STAKE_SPLIT_THRESHOLD)
+        {
+            uint64_t nStakeSplitThreshold;
+            ssValue >> nStakeSplitThreshold;
+            pwallet->LoadStakeSplitThreshold(nStakeSplitThreshold);
         }
     } catch (const std::exception& e) {
         if (strErr.empty()) {
