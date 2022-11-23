@@ -63,6 +63,8 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
+GENESISTIME = 1518696183
+
 TMPDIR_PREFIX = "dash_func_test_"
 
 class SkipTest(Exception):
