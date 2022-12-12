@@ -1,4 +1,4 @@
-### Gavin's notes on getting Gitian builds up and running using KVM
+### Notes on getting Gitian builds up and running
 
 These instructions distilled from
 [https://help.ubuntu.com/community/KVM/Installation](https://help.ubuntu.com/community/KVM/Installation).
@@ -45,11 +45,11 @@ If your main machine is a 64-bit Mac or PC with a few gigabytes of memory
 and at least 10 gigabytes of free disk space, you can `gitian-build` using
 LXC running inside a virtual machine.
 
-Here's a description of Gavin's setup on OSX 10.6:
+Here's a description of a setup on OSX 10.6:
 
 1. Download and install VirtualBox from [https://www.virtualbox.org/](https://www.virtualbox.org/)
 
-2. Download the 64-bit Ubuntu Desktop 12.04 LTS .iso CD image from
+2. Download the 64-bit Ubuntu Desktop 20.04 LTS .iso CD image from
    [http://www.ubuntu.com/](http://www.ubuntu.com/)
 
 3. Run VirtualBox and create a new virtual machine, using the Ubuntu .iso (see the [VirtualBox documentation](https://www.virtualbox.org/wiki/Documentation) for details). Create it with at least 2 gigabytes of memory and a disk that is at least 20 gigabytes big.

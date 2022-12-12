@@ -1,30 +1,24 @@
 ---
-name: "wagerr-dmg-signer"
+name: "bytz-dmg-signer"
 distro: "ubuntu"
 suites:
-- "focal"
+- "bionic"
 architectures:
 - "amd64"
 packages:
 - "faketime"
 - "xorriso"
-- "python3-pip"
 remotes:
 - "url": "https://github.com/wagerr/wagerr-detached-sigs.git"
   "dir": "signature"
-- "url": "https://github.com/achow101/signapple.git"
-  "dir": "signapple"
-  "commit": "8a945a2e7583be2665cf3a6a89d665b70ecd1ab6"
 files:
-- "wagerrcore-osx-unsigned.tar.gz"
+- "wagerr-osx-unsigned.tar.gz"
 script: |
   set -e -o pipefail
-
   WRAP_DIR=$HOME/wrapped
   mkdir -p ${WRAP_DIR}
   export PATH="$PWD":$PATH
   FAKETIME_PROGS="dmg xorrisofs"
-
   # Create global faketime wrappers
   for prog in ${FAKETIME_PROGS}; do
     echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${prog}
@@ -34,20 +28,10 @@ script: |
     echo "\$REAL \$@" >> $WRAP_DIR/${prog}
     chmod +x ${WRAP_DIR}/${prog}
   done
-
-  # Install signapple
-  cd signapple
-  python3 -m pip install -U pip setuptools
-  python3 -m pip install .
-  export PATH="$HOME/.local/bin":$PATH
-  cd ..
-
-  UNSIGNED_TARBALL=wagerrcore-osx-unsigned.tar.gz
-  UNSIGNED_APP=dist/Dash-Qt.app
-  SIGNED=wagerrcore-osx-signed.dmg
-
-  tar -xf ${UNSIGNED_TARBALL}
+  UNSIGNED=wagerr-osx-unsigned.tar.gz
+  SIGNED=wagerr-osx-signed.dmg
+  tar -xf ${UNSIGNED}
   OSX_VOLNAME="$(cat osx_volname)"
-  ./detached-sig-apply.sh ${UNSIGNED_APP} signature/osx/dist
-  ${WRAP_DIR}/xorrisofs -D -l -V "${OSX_VOLNAME}" -no-pad -r -dir-mode 0755 -o uncompressed.dmg signed-app
-  ${WRAP_DIR}/dmg dmg uncompressed.dmg ${OUTDIR}/${SIGNED}
+  ./detached-sig-apply.sh ${UNSIGNED} signature/osx
+   ${WRAP_DIR}/xorrisofs -D -l -V "${OSX_VOLNAME}" -no-pad -r -dir-mode 0755 -o uncompressed.dmg signed-app
+   ${WRAP_DIR}/dmg dmg uncompressed.dmg ${OUTDIR}/${SIGNED}
