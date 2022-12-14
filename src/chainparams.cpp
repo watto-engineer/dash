@@ -241,7 +241,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1625097600; // July 1st, 2021
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1656633600; // July 1st, 2022
@@ -311,16 +311,15 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // long living quorum params
-        AddLLMQ(Consensus::LLMQType::LLMQ_50_60);
-        AddLLMQ(Consensus::LLMQType::LLMQ_60_75);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_60);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_85);
-        AddLLMQ(Consensus::LLMQType::LLMQ_100_67);
-        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_400_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_50_60;
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_85);
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_70);
+        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_20_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_20_60;
         consensus.llmqTypeDIP0024InstantSend = Consensus::LLMQType::LLMQ_60_75;
-        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_100_67;
-        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_400_85;
+        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_20_70;
+        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_40_85;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
@@ -453,7 +452,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1606780800; // December 1st, 2020
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 1638316800; // December 1st, 2021
@@ -517,18 +516,18 @@ public:
 
         // long living quorum params
         AddLLMQ[Consensus::LLMQType::LLMQ_TEST_V17];
-        AddLLMQ(Consensus::LLMQType::LLMQ_50_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_60);
         AddLLMQ(Consensus::LLMQType::LLMQ_60_75);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_60);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_85);
-        AddLLMQ(Consensus::LLMQType::LLMQ_100_67);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_85);
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_70);
 
         consensus.llmq_test_v17 = Consensus::LLMQType::LLMQ_TEST_V17;
-        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_50_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_50_60;
+        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_40_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_20_60;
         consensus.llmqTypeDIP0024InstantSend = Consensus::LLMQType::LLMQ_60_75;
-        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_100_67;
-        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_50_60;
+        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_20_70;
+        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_20_60;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -650,7 +649,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
-        // Deployment of DIP0020, DIP0021 and LLMQ_100_67 quorums
+        // Deployment of DIP0020, DIP0021 and LLMQ_20_70 quorums
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].bit = 6;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nStartTime = 1604188800; // November 1st, 2020
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0020].nTimeout = 999999999999ULL;
@@ -709,18 +708,18 @@ public:
         nExtCoinType = 1;
 
         // long living quorum params
-        AddLLMQ(Consensus::LLMQType::LLMQ_50_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_60);
         AddLLMQ(Consensus::LLMQType::LLMQ_60_75);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_60);
-        AddLLMQ(Consensus::LLMQType::LLMQ_400_85);
-        AddLLMQ(Consensus::LLMQType::LLMQ_100_67);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_60);
+        AddLLMQ(Consensus::LLMQType::LLMQ_40_85);
+        AddLLMQ(Consensus::LLMQType::LLMQ_20_70);
         AddLLMQ(Consensus::LLMQType::LLMQ_DEVNET);
         AddLLMQ(Consensus::LLMQType::LLMQ_DEVNET_DIP0024);
-        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_50_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_50_60;
+        consensus.llmqTypeChainLocks = Consensus::LLMQType::LLMQ_20_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQType::LLMQ_20_60;
         consensus.llmqTypeDIP0024InstantSend = Consensus::LLMQType::LLMQ_60_75;
-        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_100_67;
-        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_50_60;
+        consensus.llmqTypePlatform = Consensus::LLMQType::LLMQ_20_70;
+        consensus.llmqTypeMnhf = Consensus::LLMQType::LLMQ_20_60;
 
         UpdateDevnetLLMQChainLocksFromArgs(args);
         UpdateDevnetLLMQInstantSendFromArgs(args);
