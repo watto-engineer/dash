@@ -37,7 +37,7 @@ class CChainLocksHandler : public CRecoveredSigsListener
     static constexpr int64_t CLEANUP_SEEN_TIMEOUT = 24 * 60 * 60 * 1000;
 
     // how long to wait for islocks until we consider a block with non-islocked TXs to be safe to sign
-    static constexpr int64_t WAIT_FOR_ISLOCK_TIMEOUT = 10 * 60;
+    static const int64_t WAIT_FOR_ISLOCK_TIMEOUT = 4 * 60;
 
 private:
     CConnman& connman;
