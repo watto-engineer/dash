@@ -11,6 +11,8 @@ from test_framework.util import (
     assert_array_result,
     assert_equal,
     assert_raises_rpc_error,
+    sync_blocks,
+    find_vout_for_address,
 )
 
 
@@ -36,6 +38,8 @@ class ReceivedByTest(WagerrTestFramework):
         addr = self.nodes[1].getnewaddress()
         txid = self.nodes[0].sendtoaddress(addr, 0.1)
         self.sync_all()
+        lock_vout = find_vout_for_address(self.nodes[0], txid, addr)
+        self.nodes[1].lockunspent(False, [{"txid": txid, "vout": lock_vout}])
 
         # Check not listed in listreceivedbyaddress because has 0 confirmations
         assert_array_result(self.nodes[1].listreceivedbyaddress(),
@@ -45,9 +49,9 @@ class ReceivedByTest(WagerrTestFramework):
         # Bury Tx under 10 block so it will be returned by listreceivedbyaddress
         self.nodes[1].generate(10)
         self.sync_all()
-        #assert_array_result(self.nodes[1].listreceivedbyaddress(),
-        #                    {"address": addr},
-        #                    {"address": addr, "label": "", "amount": Decimal("0.1"), "confirmations": 10, "txids": [txid, ]})
+        assert_array_result(self.nodes[1].listreceivedbyaddress(),
+                            {"address": addr},
+                            {"address": addr, "label": "", "amount": Decimal("0.1"), "confirmations": 10, "txids": [txid, ]})
         # With min confidence < 10
         assert_array_result(self.nodes[1].listreceivedbyaddress(5),
                             {"address": addr},
@@ -80,6 +84,8 @@ class ReceivedByTest(WagerrTestFramework):
         txid2 = self.nodes[0].sendtoaddress(other_addr, 0.1)
         self.nodes[0].generate(1)
         self.sync_all()
+        lock_vout = find_vout_for_address(self.nodes[0], txid2, other_addr)
+        self.nodes[1].lockunspent(False, [{"txid": txid2, "vout": lock_vout}])
         # Same test as above should still pass
         expected = {"address": addr, "label": "", "amount": Decimal("0.1"), "confirmations": 11, "txids": [txid, ]}
         res = self.nodes[1].listreceivedbyaddress(0, True, True, True, addr)
@@ -105,6 +111,8 @@ class ReceivedByTest(WagerrTestFramework):
         addr = self.nodes[1].getnewaddress()
         txid = self.nodes[0].sendtoaddress(addr, 0.1)
         self.sync_all()
+        lock_vout = find_vout_for_address(self.nodes[0], txid, addr)
+        self.nodes[1].lockunspent(False, [{"txid": txid, "vout": lock_vout}])
 
         # Check balance is 0 because of 0 confirmations
         balance = self.nodes[1].getreceivedbyaddress(addr)
@@ -134,6 +142,8 @@ class ReceivedByTest(WagerrTestFramework):
 
         txid = self.nodes[0].sendtoaddress(addr, 0.1)
         self.sync_all()
+        lock_vout = find_vout_for_address(self.nodes[0], txid, addr)
+        self.nodes[1].lockunspent(False, [{"txid": txid, "vout": lock_vout}])
 
         # listreceivedbylabel should return received_by_label_json because of 0 confirmations
         assert_array_result(self.nodes[1].listreceivedbylabel(),
@@ -147,13 +157,13 @@ class ReceivedByTest(WagerrTestFramework):
         self.nodes[1].generate(10)
         self.sync_all()
         # listreceivedbylabel should return updated received list
-        #assert_array_result(self.nodes[1].listreceivedbylabel(),
-        #                    {"label": label},
-        #                    {"label": received_by_label_json["label"], "amount": (received_by_label_json["amount"] + Decimal("0.1"))})
+        assert_array_result(self.nodes[1].listreceivedbylabel(),
+                            {"label": label},
+                            {"label": received_by_label_json["label"], "amount": (received_by_label_json["amount"] + Decimal("0.1"))})
 
         # getreceivedbylabel should return updated receive total
         balance = self.nodes[1].getreceivedbylabel(label)
-        assert_equal(balance, balance_by_label + Decimal("10000.2"))
+        assert_equal(balance, balance_by_label + Decimal("0.1"))
 
         # Create a new label named "mynewlabel" that has a 0 balance
         address = self.nodes[1].getnewaddress()
