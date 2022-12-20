@@ -2368,64 +2368,6 @@ static UniValue settxfee(const JSONRPCRequest& request)
     return true;
 }
 
-static UniValue setcoinjoinrounds(const JSONRPCRequest& request)
-{
-    RPCHelpMan{"setcoinjoinrounds",
-        "\nSet the number of rounds for CoinJoin.\n",
-        {
-            {"rounds", RPCArg::Type::NUM, RPCArg::Optional::NO,
-                "The default number of rounds is " + std::to_string(DEFAULT_COINJOIN_ROUNDS) +
-                " Cannot be more than " + std::to_string(MAX_COINJOIN_ROUNDS) + " nor less than " + std::to_string(MIN_COINJOIN_ROUNDS)},
-        },
-        RPCResults{},
-        RPCExamples{
-            HelpExampleCli("setcoinjoinrounds", "4")
-    + HelpExampleRpc("setcoinjoinrounds", "16")
-        },
-    }.Check(request);
-
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-
-    int nRounds = request.params[0].get_int();
-
-    if (nRounds > MAX_COINJOIN_ROUNDS || nRounds < MIN_COINJOIN_ROUNDS)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid number of rounds");
-
-    CCoinJoinClientOptions::SetRounds(nRounds);
-
-    return NullUniValue;
-}
-
-static UniValue setcoinjoinamount(const JSONRPCRequest& request)
-{
-    RPCHelpMan{"setcoinjoinamount",
-        "\nSet the goal amount in " + CURRENCY_UNIT + " for CoinJoin.\n",
-        {
-            {"amount", RPCArg::Type::NUM, RPCArg::Optional::NO,
-                "The default amount is " + std::to_string(DEFAULT_COINJOIN_AMOUNT) +
-                " Cannot be more than " + std::to_string(MAX_COINJOIN_AMOUNT) + " nor less than " + std::to_string(MIN_COINJOIN_AMOUNT)},
-        },
-        RPCResults{},
-        RPCExamples{
-            HelpExampleCli("setcoinjoinamount", "500")
-    + HelpExampleRpc("setcoinjoinamount", "208")
-        },
-    }.Check(request);
-
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-
-    int nAmount = request.params[0].get_int();
-
-    if (nAmount > MAX_COINJOIN_AMOUNT || nAmount < MIN_COINJOIN_AMOUNT)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount of " + CURRENCY_UNIT + " as mixing goal amount");
-
-    CCoinJoinClientOptions::SetAmount(nAmount);
-
-    return NullUniValue;
-}
-
 static UniValue getwalletinfo(const JSONRPCRequest& request)
 {
     RPCHelpMan{"getwalletinfo",
@@ -4221,8 +4163,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "rescanblockchain",                 &rescanblockchain,              {"start_height", "stop_height"} },
     { "wallet",             "sendmany",                         &sendmany,                      {"dummy","amounts","minconf","addlocked","comment","subtractfeefrom","use_is","use_cj","conf_target","estimate_mode"} },
     { "wallet",             "sendtoaddress",                    &sendtoaddress,                 {"address","amount","comment","comment_to","subtractfeefromamount","use_is","use_cj","conf_target","estimate_mode", "avoid_reuse"} },
-    { "wallet",             "setcoinjoinrounds",                &setcoinjoinrounds,             {"rounds"} },
-    { "wallet",             "setcoinjoinamount",                &setcoinjoinamount,             {"amount"} },
     { "wallet",             "setlabel",                         &setlabel,                      {"address","label"} },
     { "wallet",             "settxfee",                         &settxfee,                      {"amount"} },
     { "wallet",             "setwalletflag",                    &setwalletflag,                 {"flag","value"} },
