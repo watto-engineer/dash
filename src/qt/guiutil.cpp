@@ -798,15 +798,15 @@ fs::path static StartupShortcutPath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Wagerr Core.lnk";
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "WAGERR Core.lnk";
     if (chain == CBaseChainParams::TESTNET) // Remove this special case when CBaseChainParams::TESTNET = "testnet4"
-        return GetSpecialFolderPath(CSIDL_STARTUP) / "Wagerr Core (testnet).lnk";
-    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("Wagerr Core (%s).lnk", chain);
+        return GetSpecialFolderPath(CSIDL_STARTUP) / "WAGERR Core (testnet).lnk";
+    return GetSpecialFolderPath(CSIDL_STARTUP) / strprintf("WAGERR Core (%s).lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
 {
-    // check for "Wagerr Core*.lnk"
+    // check for "WAGERR Core*.lnk"
     return fs::exists(StartupShortcutPath());
 }
 

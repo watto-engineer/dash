@@ -9,7 +9,7 @@
 #define UNUSED
 #endif
 static const char UNUSED *wagerr_strings[] = {
-QT_TRANSLATE_NOOP("wagerr-core", "Wagerr Core"),
+QT_TRANSLATE_NOOP("wagerr-core", "WAGERR Core"),
 QT_TRANSLATE_NOOP("wagerr-core", "The %s developers"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "%s file contains all private keys from this wallet. Do not share it with "

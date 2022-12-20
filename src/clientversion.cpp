@@ -12,7 +12,7 @@
  * for both wagerrd and wagerr-qt, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
-const std::string CLIENT_NAME("Wagerr Core");
+const std::string CLIENT_NAME("WAGERR Core");
 
 
 #ifdef HAVE_BUILD_INFO
