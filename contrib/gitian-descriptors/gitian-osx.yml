@@ -1,6 +1,5 @@
 ---
-name: "wagerr-osx-5.0.0"
-enable_cache: true
+name: "wagerr-osx-5.0.99"
 distro: "ubuntu"
 suites:
 - "bionic"
