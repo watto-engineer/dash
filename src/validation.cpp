@@ -555,6 +555,10 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     if (pfMissingInputs) {
         *pfMissingInputs = false;
     }
+    bool fV17Active_context = (unsigned int)chainActive.Height() >= Params().GetConsensus().V17DeploymentHeight;
+    if (fV17Active_context && tx.ContainsZerocoins()) {
+        return state.DoS(30, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
+    }
 
     if (!CheckTransaction(tx, state, true))
         return false; // state filled in by CheckTransaction
@@ -579,7 +583,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
     // potentially causing this node to create a bad block.
     if (IsAnyOutputGrouped(tx)) {
-        if ((unsigned int)chainActive.Tip()->nHeight < chainparams.GetConsensus().ATPStartHeight)
+        if ((unsigned int)chainActive.Height() < chainparams.GetConsensus().ATPStartHeight)
         {
             return state.Invalid(ValidationInvalid::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "premature-op_group-tx");
         } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
@@ -2187,7 +2191,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
     std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
 
-    bool fDIP0001Active_context = pindex->nHeight >= Params().GetConsensus().DIP0001Height;
+    bool fV17Active_context = pindex->nHeight >= Params().GetConsensus().V17DeploymentHeight;
 
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
     if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, view, fJustCheck, fScriptChecks)) {
@@ -2209,6 +2213,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         const uint256 txhash = tx->GetHash();
 
         nInputs += tx->vin.size();
+
+        if (fV17Active_context && tx->ContainsZerocoins()) {
+            return state.DoS(100, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
+        }
 
         if (tx->HasZerocoinSpendInputs())
         {
