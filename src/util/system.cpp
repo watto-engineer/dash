@@ -1324,7 +1324,7 @@ std::string CopyrightHolders(const std::string& strPrefix, unsigned int nStartYe
     std::string strCopyrightHolders = strPrefix + strprintf(" %u-%u ", nStartYear, nEndYear) + copyright_devs;
 
     // Check for untranslated substitution to make sure Wagerr Core copyright is not removed by accident
-    if (copyright_devs.find("Wagerr Core") == std::string::npos) {
+    if (copyright_devs.find("WAGERR Core") == std::string::npos) {
         strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2014, nEndYear) + "The Wagerr Core developers";
     }
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident
