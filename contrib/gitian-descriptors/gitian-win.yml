@@ -1,5 +1,5 @@
 ---
-name: "wagerr-win-5.0.0"
+name: "wagerr-win-5.0.99"
 enable_cache: true
 distro: "ubuntu"
 suites:
