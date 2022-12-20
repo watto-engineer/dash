@@ -14,6 +14,8 @@ from test_framework.messages import CCbTx, COIN, CTransaction, FromHex, ToHex, u
 from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import assert_equal, connect_nodes, force_finish_mnsync, get_bip9_status, p2p_port
 
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
+
 class Masternode(object):
     pass
 

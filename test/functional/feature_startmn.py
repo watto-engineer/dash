@@ -10,6 +10,7 @@ from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import *
 from test_framework.blocktools import *
 
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class WalletTest(WagerrTestFramework):
     def set_test_params(self):
@@ -63,24 +64,6 @@ class WalletTest(WagerrTestFramework):
         self.nodes[0].minttoken(mgtConfig['groupID'], tokensaddress, 20)
         self.nodes[0].generate(1)
 
-        self.log.info("Create GVT token...")
-        gvtBLSKey = self.nodes[0].bls("generate")
-        self.log.info("gvtBLSKey:")
-        self.log.info(gvtBLSKey)
-        gvtConfig = self.nodes[0].configuremanagementtoken("GVT", "GuardianValidatorToken", "https://www.google.com", "4f92d91db24bb0b8ca24a2ec86c4b012ccdc4b2e9d659c2079f5cc358413a765", "0", gvtBLSKey['public'], "true", "true")
-        self.nodes[0].generate(1)
-        self.log.info("gvtConfig:")
-        self.log.info(gvtConfig)
-        self.nodes[0].minttoken(gvtConfig['groupID'], tokensaddress, 30)
-        self.nodes[0].generate(1)
-        GVTcreditID = self.nodes[0].getsubgroupid(gvtConfig['groupID'], "credit")
-        self.log.info("GVTcreditID:")
-        self.log.info(GVTcreditID)
-        GCTcreditMint=self.nodes[0].minttoken(GVTcreditID, tokensaddress, 100)
-        self.log.info("GCTcreditMint:")
-        self.log.info(GCTcreditMint)
-        self.nodes[0].generate(1)
-
         tokenbalance = self.nodes[0].gettokenbalance()
         self.log.info("tokenbalance:")
         self.log.info(tokenbalance)
@@ -97,7 +80,6 @@ class WalletTest(WagerrTestFramework):
 #        mn01_blsMnkey = mn01_blsKey['secret']
 
         self.nodes[0].sendtoaddress(mn01_fundsAddr, 10000000.001)
-        self.nodes[0].sendtoken(GVTcreditID, mn01_fundsAddr, 1)
         self.nodes[0].generate(1)
         mn01_collateral_address = self.nodes[0].getnewaddress()
         mn01_rewards_address = self.nodes[0].getnewaddress()

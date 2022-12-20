@@ -55,6 +55,7 @@ from .util import (
     get_chain_folder,
 )
 
+WAGERR_AUTH_ADDR = "TqMgq4qkw7bGxf6CDhtDfEqzEtWD5C7x8U"
 
 class TestStatus(Enum):
     PASSED = 1
