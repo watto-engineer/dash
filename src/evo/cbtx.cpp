@@ -105,7 +105,7 @@ bool CheckCbTxMerkleRoots(const CBlock& block, const CBlockIndex* pindex, const 
 
 bool CheckCbTxCoinstakeFlags(const CCbTx& cbTx, const CBlock& block, CValidationState& state) {
     if (cbTx.coinstakeFlags >= CSTX_MAX) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-flags");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-cbtx-flags");
     }
 
     bool fPos;
@@ -114,7 +114,7 @@ bool CheckCbTxCoinstakeFlags(const CCbTx& cbTx, const CBlock& block, CValidation
     bool fOperatorTx;
     GetCbTxCoinstakeFlags(cbTx.coinstakeFlags, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx);
     if (!CheckCoinstakeOutputs(block, fPos, fSplitCoinstake, fMasternodeTx, fOperatorTx)) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-cbtx-cs-outputs");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-cbtx-cs-outputs");
     }
     return true;
 }

@@ -178,7 +178,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
 
         // If prev is coinstake, check that it's matured
         if (coin.IsCoinStake() && nSpendHeight - coin.nHeight < params.COINBASE_MATURITY(nSpendHeight)) {
-            return state.Invalid(false,
+            return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinstake",
                 strprintf("tried to spend coinstake at depth %d", nSpendHeight - coin.nHeight));
         }
@@ -190,18 +190,18 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
 
         // If prev is group authority, check that it's matured
         if (IsOutputGroupedAuthority(coin.out) && nSpendHeight - coin.nHeight < params.nOpGroupNewRequiredConfirmations) {
-            return state.Invalid(false,
+            return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-token-authority",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
         }
     // Different size for NFT
     if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
         if (tx.vExtraPayload.size() > MAX_TX_EXTRA_NFT_PAYLOAD)
-            return state.Invalid(false, REJECT_INVALID, "bad-txns-nft-payload-oversize");
+            return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, false, REJECT_INVALID, "bad-txns-nft-payload-oversize");
     } else {
         if (tx.vExtraPayload.size() > MAX_TX_EXTRA_PAYLOAD)
-            return state.Invalid(false, REJECT_INVALID, "bad-txns-payload-oversize");
-+    }
+            return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, false, REJECT_INVALID, "bad-txns-payload-oversize");
+    }
         // Check for negative or overflow input values
         nValueIn += coin.out.nValue;
         if (!MoneyRange(coin.out.nValue) || !MoneyRange(nValueIn)) {
@@ -216,12 +216,13 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         CAmount txfee_aux;
         const CAmount value_out = tx.GetValueOut();
         if (nValueIn < value_out) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-in-belowout", strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(value_out)));
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-in-belowout", strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(value_out)));
         }
+
         // Tally transaction fees
         txfee_aux = nValueIn - value_out;
         if (!MoneyRange(txfee_aux)) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-fee-outofrange");
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-fee-outofrange");
         }
 
         txfee = txfee_aux;

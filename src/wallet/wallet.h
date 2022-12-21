@@ -112,6 +112,7 @@ class CWalletTx;
 struct FeeCalculation;
 enum class FeeEstimateMode;
 class ReserveDestination;
+class CReserveKey;
 
 extern CCriticalSection cs_main;
 
