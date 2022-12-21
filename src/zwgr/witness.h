@@ -56,23 +56,20 @@ public:
     CoinWitnessCacheData(CoinWitnessData* coinWitnessData);
     void SetNull();
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CoinWitnessData, obj)
     {
-        READWRITE(denom);
-        READWRITE(nHeightCheckpoint);
-        READWRITE(nHeightMintAdded);
-        READWRITE(nHeightAccStart);
-        READWRITE(nHeightAccEnd);
-        READWRITE(nMintsAdded);
-        READWRITE(txid);
-        READWRITE(isV1);
-        READWRITE(coinAmount); // used to create the PublicCoin
-        READWRITE(coinDenom);
-        READWRITE(accumulatorAmount); // used to create the pAccumulator
-        READWRITE(accumulatorDenom);
+        READWRITE(obj.denom);
+        READWRITE(obj.nHeightCheckpoint);
+        READWRITE(obj.nHeightMintAdded);
+        READWRITE(obj.nHeightAccStart);
+        READWRITE(obj.nHeightAccEnd);
+        READWRITE(obj.nMintsAdded);
+        READWRITE(obj.txid);
+        READWRITE(obj.isV1);
+        READWRITE(obj.coinAmount); // used to create the PublicCoin
+        READWRITE(obj.coinDenom);
+        READWRITE(obj.accumulatorAmount); // used to create the pAccumulator
+        READWRITE(obj.accumulatorDenom);
     };
 };
 #endif //ZWGR_WITNESS_H

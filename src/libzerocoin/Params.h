@@ -56,15 +56,13 @@ public:
 	 */
 	CBigNum groupOrder;
 
-	ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-		    READWRITE(initialized);
-		    READWRITE(g);
-		    READWRITE(h);
-		    READWRITE(modulus);
-		    READWRITE(groupOrder);
+	SERIALIZE_METHODS(IntegerGroupParams, obj)
+	{
+		    READWRITE(obj.initialized);
+		    READWRITE(obj.g);
+		    READWRITE(obj.h);
+		    READWRITE(obj.modulus);
+		    READWRITE(obj.groupOrder);
 	}
 };
 
@@ -141,18 +139,17 @@ public:
 	 * The statistical zero-knowledgeness of the accumulator proof.
 	 */
 	uint32_t k_dprime;
-	ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-	    READWRITE(initialized);
-	    READWRITE(accumulatorModulus);
-	    READWRITE(accumulatorBase);
-	    READWRITE(accumulatorPoKCommitmentGroup);
-	    READWRITE(accumulatorQRNCommitmentGroup);
-	    READWRITE(minCoinValue);
-	    READWRITE(maxCoinValue);
-	    READWRITE(k_prime);
-	    READWRITE(k_dprime);
+	SERIALIZE_METHODS(AccumulatorAndProofParams, obj)
+	{
+	    READWRITE(obj.initialized);
+	    READWRITE(obj.accumulatorModulus);
+	    READWRITE(obj.accumulatorBase);
+	    READWRITE(obj.accumulatorPoKCommitmentGroup);
+	    READWRITE(obj.accumulatorQRNCommitmentGroup);
+	    READWRITE(obj.minCoinValue);
+	    READWRITE(obj.maxCoinValue);
+	    READWRITE(obj.k_prime);
+	    READWRITE(obj.k_dprime);
   }
 };
 
@@ -207,15 +204,14 @@ public:
 	 */
 	uint32_t zkp_hash_len;
 
-	ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-	    READWRITE(initialized);
-	    READWRITE(accumulatorParams);
-	    READWRITE(coinCommitmentGroup);
-	    READWRITE(serialNumberSoKCommitmentGroup);
-	    READWRITE(zkp_iterations);
-	    READWRITE(zkp_hash_len);
+	SERIALIZE_METHODS(ZerocoinParams, obj)
+	{
+	    READWRITE(obj.initialized);
+	    READWRITE(obj.accumulatorParams);
+	    READWRITE(obj.coinCommitmentGroup);
+	    READWRITE(obj.serialNumberSoKCommitmentGroup);
+	    READWRITE(obj.zkp_iterations);
+	    READWRITE(obj.zkp_hash_len);
 	}
 };
 
