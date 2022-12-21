@@ -57,15 +57,13 @@ public:
     unsigned int outputIndex = -1;
     libzerocoin::PublicCoin pubCoin;
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(version);
-        READWRITE(coinSerialNumber);
-        READWRITE(randomness);
-        READWRITE(pubkey);
-        READWRITE(vchSig);
+    SERIALIZE_METHODS(PublicCoinSpend, obj)
+    {
+        READWRITE(obj.version);
+        READWRITE(obj.coinSerialNumber);
+        READWRITE(obj.randomness);
+        READWRITE(obj.pubkey);
+        READWRITE(obj.vchSig);
     }
 };
 

@@ -38,30 +38,29 @@ public:
 	 */
 	bool Verify(const Accumulator& a,const CBigNum& valueOfCommitmentToCoin) const;
 
-	ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-	    READWRITE(C_e);
-	    READWRITE(C_u);
-	    READWRITE(C_r);
-	    READWRITE(st_1);
-	    READWRITE(st_2);
-	    READWRITE(st_3);
-	    READWRITE(t_1);
-	    READWRITE(t_2);
-	    READWRITE(t_3);
-	    READWRITE(t_4);
-	    READWRITE(s_alpha);
-	    READWRITE(s_beta);
-	    READWRITE(s_zeta);
-	    READWRITE(s_sigma);
-	    READWRITE(s_eta);
-	    READWRITE(s_epsilon);
-	    READWRITE(s_delta);
-	    READWRITE(s_xi);
-	    READWRITE(s_phi);
-	    READWRITE(s_gamma);
-	    READWRITE(s_psi);
+	SERIALIZE_METHODS(AccumulatorProofOfKnowledge, obj)
+	{
+	    READWRITE(obj.C_e);
+	    READWRITE(obj.C_u);
+	    READWRITE(obj.C_r);
+	    READWRITE(obj.st_1);
+	    READWRITE(obj.st_2);
+	    READWRITE(obj.st_3);
+	    READWRITE(obj.t_1);
+	    READWRITE(obj.t_2);
+	    READWRITE(obj.t_3);
+	    READWRITE(obj.t_4);
+	    READWRITE(obj.s_alpha);
+	    READWRITE(obj.s_beta);
+	    READWRITE(obj.s_zeta);
+	    READWRITE(obj.s_sigma);
+	    READWRITE(obj.s_eta);
+	    READWRITE(obj.s_epsilon);
+	    READWRITE(obj.s_delta);
+	    READWRITE(obj.s_xi);
+	    READWRITE(obj.s_phi);
+	    READWRITE(obj.s_gamma);
+	    READWRITE(obj.s_psi);
   }
 private:
 	const AccumulatorAndProofParams* params;

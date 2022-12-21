@@ -152,32 +152,30 @@ public:
         }
     }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(isUsed);
-        READWRITE(randomness);
-        READWRITE(serialNumber);
-        READWRITE(value);
-        READWRITE(denomination);
-        READWRITE(nHeight);
-        READWRITE(txid);
+    SERIALIZE_METHODS(CZerocoinMint, obj)
+    {
+        READWRITE(obj.isUsed);
+        READWRITE(obj.randomness);
+        READWRITE(obj.serialNumber);
+        READWRITE(obj.value);
+        READWRITE(obj.denomination);
+        READWRITE(obj.nHeight);
+        READWRITE(obj.txid);
 
         bool fVersionedMint = true;
         try {
-            READWRITE(version);
+            READWRITE(obj.version);
         } catch (...) {
             fVersionedMint = false;
         }
 
-        if (version > CURRENT_VERSION) {
-            version = 1;
+        if (obj.version > CURRENT_VERSION) {
+            obj.version = 1;
             fVersionedMint = false;
         }
 
         if (fVersionedMint)
-            READWRITE(privkey);
+            READWRITE(obj.privkey);
     };
 };
 
@@ -224,15 +222,13 @@ public:
     void SetMintCount(int nMintsAdded) { this->nMintCount = nMintsAdded; }
     int GetMintCount() const { return nMintCount; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(coinSerial);
-        READWRITE(hashTx);
-        READWRITE(pubCoin);
-        READWRITE(denomination);
-        READWRITE(nAccumulatorChecksum);
+    SERIALIZE_METHODS(CZerocoinSpend, obj)
+    {
+        READWRITE(obj.coinSerial);
+        READWRITE(obj.hashTx);
+        READWRITE(obj.pubCoin);
+        READWRITE(obj.denomination);
+        READWRITE(obj.nAccumulatorChecksum);
     };
 };
 
