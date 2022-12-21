@@ -1541,7 +1541,7 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
     return true;
 }
 
-bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, bool check_sigs)
 {
     if (tx.nType != TRANSACTION_PROVIDER_UPDATE_REVOKE) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-type");
@@ -1565,21 +1565,7 @@ bool CheckProUpRevTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
         if (auto maybe_err = CheckInputsHash(tx, ptx); maybe_err.did_err) {
             return state.Invalid(maybe_err.reason, false, REJECT_INVALID, std::string(maybe_err.error_str));
         }
-
-        if (ptx.nReason == CProUpRevTx::REASON_EXPIRED) {
-            if (!tokenGroupManager->ManagementTokensCreated()) {
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-revoke-token-too-early");
-            }
-            if (!CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
-                // pass the state returned by the function above
-                return false;
-            }
-            CTokenGroupCreation mgtCreation;
-            if (!tokenGroupManager->GetTokenGroupCreation(tokenGroupManager->GetMGTID(), mgtCreation)) {
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-revoke-bls-key");
-            }
-            const CTokenGroupDescriptionMGT *mgtDesc = boost::get<CTokenGroupDescriptionMGT>(mgtCreation.pTokenGroupDescription.get());
-
+        if (check_sigs && !CheckHashSig(ptx, dmn->pdmnState->pubKeyOperator.Get(), state)) {
                 // pass the state returned by the function above
                 return false;
         }
