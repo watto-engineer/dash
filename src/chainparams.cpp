@@ -318,7 +318,7 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
 
-        vSporkAddresses = {"WgLzEjcmwJ48x3iTpyPGfcksV71efcTq8n"}; // 043432137728fb0f6ea29315e3e65d76f976b5d88710a8921437e1aabf1adc98ddb55035c17ffa581243db4bc7b6b3e5d0bdd968a28be906098c0b6cb8c6936b80
+        vSporkAddresses = {"Wj33PEETpJmDSHa2qosPcg8XzKe5bGLLZV"}; // 043432137728fb0f6ea29315e3e65d76f976b5d88710a8921437e1aabf1adc98ddb55035c17ffa581243db4bc7b6b3e5d0bdd968a28be906098c0b6cb8c6936b80
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
@@ -510,7 +510,7 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TNV3YwvMaD7qBASs6KjPTdYiC8GjqeQosm"}; // 04d23d4179050244bfeff9f03ab4117e79a8835a9c0aba21b6df8d9e31042cc3b76bcb323a6e3a0e87b801ba2beef2c1db3a2a93d62bdb2e10192d8807f27e6f33
+        vSporkAddresses = {"TFykoxcv77bbLq3gG3hFLZqZ6QKERU9Syi"}; // 04d23d4179050244bfeff9f03ab4117e79a8835a9c0aba21b6df8d9e31042cc3b76bcb323a6e3a0e87b801ba2beef2c1db3a2a93d62bdb2e10192d8807f27e6f33
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
@@ -693,7 +693,7 @@ public:
         nPoolMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TNV3YwvMaD7qBASs6KjPTdYiC8GjqeQosm"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
+        vSporkAddresses = {"TNZgamuYWzNeupr9qD1To2rEBoEcbPA2x4"}; // 04b33722601343992c8a651fafa0f424c6ac90f797d3f58d90eebf96e817e9d7ca76a40e3c53b3d47f6f6a60b0d36dbb94ee630a5ad622f08d92782999fe7b043a
         nMinSporkKeys = 1;
         // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
         fBIP9CheckMasternodesUpgraded = false;
@@ -906,7 +906,7 @@ public:
         WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
         private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
         */
-        vSporkAddresses = {"TKCjZUMw7Hjq5vUSKdcuQnotxcG9De2oxH"}; // 048b664010f7851071787d58c276c05701b7109fa29f2360a3e72b3bdfa32b49cf20a23fd34bcc49fc564fdbdccc54dd0dc9183a7bdf05d580d118fcdcd4abfb3f
+        vSporkAddresses = {"TPiq9YKZdbfEGuZuZhQtLNGrkKSchmL1gc"}; // 048b664010f7851071787d58c276c05701b7109fa29f2360a3e72b3bdfa32b49cf20a23fd34bcc49fc564fdbdccc54dd0dc9183a7bdf05d580d118fcdcd4abfb3f
         nMinSporkKeys = 1;
         // regtest usually has no masternodes in most tests, so don't check for upgraged MNs
         fBIP9CheckMasternodesUpgraded = false;
