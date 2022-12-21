@@ -54,17 +54,14 @@ public:
         documentHash = uint256();
     }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CTokenGroupDescriptionRegular, obj)
     {
-        READWRITE(nVersion);
-        READWRITE(strTicker);
-        READWRITE(strName);
-        READWRITE(strDocumentUrl);
-        READWRITE(documentHash);
-        READWRITE(nDecimalPos);
+        READWRITE(obj.nVersion);
+        READWRITE(obj.strTicker);
+        READWRITE(obj.strName);
+        READWRITE(obj.strDocumentUrl);
+        READWRITE(obj.documentHash);
+        READWRITE(obj.nDecimalPos);
     }
     void ToJson(UniValue& obj) const;
     void WriteHashable(CHashWriter& ss) const {
@@ -117,18 +114,15 @@ public:
         blsPubKey = CBLSPublicKey();
     }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CTokenGroupDescriptionMGT, obj)
     {
-        READWRITE(nVersion);
-        READWRITE(strTicker);
-        READWRITE(strName);
-        READWRITE(strDocumentUrl);
-        READWRITE(documentHash);
-        READWRITE(nDecimalPos);
-        READWRITE(blsPubKey);
+        READWRITE(obj.nVersion);
+        READWRITE(obj.strTicker);
+        READWRITE(obj.strName);
+        READWRITE(obj.strDocumentUrl);
+        READWRITE(obj.documentHash);
+        READWRITE(obj.nDecimalPos);
+        READWRITE(obj.blsPubKey);
     }
     void ToJson(UniValue& obj) const;
     void WriteHashable(CHashWriter& ss) const {
@@ -182,18 +176,15 @@ public:
         strDataFilename = "";
     }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CTokenGroupDescriptionNFT, obj)
     {
-        READWRITE(nVersion);
-        READWRITE(strName);
-        READWRITE(nMintAmount);
-        READWRITE(strDocumentUrl);
-        READWRITE(documentHash);
-        READWRITE(vchData);
-        READWRITE(strDataFilename);
+        READWRITE(obj.nVersion);
+        READWRITE(obj.strName);
+        READWRITE(obj.nMintAmount);
+        READWRITE(obj.strDocumentUrl);
+        READWRITE(obj.documentHash);
+        READWRITE(obj.vchData);
+        READWRITE(obj.strDataFilename);
     }
     void ToJson(UniValue& obj, const bool& fFull = false) const;
 

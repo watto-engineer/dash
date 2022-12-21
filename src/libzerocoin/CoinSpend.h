@@ -134,24 +134,23 @@ public:
     CBigNum CalculateValidSerial(ZerocoinParams* params);
     std::string ToString() const;
 
-    ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(denomination);
-        READWRITE(ptxHash);
-        READWRITE(accChecksum);
-        READWRITE(accCommitmentToCoinValue);
-        READWRITE(serialCommitmentToCoinValue);
-        READWRITE(coinSerialNumber);
-        READWRITE(accumulatorPoK);
-        READWRITE(serialNumberSoK);
-        READWRITE(commitmentPoK);
+    SERIALIZE_METHODS(CoinSpend, obj)
+    {
+        READWRITE(obj.denomination);
+        READWRITE(obj.ptxHash);
+        READWRITE(obj.accChecksum);
+        READWRITE(obj.accCommitmentToCoinValue);
+        READWRITE(obj.serialCommitmentToCoinValue);
+        READWRITE(obj.coinSerialNumber);
+        READWRITE(obj.accumulatorPoK);
+        READWRITE(obj.serialNumberSoK);
+        READWRITE(obj.commitmentPoK);
 
         try {
-            READWRITE(version);
-            READWRITE(pubkey);
-            READWRITE(vchSig);
-            READWRITE(spendType);
+            READWRITE(obj.version);
+            READWRITE(obj.pubkey);
+            READWRITE(obj.vchSig);
+            READWRITE(obj.spendType);
         } catch (...) {
             version = 1;
         }

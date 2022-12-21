@@ -46,21 +46,18 @@ public:
     void SetUsed(const bool isUsed) { this->isUsed = isUsed; }
     std::string ToString() const;
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CDeterministicMint, obj)
     {
-        READWRITE(this->nVersion);
-        READWRITE(nCount);
-        READWRITE(hashSeed);
-        READWRITE(hashSerial);
-        READWRITE(hashStake);
-        READWRITE(hashPubcoin);
-        READWRITE(txid);
-        READWRITE(nHeight);
-        READWRITE(denom);
-        READWRITE(isUsed);
+        READWRITE(obj.nVersion);
+        READWRITE(obj.nCount);
+        READWRITE(obj.hashSeed);
+        READWRITE(obj.hashSerial);
+        READWRITE(obj.hashStake);
+        READWRITE(obj.hashPubcoin);
+        READWRITE(obj.txid);
+        READWRITE(obj.nHeight);
+        READWRITE(obj.denom);
+        READWRITE(obj.isUsed);
     };
 };
 

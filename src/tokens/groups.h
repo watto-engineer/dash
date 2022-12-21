@@ -99,11 +99,8 @@ public:
 
     const std::vector<unsigned char> &bytes(void) const { return data; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(data);
+    SERIALIZE_METHODS(CTokenGroupID, obj)
+        READWRITE(obj.data);
     }
 
     bool hasFlag(TokenGroupIdFlags flag) const;
@@ -206,13 +203,11 @@ public:
     CAmount quantity; // The number of tokens specified in this script
     bool invalid;
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(this->associatedGroup);
-        READWRITE(this->quantity);
-        READWRITE(this->invalid);
+    SERIALIZE_METHODS(CTokenGroupID, obj)
+    {
+        READWRITE(obj.associatedGroup);
+        READWRITE(obj.quantity);
+        READWRITE(obj.invalid);
     }
 
     // if the utxo is a controller this is not NONE
