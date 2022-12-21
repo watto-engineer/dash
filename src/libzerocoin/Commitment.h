@@ -47,12 +47,11 @@ private:
 	CBigNum commitmentValue;
 	CBigNum randomness;
 	const CBigNum contents;
-	ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-	    READWRITE(commitmentValue);
-	    READWRITE(randomness);
-	    READWRITE(contents);
+	SERIALIZE_METHODS(Commitment, obj)
+	{
+	    READWRITE(obj.commitmentValue);
+	    READWRITE(obj.randomness);
+	    READWRITE(obj.contents);
 	}
 };
 
@@ -92,13 +91,12 @@ public:
 	 * @return
 	 */
 	bool Verify(const CBigNum& A, const CBigNum& B) const;
-	ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-	    READWRITE(S1);
-	    READWRITE(S2);
-	    READWRITE(S3);
-	    READWRITE(challenge);
+	SERIALIZE_METHODS(CommitmentProofOfKnowledge, obj)
+	{
+	    READWRITE(obj.S1);
+	    READWRITE(obj.S2);
+	    READWRITE(obj.S3);
+	    READWRITE(obj.challenge);
 	}
 private:
 	const IntegerGroupParams *ap, *bp;

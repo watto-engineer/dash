@@ -72,11 +72,10 @@ public:
      */
     bool validate() const;
 
-    ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(value);
-        READWRITE(denomination);
+    SERIALIZE_METHODS(PublicCoin, obj)
+    {
+        READWRITE(obj.value);
+        READWRITE(obj.denomination);
     }
 
 private:
@@ -125,16 +124,15 @@ public:
     bool sign(const uint256& hash, std::vector<unsigned char>& vchSig) const;
     bool IsValid();
 
-    ADD_SERIALIZE_METHODS;
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(publicCoin);
-        READWRITE(randomness);
-        READWRITE(serialNumber);
-        version = (uint8_t )ExtractVersionFromSerial(serialNumber);
+    SERIALIZE_METHODS(PrivateCoin, obj)
+    {
+        READWRITE(obj.publicCoin);
+        READWRITE(obj.randomness);
+        READWRITE(obj.serialNumber);
+        version = (uint8_t )ExtractVersionFromSerial(obj.serialNumber);
         if (version == 2) {
             READWRITE(version);
-            READWRITE(privkey);
+            READWRITE(obj.privkey);
         }
     }
 
