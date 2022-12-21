@@ -100,6 +100,7 @@ public:
     const std::vector<unsigned char> &bytes(void) const { return data; }
 
     SERIALIZE_METHODS(CTokenGroupID, obj)
+    {
         READWRITE(obj.data);
     }
 
@@ -203,7 +204,7 @@ public:
     CAmount quantity; // The number of tokens specified in this script
     bool invalid;
 
-    SERIALIZE_METHODS(CTokenGroupID, obj)
+    SERIALIZE_METHODS(CTokenGroupInfo, obj)
     {
         READWRITE(obj.associatedGroup);
         READWRITE(obj.quantity);
