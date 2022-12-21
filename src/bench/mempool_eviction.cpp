@@ -12,12 +12,12 @@ static void AddTx(const CTransactionRef& tx, const CAmount& nFee, CTxMemPool& po
 {
     int64_t nTime = 0;
     unsigned int nHeight = 1;
-    bool spendsCoinbase = false;
+    bool spendsGenerated = false;
     unsigned int sigOps = 1;
     LockPoints lp;
     pool.addUnchecked(CTxMemPoolEntry(
                                         tx, nFee, nTime, nHeight,
-                                        spendsCoinbase, sigOps, lp));
+                                        spendsGenerated, sigOps, lp));
 }
 
 // Right now this is only testing eviction performance in an extremely small

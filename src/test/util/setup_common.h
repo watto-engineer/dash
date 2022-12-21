@@ -165,7 +165,7 @@ struct TestMemPoolEntryHelper
     TestMemPoolEntryHelper &Fee(CAmount _fee) { nFee = _fee; return *this; }
     TestMemPoolEntryHelper &Time(int64_t _time) { nTime = _time; return *this; }
     TestMemPoolEntryHelper &Height(unsigned int _height) { nHeight = _height; return *this; }
-    TestMemPoolEntryHelper &SpendsCoinbase(bool _flag) { spendsGenerated = _flag; return *this; }
+    TestMemPoolEntryHelper &SpendsGenerated(bool _flag) { spendsGenerated = _flag; return *this; }
     TestMemPoolEntryHelper &SigOps(unsigned int _sigops) { sigOpCount = _sigops; return *this; }
 };
 
