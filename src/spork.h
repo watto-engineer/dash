@@ -37,6 +37,7 @@ enum SporkId : int32_t {
     SPORK_9_SUPERBLOCKS_ENABLED                            = 10008,
     SPORK_17_QUORUM_DKG_ENABLED                            = 10016,
     SPORK_19_CHAINLOCKS_ENABLED                            = 10018,
+    SPORK_20_BETTING_MAINTENANCE_MODE                      = 10019,
     SPORK_21_QUORUM_ALL_CONNECTED                          = 10020,
     SPORK_23_QUORUM_POSE                                   = 10022,
 
@@ -69,6 +70,7 @@ struct CSporkDef
     MAKE_SPORK_DEF(SPORK_9_SUPERBLOCKS_ENABLED,            4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_17_QUORUM_DKG_ENABLED,            4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_19_CHAINLOCKS_ENABLED,            4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_20_BETTING_MAINTENANCE_MODE,      4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_21_QUORUM_ALL_CONNECTED,          4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_23_QUORUM_POSE,                   4070908800ULL), // OFF
 };
@@ -117,7 +119,7 @@ public:
     }
 
     /**
-     * GetHash returns the double-sha256 hash of the serialized spork message.
+     * GetHash returns the quark hash of the serialized spork message.
      */
     uint256 GetHash() const;
 
