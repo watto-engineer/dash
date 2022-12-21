@@ -263,8 +263,7 @@ template<typename Stream> inline void Unserialize(Stream& s, Span<unsigned char>
 template<typename Stream> inline void Serialize(Stream& s, bool a)    { char f=a; ser_writedata8(s, f); }
 template<typename Stream> inline void Unserialize(Stream& s, bool& a) { char f=ser_readdata8(s); a=f; }
 
-template <typename T> size_t GetSerializeSize(const T& t, int nType, int nVersion = 0);
-template <typename S, typename T> size_t GetSerializeSize(const S& s, const T& t);
+template <typename T> size_t GetSerializeSize(const T& t, int nVersion = 0);
 
 /**
  * libzerocoin::CoinDenomination
