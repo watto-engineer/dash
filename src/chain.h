@@ -13,7 +13,6 @@
 
 #include <arith_uint256.h>
 #include <consensus/params.h>
-#include <libzerocoin/Params.h>
 #include <flatfile.h>
 #include <primitives/block.h>
 #include <tinyformat.h>
@@ -228,8 +227,8 @@ public:
         nStakeModifierV2 = uint256();
         nStakeModifierChecksum = 0;
 
-        //mapZerocoinSupply.clear();
-        //vMintDenominationsInBlock.clear();
+        mapZerocoinSupply.clear();
+        vMintDenominationsInBlock.clear();
         nAccumulatorCheckpoint = uint256();
 
         nVersion       = 0;

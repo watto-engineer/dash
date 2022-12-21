@@ -54,7 +54,7 @@ public:
         documentHash = uint256();
     }
 
-    // ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
@@ -117,7 +117,7 @@ public:
         blsPubKey = CBLSPublicKey();
     }
 
-    // ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
