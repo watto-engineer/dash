@@ -1,8 +1,8 @@
 /* src/config/wagerr-config.h.in.  Generated from configure.ac by autoheader.  */
 
-#ifndef WAGERR_CONFIG_H
+#ifndef BITCOIN_CONFIG_H
 
-#define WAGERR_CONFIG_H
+#define BITCOIN_CONFIG_H
 
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
@@ -448,4 +448,4 @@
 /* Define for large files, on AIX-style hosts. */
 #undef _LARGE_FILES
 
-#endif //WAGERR_CONFIG_H
+#endif //BITCOIN_CONFIG_H

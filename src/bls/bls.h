@@ -11,14 +11,14 @@
 #include <util/strencodings.h>
 #include <util/ranges.h>
 
-// bls-wagerr uses relic, which may define DEBUG and ERROR, which leads to many warnings in some build setups
+// bls-dash uses relic, which may define DEBUG and ERROR, which leads to many warnings in some build setups
 #undef ERROR
 #undef DEBUG
-#include <bls-wagerr/bls.hpp>
-#include <bls-wagerr/privatekey.hpp>
-#include <bls-wagerr/elements.hpp>
-#include <bls-wagerr/schemes.hpp>
-#include <bls-wagerr/threshold.hpp>
+#include <bls-dash/bls.hpp>
+#include <bls-dash/privatekey.hpp>
+#include <bls-dash/elements.hpp>
+#include <bls-dash/schemes.hpp>
+#include <bls-dash/threshold.hpp>
 #undef DOUBLE
 #undef SEED
 
