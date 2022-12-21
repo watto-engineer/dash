@@ -113,6 +113,10 @@ void CSporkManager::ProcessSpork(const CNode* pfrom, std::string_view msg_type, 
 {
     if (msg_type != NetMsgType::SPORK) return;
 
+        if (pfrom->nVersion < MIN_SPORK_VERSION) {
+            return;
+        }
+
     CSporkMessage spork;
     vRecv >> spork;
 
