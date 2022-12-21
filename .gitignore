@@ -40,8 +40,8 @@ config.log
 config.status
 configure
 libtool
-src/config/wagerr-config.h
-src/config/wagerr-config.h.in
+src/config/bitcoin-config.h
+src/config/bitcoin-config.h.in
 src/config/stamp-h1
 src/obj
 share/setup.nsi
