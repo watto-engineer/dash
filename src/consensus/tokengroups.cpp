@@ -87,7 +87,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         const CScript &scriptPubKey = outp.scriptPubKey;
         CTokenGroupInfo tokenGrp(scriptPubKey);
         if (tokenGrp.invalid)
-            return state.Invalid(false, REJECT_INVALID, "bad OP_GROUP");
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad OP_GROUP");
         if (tokenGrp.associatedGroup != NoGroup)
         {
             gBalance[tokenGrp.associatedGroup].numOutputs += 1;
@@ -95,12 +95,12 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (tokenGrp.quantity > 0)
             {
                 if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].output < tokenGrp.quantity)
-                    return state.Invalid(false, REJECT_INVALID, "token overflow");
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "token overflow");
                 gBalance[tokenGrp.associatedGroup].output += tokenGrp.quantity;
             }
             else if (tokenGrp.quantity == 0)
             {
-                return state.Invalid(false, REJECT_INVALID, "OP_GROUP quantity is zero");
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "OP_GROUP quantity is zero");
             }
             else // this is an authority output
             {
@@ -119,7 +119,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         if (coin.IsSpent()) // should never happen because you've already CheckInputs(tx,...)
         {
             LogPrint(BCLog::TOKEN, "%s - Checking token group for spent coin\n", __func__);
-            return state.Invalid(false, REJECT_INVALID, "already-spent");
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "already-spent");
         }
 
         const CScript &script = coin.out.scriptPubKey;
@@ -160,7 +160,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (!tokenGrp.isAuthority())
             {
                 if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
-                    return state.Invalid(false, REJECT_INVALID, "token overflow");
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "token overflow");
                 gBalance[tokenGrp.associatedGroup].input += amount;
             }
         }
@@ -205,13 +205,13 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (tx.nType == TRANSACTION_GROUP_CREATION_REGULAR) {
                 CTokenGroupDescriptionRegular tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
-                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-protx-payload");
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 tgDesc.WriteHashable(mintGrp);
             } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
-                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-protx-payload");
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 tgDesc.WriteHashable(mintGrp);
             }
@@ -221,37 +221,37 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (newGrpId == txo.first) // This IS new group because id matches hash, so allow all authority.
             {
                 if (bal.numOutputs != 1) // only allow the single authority tx during a create
-                    return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-create",
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-create",
                         "Multiple grouped outputs created during group creation transaction");
 
                 // Regular token
                 if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
-                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a regular token group");
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a regular token group");
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
                 // Management token
                 if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
-                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a management token group");
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a management token group");
                     }
                     if (anyInputsGroupManagement) {
                         LogPrint(BCLog::TOKEN, "%s - Group management creation transaction. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
                     } else {
-                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-tx",
                             "No group management capability at any input address - unable to create management token");
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
                 // Invalid combination token
                 if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
-                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
                 }
                 // NFT token
                 if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
-                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-token-flag", "This is not an NFT token group");
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not an NFT token group");
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL_NFT;
                 }
@@ -260,7 +260,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     if (anyInputsGroupManagement) {
                         LogPrint(BCLog::TOKEN, "%s - Group with sticky melt created. newGrpId=[%s]\n", __func__, EncodeTokenGroup(newGrpId));
                     } else {
-                        return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-tx",
                             "No group management capability at any input address - unable to set stick_melt");
                     }
                 }
@@ -268,7 +268,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             {
                 if (((uint64_t)bal.ctrlOutputPerms & (uint64_t)~GroupAuthorityFlags::ALL_BITS) != 0)
                 {
-                    return state.Invalid(false, REJECT_INVALID, "grp-invalid-tx",
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-tx",
                          "Only mint transactions can have a nonce");
                 }
             }
@@ -276,19 +276,19 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
 
         if ((bal.input > bal.output) && !hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MELT))
         {
-            return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-melt",
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-melt",
                 "Group input exceeds output, but no melt permission");
         }
         if (bal.input < bal.output)
         {
             if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT))
             {
-                return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
                     "Group output exceeds input, but no mint permission");
             }
             if (txo.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && hasCapability(bal.allowedCtrlOutputPerms, GroupAuthorityFlags::MINT)) {
                 // Redundant
-                return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
                     "NFT mint cannot have mint authority output");
             }
         }
@@ -296,7 +296,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         if (((uint64_t)(bal.ctrlOutputPerms & GroupAuthorityFlags::ALL)) &
             ~((uint64_t)(bal.allowedCtrlOutputPerms & GroupAuthorityFlags::ALL)))
         {
-                return state.Invalid(false, REJECT_GROUP_IMBALANCE, "grp-invalid-perm",
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-perm",
                 "Group output permissions exceeds input permissions");
         }
     }
@@ -313,7 +313,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
         LogPrintf("%s - COutpoint prevout[%s]\n", __func__, prevout.ToString());
         const Coin &coin = view.AccessCoin(prevout);
         if (coin.IsSpent()) {
-            return state.Invalid(false, REJECT_INVALID, "bad-protx-inputs-spent");
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-inputs-spent");
         }
 
         const CScript &script = coin.out.scriptPubKey;
@@ -341,7 +341,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
         CTokenGroupInfo tokenGrp(scriptPubKey);
 
         if (tokenGrp.invalid)
-            return state.Invalid(false, REJECT_INVALID, "bad-protx-grouped-outputs");
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-grouped-outputs");
 
         if (tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
             continue;
