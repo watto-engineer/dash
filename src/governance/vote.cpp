@@ -158,7 +158,8 @@ uint256 CGovernanceVote::GetSignatureHash() const
 
 bool CGovernanceVote::Sign(const CKey& key, const CKeyID& keyID)
 {
-    std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|"
+    std::string strError;
+    std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
                                 std::to_string(nVoteSignal) + "|" + std::to_string(nVoteOutcome) + "|" + std::to_string(nTime);
 
     if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
@@ -169,7 +170,6 @@ bool CGovernanceVote::Sign(const CKey& key, const CKeyID& keyID)
     if (!CMessageSigner::VerifyMessage(keyID, vchSig, strMessage, strError)) {
         LogPrintf("CGovernanceVote::Sign -- VerifyMessage() failed, error: %s\n", strError);
         return false;
-
     }
     return true;
 }
@@ -178,9 +178,9 @@ bool CGovernanceVote::CheckSignature(const CKeyID& keyID) const
 {
     std::string strError;
 
-    std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|"
-                                std::to_string(nVoteSignal) + "|"
-                                std::to_string(nVoteOutcome) + "|"
+    std::string strMessage = masternodeOutpoint.ToStringShort() + "|" + nParentHash.ToString() + "|" +
+                                std::to_string(nVoteSignal) + "|" +
+                                std::to_string(nVoteOutcome) + "|" +
                                 std::to_string(nTime);
 
     if (!CMessageSigner::VerifyMessage(keyID, vchSig, strMessage, strError)) {
