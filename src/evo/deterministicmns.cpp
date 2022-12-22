@@ -589,7 +589,7 @@ bool CDeterministicMNManager::ProcessBlock(const CBlock& block, const CBlockInde
         uiInterface.NotifyMasternodeListChanged(newList);
     }
 
-    if (nHeight == sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
+    if (nHeight == sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         if (!consensusParams.DIP0003EnforcementHash.IsNull() && consensusParams.DIP0003EnforcementHash != pindex->GetBlockHash()) {
             LogPrintf("CDeterministicMNManager::%s -- DIP3 enforcement block has wrong hash: hash=%s, expected=%s, nHeight=%d\n", __func__,
                     pindex->GetBlockHash().ToString(), consensusParams.DIP0003EnforcementHash.ToString(), nHeight);
@@ -631,7 +631,7 @@ bool CDeterministicMNManager::UndoBlock(const CBlock& block, const CBlockIndex* 
     }
 
 //    const auto& consensusParams = Params().GetConsensus();
-    if (nHeight == sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
+    if (nHeight == sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         LogPrintf("CDeterministicMNManager::%s -- DIP3 is not enforced anymore. nHeight=%d\n", __func__, nHeight);
     }
 
@@ -989,7 +989,7 @@ CDeterministicMNList CDeterministicMNManager::GetListForBlock(const CBlockIndex*
 CDeterministicMNList CDeterministicMNManager::GetListAtChainTip()
 {
     LOCK(cs);
-    if (!tipIndex || tipIndex->nHeight < sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
+    if (!tipIndex || tipIndex->nHeight < sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
         return {};
     }
     return GetListForBlock(tipIndex);
@@ -1029,7 +1029,7 @@ bool CDeterministicMNManager::IsDIP3Enforced(int nHeight)
         }
     }
 
-    return nHeight >= sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED);
+    return nHeight >= sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED);
 }
 
 void CDeterministicMNManager::CleanupCache(int nHeight)
@@ -1243,67 +1243,6 @@ static bool CheckHashSig(const ProTx& proTx, const CBLSPublicKey& pubKey, CValid
     return true;
 }
 
-+template <typename ProTx>
-static bool CheckGVTCredit(const CTransaction& tx, const ProTx& proTx, CValidationState& state, const CCoinsViewCache& view)
-{
-    CAmount nGVTCreditAmount = 0;
-    CAmount nGVTDebitAmount = 0;
-    for (const auto &inp : tx.vin) {
-        const COutPoint &prevout = inp.prevout;
-        LogPrintf("%s - COutpoint prevout[%s]\n", __func__, prevout.ToString());
-        const Coin &coin = view.AccessCoin(prevout);
-        if (coin.IsSpent()) {
-            return state.DoS(100, false, REJECT_INVALID, "bad-protx-inputs-spent");
-        }
-
-        const CScript &script = coin.out.scriptPubKey;
-        if (coin.nHeight < Params().GetConsensus().ATPStartHeight)
-            continue;
-
-        CTokenGroupInfo tokenGrp(script);
-        if (tokenGrp.invalid || tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
-            continue;
-
-        CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager->MatchesGVT(parentgrp))
-            continue;
-
-        std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
-        std::string subgroup = std::string(subgroupData.begin(), subgroupData.end());
-
-        if (subgroup != "credit")
-            continue;
-
-        nGVTCreditAmount += tokenGrp.quantity;
-    }
-    for (const auto &outp : tx.vout) {
-        const CScript &scriptPubKey = outp.scriptPubKey;
-        CTokenGroupInfo tokenGrp(scriptPubKey);
-
-        if (tokenGrp.invalid)
-            return state.DoS(100, false, REJECT_INVALID, "bad-protx-grouped-outputs");
-
-        if (tokenGrp.isAuthority() || !tokenGrp.associatedGroup.isSubgroup())
-            continue;
-
-        CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager->MatchesGVT(parentgrp))
-            continue;
-
-        std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
-        std::string subgroup = std::string(subgroupData.begin(), subgroupData.end());
-
-        if (subgroup != "credit")
-            continue;
-
-        nGVTDebitAmount += tokenGrp.quantity;
-    }
-    if (nGVTCreditAmount - nGVTDebitAmount != 1)
-            return state.DoS(100, false, REJECT_INVALID, "bad-protx-credit");
-
-    return true;
-}
-
 bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view, bool check_sigs)
 {
     if (tx.nType != TRANSACTION_PROVIDER_REGISTER) {
@@ -1404,10 +1343,6 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         if (!ptx.vchSig.empty()) {
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-protx-sig");
         }
-    }
-    // needs to have 1 GVT.credit as input and no token outputs
-    if (!CheckGVTCredit(tx, ptx, state, view)) {
-        return false;
     }
 
     return true;

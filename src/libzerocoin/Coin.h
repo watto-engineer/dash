@@ -129,9 +129,9 @@ public:
         READWRITE(obj.publicCoin);
         READWRITE(obj.randomness);
         READWRITE(obj.serialNumber);
-        version = (uint8_t )ExtractVersionFromSerial(obj.serialNumber);
-        if (version == 2) {
-            READWRITE(version);
+        obj.version = (uint8_t )ExtractVersionFromSerial(obj.serialNumber);
+        if (obj.version == 2) {
+            READWRITE(obj.version);
             READWRITE(obj.privkey);
         }
     }

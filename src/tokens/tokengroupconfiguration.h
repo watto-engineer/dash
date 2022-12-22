@@ -54,24 +54,24 @@ public:
                 CTokenGroupDescriptionRegular tgDesc;
                 READWRITE(tgDesc);
                 obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
-            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
+            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
                 READWRITE(tgDesc);
                 obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
-            } else if (creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
+            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
                 CTokenGroupDescriptionNFT tgDesc;
                 READWRITE(tgDesc);
                 obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
             }
         } else {
             if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-                CTokenGroupDescriptionRegular *tgDesc = boost::get<CTokenGroupDescriptionRegular>(pTokenGroupDescription.get());
+                CTokenGroupDescriptionRegular *tgDesc = boost::get<CTokenGroupDescriptionRegular>(obj.pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
-                CTokenGroupDescriptionMGT *tgDesc = boost::get<CTokenGroupDescriptionMGT>(pTokenGroupDescription.get());
+                CTokenGroupDescriptionMGT *tgDesc = boost::get<CTokenGroupDescriptionMGT>(obj.pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
-                CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(pTokenGroupDescription.get());
+                CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(obj.pTokenGroupDescription.get());
                 READWRITE(*tgDesc);
             }
         }

@@ -46,6 +46,7 @@
 #include <policy/policy.h>
 #include <policy/settings.h>
 #include <pos/staking-manager.h>
+#include <reward-manager.h>
 #include <rpc/blockchain.h>
 #include <rpc/register.h>
 #include <rpc/server.h>
@@ -795,8 +796,8 @@ void SetupServerArgs(NodeContext& node)
     argsman.AddArg("-server", "Accept command line and JSON-RPC commands", ArgsManager::ALLOW_ANY, OptionsCategory::RPC);
 
 #ifdef ENABLE_WALLET
-    argsman.AddArg("-staking=<n>", strprintf(_("Enable staking functionality (0-1, default: %u)"), 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
-    argsman.AddArg("-wagerrstake=<n>", strprintf(_("Enable or disable staking functionality for WAGERR inputs (0-1, default: %u)"), 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
+    argsman.AddArg("-staking=<n>", strprintf("Enable staking functionality (0-1, default: %u)", 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
+    argsman.AddArg("-wagerrstake=<n>", strprintf("Enable or disable staking functionality for WAGERR inputs (0-1, default: %u)", 1), ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
     argsman.AddArg("-reservebalance=<n>", "Keep the specified amount available for spending at all times (default: 0)", ArgsManager::ALLOW_ANY, OptionsCategory::BLOCK_CREATION);
 #endif // ENABLE_WALLET
 
@@ -819,7 +820,7 @@ void SetupServerArgs(NodeContext& node)
 std::string LicenseInfo()
 {
     const std::string URL_SOURCE_CODE = "<https://github.com/wagerr/wagerr>";
-    const std::string URL_WEBSITE = "<https://wagerr.com>"
+    const std::string URL_WEBSITE = "<https://wagerr.com>";
 
     return CopyrightHolders(_("Copyright (C)").translated, 2014, COPYRIGHT_YEAR) + "\n" +
            "\n" +
@@ -2135,8 +2136,12 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
                 if (!fReindexTokens) {
                     // ATP: load token data
-                    uiInterface.InitMessage(_("Loading token data..."));
+                    uiInterface.InitMessage(_("Loading token data...").translated);
+                    std::string strError;
+                    if (!pTokenDB->LoadTokensFromDB(strError)) {
+                        strLoadError = Untranslated(strError);
                         break;
+                    }
                 }
 
                 if (fReset) {
@@ -2321,14 +2326,18 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 }
 
                 if (fReindexTokens) {
-                    uiInterface.InitMessage(_("Reindexing token database..."));
-                    if (!ReindexTokenDB(strLoadError)) {
+                    uiInterface.InitMessage(_("Reindexing token database...").translated);
+                    std::string strError;
+                    if (!ReindexTokenDB(strError)) {
+                        strLoadError = Untranslated(strError);
                         break;
                     }
                 }
 
-                uiInterface.InitMessage(_("Verifying tokens..."));
-                if (!VerifyTokenDB(strLoadError)) {
+                uiInterface.InitMessage(_("Verifying tokens...").translated);
+                std::string strError;
+                if (!VerifyTokenDB(strError)) {
+                    strLoadError = Untranslated(strError);
                     break;
                 }
 
@@ -2564,7 +2573,7 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
         node.scheduler->scheduleEvery(std::bind(&CStakingManager::DoMaintenance, std::ref(stakingManager), std::ref(*node.connman)), 5 * 1000);
     }
     if (rewardManager->fEnableRewardManager) {
-        scheduler.scheduleEvery(std::bind(&CRewardManager::DoMaintenance, std::ref(rewardManager), std::ref(*node.connman)), 3 * 60 * 1000);
+        node.scheduler->scheduleEvery(std::bind(&CRewardManager::DoMaintenance, std::ref(rewardManager), std::ref(*node.connman)), 3 * 60 * 1000);
     }
 #endif // ENABLE_WALLET
     }
