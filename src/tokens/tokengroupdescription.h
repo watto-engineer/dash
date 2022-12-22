@@ -40,6 +40,7 @@ public:
     std::string strName; // Token name
     std::string strDocumentUrl; // Extended token description document URL
     uint256 documentHash;
+    uint8_t nDecimalPos; // Decimal position to translate between token value and amount
 
     CTokenGroupDescriptionRegular() {
         SetNull();
@@ -268,6 +269,9 @@ public:
     std::string operator()(CTokenGroupDescriptionMGT& tgDesc) const {
         return tgDesc.strName;
     }
+    std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return tgDesc.strName;
+    }
 };
 inline std::string tgDescGetName(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_name(), tgDesc);
@@ -296,6 +300,9 @@ public:
         return tgDesc.documentHash;
     }
     uint256 operator()(CTokenGroupDescriptionMGT& tgDesc) const {
+        return tgDesc.documentHash;
+    }
+    uint256 operator()(CTokenGroupDescriptionNFT& tgDesc) const {
         return tgDesc.documentHash;
     }
 };

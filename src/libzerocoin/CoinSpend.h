@@ -152,7 +152,7 @@ public:
             READWRITE(obj.vchSig);
             READWRITE(obj.spendType);
         } catch (...) {
-            version = 1;
+            obj.version = 1;
         }
     }
 
