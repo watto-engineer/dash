@@ -47,7 +47,7 @@ private:
 	CBigNum commitmentValue;
 	CBigNum randomness;
 	const CBigNum contents;
-	// ADD_SERIALIZE_METHODS;
+	ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
 	    READWRITE(commitmentValue);
@@ -92,7 +92,7 @@ public:
 	 * @return
 	 */
 	bool Verify(const CBigNum& A, const CBigNum& B) const;
-	// ADD_SERIALIZE_METHODS;
+	ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
 	    READWRITE(S1);

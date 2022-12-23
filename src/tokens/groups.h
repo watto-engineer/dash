@@ -99,7 +99,7 @@ public:
 
     const std::vector<unsigned char> &bytes(void) const { return data; }
 
-    // ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
@@ -206,7 +206,7 @@ public:
     CAmount quantity; // The number of tokens specified in this script
     bool invalid;
 
-    // ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
