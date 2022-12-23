@@ -65,7 +65,7 @@ public:
 
     static bool GetSuperblockPayments(CGovernanceManager& governanceManager, int nBlockHeight, std::vector<CTxOut>& voutSuperblockRet);
     static void ExecuteBestSuperblock(CGovernanceManager& governanceManager, int nBlockHeight);
-    static bool IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward);
+    static bool IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, const CBlockReward& blockReward);
 };
 
 /**

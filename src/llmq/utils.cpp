@@ -850,7 +850,7 @@ bool IsQuorumTypeEnabledInternal(Consensus::LLMQType llmqType, const CQuorumMana
     {
         case Consensus::LLMQType::LLMQ_TEST_INSTANTSEND:
         case Consensus::LLMQType::LLMQ_DEVNET:
-        case Consensus::LLMQType::LLMQ_50_60: {
+        case Consensus::LLMQType::LLMQ_20_60: {
             if (IsInstantSendLLMQTypeShared()) {
                 break;
             }

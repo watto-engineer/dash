@@ -367,7 +367,7 @@ bool CSuperblockManager::GetSuperblockPayments(CGovernanceManager& governanceMan
     return true;
 }
 
-bool CSuperblockManager::IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, CBlockReward blockReward)
+bool CSuperblockManager::IsValid(CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, const CBlockReward& blockReward)
 {
     // GET BEST SUPERBLOCK, SHOULD MATCH
     LOCK(governanceManager.cs);

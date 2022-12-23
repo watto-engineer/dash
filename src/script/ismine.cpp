@@ -7,7 +7,7 @@
 #include <script/ismine.h>
 
 #include <key.h>
-#include <keystore.h>
+#include <script/signingprovider.h>
 #include <script/script.h>
 #include <script/sign.h>
 

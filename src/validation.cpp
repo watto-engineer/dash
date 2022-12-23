@@ -2530,7 +2530,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime5_3 = GetTimeMicros(); nTimeValueValid += nTime5_3 - nTime5_2;
     LogPrint(BCLog::BENCHMARK, "      - IsBlockValueValid: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3 - nTime5_2), nTimeValueValid * MICRO, nTimeValueValid * MILLI / nBlocksTotal);
 
-    if (!IsBlockPayeeValid(*sporkManager, *governance, *block.vtx[0], block.IsProofOfStake() ? block.vtx[1] : nullptr, pindex->nHeight, blockReward)) {
+    if (!IsBlockPayeeValid(*sporkManager, *governance, block.IsProofOfStake() ? *block.vtx[1].get() : *block.vtx[0].get(), pindex->nHeight, blockReward)) {
         // NOTE: Do not punish, the node might be missing governance data
         return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): couldn't find masternode or superblock payments"), REJECT_INVALID, "bad-cb-payee");
     }
