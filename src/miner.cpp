@@ -20,13 +20,13 @@
 #include <consensus/tx_verify.h>
 #include <consensus/validation.h>
 #include <init.h>
-#include <keystore.h>
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <pos/kernel.h>
 #include <pos/stakeinput.h>
 #include <pow.h>
 #include <primitives/transaction.h>
+#include <script/signingprovider.h>
 #include <timedata.h>
 #include <util/moneystr.h>
 #include <util/system.h>
@@ -137,7 +137,7 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
     CAmount nValue = coinstakeTx->vout[1].nValue;
     if (nValue / 2 > nSplitValue) {
         blockReward.fSplitCoinstake = true;
-        coinstakeTx->vout[1].nValue = ((nValue) / 2 / CENT) * CENT;
+        coinstakeTx->vout[1].nValue = ((nValue) / 2 / 1000000) * 1000000;
         coinstakeTx->vout.emplace_back(CTxOut(nValue - coinstakeTx->vout[1].nValue, coinstakeTx->vout[1].scriptPubKey));
     } else {
     }
@@ -148,17 +148,17 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn,
                                     std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, uint64_t nTxNewTime)
- {
+{
     CAmount nSplitValue = MAX_MONEY;
-    CBasicKeyStore tempKeystore;
 #ifdef ENABLE_WALLET
     std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    const CKeyStore& keystore = wallets.size() < 1 ? tempKeystore : *wallets[0];
+//    const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : wallets[0].get()->GetSigningProvider();
+    const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : *wallets[0]->GetSigningProvider();
     if (HasWallets()) {
         nSplitValue = (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN);
     }
 #else
-    const CKeyStore& keystore = tempKeystore;
+    const SigningProvider& signingProvider = SigningProvider();
 #endif
 
     bool fPos = (pCoinstakeTx != nullptr);
@@ -252,7 +252,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // get some info back to pass to getblocktemplate
     CAmount nMasternodePaymentAmount = 0;
     if (fPos) {
-        FillBlockPayments(*pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+        FillBlockPayments(spork_manager, governance_manager, *pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
         // Unpaid masternode rewards default to the staking node
         for (const auto& txout : pblocktemplate->voutMasternodePayments) {
             nMasternodePaymentAmount += txout.nValue;
@@ -270,15 +270,16 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             coinstakeInput->GetScriptPubKeyKernel(coinstakeInScript);
             CTransactionRef coinstakeTxFrom;
             coinstakeInput->GetTxFrom(coinstakeTxFrom);
-            if (!SignSignature(keystore, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
+            if (!SignSignature(signingProvider, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
                 throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
         }
     } else {
-        FillBlockPayments(coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
+        FillBlockPayments(spork_manager, governance_manager, coinbaseTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
         // Unpaid masternode rewards default to the miner
         CAmount nMasternodePaymentAmount = 0;
         for (const auto& txout : pblocktemplate->voutMasternodePayments) {
             nMasternodePaymentAmount += txout.nValue;
+        }
         coinbaseTx.vout[0].nValue = blockReward.GetCoinbaseReward().amount;
         coinbaseTx.vout.insert(coinbaseTx.vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
     }
