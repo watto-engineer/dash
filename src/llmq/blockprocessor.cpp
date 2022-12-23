@@ -338,8 +338,8 @@ bool CQuorumBlockProcessor::UpgradeDB()
 
     LogPrintf("CQuorumBlockProcessor::%s -- Upgrading DB...\n", __func__);
 
-    if (::ChainActive().Height() >= sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
-        auto pindex = ::ChainActive[sporkManager.GetSporkValue(SPORK_4_DIP0003_ENFORCED)];
+    if (::ChainActive().Height() >= sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED)) {
+        const auto* pindex = ::ChainActive()[sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED)];
         while (pindex != nullptr) {
             if (fPruneMode && ((pindex->nStatus & BLOCK_HAVE_DATA) == 0)) {
                 // Too late, we already pruned blocks we needed to reprocess commitments

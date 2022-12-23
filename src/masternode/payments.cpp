@@ -64,7 +64,7 @@ bool IsOldBudgetBlockValueValid(const CBlock& block, int nBlockHeight, CBlockRew
     }
     if(!isBlockRewardValueMet) {
         strErrorRet = strprintf("coinbase pays too much at height %d (actual=%d vs limit=%d), exceeded block reward, block is not in old budget cycle window",
-                                nBlockHeight, block.vtx[0]->GetValueOut(), blockReward);
+                                nBlockHeight, block.vtx[0]->GetValueOut(), blockReward.GetTotalRewards().amount);
     }
     return isBlockRewardValueMet;
 }
@@ -80,7 +80,7 @@ bool IsOldBudgetBlockValueValid(const CBlock& block, int nBlockHeight, CBlockRew
 *   - When non-superblocks are detected, the normal schedule should be maintained
 */
 
-bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CBlock& block, const int nBlockHeight, const CBlockReward& blockRewardIn, const CAmount coinstakeValueIn, std::string& strErrorRet)
+bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CBlock& block, int nBlockHeight, const CBlockReward& blockRewardIn, CAmount coinstakeValueIn, std::string& strErrorRet)
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
     bool fDIP0003Active_context = nBlockHeight >= consensusParams.DIP0003Height;
@@ -181,7 +181,7 @@ bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& go
     return true;
 }
 
-bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CTransactionRef txNewMiner, const CTransactionRef txNewStaker, int nBlockHeight, CBlockReward blockReward)
+bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CTransaction& txNew, int nBlockHeight, const CBlockReward& blockReward)
 {
     if(fDisableGovernance) {
         //there is no budget data to use to check anything, let's just accept the longest chain
@@ -204,8 +204,6 @@ bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& go
 
     // superblocks started
     // SEE IF THIS IS A VALID SUPERBLOCK
-
-    const CTransaction txNew = txNewStaker ? *txNewStaker : *txNewMiner;
 
     if(AreSuperblocksEnabled(sporkManager)) {
         if(CSuperblockManager::IsSuperblockTriggered(governanceManager, nBlockHeight)) {
@@ -304,9 +302,9 @@ bool CMasternodePayments::GetBlockTxOuts(int nBlockHeight, CBlockReward& blockRe
     }
 
     CAmount operatorReward = 0;
-    CAmount masternodeReward = GetMasternodePayment(nBlockHeight, blockReward, Params().GetConsensus().BRRHeight);
+    //CAmount masternodeReward = GetMasternodePayment(nBlockHeight, blockReward, Params().GetConsensus().BRRHeight);
     // TODO: add token amount
-    // CAmount masternodeReward = blockReward.GetMasternodeReward().amount;// GetMasternodePayment(nBlockHeight, blockReward);
+    CAmount masternodeReward = blockReward.GetMasternodeReward().amount;// GetMasternodePayment(nBlockHeight, blockReward);
 
     if (dmnPayee->nOperatorReward != 0 && dmnPayee->pdmnState->scriptOperatorPayout != CScript()) {
         // This calculation might eventually turn out to result in 0 even if an operator reward percentage is given.

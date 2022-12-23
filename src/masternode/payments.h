@@ -22,9 +22,12 @@ class CSporkManager;
 class CTxOut;
 
 /// TODO: all 4 functions do not belong here really, they should be refactored/moved somewhere (main.cpp ?)
-bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CBlock& block, const int nBlockHeight, const CBlockReward& blockRewardIn, const CAmount coinstakeValueIn, std::string& strErrorRet);
-bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, const CTransactionRef txNewMiner, const CTransactionRef txNewStaker, int nBlockHeight, CBlockReward blockReward);
-void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& governanceManager, CMutableTransaction& txNew, int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet);
+bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager,
+                       const CBlock& block, int nBlockHeight, const CBlockReward& blockRewardIn, CAmount coinstakeValueIn, std::string& strErrorRet);
+bool IsBlockPayeeValid(const CSporkManager& sporkManager, CGovernanceManager& governanceManager,
+                       const CTransaction& txNew, int nBlockHeight, const CBlockReward& blockReward);
+void FillBlockPayments(const CSporkManager& sporkManager, CGovernanceManager& governanceManager,
+                       CMutableTransaction& txNew, int nBlockHeight, CBlockReward& blockReward, std::vector<CTxOut>& voutMasternodePaymentsRet, std::vector<CTxOut>& voutSuperblockPaymentsRet);
 
 extern CMasternodePayments mnpayments;
 
