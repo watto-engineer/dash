@@ -50,7 +50,7 @@ public:
      * @return
      */
     bool Verify(const CBigNum& coinSerialNumber, const CBigNum& valueOfCommitmentToCoin,const uint256 msghash, bool isInParamsValidationRange = true) const;
-    // ADD_SERIALIZE_METHODS;
+    ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(s_notprime);

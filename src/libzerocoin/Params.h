@@ -56,7 +56,7 @@ public:
 	 */
 	CBigNum groupOrder;
 
-	// ADD_SERIALIZE_METHODS;
+	ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
@@ -141,7 +141,7 @@ public:
 	 * The statistical zero-knowledgeness of the accumulator proof.
 	 */
 	uint32_t k_dprime;
-	// ADD_SERIALIZE_METHODS;
+	ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
 	    READWRITE(initialized);
@@ -207,7 +207,7 @@ public:
 	 */
 	uint32_t zkp_hash_len;
 
-	// ADD_SERIALIZE_METHODS;
+	ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
 	    READWRITE(initialized);
