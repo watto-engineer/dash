@@ -7,7 +7,7 @@
 
 #include <chainparams.h>
 #include <dstencode.h>
-#include <util.h>
+//#include <util/system.h>
 #include <script/standard.h>
 #include <serialize.h>
 #include <betting/bet_common.h>

@@ -5,7 +5,7 @@
 #ifndef WAGERR_BET_H
 #define WAGERR_BET_H
 
-#include <util.h>
+//#include <util/system.h>
 #include <amount.h>
 #include <primitives/transaction.h>
 
