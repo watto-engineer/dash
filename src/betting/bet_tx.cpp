@@ -5,13 +5,14 @@
 #include <betting/bet_tx.h>
 #include <betting/bet_common.h>
 #include <streams.h>
+#include <util/memory.h>
 #include <version.h>
 
 template<typename BettingTxTypeName>
 std::unique_ptr<CBettingTx> DeserializeBettingTx(CDataStream &ss)
 {
     BettingTxTypeName bettingTx;
-    if (ss.size() < ::GetSerializeSize(bettingTx, SER_NETWORK, PROTOCOL_VERSION))
+    if (ss.size() < ::GetSerializeSize(bettingTx, PROTOCOL_VERSION))
         return nullptr;
     ss >> bettingTx;
     // check buffer stream is empty after deserialization

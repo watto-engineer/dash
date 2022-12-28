@@ -1733,7 +1733,7 @@ UniValue listtransactionrecords(const JSONRPCRequest& request)
     return ret;
 }
 
-UniValue listaccounts(const JSONRPCRequest& request)
+UniValue listsinceblock(const JSONRPCRequest& request)
 {
     RPCHelpMan{"listsinceblock",
         "\nGet all transactions in blocks since block [blockhash], or all transactions if omitted.\n"
