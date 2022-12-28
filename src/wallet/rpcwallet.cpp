@@ -910,7 +910,7 @@ UniValue getextendedbalance(const JSONRPCRequest &request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("blocks", (int)chainActive.Height()));
+    obj.push_back(Pair("blocks", (int)::ChainActive().Height()));
     obj.push_back(Pair("balance", ValueFromAmount(pwallet->GetBalance())));
     obj.push_back(Pair("balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedBalance())));
     obj.push_back(Pair("balance_immature", ValueFromAmount(pwallet->GetImmatureBalance())));
@@ -3670,7 +3670,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
-    bool fValidTime = chainActive.Tip()->nTime > 1471482000;
+    bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
     bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     bool fWalletUnlocked = !pwallet->IsLocked(true);
     bool fMintableCoins = stakingManager->MintableCoins();
@@ -4348,7 +4348,7 @@ UniValue placebet(const JSONRPCRequest& request)
     if (outcome < moneyLineHomeWin || outcome > totalUnder)
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-    if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+    if (::ChainActive().Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
         CPeerlessExtendedEventDB plEvent;
         if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
@@ -4430,7 +4430,7 @@ UniValue placeparlaybet(const JSONRPCRequest& request)
         if (outcome < moneyLineHomeWin || outcome > totalUnder)
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-        if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+        if (::ChainActive().Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
             CPeerlessExtendedEventDB plEvent;
             if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
                 throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
@@ -4512,7 +4512,7 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
             HelpExampleRpc("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\""));
     }
 
-    if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+    if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
@@ -4627,7 +4627,7 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
             HelpExampleRpc("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 322,\"marketType\": 2, \"contenderId\": 200}]\", 25, \"Parlay bet\", \"seans outpost\""));
     }
 
-    if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+    if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
@@ -5675,7 +5675,7 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
 
             if (key.outPoint.hash != txHash) break;
 
-            CBlockIndex *blockIndex = chainActive[(int) key.blockHeight];
+            CBlockIndex *blockIndex = ::ChainActive()[(int) key.blockHeight];
             if (blockIndex) {
                 hash = UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]);
                 if (hash == 0) {
@@ -5952,7 +5952,7 @@ UniValue GetQuickGamesBets(uint32_t count, uint32_t from, CWallet *_pwalletMain,
 
         }
 
-        CBlockIndex *blockIndex = chainActive[(int) key.blockHeight];
+        CBlockIndex *blockIndex = ::ChainActive()[(int) key.blockHeight];
         if (blockIndex) {
             hash = UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]);
             if (hash == 0) {

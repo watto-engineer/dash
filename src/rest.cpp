@@ -664,10 +664,10 @@ static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart
     CBlock block;
     {
         LOCK(cs_main);
-        if (blockheight > chainActive.Height()) {
+        if (blockheight > ::ChainActive().Height()) {
             return RESTERR(req, HTTP_NOT_FOUND, "Block height out of range");
         }
-        hashStr = chainActive[blockheight]->GetBlockHash().GetHex();
+        hashStr = ::ChainActive()[blockheight]->GetBlockHash().GetHex();
     }
 
     uint256 hash;

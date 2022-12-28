@@ -516,7 +516,6 @@ void SetupServerArgs(NodeContext& node)
     const auto regtestBaseParams = CreateBaseChainParams(CBaseChainParams::REGTEST);
     const auto defaultChainParams = CreateChainParams(CBaseChainParams::MAIN);
     const auto testnetChainParams = CreateChainParams(CBaseChainParams::TESTNET);
-    const auto devnetChainParams = CreateChainParams(CBaseChainParams::DEVNET);
     const auto regtestChainParams = CreateChainParams(CBaseChainParams::REGTEST);
 
     // Hidden Options
@@ -2222,11 +2221,11 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 // Wrapped serials inflation check
                 bool reindexDueWrappedSerials = false;
                 bool reindexZerocoinSupply = false;
-                int chainHeight = chainActive.Height();
+                int chainHeight = ::ChainActive().Height();
                 if(Params().NetworkIDString() == CBaseChainParams::MAIN && chainHeight > Params().GetConsensus().nFakeSerialBlockheightEnd) {
 
                     // Supply needs to be exactly GetSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount
-                    CBlockIndex* pblockindex = chainActive[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
+                    CBlockIndex* pblockindex = ::ChainActive()[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
                     CAmount zwgrSupplyCheckpoint = Params().GetConsensus().nSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount();
 
                     if (pblockindex->GetZerocoinSupply() < zwgrSupplyCheckpoint) {
@@ -2257,10 +2256,10 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
 
                 // Check Recalculation result
                 if(Params().NetworkIDString() == CBaseChainParams::MAIN && chainHeight > Params().GetConsensus().nFakeSerialBlockheightEnd) {
-                    CBlockIndex* pblockindex = chainActive[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
+                    CBlockIndex* pblockindex = ::ChainActive()[Params().GetConsensus().nFakeSerialBlockheightEnd + 1];
                     CAmount zwgrSupplyCheckpoint = Params().GetConsensus().nSupplyBeforeFakeSerial + GetWrapppedSerialInflationAmount();
                     if (pblockindex->GetZerocoinSupply() != zwgrSupplyCheckpoint)
-                        return InitError(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwgrSupplyCheckpoint/COIN));
+                        return InitError(Untranslated(strprintf("ZerocoinSupply Recalculation failed: %d vs %d", pblockindex->GetZerocoinSupply()/COIN , zwgrSupplyCheckpoint/COIN)));
                 }
 
                 bool failed_chainstate_init = false;

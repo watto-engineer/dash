@@ -55,8 +55,6 @@ public:
     bool MGTTokensCreated() { return tgMGTCreation ? true : false; };
     bool GVTTokensCreated() { return tgGVTCreation ? true : false; };
 
-    bool ManagementTokensCreated(int nHeight);
-
     uint16_t GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId);
     unsigned int GetTokenTxStats(const CTransaction &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, unsigned int &nTokenCount, CAmount &nTokenMint);
 

@@ -26,12 +26,12 @@ CZStake::CZStake(const libzerocoin::CoinSpend& spend)
 
 int CZStake::GetChecksumHeightFromMint()
 {
-    int nHeightChecksum = chainActive.Height() - Params().GetConsensus().nZerocoinRequiredStakeDepth;
+    int nHeightChecksum = ::ChainActive().Height() - Params().GetConsensus().nZerocoinRequiredStakeDepth;
 
     //Need to return the first occurance of this checksum in order for the validation process to identify a specific
     //block height
     uint32_t nChecksum = 0;
-    nChecksum = ParseChecksum(chainActive[nHeightChecksum]->GetBlockHeader().nAccumulatorCheckpoint, denom);
+    nChecksum = ParseChecksum(::ChainActive()[nHeightChecksum]->GetBlockHeader().nAccumulatorCheckpoint, denom);
     return GetChecksumHeight(nChecksum, denom);
 }
 
@@ -60,11 +60,11 @@ CBlockIndex* CZStake::GetIndexFrom()
     else
         nHeightChecksum = GetChecksumHeightFromSpend();
 
-    if (nHeightChecksum < Params().GetConsensus().nZerocoinStartHeight || nHeightChecksum > chainActive.Height()) {
+    if (nHeightChecksum < Params().GetConsensus().nZerocoinStartHeight || nHeightChecksum > ::ChainActive().Height()) {
         pindexFrom = nullptr;
     } else {
         //note that this will be a nullptr if the height DNE
-        pindexFrom = chainActive[nHeightChecksum];
+        pindexFrom = ::ChainActive()[nHeightChecksum];
     }
 
     return pindexFrom;
@@ -96,8 +96,8 @@ bool CZStake::GetModifier(uint64_t& nStakeModifier)
             return true;
         }
 
-        if (pindex->nHeight + 1 <= chainActive.Height())
-            pindex = chainActive.Next(pindex);
+        if (pindex->nHeight + 1 <= ::ChainActive().Height())
+            pindex = chainA::ChainActive()ctive.Next(pindex);
         else
             return false;
     }
@@ -300,7 +300,7 @@ CBlockIndex* CStake::GetIndexFrom()
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {
             CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
-            if (chainActive.Contains(pindex))
+            if (::ChainActive().Contains(pindex))
                 pindexFrom = pindex;
         }
     } else {

@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <dstencode.h>
-#include <util.h>
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
 #include <betting/bet_common.h>
@@ -90,7 +89,7 @@ int64_t GetCGBlockPayoutsV2(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& n
  */
 void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    int nLastBlockHeight = chainActive.Height();
+    int nLastBlockHeight = ::ChainActive().Height();
 
     // Get all the results posted in the latest block.
     std::vector<CPeerlessResultDB> results = GetPLResults(nNewBlockHeight - 1);
@@ -101,7 +100,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
         CBlockIndex *BlocksIndex = NULL;
         int startHeight = nLastBlockHeight - Params().GetConsensus().BetBlocksIndexTimespanV2();
         startHeight = startHeight < Params().GetConsensus().WagerrProtocolV2StartHeight() ? Params().GetConsensus().WagerrProtocolV2StartHeight() : startHeight;
-        BlocksIndex = chainActive[startHeight];
+        BlocksIndex = ::ChainActive()[startHeight];
 
         OutcomeType nMoneylineResult = (OutcomeType) 0;
         std::vector<OutcomeType> vSpreadsResult;
@@ -409,8 +408,8 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                 COutPoint prevout = txin.prevout;
 
                                 uint256 hashBlock;
-                                CTransactionRef txPrev;
-                                if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+                                CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+                                if (txPrev) {
                                     ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
 
@@ -489,7 +488,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                 nTotalsWinner = 0;
             }
 
-            BlocksIndex = chainActive.Next(BlocksIndex);
+            BlocksIndex = ::ChainActive().Next(BlocksIndex);
         }
     }
 
@@ -524,7 +523,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
         // Look back the chain 10 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        BlocksIndex = chainActive[nLastBlockHeight - 14400];
+        BlocksIndex = ::ChainActive()[nLastBlockHeight - 14400];
 
         time_t eventStart = 0;
         bool eventStartedFlag = false;
@@ -594,9 +593,9 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                                 totalBetAmount = totalBetAmount + betAmount;
                                 CTxDestination payoutAddress;
                                 uint256 hashBlock;
-                                CTransactionRef txPrev;
+                                CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
 
-                                if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+                                if (txPrev) {
                                     ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
 
@@ -616,7 +615,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                 break;
             }
 
-            BlocksIndex = chainActive.Next(BlocksIndex);
+            BlocksIndex = ::ChainActive().Next(BlocksIndex);
         }
 
         // Choose winner from candidates who entered the lotto and payout their winnings.
@@ -642,7 +641,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
             // Use random number to choose winner.
             auto noOfBets    = candidates.size();
 
-            CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
+            CBlockIndex *winBlockIndex = ::ChainActive()[nLastBlockHeight];
             arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
             if (hashProofOfStake == 0) {
                 CBlock block;

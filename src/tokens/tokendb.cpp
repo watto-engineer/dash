@@ -104,7 +104,7 @@ bool VerifyTokenDB(std::string &strError) {
             strError = "Cannot find token creation transaction's block";
             return error(strError.c_str());
         }
-        if (!chainActive.Contains(pindex->second)) {
+        if (!::ChainActive().Contains(pindex->second)) {
             strError = "Token creation not found in the current chain";
             return error(strError.c_str());
         }
@@ -145,10 +145,10 @@ bool ReindexTokenDB(std::string &strError) {
 
     uiInterface.ShowProgress(_("Reindexing token database..."), 0, false);
 
-    CBlockIndex* pindex = chainActive[Params().GetConsensus().ATPStartHeight];
+    CBlockIndex* pindex = ::ChainActive()[Params().GetConsensus().ATPStartHeight];
     std::vector<CTokenGroupCreation> vTokenGroups;
     while (pindex) {
-        uiInterface.ShowProgress(_("Reindexing token database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().ATPStartHeight) / (double)(chainActive.Height() - Params().GetConsensus().ATPStartHeight) * 100))), false);
+        uiInterface.ShowProgress(_("Reindexing token database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().ATPStartHeight) / (double)(::ChainActive().Height() - Params().GetConsensus().ATPStartHeight) * 100))), false);
 
         if (pindex->nHeight % 10000 == 0)
             LogPrintf("Reindexing token database: block %d...\n", pindex->nHeight);
@@ -175,7 +175,7 @@ bool ReindexTokenDB(std::string &strError) {
         tokenGroupManager.get()->AddTokenGroups(vTokenGroups);
         vTokenGroups.clear();
 
-        pindex = chainActive.Next(pindex);
+        pindex = ::ChainActive().Next(pindex);
     }
 
     uiInterface.ShowProgress("", 100, false);

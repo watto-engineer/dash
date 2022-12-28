@@ -424,7 +424,7 @@ void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& has
             } else {
                 chainlockHeight = clsig.nHeight;
             }
-            if (vRec.statusUpdateNeeded(::chainActive.Height(), chainlockHeight))
+            if (vRec.statusUpdateNeeded(::::ChainActive().Height(), chainlockHeight))
                 vRec.updateStatus(iStatus, numBlocks, adjustedTime, chainlockHeight);
 
             entry.push_back(Pair("depth", vRec.status.depth));

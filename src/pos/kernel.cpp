@@ -247,7 +247,7 @@ bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifi
         return true;
     }
     const CBlockIndex* pindex = pindexFrom;
-    CBlockIndex* pindexNext = chainActive[pindex->nHeight + 1];
+    CBlockIndex* pindexNext = ::ChainActive()[pindex->nHeight + 1];
 
     // loop to find the stake modifier later by a selection interval
     do {
@@ -259,7 +259,7 @@ bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifi
             nStakeModifierHeight = pindex->nHeight;
             nStakeModifierTime = pindex->GetBlockTime();
         }
-        pindexNext = chainActive[pindex->nHeight + 1];
+        pindexNext = ::ChainActive()[pindex->nHeight + 1];
     } while (nStakeModifierTime < pindexFrom->GetBlockTime() + OLD_MODIFIER_INTERVAL);
 
     nStakeModifier = pindex->nStakeModifier;
@@ -341,7 +341,7 @@ bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
             return error("%s : zWAGERR stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, nPreviousBlockHeight, pindexFrom->nHeight);
 
         //The checksum needs to be the exact checksum from 200 blocks ago
-        uint256 nCheckpoint200 = chainActive[nPreviousBlockHeight - Params().GetConsensus().nZerocoinRequiredStakeDepth]->GetBlockHeader().nAccumulatorCheckpoint;
+        uint256 nCheckpoint200 = ::ChainActive()[nPreviousBlockHeight - Params().GetConsensus().nZerocoinRequiredStakeDepth]->GetBlockHeader().nAccumulatorCheckpoint;
         uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zWAGERR->GetValue()));
         if (nChecksum200 != zWAGERR->GetChecksum())
             return error("%s: accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zWAGERR->GetChecksum(), nChecksum200);

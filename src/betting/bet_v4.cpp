@@ -7,7 +7,6 @@
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
 #include <validation.h>
-#include <util.h>
 #include <base58.h>
 
 void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
@@ -206,7 +205,7 @@ void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
  */
 bool UndoFieldBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
-    int nCurrentHeight = chainActive.Height();
+    int nCurrentHeight = ::ChainActive().Height();
     // Get all the results posted in the previous block.
     std::vector<CFieldResultDB> results = GetFieldResults(height - 1);
 

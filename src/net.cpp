@@ -2114,8 +2114,8 @@ void CConnman::CheckOffsetDisconnectedPeers(const CNetAddr& ip)
         // clear the set
         setOffsetDisconnectedPeers.clear();
         // Trigger the warning
-        std::string strMessage = _("Warning: Peers are being disconnected due time differences. Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.");
-        LogPrintf("*** %s\n", strMessage);
+        bilingual_str strMessage = _("Warning: Peers are being disconnected due time differences. Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.");
+        LogPrintf("*** %s\n", strMessage.translated);
         uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_ERROR);
     }
 }
@@ -3586,7 +3586,7 @@ void CConnman::RelayInvFiltered(CInv &inv, const uint256& relatedTxHash, const i
 }
 
 int CConnman::GetMinPeerVersion() {
-    if (sporkManager.IsSporkActive(SPORK_8_NEW_PROTOCOL_ENFORCEMENT))
+    if (sporkManager->IsSporkActive(SPORK_8_NEW_PROTOCOL_ENFORCEMENT))
             return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
 
     return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;

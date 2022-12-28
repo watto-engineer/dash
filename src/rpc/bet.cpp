@@ -296,7 +296,7 @@ extern UniValue getpayoutinfosince(const JSONRPCRequest& request)
 
     LOCK(cs_main);
 
-    int nCurrentHeight = chainActive.Height();
+    int nCurrentHeight = ::ChainActive().Height();
 
     uint32_t startBlockHeight = static_cast<uint32_t>(nCurrentHeight) - nLastBlocks + 1;
 
@@ -350,8 +350,8 @@ UniValue getchaingamesinfo(const JSONRPCRequest& request)
     }
 
     CBlockIndex *BlocksIndex = NULL;
-    int height = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 14400;
-    BlocksIndex = chainActive[height];
+    int height = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? ::ChainActive().Height() - 10500 : ::ChainActive().Height() - 14400;
+    BlocksIndex = ::ChainActive()[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -397,7 +397,7 @@ UniValue getchaingamesinfo(const JSONRPCRequest& request)
             }
         }
 
-        BlocksIndex = chainActive.Next(BlocksIndex);
+        BlocksIndex = ::ChainActive().Next(BlocksIndex);
     }
 
     if (resultHeight > Params().GetConsensus().nWagerrProtocolV2StartHeight && fShowWinner) {
@@ -488,7 +488,7 @@ UniValue getalleventliabilities(const JSONRPCRequest& request)
 
         // Only list active events.
         /*
-        if (plEvent.nEventCreationHeight < chainActive.Height() - Params().BetBlocksIndexTimespan()) {
+        if (plEvent.nEventCreationHeight < ::ChainActive().Height() - Params().BetBlocksIndexTimespan()) {
             continue;
         }
         */
@@ -993,8 +993,8 @@ UniValue listchaingamesevents(const JSONRPCRequest& request)
 
     LOCK(cs_main);
 
-    int height = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
-    BlocksIndex = chainActive[height];
+    int height = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? ::ChainActive().Height() - 10500 : ::ChainActive().Height() - 1500;
+    BlocksIndex = ::ChainActive()[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -1027,7 +1027,7 @@ UniValue listchaingamesevents(const JSONRPCRequest& request)
             }
         }
 
-        BlocksIndex = chainActive.Next(BlocksIndex);
+        BlocksIndex = ::ChainActive().Next(BlocksIndex);
     }
 
     return ret;

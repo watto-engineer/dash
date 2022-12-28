@@ -83,7 +83,7 @@ std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = chainActive[nLastBlockHeight];
+    resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
@@ -128,7 +128,7 @@ std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = chainActive[nLastBlockHeight];
+    resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
@@ -171,7 +171,7 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
     chainGameResults.clear();
 
     // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = chainActive[nLastBlockHeight];
+    CBlockIndex *resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
