@@ -140,7 +140,6 @@ struct Params {
     int nTimeSlotLength;
 
     /** ATP parameters */
-    int64_t ATPStartHeight;
     std::string WagerrAddrPrefix;
     std::string strTokenManagementKey;
     int nOpGroupNewRequiredConfirmations;

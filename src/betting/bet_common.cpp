@@ -22,9 +22,8 @@ bool IsValidOracleTx(const CTxIn &txin, int nHeight)
     std::vector<COracle> oracles = Params().Oracles();
 
     uint256 hashBlock;
-    CTransactionRef txPrev;
-    if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
-
+    CTransactionRef txPrev = GetTransaction(::ChainActive()[nHeight], nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+    if (txPrev) {
         const CTxOut &prevTxOut = txPrev->vout[prevout.n];
 
         txnouttype type;

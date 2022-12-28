@@ -6,6 +6,7 @@
 #define WAGERR_QUICKGAMESVIEW_H
 
 #include "arith_uint256.h"
+#include <vector>
 #include <map>
 
 typedef enum QuickGamesType {
