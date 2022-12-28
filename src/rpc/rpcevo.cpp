@@ -1106,7 +1106,7 @@ UniValue protx_revoke_authorize(const JSONRPCRequest& request)
         // the private key must match the public key of the GVT token
         CTokenGroupID gvtCreditID(tokenGroupManager->GetGVTID(), "revoke");
         CValidationState state;
-        CCoinsViewCache &view = *pcoinsTip;
+        CCoinsViewCache &view = ::ChainstateActive().CoinsTip();
         CAmount nCredit;
         CAmount nDebit;
         if (!GetTokenBalance(tx, gvtCreditID, state, view, nCredit, nDebit)) {

@@ -31,9 +31,9 @@ bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CT
     nWinnerPayments = 0;
 
     uint256 hashBlock;
-    CTransactionRef txPrev;
+    CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr,  prevout.hash, Params().GetConsensus(), hashBlock);
 
-    if (GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
+    if (txPrev) {
         stakeAmount = txPrev->vout[prevout.n].nValue + nExpectedMint;
     } else {
         return false;
@@ -149,11 +149,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
     uint256 hashBlock;
-    CTransactionRef txPrev;
     CTxDestination address;
     CTxDestination prevAddr;
     // if we cant extract playerAddress - skip tx
-    if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true) ||
+    CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock);
+
+    if (!txPrev ||
             !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
         return true;
     }
@@ -165,7 +166,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
         if (bettingTx == nullptr) continue;
 
-        if (height >= sporkManager.GetSporkValue(SPORK_20_BETTING_MAINTENANCE_MODE)) {
+        if (height >= sporkManager->GetSporkValue(SPORK_20_BETTING_MAINTENANCE_MODE)) {
             return error("CheckBettingTX : Betting transactions are temporarily disabled for maintenance");
         }
 
@@ -187,7 +188,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
                     }
 
-                    if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+                    if (::ChainActive().Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
                         if (GetBetPotentialOdds(plBet, plEvent) == 0) {
                             return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
                         }
@@ -229,7 +230,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
                         }
 
-                        if (chainActive.Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+                        if (::ChainActive().Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
                             if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
                                 return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
                             }
@@ -246,7 +247,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fBetTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldBetTx");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldBetTx");
 
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
                 if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
@@ -280,7 +281,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fParlayBetTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldParlayBetTx");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldParlayBetTx");
 
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
                 if (betAmount < (Params().GetConsensus().MinBetPayoutRange()  * COIN ) || betAmount > (Params().GetConsensus().MaxBetPayoutRange() * COIN)) {
@@ -380,7 +381,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
                 auto mappingType = MappingType(mapTx->nMType);
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
                    (mappingType == individualSportMapping || mappingType == contenderMapping ) )
                 {
                     return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
@@ -429,7 +430,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fEventTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
@@ -461,7 +462,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
@@ -478,7 +479,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateModifiersTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateModifiersTx* fUpdateOddsTx = (CFieldUpdateModifiersTx*) bettingTx.get();
@@ -495,7 +496,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fUpdateMarginTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
@@ -507,7 +508,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
@@ -519,7 +520,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
@@ -676,7 +677,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case plEventZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -704,11 +705,11 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
     const bool validOracleTx{IsValidOracleTx(txin, height)};
     // Get player address
     uint256 hashBlock;
-    CTransactionRef txPrev;
     CTxDestination address;
     CTxDestination prevAddr;
+    CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock);
     // if we cant extract playerAddress - skip vout
-    if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true) ||
+    if (!txPrev ||
             !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
         return;
     }
@@ -891,7 +892,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fBetTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
                 LogPrint(BCLog::BETTING, "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
@@ -966,7 +967,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fParlayBetTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
 
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
                 std::vector<CFieldEventDB> lockedEvents;
@@ -1088,7 +1089,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
                 auto mappingType = MappingType(mapTx->nMType);
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
                    (mappingType == individualSportMapping || mappingType == contenderMapping ) )
                 {
                     break;
@@ -1165,7 +1166,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fEventTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
@@ -1193,7 +1194,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fUpdateOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
@@ -1222,7 +1223,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fUpdateModifiersTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
@@ -1251,7 +1252,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fUpdateMarginTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
@@ -1276,7 +1277,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
@@ -1306,7 +1307,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
@@ -1533,7 +1534,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
             }
             case plEventZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();

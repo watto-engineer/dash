@@ -634,7 +634,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
 
     LOCK(cs_main);
 
-    if (chainActive.Tip()->nHeight + 1 >= Params().GetConsensus().nPosStartHeight && Params().NetworkIDString() != CBaseChainParams::REGTEST) {
+    if (::ChainActive().Tip()->nHeight + 1 >= Params().GetConsensus().nPosStartHeight && Params().NetworkIDString() != CBaseChainParams::REGTEST) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Unable to call getblocktemplate in the Proof-of-Stake phase");
     }
 
@@ -792,7 +792,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
         if (fPosPhase) {
             std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
-            if (stakingManager->CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
+            if (stakingManager->CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
                 // Coinstake found. Extract signing key from coinstake
                 pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
             };
@@ -918,7 +918,7 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     result.pushKV("transactions", transactions);
     result.pushKV("coinbaseaux", aux);
     result.pushKV("coinbasevalue", (int64_t)pblock->vtx[0]->GetValueOut());
-    CBlockReward blockReward(chainActive.Height() + 1,  0, false, Params().GetConsensus());
+    CBlockReward blockReward(::ChainActive().Height() + 1,  0, false, Params().GetConsensus());
     UniValue minerRewardObj(UniValue::VARR);
     CReward minerReward = blockReward.GetCoinbaseReward();
     for (const auto& minerTokenReward : minerReward.tokenAmounts) {

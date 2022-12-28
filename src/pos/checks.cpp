@@ -17,7 +17,7 @@ bool IsBlockHashInChain(const uint256& hashBlock)
     if (hashBlock == uint256() || !mapBlockIndex.count(hashBlock))
         return false;
 
-    return chainActive.Contains(mapBlockIndex[hashBlock]);
+    return ::ChainActive().Contains(mapBlockIndex[hashBlock]);
 }
 
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx)

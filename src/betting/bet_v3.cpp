@@ -10,7 +10,6 @@
 #include <dstencode.h>
 #include <pos/kernel.h>
 #include <validation.h>
-#include <util.h>
 #include <base58.h>
 
 void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
@@ -280,7 +279,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
 
     LogPrint(BCLog::BETTING, "Start generating quick games bets payouts...\n");
 
-    CBlockIndex *blockIndex = chainActive[nLastBlockHeight];
+    CBlockIndex *blockIndex = ::ChainActive()[nLastBlockHeight];
     std::map<std::string, CAmount> mExpectedRewards;
     uint32_t blockHeight = static_cast<uint32_t>(nLastBlockHeight);
     auto it = bettingsViewCache.quickGamesBets->NewIterator();
@@ -452,7 +451,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
             // Use random number to choose winner.
             auto noOfBets    = candidates.size();
 
-            CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
+            CBlockIndex *winBlockIndex = ::ChainActive()[nLastBlockHeight];
             arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
             if (hashProofOfStake == 0) hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
             arith_uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
@@ -481,7 +480,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
                 }
                 vPayoutsInfo.emplace_back(candidates[winnerNr].first, PayoutType::chainGamesPayout);
                 vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(winnerAddress), entranceFee, result.nEventId);
-                LogPrint(BCLog::BETTING, "Reward address: %s, reward: %ll\n", EncodeDestination(payoutScriptOMNO), fee);
+                LogPrint(BCLog::BETTING, "Reward address: %s, reward: %ll\n", EncodeDestination(CScriptID(payoutScriptOMNO)), fee);
                 vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesReward);
                 vExpectedPayouts.emplace_back(fee, payoutScriptOMNO, 0);
             }
@@ -503,7 +502,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
  */
 bool UndoPLBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
-    int nCurrentHeight = chainActive.Height();
+    int nCurrentHeight = ::ChainActive().Height();
     // Get all the results posted in the previous block.
     std::vector<CPeerlessResultDB> results = GetPLResults(height - 1);
 

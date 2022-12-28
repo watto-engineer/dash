@@ -33,7 +33,7 @@ bool CStakingManager::MintableCoins()
 
     LOCK2(cs_main, pwallet->cs_wallet);
 
-    int blockHeight = chainActive.Height();
+    int blockHeight = ::ChainActive().Height();
 
     std::vector<COutput> vCoins;
     CCoinControl coin_control;
@@ -133,7 +133,7 @@ bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInp
         while (nTryTime > minTime)
         {
             //new block came in, move on
-            if (chainActive.Height() != prevHeight)
+            if (::ChainActive().Height() != prevHeight)
                 break;
 
             --nTryTime;
@@ -150,7 +150,7 @@ bool CStakingManager::Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInp
     }
 
     mapHashedBlocks.clear();
-    mapHashedBlocks[chainActive.Tip()->nHeight] = GetTime(); //store a time stamp of when we last hashed on this block
+    mapHashedBlocks[::ChainActive().Tip()->nHeight] = GetTime(); //store a time stamp of when we last hashed on this block
     return fSuccess;
 }
 
@@ -243,9 +243,9 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
 }
 
 bool CStakingManager::IsStaking() {
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight)) {
+    if (mapHashedBlocks.count(::ChainActive().Tip()->nHeight)) {
         return true;
-    } else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval) {
+    } else if (mapHashedBlocks.count(::ChainActive().Tip()->nHeight - 1) && nLastCoinStakeSearchInterval) {
         return true;
     }
     return false;
@@ -264,7 +264,7 @@ void CStakingManager::DoMaintenance(CConnman& connman)
 {
     if (!fEnableStaking) return; // Should never happen
 
-    CBlockIndex* pindexPrev = chainActive.Tip();
+    CBlockIndex* pindexPrev = ::ChainActive().Tip();
     bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync.IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance()) {
         nLastCoinStakeSearchInterval = 0;
@@ -283,9 +283,9 @@ void CStakingManager::DoMaintenance(CConnman& connman)
         return;
     }
 
-    const bool fTimeV2 = Params().GetConsensus().IsTimeProtocolV2(chainActive.Height()+1);
+    const bool fTimeV2 = Params().GetConsensus().IsTimeProtocolV2(::ChainActive().Height()+1);
     //search our map of hashed blocks, see if bestblock has been hashed yet
-    const int chainHeight = chainActive.Height();
+    const int chainHeight = ::ChainActive().Height();
     if (mapHashedBlocks.count(chainHeight) && !fLastLoopOrphan)
     {
         int64_t nTime = GetAdjustedTime();
@@ -321,7 +321,7 @@ void CStakingManager::DoMaintenance(CConnman& connman)
     std::shared_ptr<CStakeInput> coinstakeInputPtr = nullptr;
     std::unique_ptr<CBlockTemplate> pblocktemplate = nullptr;
     int64_t nCoinStakeTime;
-    if (CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
+    if (CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
         // Coinstake found. Extract signing key from coinstake
         try {
             pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);

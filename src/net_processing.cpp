@@ -3847,7 +3847,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& msg_type, CDataStream& vRec
         if (pfrom->nVersion < GETHEADERS_VERSION) {
             LOCK(cs_main);
             if (mapBlockIndex.find(pblock->hashPrevBlock) == mapBlockIndex.end()) {
-                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(pindexBestHeader), pblock->GetHash()));
+                connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, ::ChainActive().GetLocator(pindexBestHeader), pblock->GetHash()));
                 return true;
             } else {
                 State(pfrom->GetId())->nStallingSince = 0;

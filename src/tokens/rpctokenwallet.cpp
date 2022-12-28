@@ -655,7 +655,7 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
         if (InterpretBool(request.params[curparam].get_str()))
             filter = filter | ISMINE_WATCH_ONLY;
 
-    int depth = pindex ? (1 + chainActive.Height() - pindex->nHeight) : -1;
+    int depth = pindex ? (1 + ::ChainActive().Height() - pindex->nHeight) : -1;
 
     UniValue transactions(UniValue::VARR);
 
@@ -668,7 +668,7 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
             ListGroupedTransactions(pwallet, grpID, tx, "*", 0, true, transactions, filter);
     }
 
-    CBlockIndex *pblockLast = chainActive[chainActive.Height() + 1 - target_confirms];
+    CBlockIndex *pblockLast = ::ChainActive()[::ChainActive().Height() + 1 - target_confirms];
     uint256 lastblock = pblockLast ? pblockLast->GetBlockHash() : uint256();
 
     UniValue ret(UniValue::VOBJ);

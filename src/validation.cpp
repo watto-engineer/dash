@@ -564,7 +564,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     if (pfMissingInputs) {
         *pfMissingInputs = false;
     }
-    bool fV17Active_context = (unsigned int)chainActive.Height() >= Params().GetConsensus().V17DeploymentHeight;
+    bool fV17Active_context = (unsigned int)::ChainActive().Height() >= Params().GetConsensus().V17DeploymentHeight;
     if (fV17Active_context && tx.ContainsZerocoins()) {
         return state.DoS(30, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
     }
@@ -592,10 +592,10 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
     // potentially causing this node to create a bad block.
     if (IsAnyOutputGrouped(tx)) {
-        if ((unsigned int)chainActive.Height() < chainparams.GetConsensus().ATPStartHeight)
+        if ((unsigned int)::ChainActive().Height() < chainparams.GetConsensus().ATPStartHeight)
         {
             return state.Invalid(ValidationInvalid::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "premature-op_group-tx");
-        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
+        } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated(::ChainActive().Height())){
             for (const CTxOut &txout : tx.vout)
             {
                 CTokenGroupInfo grp(txout.scriptPubKey);
@@ -834,7 +834,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
                     __func__, hash.ToString(), FormatStateMessage(state));
         }
 
-        if (!CheckBettingTx(bettingsViewCache, tx, chainActive.Height())) {
+        if (!CheckBettingTx(bettingsViewCache, tx, ::ChainActive().Height())) {
             return error("AcceptToMemoryPool: Error when betting TX checking!");
         }
 
@@ -1406,7 +1406,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
     if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs())
     {
-        if ((unsigned int)chainActive.Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) {
+        if ((unsigned int)::ChainActive().Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) {
             std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
             CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
             if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
@@ -1418,7 +1418,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                 if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
                     return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
                 }
-                if (!tokenGroupManager->ManagementTokensCreated(chainActive.Height())){
+                if (!tokenGroupManager->ManagementTokensCreated(::ChainActive().Height())){
                     for (const CTxOut &txout : tx.vout)
                     {
                         CTokenGroupInfo grp(txout.scriptPubKey);

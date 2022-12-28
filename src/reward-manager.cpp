@@ -30,7 +30,7 @@ bool CRewardManager::IsReady() {
     if (!fHaveConnections || !masternodeSync.IsSynced()) {
         return false;
     }
-    const CBlockIndex* tip = chainActive.Tip();
+    const CBlockIndex* tip = ::ChainActive().Tip();
     if (tip == nullptr || tip->nTime < (GetAdjustedTime() - 300)) {
         return false;
     }

@@ -43,7 +43,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
 
     {   // Don't keep cs_main locked
         LOCK(cs_main);
-        nHeight = chainActive.Height();
+        nHeight = ::ChainActive().Height();
         nHeightEnd = nHeight+nGenerate;
     }
     unsigned int nExtraNonce = 0;
@@ -58,7 +58,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
         if (fPosPhase) {
             std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
-            if (stakingManager->CreateCoinStake(chainActive.Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
+            if (stakingManager->CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
                 // Coinstake found. Extract signing key from coinstake
                 pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
             };
@@ -74,7 +74,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
         CBlock *pblock = &pblocktemplate->block;
         {
             LOCK(cs_main);
-            IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
+            IncrementExtraNonce(pblock, ::ChainActive().Tip(), nExtraNonce);
         }
         while (!fPosPhase && nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
             ++pblock->nNonce;

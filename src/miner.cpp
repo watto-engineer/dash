@@ -262,7 +262,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
         CAmount nBetPayout = 0;
 
-        CCoinsViewCache view(pcoinsTip.get());
+        CCoinsViewCache &view = ::ChainstateActive().CoinsTip();
         CBettingsView bettingsViewCache(bettingsView.get());
         nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
 
@@ -282,7 +282,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
                 CBlock block;
                 int vtxNr = -1;
-                if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, chainActive[nHeight], Params().GetConsensus())) {
+                if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, ::ChainActive()[nHeight], Params().GetConsensus())) {
                     for (size_t i = 0; i < block.vtx.size(); i++) {
                         const CTransactionRef& tx = block.vtx[i];
                         if (tx->GetHash() == payout.first.betKey.outPoint.hash) {
