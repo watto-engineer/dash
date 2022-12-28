@@ -185,10 +185,10 @@ CAmount DeserializeAmount(opcodetype opcodeQty, std::vector<unsigned char> &vec)
 #if 0
 CTokenGroupID ExtractControllingGroup(const CScript &scriptPubKey)
 {
-    txnouttype whichType;
     typedef std::vector<unsigned char> valtype;
     std::vector<valtype> vSolutions;
-    if (!Solver(scriptPubKey, whichType, vSolutions))
+    txnouttype whichType = Solver(scriptPubKey, vSolutions);
+    if (whichType == TX_NONSTANDARD)
         return CTokenGroupID();
 
     // only certain well known script types are allowed to mint or melt

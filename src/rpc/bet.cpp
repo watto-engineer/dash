@@ -68,9 +68,9 @@ extern UniValue getmappingid(const JSONRPCRequest& request)
         LogPrint(BCLog::BETTING, "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
-                mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
-                mappings.push_back(Pair("exists", true));
-                mappings.push_back(Pair("mapping-index", mIndex));
+                mappings.pushKV("mapping-id", (uint64_t) key.nId);
+                mappings.pushKV("exists", true);
+                mappings.pushKV("mapping-index", mIndex);
                 mappingFound = true;
             }
         }
@@ -231,8 +231,8 @@ extern UniValue getpayoutinfo(const JSONRPCRequest& request)
         uint256 txHash = uint256S(find_value(obj, "txHash").get_str());
         uint32_t nOut = find_value(obj, "nOut").get_int();
         uint256 hashBlock;
-        CTransactionRef tx;
-        if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock, true)) {
+        CTransactionRef tx = GetTransaction(::ChainActive().Tip(), nullptr, txHash, Params().GetConsensus(), hashBlock);
+        if (!tx) {
             vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
@@ -240,7 +240,10 @@ extern UniValue getpayoutinfo(const JSONRPCRequest& request)
             vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
-        uint32_t blockHeight = mapBlockIndex.at(hashBlock)->nHeight;
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        uint32_t blockHeight;
+        if (pindex)
+            blockHeight = pindex->nHeight;
 
         CPayoutInfoDB payoutInfo;
         // try to find payout info from db

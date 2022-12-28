@@ -1224,6 +1224,7 @@ static bool MaybePunishNode(NodeId nodeid, const CValidationState& state, bool v
     case ValidationInvalidReason::BLOCK_CHAINLOCK:
     case ValidationInvalidReason::TX_BAD_SPECIAL:
     case ValidationInvalidReason::TX_CONFLICT_LOCK:
+    case ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY:
         {
             // TODO: Handle this much more gracefully (10 DoS points is super arbitrary)
             LOCK(cs_main);
@@ -3031,7 +3032,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& msg_type, CDataStream& vRec
             if (inv.type == MSG_BLOCK) {
                 UpdateBlockAvailability(pfrom->GetId(), inv.hash);
 
-                if (IsInitialBlockDownload() && fAlreadyHave && pfrom->nVersion < GETHEADERS_VERSION) {
+                if (::ChainstateActive().IsInitialBlockDownload() && fAlreadyHave && pfrom->nVersion < GETHEADERS_VERSION) {
                     CNodeState *state = State(pfrom->GetId());
                     if (state && state->fSyncStarted && state->nStallingSince == 0) {
                         state->nStallingSince = GetTimeMicros();
@@ -3846,7 +3847,7 @@ bool ProcessMessage(CNode* pfrom, const std::string& msg_type, CDataStream& vRec
         // In legacy mode, when the block does not connect, request the missing blocks and bail
         if (pfrom->nVersion < GETHEADERS_VERSION) {
             LOCK(cs_main);
-            if (mapBlockIndex.find(pblock->hashPrevBlock) == mapBlockIndex.end()) {
+            if (LookupBlockIndex(pblock->hashPrevBlock) == nullptr) {
                 connman->PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, ::ChainActive().GetLocator(pindexBestHeader), pblock->GetHash()));
                 return true;
             } else {

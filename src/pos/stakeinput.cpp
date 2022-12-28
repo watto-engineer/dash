@@ -97,7 +97,7 @@ bool CZStake::GetModifier(uint64_t& nStakeModifier)
         }
 
         if (pindex->nHeight + 1 <= ::ChainActive().Height())
-            pindex = chainA::ChainActive()ctive.Next(pindex);
+            pindex = ::ChainActive().Next(pindex);
         else
             return false;
     }
@@ -232,9 +232,9 @@ CAmount CStake::GetValue() const
 bool CStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>& vout, CAmount nTotal)
 {
     std::vector<valtype> vSolutions;
-    txnouttype whichType;
     CScript scriptPubKeyKernel = txFrom->vout[nPosition].scriptPubKey;
-    if (!Solver(scriptPubKeyKernel, whichType, vSolutions)) {
+    txnouttype whichType = Solver(scriptPubKeyKernel, vSolutions);
+    if (whichType == TX_NONSTANDARD) {
         LogPrintf("CreateCoinStake : failed to parse kernel\n");
         return false;
     }
@@ -247,10 +247,15 @@ bool CStake::CreateTxOuts(std::shared_ptr<CWallet> pwallet, std::vector<CTxOut>&
     CScript scriptPubKey;
     if (whichType == TX_PUBKEYHASH) // pay to address type
     {
+        auto spk_man = pwallet->GetLegacyScriptPubKeyMan();
+        if (!spk_man) {
+            return false;
+        }
+
         //convert to pay to public key type
         CKey key;
         CKeyID keyID = CKeyID(uint160(vSolutions[0]));
-        if (!pwallet->GetKey(keyID, key)) {
+        if (!spk_man->GetKey(keyID, key)) {
             LogPrintf("CreateCoinStake : key not found\n");
             return false;
         }
@@ -295,11 +300,11 @@ CBlockIndex* CStake::GetIndexFrom()
     if (pindexFrom)
         return pindexFrom;
     uint256 hashBlock;
-    CTransactionRef tx;
-    if (GetTransaction(txFrom->GetHash(), tx, Params().GetConsensus(), hashBlock, true)) {
+    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), nullptr, txFrom->GetHash(), Params().GetConsensus(), hashBlock);
+    if (!tx) {
         // If the index is in the chain, then set it as the "index from"
-        if (mapBlockIndex.count(hashBlock)) {
-            CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
             if (::ChainActive().Contains(pindex))
                 pindexFrom = pindex;
         }
@@ -312,9 +317,9 @@ CBlockIndex* CStake::GetIndexFrom()
 
 bool IsValidStakeInput(const CTxOut& txOut) {
     std::vector<valtype> vSolutions;
-    txnouttype whichType;
     CScript scriptPubKeyKernel = txOut.scriptPubKey;
-    if (!Solver(scriptPubKeyKernel, whichType, vSolutions)) {
+    txnouttype whichType = Solver(scriptPubKeyKernel, vSolutions);
+    if (whichType == TX_NONSTANDARD) {
         return false;
     }
 
