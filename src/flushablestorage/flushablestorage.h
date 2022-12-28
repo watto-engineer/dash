@@ -5,7 +5,7 @@
 #ifndef FLUSHABLE_STORAGE_H
 #define FLUSHABLE_STORAGE_H
 
-#include <util.h>
+//#include <util/system.h>
 #include <memory>
 #include "dbwrapper.h"
 #include <boost/optional.hpp>
@@ -44,7 +44,7 @@ public:
     ~CStorageLevelDBIterator() override { }
     void Seek(const std::vector<unsigned char>& key) override {
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
-        ssKey.reserve(::GetSerializeSize(key, SER_DISK, CLIENT_VERSION));
+        ssKey.reserve(::GetSerializeSize(key, CLIENT_VERSION));
         ssKey << key;
         leveldb::Slice slKey(&ssKey[0], ssKey.size());
         it->Seek(slKey);

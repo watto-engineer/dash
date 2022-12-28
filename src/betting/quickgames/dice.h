@@ -26,19 +26,13 @@ struct DiceBetInfo {
     QuickGamesDiceBetType betType;
     uint32_t betNumber;
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(DiceBetInfo, obj){
+        uint8_t bet_type;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        uint8_t type;
-        if (ser_action.ForRead()) {
-            READWRITE(type);
-            betType = (QuickGamesDiceBetType) type;
-        }
-        else {
-            type = (uint8_t) betType;
-            READWRITE(type);
-        }
+        SER_WRITE(obj, bet_type = (uint8_t) obj.betType);
+        READWRITE(bet_type);
+        SER_READ(obj, obj.betType = (QuickGamesDiceBetType) bet_type);
+
         if (type != qgDiceEven && type != qgDiceOdd) {
             READWRITE(betNumber);
         }

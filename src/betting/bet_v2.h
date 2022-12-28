@@ -5,7 +5,7 @@
 #ifndef WAGERR_V2_BET_H
 #define WAGERR_V2_BET_H
 
-#include <util.h>
+#include <primitives/transaction.h>
 #include <amount.h>
 
 class CBetOut;

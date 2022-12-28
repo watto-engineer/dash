@@ -5,7 +5,7 @@
 #ifndef WAGERR_BET_TX_H
 #define WAGERR_BET_TX_H
 
-#include <util.h>
+//#include <util/system.h>
 #include <serialize.h>
 
 class CTxOut;
@@ -47,16 +47,16 @@ public:
     uint8_t version;
     uint8_t txType;
 
-    ADD_SERIALIZE_METHODS;
-
     size_t GetSerializeSize(int nType, int nVersion) const {
         return 3;
     }
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(prefix);
-        READWRITE(version);
-        READWRITE(txType);
+    SERIALIZE_METHODS(CBettingTxHeader, obj)
+    {
+        READWRITE(
+                obj.prefix,
+                obj.version,
+                obj.txType
+                );
     }
 };
 
@@ -80,48 +80,42 @@ public:
 
     BetTxTypes GetTxType() const override { return mappingTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nMType);
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        ser_writedata8(s, nMType);
         // if mapping type is teamMapping (0x03) or contenderMapping (0x06) nId is 4 bytes, else - 2 bytes
         if (nMType == 0x03 || nMType == 0x06) {
-            uint32_t nId32;
-            if (ser_action.ForRead()) {
-                READWRITE(nId32);
-                nId = nId32;
-            }
-            else {
-                nId32 = nId;
-                READWRITE(nId32);
-            }
+            ser_writedata32(s, nId);
+        } else {
+            ser_writedata16(s, nId);
         }
-        else {
-            uint16_t nId16;
-            if (ser_action.ForRead()) {
-                READWRITE(nId16);
-                nId = nId16;
-            }
-            else {
-                nId16 = static_cast<uint16_t>(nId);
-                READWRITE(nId16);
-            }
-        }
-        // OMG string serialization
         char ch;
-        if (ser_action.ForRead()) {
-            sName.clear();
-            while (s.size() != 0) {
-                READWRITE(ch);
-                sName += ch;
-            }
+        for (size_t i = 0; i < sName.size(); i++) {
+            ch = (uint8_t) sName[i];
+            ser_writedata8(s, ch);
         }
-        else {
-            for (size_t i = 0; i < sName.size(); i++) {
-                ch = (uint8_t) sName[i];
-                READWRITE(ch);
-            }
+    }
+
+    /**
+     * Unserialize from a stream.
+     */
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        nMType = ser_readdata8(s);
+        // if mapping type is teamMapping (0x03) or contenderMapping (0x06) nId is 4 bytes, else - 2 bytes
+        if (nMType == 0x03 || nMType == 0x06) {
+            nId = ser_readdata32(s);
+        } else {
+            uint16_t nId16 = ser_readdata16(s);
+            nId = nId16;
+        }
+        char ch;
+        sName.clear();
+        while (s.size() != 0) {
+            ch = ser_readdata8(s);
+            sName += ch;
         }
     }
 };
@@ -149,20 +143,18 @@ public:
 
     BetTxTypes GetTxType() const override { return plEventTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
-        READWRITE(nSport);
-        READWRITE(nTournament);
-        READWRITE(nStage);
-        READWRITE(nHomeTeam);
-        READWRITE(nAwayTeam);
-        READWRITE(nHomeOdds);
-        READWRITE(nAwayOdds);
-        READWRITE(nDrawOdds);
+    SERIALIZE_METHODS(CPeerlessEventTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
+        READWRITE(obj.nSport);
+        READWRITE(obj.nTournament);
+        READWRITE(obj.nStage);
+        READWRITE(obj.nHomeTeam);
+        READWRITE(obj.nAwayTeam);
+        READWRITE(obj.nHomeOdds);
+        READWRITE(obj.nAwayOdds);
+        READWRITE(obj.nDrawOdds);
     }
 };
 
@@ -185,19 +177,17 @@ public:
 
     BetTxTypes GetTxType() const override { return fEventTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
-        READWRITE(nSport);
-        READWRITE(nTournament);
-        READWRITE(nStage);
-        READWRITE(nGroupType);
-        READWRITE(nMarketType);
-        READWRITE(nMarginPercent);
-        READWRITE(mContendersInputOdds);
+    SERIALIZE_METHODS(CFieldEventTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
+        READWRITE(obj.nSport);
+        READWRITE(obj.nTournament);
+        READWRITE(obj.nStage);
+        READWRITE(obj.nGroupType);
+        READWRITE(obj.nMarketType);
+        READWRITE(obj.nMarginPercent);
+        READWRITE(obj.mContendersInputOdds);
     }
 };
 
@@ -213,12 +203,10 @@ public:
 
     BetTxTypes GetTxType() const override { return fUpdateOddsTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(mContendersInputOdds);
+    SERIALIZE_METHODS(CFieldUpdateOddsTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.mContendersInputOdds);
     }
 };
 
@@ -234,12 +222,10 @@ public:
 
     BetTxTypes GetTxType() const override { return fUpdateModifiersTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(mContendersModifires);
+    SERIALIZE_METHODS(CFieldUpdateModifiersTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.mContendersModifires);
     }
 };
 
@@ -254,12 +240,10 @@ public:
 
     BetTxTypes GetTxType() const override { return fUpdateMarginTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nMarginPercent);
+    SERIALIZE_METHODS(CFieldUpdateMarginTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nMarginPercent);
     }
 };
 
@@ -273,11 +257,9 @@ public:
 
     BetTxTypes GetTxType() const override { return fZeroingOddsTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
+    SERIALIZE_METHODS(CFieldZeroingOddsTx, obj)
+    {
+        READWRITE(obj.nEventId);
     }
 };
 
@@ -294,13 +276,11 @@ public:
 
     BetTxTypes GetTxType() const override { return fResultTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nResultType);
-        READWRITE(contendersResults);
+    SERIALIZE_METHODS(CFieldResultTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nResultType);
+        READWRITE(obj.contendersResults);
     }
 };
 
@@ -321,13 +301,11 @@ public:
 
     BetTxTypes GetTxType() const override { return fBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nOutcome);
-        READWRITE(nContenderId);
+    SERIALIZE_METHODS(CFieldBetTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nOutcome);
+        READWRITE(obj.nContenderId);
     }
 };
 
@@ -341,11 +319,9 @@ public:
 
     BetTxTypes GetTxType() const override { return fParlayBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(legs);
+    SERIALIZE_METHODS(CFieldParlayBetTx, obj)
+    {
+        READWRITE(obj.legs);
     }
 };
 
@@ -361,12 +337,10 @@ public:
 
     BetTxTypes GetTxType() const override { return plBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nOutcome);
+    SERIALIZE_METHODS(CPeerlessBetTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nOutcome);
     }
 };
 
@@ -384,14 +358,12 @@ public:
 
     BetTxTypes GetTxType() const override { return plResultTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nResultType);
-        READWRITE(nHomeScore);
-        READWRITE(nAwayScore);
+    SERIALIZE_METHODS(CPeerlessResultTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nResultType);
+        READWRITE(obj.nHomeScore);
+        READWRITE(obj.nAwayScore);
     }
 };
 
@@ -408,14 +380,12 @@ public:
 
     BetTxTypes GetTxType() const override { return plUpdateOddsTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nHomeOdds);
-        READWRITE(nAwayOdds);
-        READWRITE(nDrawOdds);
+    SERIALIZE_METHODS(CPeerlessUpdateOddsTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nHomeOdds);
+        READWRITE(obj.nAwayOdds);
+        READWRITE(obj.nDrawOdds);
     }
 };
 
@@ -432,15 +402,12 @@ public:
 
     BetTxTypes GetTxType() const override { return plSpreadsEventTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CPeerlessSpreadsEventTx, obj)
     {
-        READWRITE(nEventId);
-        READWRITE(nPoints);
-        READWRITE(nHomeOdds);
-        READWRITE(nAwayOdds);
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nPoints);
+        READWRITE(obj.nHomeOdds);
+        READWRITE(obj.nAwayOdds);
     }
 
 };
@@ -458,15 +425,12 @@ public:
 
     BetTxTypes GetTxType() const override { return plTotalsEventTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CPeerlessTotalsEventTx, obj)
     {
-        READWRITE(nEventId);
-        READWRITE(nPoints);
-        READWRITE(nOverOdds);
-        READWRITE(nUnderOdds);
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nPoints);
+        READWRITE(obj.nOverOdds);
+        READWRITE(obj.nUnderOdds);
     }
 };
 
@@ -480,12 +444,10 @@ public:
 
     BetTxTypes GetTxType() const override { return plEventPatchTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
+    SERIALIZE_METHODS(CPeerlessEventPatchTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
     }
 };
 
@@ -499,11 +461,9 @@ public:
 
     BetTxTypes GetTxType() const override { return plParlayBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(legs);
+    SERIALIZE_METHODS(CPeerlessParlayBetTx, obj)
+    {
+        READWRITE(obj.legs);
     }
 };
 
@@ -522,12 +482,10 @@ public:
 
     BetTxTypes GetTxType() const override { return cgEventTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nEntryFee);
+    SERIALIZE_METHODS(CChainGamesEventTx, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nEntryFee);
     }
 };
 
@@ -542,12 +500,9 @@ public:
 
     BetTxTypes GetTxType() const override { return cgBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CChainGamesBetTx, obj)
     {
-        READWRITE(nEventId);
+        READWRITE(obj.nEventId);
     }
 
 };
@@ -562,12 +517,9 @@ public:
 
     BetTxTypes GetTxType() const override { return cgResultTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CChainGamesResultTx, obj)
     {
-        READWRITE(nEventId);
+        READWRITE(obj.nEventId);
     }
 
 };
@@ -587,12 +539,10 @@ public:
 
     BetTxTypes GetTxType() const override { return qgBetTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(gameType);
-        READWRITE(vBetInfo);
+    SERIALIZE_METHODS(CQuickGamesBetTx, obj)
+    {
+        READWRITE(obj.gameType);
+        READWRITE(obj.vBetInfo);
     }
 };
 
@@ -606,11 +556,9 @@ public:
 
     BetTxTypes GetTxType() const override { return plEventZeroingOddsTxType; }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(vEventIds);
+    SERIALIZE_METHODS(CPeerlessEventZeroingOddsTx, obj)
+    {
+        READWRITE(obj.vEventIds);
     }
 };
 

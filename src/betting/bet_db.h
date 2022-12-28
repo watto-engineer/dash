@@ -29,24 +29,26 @@ typedef struct MappingKey {
     MappingKey() {}
     MappingKey(MappingType type, uint32_t id) : nMType(type), nId(id) {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
         uint32_t be_val;
-        if (ser_action.ForRead()) {
-            READWRITE(be_val);
-            nMType = (MappingType) ntohl(be_val);
-            READWRITE(be_val);
-            nId = ntohl(be_val);
-        }
-        else {
-            be_val = htonl((uint32_t)nMType);
-            READWRITE(be_val);
-            be_val = htonl(nId);
-            READWRITE(be_val);
-        }
+        be_val = htonl((uint32_t)nMType);
+        ser_writedata32(s, be_val);
+        be_val = htonl(nId);
+        ser_writedata32(s, be_val);
     }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        uint32_t be_val;
+        be_val = ser_readdata32(s);
+        nMType = (MappingType) ntohl(be_val);
+        be_val = ser_readdata32(s);
+        nId = ntohl(be_val);
+    }
+
 } MappingKey;
 
 class CMappingDB
@@ -61,11 +63,9 @@ public:
     static std::string ToTypeName(MappingType type);
     static MappingType FromTypeName(const std::string& name);
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(sName);
+    SERIALIZE_METHODS(CMappingDB, obj)
+    {
+        READWRITE(obj.sName);
     }
 };
 
@@ -77,20 +77,22 @@ typedef struct EventKey {
     explicit EventKey(const EventKey& key) : eventId(key.eventId) { }
     explicit EventKey(EventKey&& key) : eventId(key.eventId) { }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
         uint32_t be_val;
-        if (ser_action.ForRead()) {
-            READWRITE(be_val);
-            eventId = ntohl(be_val);
-        }
-        else {
-            be_val = htonl(eventId);
-            READWRITE(be_val);
-        }
+        be_val = htonl(eventId);
+        ser_writedata32(s, be_val);
     }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        uint32_t be_val;
+        be_val = ser_readdata32(s);
+        eventId = ntohl(be_val);
+    }
+
 } EventKey;
 
 // class using for saving short event info inside universal bet model
@@ -156,30 +158,28 @@ public:
         nStartTime = eventPatchTx.nStartTime;
     }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CPeerlessBaseEventDB, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
+        READWRITE(obj.nSport);
+        READWRITE(obj.nTournament);
+        READWRITE(obj.nStage);
+        READWRITE(obj.nHomeTeam);
+        READWRITE(obj.nAwayTeam);
+        READWRITE(obj.nHomeOdds);
+        READWRITE(obj.nAwayOdds);
+        READWRITE(obj.nDrawOdds);
+        READWRITE(obj.nSpreadPoints);
+        READWRITE(obj.nSpreadHomeOdds);
+        READWRITE(obj.nSpreadAwayOdds);
+        READWRITE(obj.nTotalPoints);
+        READWRITE(obj.nTotalOverOdds);
+        READWRITE(obj.nTotalUnderOdds);
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
-        READWRITE(nSport);
-        READWRITE(nTournament);
-        READWRITE(nStage);
-        READWRITE(nHomeTeam);
-        READWRITE(nAwayTeam);
-        READWRITE(nHomeOdds);
-        READWRITE(nAwayOdds);
-        READWRITE(nDrawOdds);
-        READWRITE(nSpreadPoints);
-        READWRITE(nSpreadHomeOdds);
-        READWRITE(nSpreadAwayOdds);
-        READWRITE(nTotalPoints);
-        READWRITE(nTotalOverOdds);
-        READWRITE(nTotalUnderOdds);
-
-        READWRITE(nEventCreationHeight);
-        if (nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
-            READWRITE(fLegacyInitialHomeFavorite);
+        READWRITE(obj.nEventCreationHeight);
+        if (obj.nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+            READWRITE(obj.fLegacyInitialHomeFavorite);
         }
     }
 };
@@ -210,48 +210,46 @@ public:
     // Default Constructor.
     explicit CPeerlessExtendedEventDB() : CPeerlessBaseEventDB() {}
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CPeerlessExtendedEventDB, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
+        READWRITE(obj.nSport);
+        READWRITE(obj.nTournament);
+        READWRITE(obj.nStage);
+        READWRITE(obj.nHomeTeam);
+        READWRITE(obj.nAwayTeam);
+        READWRITE(obj.nHomeOdds);
+        READWRITE(obj.nAwayOdds);
+        READWRITE(obj.nDrawOdds);
+        READWRITE(obj.nSpreadPoints);
+        READWRITE(obj.nSpreadHomeOdds);
+        READWRITE(obj.nSpreadAwayOdds);
+        READWRITE(obj.nTotalPoints);
+        READWRITE(obj.nTotalOverOdds);
+        READWRITE(obj.nTotalUnderOdds);
+        READWRITE(obj.nMoneyLineHomePotentialLiability);
+        READWRITE(obj.nMoneyLineAwayPotentialLiability);
+        READWRITE(obj.nMoneyLineDrawPotentialLiability);
+        READWRITE(obj.nSpreadHomePotentialLiability);
+        READWRITE(obj.nSpreadAwayPotentialLiability);
+        READWRITE(obj.nSpreadPushPotentialLiability);
+        READWRITE(obj.nTotalOverPotentialLiability);
+        READWRITE(obj.nTotalUnderPotentialLiability);
+        READWRITE(obj.nTotalPushPotentialLiability);
+        READWRITE(obj.nMoneyLineHomeBets);
+        READWRITE(obj.nMoneyLineAwayBets);
+        READWRITE(obj.nMoneyLineDrawBets);
+        READWRITE(obj.nSpreadHomeBets);
+        READWRITE(obj.nSpreadAwayBets);
+        READWRITE(obj.nSpreadPushBets);
+        READWRITE(obj.nTotalOverBets);
+        READWRITE(obj.nTotalUnderBets);
+        READWRITE(obj.nTotalPushBets);
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
-        READWRITE(nSport);
-        READWRITE(nTournament);
-        READWRITE(nStage);
-        READWRITE(nHomeTeam);
-        READWRITE(nAwayTeam);
-        READWRITE(nHomeOdds);
-        READWRITE(nAwayOdds);
-        READWRITE(nDrawOdds);
-        READWRITE(nSpreadPoints);
-        READWRITE(nSpreadHomeOdds);
-        READWRITE(nSpreadAwayOdds);
-        READWRITE(nTotalPoints);
-        READWRITE(nTotalOverOdds);
-        READWRITE(nTotalUnderOdds);
-        READWRITE(nMoneyLineHomePotentialLiability);
-        READWRITE(nMoneyLineAwayPotentialLiability);
-        READWRITE(nMoneyLineDrawPotentialLiability);
-        READWRITE(nSpreadHomePotentialLiability);
-        READWRITE(nSpreadAwayPotentialLiability);
-        READWRITE(nSpreadPushPotentialLiability);
-        READWRITE(nTotalOverPotentialLiability);
-        READWRITE(nTotalUnderPotentialLiability);
-        READWRITE(nTotalPushPotentialLiability);
-        READWRITE(nMoneyLineHomeBets);
-        READWRITE(nMoneyLineAwayBets);
-        READWRITE(nMoneyLineDrawBets);
-        READWRITE(nSpreadHomeBets);
-        READWRITE(nSpreadAwayBets);
-        READWRITE(nSpreadPushBets);
-        READWRITE(nTotalOverBets);
-        READWRITE(nTotalUnderBets);
-        READWRITE(nTotalPushBets);
-
-        READWRITE(nEventCreationHeight);
-        if (nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
-            READWRITE(fLegacyInitialHomeFavorite);
+        READWRITE(obj.nEventCreationHeight);
+        if (obj.nEventCreationHeight < Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+            READWRITE(obj.fLegacyInitialHomeFavorite);
         }
     }
 };
@@ -274,14 +272,12 @@ public:
     explicit CPeerlessResultDB(uint32_t eventId, uint32_t resultType, uint32_t homeScore, uint32_t awayScore) :
         nEventId(eventId), nResultType(resultType), nHomeScore(homeScore), nAwayScore(awayScore) {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nResultType);
-        READWRITE(nHomeScore);
-        READWRITE(nAwayScore);
+    SERIALIZE_METHODS(CPeerlessResultDB, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nResultType);
+        READWRITE(obj.nHomeScore);
+        READWRITE(obj.nAwayScore);
     }
 };
 
@@ -321,25 +317,23 @@ typedef struct ContenderInfo {
         , nModifier(modifier)
     {}
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(ContenderInfo, obj)
+    {
+        READWRITE(obj.nInputOdds);
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nInputOdds);
+        READWRITE(obj.nOutrightOdds);
+        READWRITE(obj.nOutrightBets);
+        READWRITE(obj.nOutrightPotentialLiability);
 
-        READWRITE(nOutrightOdds);
-        READWRITE(nOutrightBets);
-        READWRITE(nOutrightPotentialLiability);
+        READWRITE(obj.nPlaceOdds);
+        READWRITE(obj.nPlaceBets);
+        READWRITE(obj.nPlacePotentialLiability);
 
-        READWRITE(nPlaceOdds);
-        READWRITE(nPlaceBets);
-        READWRITE(nPlacePotentialLiability);
+        READWRITE(obj.nShowOdds);
+        READWRITE(obj.nShowBets);
+        READWRITE(obj.nShowPotentialLiability);
 
-        READWRITE(nShowOdds);
-        READWRITE(nShowBets);
-        READWRITE(nShowPotentialLiability);
-
-        READWRITE(nModifier);
+        READWRITE(obj.nModifier);
     }
 } ContenderInfo;
 
@@ -372,19 +366,17 @@ public:
     std::string ToString();
     std::string ContendersToString();
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nStartTime);
-        READWRITE(nGroupType);
-        READWRITE(nMarketType);
-        READWRITE(nSport);
-        READWRITE(nTournament);
-        READWRITE(nStage);
-        READWRITE(nMarginPercent);
-        READWRITE(contenders);
+    SERIALIZE_METHODS(CFieldEventDB, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nStartTime);
+        READWRITE(obj.nGroupType);
+        READWRITE(obj.nMarketType);
+        READWRITE(obj.nSport);
+        READWRITE(obj.nTournament);
+        READWRITE(obj.nStage);
+        READWRITE(obj.nMarginPercent);
+        READWRITE(obj.contenders);
     }
 
 private:
@@ -429,13 +421,10 @@ public:
         , contendersResults(mContendersResults)
     {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nResultType);
-        READWRITE(contendersResults);
+    SERIALIZE_METHODS(CFieldResultDB, obj){
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nResultType);
+        READWRITE(obj.contendersResults);
     }
 };
 
@@ -453,21 +442,23 @@ typedef struct PeerlessBetKey {
         return blockHeight == rhs.blockHeight && outPoint == rhs.outPoint;
     }
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
         uint32_t be_val;
-        if (ser_action.ForRead()) {
-            READWRITE(be_val);
-            blockHeight = ntohl(be_val);
-        }
-        else {
-            be_val = htonl(blockHeight);
-            READWRITE(be_val);
-        }
-        READWRITE(outPoint);
+        be_val = htonl(blockHeight);
+        ser_writedata32(s, be_val);
+        
     }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        uint32_t be_val;
+        be_val = ser_readdata32(s);
+        blockHeight = ntohl(be_val);
+    }
+
 } PeerlessBetKey;
 
 class CPeerlessLegDB
@@ -480,21 +471,23 @@ public:
     explicit CPeerlessLegDB() {}
     explicit CPeerlessLegDB(uint32_t eventId, OutcomeType outcome) : nEventId(eventId), nOutcome(outcome) {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
         uint8_t outcome;
-        READWRITE(nEventId);
-        if (ser_action.ForRead()) {
-            READWRITE(outcome);
-            nOutcome = (OutcomeType) outcome;
-        }
-        else {
-            outcome = (uint8_t) nOutcome;
-            READWRITE(outcome);
-        }
+        outcome = (uint8_t) nOutcome;
+        ser_writedata8(s, outcome);
+        
     }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        uint8_t outcome;
+        outcome = ser_readdata8(s);
+        nOutcome = (OutcomeType) outcome;
+    }
+
 };
 
 // Class for serializing bets in DB
@@ -533,35 +526,18 @@ public:
     // for undo
     void SetUncompleted() { completed = false; }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CPeerlessBetDB, obj)
+    {
+        std::string address_str;
+        uint8_t res_type;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        std::string addrStr;
-        READWRITE(betAmount);
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress = DecodeDestination(addrStr);
-        }
-        else {
-            addrStr = EncodeDestination(playerAddress);
-            READWRITE(addrStr);
-        }
-        READWRITE(legs);
-        READWRITE(lockedEvents);
-        READWRITE(betTime);
-        READWRITE(completed);
-        uint8_t resType;
-        if (ser_action.ForRead()) {
-            READWRITE(resType);
-            resultType = (BetResultType) resType;
-        }
-        else {
-            resType = (uint8_t) resultType;
-            READWRITE(resType);
-        }
-        READWRITE(payout);
-        READWRITE(payoutHeight);
+        SER_WRITE(obj, address_str = EncodeDestination(obj.playerAddress));
+        SER_WRITE(obj, res_type = (uint8_t) obj.resultType);
+
+        READWRITE(obj.betAmount, address_str, obj.legs, obj.lockedEvents, obj.betTime, obj.completed, res_type, obj.payout, obj.payoutHeight);
+
+        SER_READ(obj, obj.playerAddress = DecodeDestination(address_str));
+        SER_READ(obj, obj.resultType = (BetResultType) res_type);
     }
 
 private:
@@ -586,21 +562,15 @@ public:
         , nContenderId(contenderId)
     {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
+    SERIALIZE_METHODS(CFieldLegDB, obj)
+    {
         uint8_t market;
-        READWRITE(nEventId);
-        if (ser_action.ForRead()) {
-            READWRITE(market);
-            nOutcome = (FieldBetOutcomeType) market;
-        }
-        else {
-            market = (uint8_t) nOutcome;
-            READWRITE(market);
-        }
-        READWRITE(nContenderId);
+
+        SER_WRITE(obj, market = (uint8_t) obj.nOutcome);
+
+        READWRITE(obj.nEventId, market, obj.nContenderId);
+
+        SER_READ(obj, obj.nOutcome = (FieldBetOutcomeType) market);
     }
 };
 
@@ -637,35 +607,18 @@ public:
     // for undo
     void SetUncompleted() { completed = false; }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CFieldBetDB, obj)
+    {
+        std::string address_str;
+        uint8_t res_type;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        std::string addrStr;
-        READWRITE(betAmount);
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress = DecodeDestination(addrStr);
-        }
-        else {
-            addrStr = EncodeDestination(playerAddress);
-            READWRITE(addrStr);
-        }
-        READWRITE(legs);
-        READWRITE(lockedEvents);
-        READWRITE(betTime);
-        READWRITE(completed);
-        uint8_t resType;
-        if (ser_action.ForRead()) {
-            READWRITE(resType);
-            resultType = (BetResultType) resType;
-        }
-        else {
-            resType = (uint8_t) resultType;
-            READWRITE(resType);
-        }
-        READWRITE(payout);
-        READWRITE(payoutHeight);
+        SER_WRITE(obj, address_str = EncodeDestination(obj.playerAddress));
+        SER_WRITE(obj, res_type = (uint8_t) obj.resultType);
+
+        READWRITE(obj.betAmount, address_str, obj.legs, obj.lockedEvents, obj.betTime, obj.completed, res_type, obj.payout, obj.payoutHeight);
+
+        SER_READ(obj, obj.playerAddress = DecodeDestination(address_str));
+        SER_READ(obj, obj.resultType = (BetResultType) res_type);
     }
 
 private:
@@ -686,12 +639,10 @@ public:
     explicit CChainGamesEventDB() {}
     explicit CChainGamesEventDB(uint32_t eventId, uint32_t entryFee) : nEventId(eventId), nEntryFee(entryFee) {}
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(nEntryFee);
+    SERIALIZE_METHODS(CChainGamesEventDB, obj)
+    {
+        READWRITE(obj.nEventId);
+        READWRITE(obj.nEntryFee);
     }
 };
 
@@ -714,25 +665,15 @@ public:
     explicit CChainGamesBetDB(uint32_t eventId, CAmount amount, CTxDestination address, int64_t time) :
         nEventId(eventId), betAmount(amount), playerAddress(address), betTime(time) { }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CChainGamesBetDB, obj)
+    {
+        std::string address_str;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(nEventId);
-        READWRITE(completed);
-        READWRITE(betAmount);
-        std::string addrStr;
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress = DecodeDestination(addrStr);
-        }
-        else {
-            addrStr = EncodeDestination(playerAddress);
-            READWRITE(addrStr);
-        }
-        READWRITE(betTime);
-        READWRITE(payout);
-        READWRITE(payoutHeight);
+        SER_WRITE(obj, address_str = EncodeDestination(obj.playerAddress));
+
+        READWRITE(obj.nEventId, obj.completed, obj.betAmount, address_str, obj.betTime, obj.payout, obj.payoutHeight);
+
+        SER_READ(obj, obj.playerAddress = DecodeDestination(address_str));
     }
 
     bool IsCompleted() const { return completed; }
@@ -754,12 +695,9 @@ public:
 
     explicit CChainGamesResultDB(uint16_t nEventId) : nEventId(nEventId) {};
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action)
+    SERIALIZE_METHODS(CChainGamesResultDB, obj)
     {
-        READWRITE(nEventId);
+        READWRITE(obj.nEventId);
     }
 };
 
@@ -791,43 +729,19 @@ public:
     // for undo
     void SetUncompleted() { completed = false; }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CQuickGamesBetDB, obj){
+        std::string address_str;
+        uint8_t game_type, res_type;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        uint8_t type;
-        std::string addrStr;
-        if (ser_action.ForRead()) {
-            READWRITE(type);
-            gameType = (QuickGamesType) type;
+        SER_WRITE(obj, game_type = (uint8_t) obj.gameType);
+        SER_WRITE(obj, address_str = EncodeDestination(obj.playerAddress));
+        SER_WRITE(obj, res_type = (uint8_t) obj.resultType);
 
-        }
-        else {
-            type = (uint8_t) gameType;
-            READWRITE(type);
-        }
-        READWRITE(vBetInfo);
-        READWRITE(betAmount);
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress = DecodeDestination(addrStr);
-        }
-        else {
-            addrStr = EncodeDestination(playerAddress);
-            READWRITE(addrStr);
-        }
-        READWRITE(betTime);
-        uint8_t resType;
-        if (ser_action.ForRead()) {
-            READWRITE(resType);
-            resultType = (BetResultType) resType;
-        }
-        else {
-            resType = (uint8_t) resultType;
-            READWRITE(resType);
-        }
-        READWRITE(payout);
-        READWRITE(completed);
+        READWRITE(game_type, obj.vBetInfo, obj.betAmount, address_str, obj.betTime, res_type, obj.payout, obj.completed);
+
+        SER_READ(obj, obj.gameType = (QuickGamesType) game_type);
+        SER_READ(obj, obj.playerAddress = DecodeDestination(address_str));
+        SER_READ(obj, obj.resultType = (BetResultType) res_type);
     }
 private:
     bool completed = false;
@@ -862,8 +776,6 @@ public:
     BettingUndoVariant Get() {
         return undoVariant;
     }
-
-    ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action) {
@@ -912,6 +824,17 @@ public:
             }
         }
     }
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        const_cast<CBettingUndoDB*>(this)->SerializationOp(s, CSerActionSerialize());
+    }
+
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        SerializationOp(s, CSerActionUnserialize());
+    }
 
 private:
     BettingUndoVariant undoVariant;
@@ -933,21 +856,15 @@ public:
     explicit CPayoutInfoDB(PeerlessBetKey &betKey, PayoutType payoutType) : betKey{betKey}, payoutType{payoutType} { }
     explicit CPayoutInfoDB(const CPayoutInfoDB& payoutInfo) : betKey{payoutInfo.betKey}, payoutType{payoutInfo.payoutType} { }
 
-    ADD_SERIALIZE_METHODS;
+    SERIALIZE_METHODS(CPayoutInfoDB, obj)
+    {
+        uint8_t payout_type;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action) {
-        READWRITE(betKey);
-        uint8_t type;
-        if (ser_action.ForRead()) {
-            READWRITE(type);
-            payoutType = (PayoutType) type;
+        SER_WRITE(obj, payout_type = (uint8_t) obj.payoutType);
 
-        }
-        else {
-            type = (uint8_t) payoutType;
-            READWRITE(type);
-        }
+        READWRITE(obj.betKey, payout_type);
+
+        SER_READ(obj, obj.payoutType = (PayoutType) payout_type);
     }
 
     inline int CompareTo(const CPayoutInfoDB& rhs) const
