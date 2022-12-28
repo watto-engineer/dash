@@ -12,23 +12,21 @@
 #include "zwgr/zwgrmodule.h"
 #include "zwgr/zerocoindb.h"
 
-bool IsBlockHashInChain(const uint256& hashBlock)
-{
-    if (hashBlock == uint256() || !mapBlockIndex.count(hashBlock))
-        return false;
-
-    return ::ChainActive().Contains(mapBlockIndex[hashBlock]);
-}
-
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx)
 {
     uint256 hashBlock;
-    if (!GetTransaction(txId, tx, Params().GetConsensus(), hashBlock, true))
-        return false;
-    if (!IsBlockHashInChain(hashBlock))
+    tx = GetTransaction(::ChainActive().Tip(), nullptr, txId, Params().GetConsensus(), hashBlock);
+    if (!tx)
         return false;
 
-    nHeightTx = mapBlockIndex.at(hashBlock)->nHeight;
+    if (hashBlock == uint256())
+        return false;
+
+    CBlockIndex* blockIndex = LookupBlockIndex(hashBlock);
+    if (blockIndex == nullptr)
+        return false;
+
+    nHeightTx = blockIndex->nHeight;
     return true;
 }
 
@@ -156,8 +154,8 @@ bool CheckZerocoinSpendTx(CBlockIndex *pindex, CValidationState& state, const CT
     if (IsTransactionInChain(txid, nHeightTx)) {
         //when verifying blocks on init, the blocks are scanned without being disconnected - prevent that from causing an error
 //                if (!fVerifyingBlocks || (fVerifyingBlocks && pindex->nHeight > nHeightTx))
-        if (!IsInitialBlockDownload())
-            return state.DoS(100, error("%s : txid %s already exists in block %d , trying to include it again in block %d", __func__,
+        if (!::ChainstateActive().IsInitialBlockDownload())
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s : txid %s already exists in block %d , trying to include it again in block %d", __func__,
                                         tx.GetHash().GetHex(), nHeightTx, pindex->nHeight),
                                 REJECT_INVALID, "bad-txns-inputs-missingorspent");
     }
@@ -218,10 +216,10 @@ bool CheckZerocoinSpendTx(CBlockIndex *pindex, CValidationState& state, const CT
                 continue;
             libzerocoin::PublicCoin coin(Params().Zerocoin_Params(false));
             if (!TxOutToPublicCoin(out, coin, state))
-                return state.DoS(100, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx.GetHash().GetHex()));
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-xwagerr");
 
             if (!ContextualCheckZerocoinMint(coin, pindex))
-                return state.DoS(100, error("%s: zerocoin mint failed contextual check", __func__));
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: zerocoin mint failed contextual check", __func__), REJECT_INVALID, "bad-xwagerr");
 
             vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
         }

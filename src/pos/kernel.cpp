@@ -78,10 +78,10 @@ static bool SelectBlockFromCandidates(
     uint256 hashBest;
     *pindexSelected = (const CBlockIndex*)0;
     for (const std::pair<int64_t, uint256> & item : vSortedByTimestamp) {
-        if (!mapBlockIndex.count(item.second))
+        const CBlockIndex* pindex = LookupBlockIndex(item.second);
+        if (!pindex)
             return error("%s : failed to find block index for candidate block %s", __func__, item.second.GetHex());
 
-        const CBlockIndex* pindex = mapBlockIndex[item.second];
         if (fSelected && pindex->GetBlockTime() > nSelectionIntervalStop)
             break;
 
@@ -236,9 +236,9 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
 {
     nStakeModifier = 0;
-    if (!mapBlockIndex.count(hashBlockFrom))
+    const CBlockIndex* pindexFrom = LookupBlockIndex(hashBlockFrom);
+    if (!pindexFrom)
         return error("%s : block not indexed", __func__);
-    const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
     nStakeModifierHeight = pindexFrom->nHeight;
     nStakeModifierTime = pindexFrom->GetBlockTime();
     // Fixed stake modifier only for regtest
@@ -374,8 +374,8 @@ bool initStakeInput(const CBlock& block, std::unique_ptr<CStake>& ionStake, std:
     } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;
-        CTransactionRef txPrev;
-        if (!GetTransaction(txin.prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true))
+        CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock);
+        if (!txPrev)
             return error("%s : INFO: read txPrev failed, tx id prev: %s, block id %s",
                          __func__, txin.prevout.hash.GetHex(), block.GetHash().GetHex());
 
@@ -477,11 +477,11 @@ bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex*
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            return state.Invalid(error("%s : ComputeNextStakeModifier() failed", __func__));
+            return error("%s : ComputeNextStakeModifier() failed", __func__);
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
         pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
         if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            return state.DoS(20, error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__));
+            return error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__);
     } else {
         // compute v2 stake modifier
         ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);

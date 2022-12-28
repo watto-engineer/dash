@@ -45,6 +45,8 @@ enum class ValidationInvalidReason {
     TX_MISSING_INPUTS,        //!< a transaction was missing some of its inputs
     TX_PREMATURE_SPEND,       //!< transaction spends a coinbase too early, or violates locktime/sequence locks
     TX_BAD_SPECIAL,           //!< special transaction violates some rules that are not enough for insta-ban
+    // Wagerr specific:
+    TX_RESTRICTED_FUNCTIONALITY,
     /**
      * Tx already in mempool or conflicts with a tx in the chain
      * TODO: Currently this is only used if the transaction already exists in the mempool or on chain,

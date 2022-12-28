@@ -566,7 +566,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     }
     bool fV17Active_context = (unsigned int)::ChainActive().Height() >= Params().GetConsensus().V17DeploymentHeight;
     if (fV17Active_context && tx.ContainsZerocoins()) {
-        return state.DoS(30, error("%s: zerocoin has been disabled", __func__), REJECT_INVALID, "bad-txns-xwagerr");
+        return state.Invalid(ValidationInvalidReason::RESTRICTED_FUNCTIONALITY, false, REJECT_INVALID, "bad-txns-xwagerr", "zerocoin has been disabled");
     }
 
     if (!CheckTransaction(tx, state, true))
@@ -582,11 +582,11 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
-        return state.ReasonInvalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinbase");
+        return state.Invalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinbase");
 
     // Coinstake is only valid in a block, not as a loose transaction
     if (tx.IsCoinStake())
-        return state.ReasonInvalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinstake");
+        return state.Invalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinstake");
 
     // Disallow any OP_GROUP txs from entering the mempool until OP_GROUP is enabled.
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
@@ -594,13 +594,13 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     if (IsAnyOutputGrouped(tx)) {
         if ((unsigned int)::ChainActive().Height() < chainparams.GetConsensus().ATPStartHeight)
         {
-            return state.Invalid(ValidationInvalid::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "premature-op_group-tx");
+            return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false, REJECT_INVALID, "premature-op_group-tx");
         } else if (!IsAnyOutputGroupedCreation(tx, TokenGroupIdFlags::MGT_TOKEN) && !tokenGroupManager->ManagementTokensCreated(::ChainActive().Height())){
             for (const CTxOut &txout : tx.vout)
             {
                 CTokenGroupInfo grp(txout.scriptPubKey);
                 if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
-                    return state.DoS(0, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
+                    return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false, REJECT_INVALID, "op_group-before-mgt-tokens");
                 }
             }
         }
@@ -1410,13 +1410,13 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
             std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
             CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
             if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
-                return state.DoS(0, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
+                return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
 
             //Check that all token transactions paid their XDM fees
             CAmount nXDMFees = 0;
             if (IsAnyOutputGrouped(tx)) {
                 if (!tokenGroupManager->CheckXDMFees(tx, tgMintMeltBalance, state, pindexPrev, nXDMFees)) {
-                    return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
+                    return state.Invalid(ValidationInvalidReason::TX_MEMPOOL_POLICY, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
                 }
                 if (!tokenGroupManager->ManagementTokensCreated(::ChainActive().Height())){
                     for (const CTxOut &txout : tx.vout)
@@ -1435,11 +1435,11 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                 if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && mintMeltItem.second.output > 0) {
                     CTokenGroupCreation tgCreation;
                     if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
-                        return state.DoS(0, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
+                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
                     }
                     CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(tgCreation.pTokenGroupDescription.get());
                     if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
-                        return state.DoS(0, error("NFT mints the wrong amount (%d instead of %d)",
+                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("NFT mints the wrong amount (%d instead of %d)",
                                     (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
                     }
                 }

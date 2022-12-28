@@ -9,7 +9,6 @@
 #include "libzerocoin/CoinSpend.h"
 #include "primitives/transaction.h"
 
-bool IsBlockHashInChain(const uint256& hashBlock);
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx);
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx);
 

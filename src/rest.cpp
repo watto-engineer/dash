@@ -621,7 +621,8 @@ static bool rest_getutxos(const util::Ref& context, HTTPRequest* req, const std:
     }
     }
 }
-static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIPart) {
+static bool rest_transactionrecords(const util::Ref& context, HTTPRequest* req, const std::string& strURIPart)
+{
     if (!CheckWarmup(req))
         return false;
     std::string param;
@@ -630,7 +631,7 @@ static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIP
     switch (rf) {
         case RetFormat::JSON: {
             UniValue params{UniValue::VARR};
-            JSONRPCRequest request = JSONRPCRequest();
+            JSONRPCRequest request = JSONRPCRequest(context);
             request.params = params;
 
             UniValue chainInfoObject = listtransactionrecords(request);
@@ -648,7 +649,8 @@ static bool rest_transactionrecords(HTTPRequest* req, const std::string &strURIP
     return true; // continue to process further HTTP reqs on this cxn
 }
 
-static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart) {
+static bool rest_block_by_height(const util::Ref& context, HTTPRequest* req, const std::string& strURIPart)
+{
     if (!CheckWarmup(req))
         return false;
     std::string param;
@@ -676,12 +678,15 @@ static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart
 
 
     CBlockIndex *pblockindex = NULL;
+    CBlockIndex* tip = nullptr;
     {
         LOCK(cs_main);
-        if (mapBlockIndex.count(hash) == 0)
+        tip = ::ChainActive().Tip();
+        pblockindex = LookupBlockIndex(hash);
+        if (!pblockindex) {
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
+        }
 
-        pblockindex = mapBlockIndex[hash];
         if (!(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0)
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not available (pruned data)");
 
@@ -701,14 +706,14 @@ static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart
         }
 
         case RetFormat::HEX: {
-            std::string strHex = HexStr(ssBlock.begin(), ssBlock.end()) + "\n";
+            std::string strHex = HexStr(ssBlock) + "\n";
             req->WriteHeader("Content-Type", "text/plain");
             req->WriteReply(HTTP_OK, strHex);
             return true;
         }
 
         case RetFormat::JSON: {
-            UniValue objBlock = blockToJSON(block, pblockindex, true);
+            UniValue objBlock = blockToJSON(block, tip, pblockindex, true);
             std::string strJSON = objBlock.write() + "\n";
             req->WriteHeader("Content-Type", "application/json");
             req->WriteReply(HTTP_OK, strJSON);
@@ -725,7 +730,8 @@ static bool rest_block_by_height(HTTPRequest* req, const std::string &strURIPart
     return true; // continue to process further HTTP reqs on this cxn
 }
 
-static bool rest_bet_by_txid(HTTPRequest* req, const std::string &strURIPart) {
+static bool rest_bet_by_txid(const util::Ref& context, HTTPRequest* req, const std::string& strURIPart)
+{
     if (!CheckWarmup(req))
         return false;
     std::string param;
@@ -738,7 +744,7 @@ static bool rest_bet_by_txid(HTTPRequest* req, const std::string &strURIPart) {
 
     UniValue params{UniValue::VARR};
     params.push_back(hashStr);
-    JSONRPCRequest request = JSONRPCRequest();
+    JSONRPCRequest request = JSONRPCRequest(context);
     request.params = params;
 
     UniValue chainInfoObject = getbetbytxid(request);
