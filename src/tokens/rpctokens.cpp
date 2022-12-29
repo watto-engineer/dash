@@ -30,27 +30,27 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
     CTxDestination creationDestination;
     GetGroupedCreationOutput(*tgCreation.creationTransaction, creationOutput);
     ExtractDestination(creationOutput.scriptPubKey, creationDestination);
-    entry.push_back(Pair("groupID", EncodeTokenGroup(tgID)));
+    entry.pushKV("groupID", EncodeTokenGroup(tgID));
     if (tgID.isSubgroup()) {
         CTokenGroupID parentgrp = tgID.parentGroup();
         const std::vector<unsigned char> subgroupData = tgID.GetSubGroupData();
-        entry.push_back(Pair("parent_groupID", EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup)));
-        entry.push_back(Pair("subgroup_data", std::string(subgroupData.begin(), subgroupData.end())));
+        entry.pushKV("parent_groupID", EncodeTokenGroup(tgCreation.tokenGroupInfo.associatedGroup));
+        entry.pushKV("subgroup_data", std::string(subgroupData.begin(), subgroupData.end()));
     }
 
     std::string flags = tgID.encodeFlags();
     if (flags != "none")
-        entry.push_back(Pair("flags", flags));
+        entry.pushKV("flags", flags);
 
     UniValue specification = tgDescToJson(*tgCreation.pTokenGroupDescription, fShowNFTData);
-    entry.push_back(Pair("specification", specification));
+    entry.pushKV("specification", specification);
 
     if (fShowCreation) {
         UniValue extendedEntry(UniValue::VOBJ);
-        extendedEntry.push_back(Pair("txid", tgCreation.creationTransaction->GetHash().GetHex()));
-        extendedEntry.push_back(Pair("blockhash", tgCreation.creationBlockHash.GetHex()));
-        extendedEntry.push_back(Pair("address", EncodeDestination(creationDestination)));
-        entry.push_back(Pair("creation", extendedEntry));
+        extendedEntry.pushKV("txid", tgCreation.creationTransaction->GetHash().GetHex());
+        extendedEntry.pushKV("blockhash", tgCreation.creationBlockHash.GetHex());
+        extendedEntry.pushKV("address", EncodeDestination(creationDestination));
+        entry.pushKV("creation", extendedEntry);
     }
 }
 
@@ -100,7 +100,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
 
         UniValue entry(UniValue::VOBJ);
         for (auto tokenGroupMapping : tokenGroupManager.get()->GetMapTokenGroups()) {
-            entry.push_back(Pair(tgDescGetName(*tokenGroupMapping.second.pTokenGroupDescription), EncodeTokenGroup(tokenGroupMapping.second.tokenGroupInfo.associatedGroup)));
+            entry.pushKV(tgDescGetName(*tokenGroupMapping.second.pTokenGroupDescription), EncodeTokenGroup(tokenGroupMapping.second.tokenGroupInfo.associatedGroup));
         }
         ret.push_back(entry);
     } else if (operation == "all") {
@@ -143,8 +143,8 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
         uint64_t nHeight = pindex ? pindex->nHeight : -1;
 
         UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("height", nHeight));
-        entry.push_back(Pair("blockhash", hash.GetHex()));
+        entry.pushKV("height", nHeight);
+        entry.pushKV("blockhash", hash.GetHex());
 
         ret.push_back(entry);
 
@@ -369,17 +369,17 @@ void TokenTxToJSON(const CTransactionRef& tx, const uint256 hashBlock, UniValue&
     TokenTxToUniv(tx, uint256(), entry);
 
     if (!hashBlock.IsNull()) {
-        entry.push_back(Pair("blockhash", hashBlock.GetHex()));
+        entry.pushKV("blockhash", hashBlock.GetHex());
         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
         if (mi != mapBlockIndex.end() && (*mi).second) {
             CBlockIndex* pindex = (*mi).second;
             if (::ChainActive().Contains(pindex)) {
-                entry.push_back(Pair("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight));
-                entry.push_back(Pair("time", pindex->GetBlockTime()));
-                entry.push_back(Pair("blocktime", pindex->GetBlockTime()));
+                entry.pushKV("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight);
+                entry.pushKV("time", pindex->GetBlockTime());
+                entry.pushKV("blocktime", pindex->GetBlockTime());
             }
             else
-                entry.push_back(Pair("confirmations", 0));
+                entry.pushKV("confirmations", 0);
         }
     }
 }
@@ -438,7 +438,7 @@ extern UniValue gettokentransaction(const JSONRPCRequest& request)
     }
 
     UniValue result(UniValue::VOBJ);
-    if (blockindex) result.push_back(Pair("in_active_chain", in_active_chain));
+    if (blockindex) result.pushKV("in_active_chain", in_active_chain);
     TokenTxToJSON(tx, hash_block, result);
     return result;
 }

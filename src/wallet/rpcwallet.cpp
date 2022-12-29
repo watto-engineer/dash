@@ -910,16 +910,16 @@ UniValue getextendedbalance(const JSONRPCRequest &request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("blocks", (int)::ChainActive().Height()));
-    obj.push_back(Pair("balance", ValueFromAmount(pwallet->GetBalance())));
-    obj.push_back(Pair("balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedBalance())));
-    obj.push_back(Pair("balance_immature", ValueFromAmount(pwallet->GetImmatureBalance())));
-    obj.push_back(Pair("watchonly_balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedWatchOnlyBalance())));
-    obj.push_back(Pair("watchonly_balance_immature", ValueFromAmount(pwallet->GetImmatureWatchOnlyBalance())));
-    obj.push_back(Pair("balance_unlocked", ValueFromAmount(pwallet->GetUnlockedBalance())));
-    obj.push_back(Pair("balance_locked", ValueFromAmount(pwallet->GetLockedBalance())));
-    obj.push_back(Pair("watchonly_balance_locked", ValueFromAmount(pwallet->GetLockedWatchOnlyBalance())));
-    obj.push_back(Pair("available_balance", ValueFromAmount(pwallet->GetAvailableBalance())));
+    obj.pushKV("blocks", (int)::ChainActive().Height());
+    obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance()));
+    obj.pushKV("balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedBalance()));
+    obj.pushKV("balance_immature", ValueFromAmount(pwallet->GetImmatureBalance()));
+    obj.pushKV("watchonly_balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedWatchOnlyBalance()));
+    obj.pushKV("watchonly_balance_immature", ValueFromAmount(pwallet->GetImmatureWatchOnlyBalance()));
+    obj.pushKV("balance_unlocked", ValueFromAmount(pwallet->GetUnlockedBalance()));
+    obj.pushKV("balance_locked", ValueFromAmount(pwallet->GetLockedBalance()));
+    obj.pushKV("watchonly_balance_locked", ValueFromAmount(pwallet->GetLockedWatchOnlyBalance()));
+    obj.pushKV("available_balance", ValueFromAmount(pwallet->GetAvailableBalance()));
     return obj;
 }
 
@@ -3584,8 +3584,8 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
         throw std::runtime_error(std::string(__func__) + ": writing generated key failed");
     }
 
-    result.push_back(Pair("threshold", int(pwallet->GetStakeSplitThreshold())));
-    result.push_back(Pair("saved", "true"));
+    result.pushKV("threshold", int(pwallet->GetStakeSplitThreshold()));
+    result.pushKV("saved", "true");
 
     return result;
 }
@@ -3634,8 +3634,8 @@ UniValue autocombinedust(const JSONRPCRequest& request)
     }
 
 
-    result.push_back(Pair("threshold", int(rewardManager->GetAutoCombineThresholdAmount())));
-    result.push_back(Pair("enabled", rewardManager->IsAutoCombineEnabled()));
+    result.pushKV("threshold", int(rewardManager->GetAutoCombineThresholdAmount()));
+    result.pushKV("enabled", rewardManager->IsAutoCombineEnabled());
 
     return result;
 }
@@ -3679,15 +3679,15 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     bool fStakingStatus = stakingManager->IsStaking();
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("validtime", fValidTime));
-    obj.push_back(Pair("haveconnections", fHaveConnections));
+    obj.pushKV("validtime", fValidTime);
+    obj.pushKV("haveconnections", fHaveConnections);
     if (pwallet) {
-        obj.push_back(Pair("walletunlocked", fWalletUnlocked));
-        obj.push_back(Pair("mintablecoins", fMintableCoins));
-        obj.push_back(Pair("enoughcoins", fEnoughCoins));
+        obj.pushKV("walletunlocked", fWalletUnlocked);
+        obj.pushKV("mintablecoins", fMintableCoins);
+        obj.pushKV("enoughcoins", fEnoughCoins);
     }
-    obj.push_back(Pair("mnsync", fMnSync));
-    obj.push_back(Pair("staking_status", fStakingStatus));
+    obj.pushKV("mnsync", fMnSync);
+    obj.pushKV("staking_status", fStakingStatus);
 
     return obj;
 }
@@ -4779,28 +4779,28 @@ UniValue listbets(const JSONRPCRequest& request)
                 if (txType == plBetTxType) {
                     CPeerlessBetTx* plBet = (CPeerlessBetTx*) bettingTx.get();
                     UniValue entry(UniValue::VOBJ);
-                    entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                    entry.push_back(Pair("event-id", (uint64_t) plBet->nEventId));
+                    entry.pushKV("tx-id", txHash.ToString().c_str());
+                    entry.pushKV("event-id", (uint64_t) plBet->nEventId);
 
                     // Retrieve the event details
                     CPeerlessExtendedEventDB plEvent;
                     if (bettingsView->events->Read(EventKey{plBet->nEventId}, plEvent)) {
 
-                        entry.push_back(Pair("starting", plEvent.nStartTime));
+                        entry.pushKV("starting", plEvent.nStartTime);
                         CMappingDB mapping;
                         if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                            entry.push_back(Pair("home", mapping.sName));
+                            entry.pushKV("home", mapping.sName);
                         }
                         if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                            entry.push_back(Pair("away", mapping.sName));
+                            entry.pushKV("away", mapping.sName);
                         }
                         if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                            entry.push_back(Pair("tournament", mapping.sName));
+                            entry.pushKV("tournament", mapping.sName);
                         }
                     }
 
-                    entry.push_back(Pair("team-to-win", (uint64_t) plBet->nOutcome));
-                    entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+                    entry.pushKV("team-to-win", (uint64_t) plBet->nOutcome);
+                    entry.pushKV("amount", ValueFromAmount(txout.nValue));
 
                     std::string betResult = "pending";
                     CPeerlessResultDB plResult;
@@ -4840,7 +4840,7 @@ UniValue listbets(const JSONRPCRequest& request)
                         }
                     }
 
-                    entry.push_back(Pair("result", betResult));
+                    entry.pushKV("result", betResult);
 
                     result.push_back(entry);
                 }
@@ -4939,28 +4939,28 @@ UniValue getbet(const JSONRPCRequest& request)
         if (bettingTx->GetTxType() == plBetTxType) {
             CPeerlessBetTx* plBet = (CPeerlessBetTx*) bettingTx.get();
 
-            ret.push_back(Pair("tx-id", txHash.ToString().c_str()));
-            ret.push_back(Pair("event-id", (uint64_t)plBet->nEventId));
+            ret.pushKV("tx-id", txHash.ToString().c_str());
+            ret.pushKV("event-id", (uint64_t)plBet->nEventId);
 
             // Retrieve the event details
             CPeerlessExtendedEventDB plEvent;
             if (bettingsView->events->Read(EventKey{plBet->nEventId}, plEvent)) {
 
-                ret.push_back(Pair("starting", plEvent.nStartTime));
+                ret.pushKV("starting", plEvent.nStartTime);
                 CMappingDB mapping;
                 if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                    ret.push_back(Pair("home", mapping.sName));
+                    ret.pushKV("home", mapping.sName);
                 }
                 if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                    ret.push_back(Pair("away", mapping.sName));
+                    ret.pushKV("away", mapping.sName);
                 }
                 if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                    ret.push_back(Pair("tournament", mapping.sName));
+                    ret.pushKV("tournament", mapping.sName);
                 }
             }
 
-            ret.push_back(Pair("team-to-win", (uint64_t)plBet->nOutcome));
-            ret.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+            ret.pushKV("team-to-win", (uint64_t)plBet->nOutcome);
+            ret.pushKV("amount", ValueFromAmount(txout.nValue));
 
             std::string betResult = "pending";
             CPeerlessResultDB plResult;
@@ -4999,7 +4999,7 @@ UniValue getbet(const JSONRPCRequest& request)
                     LogPrintf("Invalid bet outcome");
                 }
             }
-            ret.push_back(Pair("result", betResult));
+            ret.pushKV("result", betResult);
         }
         break;
     }
@@ -5053,58 +5053,58 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
 
     UniValue uLegs(UniValue::VARR);
 
-    uValue.push_back(Pair("type", "peerless"));
+    uValue.pushKV("type", "peerless");
 
     for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
         auto &leg = uniBet.legs[i];
         auto &lockedEvent = uniBet.lockedEvents[i];
         UniValue uLeg(UniValue::VOBJ);
         UniValue uLockedEvent(UniValue::VOBJ);
-        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+        uLeg.pushKV("event-id", (uint64_t) leg.nEventId);
+        uLeg.pushKV("outcome", (uint64_t) leg.nOutcome);
 
-        uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
-        uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
-        uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-        uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
-        uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
-        uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
-        uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
-        uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
-        uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+        uLockedEvent.pushKV("homeOdds", (uint64_t) lockedEvent.nHomeOdds);
+        uLockedEvent.pushKV("awayOdds", (uint64_t) lockedEvent.nAwayOdds);
+        uLockedEvent.pushKV("drawOdds", (uint64_t) lockedEvent.nDrawOdds);
+        uLockedEvent.pushKV("spreadPoints", (int64_t) lockedEvent.nSpreadPoints);
+        uLockedEvent.pushKV("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds);
+        uLockedEvent.pushKV("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds);
+        uLockedEvent.pushKV("totalPoints", (uint64_t) lockedEvent.nTotalPoints);
+        uLockedEvent.pushKV("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds);
+        uLockedEvent.pushKV("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds);
 
         // Retrieve the event details
         CPeerlessExtendedEventDB plEvent;
         if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
-            uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
+            uLockedEvent.pushKV("starting", plEvent.nStartTime);
             CMappingDB mapping;
             if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                uLockedEvent.push_back(Pair("home", mapping.sName));
+                uLockedEvent.pushKV("home", mapping.sName);
             }
             else {
-                uLockedEvent.push_back(Pair("home", "undefined"));
+                uLockedEvent.pushKV("home", "undefined");
             }
             if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                uLockedEvent.push_back(Pair("away", mapping.sName));
+                uLockedEvent.pushKV("away", mapping.sName);
             }
             else {
-                uLockedEvent.push_back(Pair("away", "undefined"));
+                uLockedEvent.pushKV("away", "undefined");
             }
             if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                uLockedEvent.push_back(Pair("tournament", mapping.sName));
+                uLockedEvent.pushKV("tournament", mapping.sName);
             }
             else {
-                uLockedEvent.push_back(Pair("tournament", "undefined"));
+                uLockedEvent.pushKV("tournament", "undefined");
             }
         }
         CPeerlessResultDB plResult;
         uint32_t legOdds = 0;
         if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
-            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
-            uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
-            uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
+            uLockedEvent.pushKV("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType));
+            uLockedEvent.pushKV("homeScore", (uint64_t) plResult.nHomeScore);
+            uLockedEvent.pushKV("awayScore", (uint64_t) plResult.nAwayScore);
             if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().nBetPlaceTimeoutBlocks)) {
-                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+                uLeg.pushKV("legResultType", "refund - invalid bet");
             }
             else {
                 legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().GetConsensus().nWagerrProtocolV3StartHeight).first;
@@ -5124,28 +5124,28 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
                 else {
                     legResultTypeStr = std::string("win");
                 }
-                uLeg.push_back(Pair("legResultType", legResultTypeStr));
+                uLeg.pushKV("legResultType", legResultTypeStr);
             }
         }
         else {
-            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
-            uLockedEvent.push_back(Pair("homeScore", "undefined"));
-            uLockedEvent.push_back(Pair("awayScore", "undefined"));
-            uLeg.push_back(Pair("legResultType", "pending"));
+            uLockedEvent.pushKV("eventResultType", "event result not found");
+            uLockedEvent.pushKV("homeScore", "undefined");
+            uLockedEvent.pushKV("awayScore", "undefined");
+            uLeg.pushKV("legResultType", "pending");
         }
-        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+        uLeg.pushKV("lockedEvent", uLockedEvent);
         uLegs.push_back(uLeg);
     }
-    uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
-    uValue.push_back(Pair("betTxHash", betKey.outPoint.hash.GetHex()));
-    uValue.push_back(Pair("betTxOut", (uint64_t) betKey.outPoint.n));
-    uValue.push_back(Pair("legs", uLegs));
-    uValue.push_back(Pair("address", EncodeDestination(uniBet.playerAddress)));
-    uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
-    uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
-    uValue.push_back(Pair("completed", uniBet.IsCompleted() ? "yes" : "no"));
-    uValue.push_back(Pair("betResultType", BetResultTypeToStr(uniBet.resultType)));
-    uValue.push_back(Pair("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending"));
+    uValue.pushKV("betBlockHeight", (uint64_t) betKey.blockHeight);
+    uValue.pushKV("betTxHash", betKey.outPoint.hash.GetHex());
+    uValue.pushKV("betTxOut", (uint64_t) betKey.outPoint.n);
+    uValue.pushKV("legs", uLegs);
+    uValue.pushKV("address", EncodeDestination(uniBet.playerAddress));
+    uValue.pushKV("amount", ValueFromAmount(uniBet.betAmount));
+    uValue.pushKV("time", (uint64_t) uniBet.betTime);
+    uValue.pushKV("completed", uniBet.IsCompleted() ? "yes" : "no");
+    uValue.pushKV("betResultType", BetResultTypeToStr(uniBet.resultType));
+    uValue.pushKV("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending");
 
     if (requiredPayoutInfo) {
         if (uniBet.IsCompleted()) {
@@ -5158,20 +5158,20 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
                     CBettingDB::BytesToDbType(it->Value(), payoutInfo);
                     if (uniBet.payoutHeight != payoutKey.blockHeight) break;
                     if (payoutInfo.betKey == betKey) {
-                        uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
-                        uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
+                        uValue.pushKV("payoutTxHash", payoutKey.outPoint.hash.GetHex());
+                        uValue.pushKV("payoutTxOut", (uint64_t) payoutKey.outPoint.n);
                         break;
                     }
                 }
             }
             else {
-                uValue.push_back(Pair("payoutTxHash", "no"));
-                uValue.push_back(Pair("payoutTxOut", "no"));
+                uValue.pushKV("payoutTxHash", "no");
+                uValue.pushKV("payoutTxOut", "no");
             }
         }
         else {
-            uValue.push_back(Pair("payoutTxHash", "pending"));
-            uValue.push_back(Pair("payoutTxOut", "pending"));
+            uValue.pushKV("payoutTxHash", "pending");
+            uValue.pushKV("payoutTxOut", "pending");
         }
     }
 }
@@ -5313,13 +5313,13 @@ UniValue GetContendersInfo(const std::map<uint32_t, ContenderInfo> mContenders)
     UniValue uContenders(UniValue::VARR);
     for (const auto& contender_it : mContenders) {
         UniValue uContender(UniValue::VOBJ);
-        uContender.push_back(Pair("id", (uint64_t) contender_it.first));
-        uContender.push_back(Pair("name", GetContenderNameById(contender_it.first)));
-        uContender.push_back(Pair("modifier", (uint64_t) contender_it.second.nModifier));
-        uContender.push_back(Pair("input-odds", (uint64_t) contender_it.second.nInputOdds));
-        uContender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
-        uContender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
-        uContender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));
+        uContender.pushKV("id", (uint64_t) contender_it.first);
+        uContender.pushKV("name", GetContenderNameById(contender_it.first));
+        uContender.pushKV("modifier", (uint64_t) contender_it.second.nModifier);
+        uContender.pushKV("input-odds", (uint64_t) contender_it.second.nInputOdds);
+        uContender.pushKV("outright-odds", (uint64_t) contender_it.second.nOutrightOdds);
+        uContender.pushKV("place-odds", (uint64_t) contender_it.second.nPlaceOdds);
+        uContender.pushKV("show-odds", (uint64_t) contender_it.second.nShowOdds);
         uContenders.push_back(uContender);
     }
     return uContenders;
@@ -5395,22 +5395,22 @@ UniValue listfieldevents(const JSONRPCRequest& request)
         if (openedOnly && bettingsView->fieldResults->Exists(ResultKey{fEvent.nEventId}))
             continue;
 
-        evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
-        evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
-        evt.push_back(Pair("mrg-in", (uint64_t) fEvent.nMarginPercent));
+        evt.pushKV("event_id", (uint64_t) fEvent.nEventId);
+        evt.pushKV("starting", (uint64_t) fEvent.nStartTime);
+        evt.pushKV("mrg-in", (uint64_t) fEvent.nMarginPercent);
 
-        evt.push_back(Pair("sport", sport));
+        evt.pushKV("sport", sport);
 
         if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, fEvent.nTournament}, mapping))
             continue;
-        evt.push_back(Pair("tournament", mapping.sName));
+        evt.pushKV("tournament", mapping.sName);
 
         if (!bettingsView->mappings->Read(MappingKey{roundMapping, fEvent.nStage}, mapping))
             continue;
-        evt.push_back(Pair("round", mapping.sName));
+        evt.pushKV("round", mapping.sName);
 
 
-        evt.push_back(Pair("contenders", GetContendersInfo(fEvent.contenders)));
+        evt.pushKV("contenders", GetContendersInfo(fEvent.contenders));
 
         result.push_back(evt);
     }
@@ -5422,40 +5422,40 @@ void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFie
 
     UniValue uLegs(UniValue::VARR);
 
-    uValue.push_back(Pair("type", "field"));
+    uValue.pushKV("type", "field");
 
     for (uint32_t i = 0; i < fieldBet.legs.size(); i++) {
         auto &leg = fieldBet.legs[i];
         auto &lockedEvent = fieldBet.lockedEvents[i];
         UniValue uLeg(UniValue::VOBJ);
         UniValue uLockedEvent(UniValue::VOBJ);
-        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+        uLeg.pushKV("event-id", (uint64_t) leg.nEventId);
+        uLeg.pushKV("outcome", (uint64_t) leg.nOutcome);
 
-        uLockedEvent.push_back(Pair("contenders", GetContendersInfo(lockedEvent.contenders)));
-        uLockedEvent.push_back(Pair("starting", lockedEvent.nStartTime));
+        uLockedEvent.pushKV("contenders", GetContendersInfo(lockedEvent.contenders));
+        uLockedEvent.pushKV("starting", lockedEvent.nStartTime);
         CMappingDB mapping;
         if (bettingsView->mappings->Read(MappingKey{tournamentMapping, lockedEvent.nTournament}, mapping)) {
-            uLockedEvent.push_back(Pair("tournament", mapping.sName));
+            uLockedEvent.pushKV("tournament", mapping.sName);
         }
         else {
-            uLockedEvent.push_back(Pair("tournament", "undefined"));
+            uLockedEvent.pushKV("tournament", "undefined");
         }
         CFieldResultDB fResult;
         uint32_t legOdds = 0;
         if (bettingsView->fieldResults->Read(FieldResultKey{leg.nEventId}, fResult)) {
-            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) fResult.nResultType)));
+            uLockedEvent.pushKV("eventResultType", EventResultTypeToStr((ResultType) fResult.nResultType));
             UniValue results(UniValue::VARR);
             for (auto &contenderResult : fResult.contendersResults) {
                 UniValue result(UniValue::VOBJ);
-                result.push_back(Pair("contenderId", (int64_t) (contenderResult.first)));
-                result.push_back(Pair("name", GetContenderNameById(contenderResult.first)));
-                result.push_back(Pair("result", ContenderResultToString(contenderResult.second)));
+                result.pushKV("contenderId", (int64_t) (contenderResult.first));
+                result.pushKV("name", GetContenderNameById(contenderResult.first));
+                result.pushKV("result", ContenderResultToString(contenderResult.second));
                 results.push_back(result);
             }
-            uLockedEvent.push_back(Pair("contenderResults", results));
+            uLockedEvent.pushKV("contenderResults", results);
             if (lockedEvent.nStartTime > 0 && fieldBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().GetConsensus().BetPlaceTimeoutBlocks())) {
-                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+                uLeg.pushKV("legResultType", "refund - invalid bet");
             }
             else {
                 legOdds = GetBetOdds(leg, lockedEvent, fResult, (int64_t)betKey.blockHeight >= Params().GetConsensus().WagerrProtocolV4StartHeight()).first;
@@ -5469,27 +5469,27 @@ void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFie
                 else {
                     legResultTypeStr = std::string("win");
                 }
-                uLeg.push_back(Pair("legResultType", legResultTypeStr));
+                uLeg.pushKV("legResultType", legResultTypeStr);
             }
         }
         else {
-            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
-            uLeg.push_back(Pair("legResultType", "pending"));
+            uLockedEvent.pushKV("eventResultType", "event result not found");
+            uLeg.pushKV("legResultType", "pending");
         }
-        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+        uLeg.pushKV("lockedEvent", uLockedEvent);
         uLegs.push_back(uLeg);
     }
 
-    uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
-    uValue.push_back(Pair("betTxHash", betKey.outPoint.hash.GetHex()));
-    uValue.push_back(Pair("betTxOut", (uint64_t) betKey.outPoint.n));
-    uValue.push_back(Pair("legs", uLegs));
-    uValue.push_back(Pair("address", EncodeDestination(fieldBet.playerAddress)));
-    uValue.push_back(Pair("amount", ValueFromAmount(fieldBet.betAmount)));
-    uValue.push_back(Pair("time", (uint64_t) fieldBet.betTime));
-    uValue.push_back(Pair("completed", fieldBet.IsCompleted() ? "yes" : "no"));
-    uValue.push_back(Pair("betResultType", BetResultTypeToStr(fieldBet.resultType)));
-    uValue.push_back(Pair("payout", fieldBet.IsCompleted() ? ValueFromAmount(fieldBet.payout) : "pending"));
+    uValue.pushKV("betBlockHeight", (uint64_t) betKey.blockHeight);
+    uValue.pushKV("betTxHash", betKey.outPoint.hash.GetHex());
+    uValue.pushKV("betTxOut", (uint64_t) betKey.outPoint.n);
+    uValue.pushKV("legs", uLegs);
+    uValue.pushKV("address", EncodeDestination(fieldBet.playerAddress));
+    uValue.pushKV("amount", ValueFromAmount(fieldBet.betAmount));
+    uValue.pushKV("time", (uint64_t) fieldBet.betTime);
+    uValue.pushKV("completed", fieldBet.IsCompleted() ? "yes" : "no");
+    uValue.pushKV("betResultType", BetResultTypeToStr(fieldBet.resultType));
+    uValue.pushKV("payout", fieldBet.IsCompleted() ? ValueFromAmount(fieldBet.payout) : "pending");
 
     if (requiredPayoutInfo) {
         if (fieldBet.IsCompleted()) {
@@ -5502,46 +5502,46 @@ void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFie
                     CBettingDB::BytesToDbType(it->Value(), payoutInfo);
                     if (fieldBet.payoutHeight != payoutKey.blockHeight) break;
                     if (payoutInfo.betKey == betKey) {
-                        uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
-                        uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
+                        uValue.pushKV("payoutTxHash", payoutKey.outPoint.hash.GetHex());
+                        uValue.pushKV("payoutTxOut", (uint64_t) payoutKey.outPoint.n);
                         break;
                     }
                 }
             }
             else {
-                uValue.push_back(Pair("payoutTxHash", "no"));
-                uValue.push_back(Pair("payoutTxOut", "no"));
+                uValue.pushKV("payoutTxHash", "no");
+                uValue.pushKV("payoutTxOut", "no");
             }
         }
         else {
-            uValue.push_back(Pair("payoutTxHash", "pending"));
-            uValue.push_back(Pair("payoutTxOut", "pending"));
+            uValue.pushKV("payoutTxHash", "pending");
+            uValue.pushKV("payoutTxOut", "pending");
         }
     }
 }
 
 void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB &qgBet, arith_uint256 hash, bool requiredPayoutInfo = false) {
 
-    uValue.push_back(Pair("type", "quickgame"));
+    uValue.pushKV("type", "quickgame");
 
     auto &gameView = Params().QuickGamesArr()[qgBet.gameType];
 
-    uValue.push_back(Pair("blockHeight", (uint64_t) key.blockHeight));
-    uValue.push_back(Pair("resultBlockHash", hash.ToString().c_str()));
-    uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
-    uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
-    uValue.push_back(Pair("address", EncodeDestination(qgBet.playerAddress)));
-    uValue.push_back(Pair("amount", ValueFromAmount(qgBet.betAmount)));
-    uValue.push_back(Pair("time", (uint64_t) qgBet.betTime));
-    uValue.push_back(Pair("gameName", gameView.name));
+    uValue.pushKV("blockHeight", (uint64_t) key.blockHeight);
+    uValue.pushKV("resultBlockHash", hash.ToString().c_str());
+    uValue.pushKV("betTxHash", key.outPoint.hash.GetHex());
+    uValue.pushKV("betTxOut", (uint64_t) key.outPoint.n);
+    uValue.pushKV("address", EncodeDestination(qgBet.playerAddress));
+    uValue.pushKV("amount", ValueFromAmount(qgBet.betAmount));
+    uValue.pushKV("time", (uint64_t) qgBet.betTime);
+    uValue.pushKV("gameName", gameView.name);
     UniValue betInfo{UniValue::VOBJ};
     for (auto val : gameView.betInfoParser(qgBet.vBetInfo, hash)) {
-        betInfo.push_back(Pair(val.first, val.second));
+        betInfo.pushKV(val.first, val.second);
     }
-    uValue.push_back(Pair("betInfo", betInfo));
-    uValue.push_back(Pair("completed", qgBet.IsCompleted() ? "yes" : "no"));
-    uValue.push_back(Pair("betResultType", BetResultTypeToStr(qgBet.resultType)));
-    uValue.push_back(Pair("payout", qgBet.IsCompleted() ? ValueFromAmount(qgBet.payout) : "pending"));
+    uValue.pushKV("betInfo", betInfo);
+    uValue.pushKV("completed", qgBet.IsCompleted() ? "yes" : "no");
+    uValue.pushKV("betResultType", BetResultTypeToStr(qgBet.resultType));
+    uValue.pushKV("payout", qgBet.IsCompleted() ? ValueFromAmount(qgBet.payout) : "pending");
 
     if (requiredPayoutInfo) {
         if (qgBet.IsCompleted()) {
@@ -5558,15 +5558,15 @@ void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB 
                     break;
 
                 if (payoutInfo.betKey == key) {
-                    uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
-                    uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
+                    uValue.pushKV("payoutTxHash", payoutKey.outPoint.hash.GetHex());
+                    uValue.pushKV("payoutTxOut", (uint64_t) payoutKey.outPoint.n);
                     break;
                 }
             }
         }
         else {
-            uValue.push_back(Pair("payoutTxHash", "pending"));
-            uValue.push_back(Pair("payoutTxOut", "pending"));
+            uValue.pushKV("payoutTxHash", "pending");
+            uValue.pushKV("payoutTxOut", "pending");
         }
     }
 }
@@ -5802,9 +5802,9 @@ UniValue listchaingamesbets(const JSONRPCRequest& request)
                 if (cgBettingTx->GetTxType() == cgBetTxType) {
                     CChainGamesBetTx* cgBet = (CChainGamesBetTx*) cgBettingTx.get();
                     UniValue entry(UniValue::VOBJ);
-                    entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                    entry.push_back(Pair("event-id", (uint64_t) cgBet->nEventId));
-                    entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+                    entry.pushKV("tx-id", txHash.ToString().c_str());
+                    entry.pushKV("event-id", (uint64_t) cgBet->nEventId);
+                    entry.pushKV("amount", ValueFromAmount(txout.nValue));
                     ret.push_back(entry);
                 }
             }

@@ -1624,7 +1624,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
     obj.pushKV("verificationprogress",  GuessVerificationProgress(Params().TxData(), tip));
     obj.pushKV("initialblockdownload",  ::ChainstateActive().IsInitialBlockDownload());
     obj.pushKV("chainwork",             tip->nChainWork.GetHex());
-    obj.pushKV("moneysupply",           tip->nMoneySupply;
+    obj.pushKV("moneysupply",           tip->nMoneySupply);
     obj.pushKV("size_on_disk",          CalculateCurrentUsage());
     obj.pushKV("pruned",                fPruneMode);
     if (fPruneMode) {
@@ -2801,7 +2801,7 @@ UniValue scantokens(const JSONRPCRequest& request)
             unspent.pushKV("txid", outpoint.hash.GetHex());
             unspent.pushKV("vout", (int32_t)outpoint.n);
             if (IsValidDestination(dest)) {
-                unspent.push_back(Pair("address", EncodeDestination(dest)));
+                unspent.pushKV("address", EncodeDestination(dest));
             }
             unspent.pushKV("scriptPubKey", HexStr(txo.scriptPubKey.begin(), txo.scriptPubKey.end()));
             unspent.pushKV("amount", ValueFromAmount(txo.nValue));

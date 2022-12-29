@@ -923,13 +923,13 @@ static UniValue getblocktemplate(const JSONRPCRequest& request)
     CReward minerReward = blockReward.GetCoinbaseReward();
     for (const auto& minerTokenReward : minerReward.tokenAmounts) {
         UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("amount", 1));
-        obj.push_back(Pair("tokenid", HexStr(minerTokenReward.first.bytes())));
-        obj.push_back(Pair("tokenamount", minerTokenReward.second));
+        obj.pushKV("amount", 1);
+        obj.pushKV("tokenid", HexStr(minerTokenReward.first.bytes()));
+        obj.pushKV("tokenamount", minerTokenReward.second);
         minerRewardObj.push_back(obj);
     }
 
-    result.push_back(Pair("minerrewards", minerRewardObj));
+    result.pushKV("minerrewards", minerRewardObj);
 
     result.pushKV("longpollid", ::ChainActive().Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast));
     result.pushKV("target", hashTarget.GetHex());

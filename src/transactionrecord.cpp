@@ -408,13 +408,13 @@ void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& has
     std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(*wallet, iWtx);
     for(auto&& vRec: vRecs) {
         UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("type", vRec.GetTransactionRecordType()));
-        entry.push_back(Pair("transactionid", vRec.getTxHash()));
-        entry.push_back(Pair("outputindex", vRec.getOutputIndex()));
-        entry.push_back(Pair("time", vRec.time));
-        entry.push_back(Pair("debit", vRec.debit));
-        entry.push_back(Pair("credit", vRec.credit));
-        entry.push_back(Pair("involvesWatchonly", vRec.involvesWatchAddress));
+        entry.pushKV("type", vRec.GetTransactionRecordType());
+        entry.pushKV("transactionid", vRec.getTxHash());
+        entry.pushKV("outputindex", vRec.getOutputIndex());
+        entry.pushKV("time", vRec.time);
+        entry.pushKV("debit", vRec.debit);
+        entry.pushKV("credit", vRec.credit);
+        entry.pushKV("involvesWatchonly", vRec.involvesWatchAddress);
 
         if (fLong) {
             int chainlockHeight;
@@ -427,15 +427,15 @@ void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& has
             if (vRec.statusUpdateNeeded(::::ChainActive().Height(), chainlockHeight))
                 vRec.updateStatus(iStatus, numBlocks, adjustedTime, chainlockHeight);
 
-            entry.push_back(Pair("depth", vRec.status.depth));
-            entry.push_back(Pair("status", vRec.GetTransactionStatus()));
-            entry.push_back(Pair("countsForBalance", vRec.status.countsForBalance));
-            entry.push_back(Pair("lockedByInstantSend", vRec.status.lockedByInstantSend));
-            entry.push_back(Pair("lockedByChainLocks", vRec.status.lockedByChainLocks));
-            entry.push_back(Pair("matures_in", vRec.status.matures_in));
-            entry.push_back(Pair("open_for", vRec.status.open_for));
-            entry.push_back(Pair("cur_num_blocks", vRec.status.cur_num_blocks));
-            entry.push_back(Pair("chainLockHeight", vRec.status.cachedChainLockHeight)); // TODO: identify chainLockHeight / cachedChainLockHeight
+            entry.pushKV("depth", vRec.status.depth);
+            entry.pushKV("status", vRec.GetTransactionStatus());
+            entry.pushKV("countsForBalance", vRec.status.countsForBalance);
+            entry.pushKV("lockedByInstantSend", vRec.status.lockedByInstantSend);
+            entry.pushKV("lockedByChainLocks", vRec.status.lockedByChainLocks);
+            entry.pushKV("matures_in", vRec.status.matures_in);
+            entry.pushKV("open_for", vRec.status.open_for);
+            entry.pushKV("cur_num_blocks", vRec.status.cur_num_blocks);
+            entry.pushKV("chainLockHeight", vRec.status.cachedChainLockHeight); // TODO: identify chainLockHeight / cachedChainLockHeight
         }
         ret.push_back(entry);
     }
