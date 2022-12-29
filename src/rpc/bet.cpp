@@ -124,10 +124,10 @@ extern UniValue getmappingname(const JSONRPCRequest& request)
 
     CMappingDB map{};
     if (bettingsView->mappings->Read(MappingKey{type, id}, map)) {
-        mapping.push_back(Pair("mapping-type", CMappingDB::ToTypeName(type)));
-        mapping.push_back(Pair("mapping-name", map.sName));
-        mapping.push_back(Pair("exists", true));
-        mapping.push_back(Pair("mapping-index", static_cast<uint64_t>(id)));
+        mapping.pushKV("mapping-type", CMappingDB::ToTypeName(type));
+        mapping.pushKV("mapping-name", map.sName);
+        mapping.pushKV("exists", true);
+        mapping.pushKV("mapping-index", static_cast<uint64_t>(id));
     }
 
     result.push_back(mapping);
@@ -164,16 +164,16 @@ UniValue CreatePayoutInfoResponse(const std::vector<std::pair<bool, CPayoutInfoD
             CPayoutInfoDB &payoutInfo = info.second;
             UniValue infoObj{UniValue::VOBJ};
 
-            infoObj.push_back(Pair("payoutType", GetPayoutTypeStr(payoutInfo.payoutType)));
-            infoObj.push_back(Pair("betBlockHeight", (uint64_t) payoutInfo.betKey.blockHeight));
-            infoObj.push_back(Pair("betTxHash", payoutInfo.betKey.outPoint.hash.GetHex()));
-            infoObj.push_back(Pair("betTxOut", (uint64_t) payoutInfo.betKey.outPoint.n));
-            retObj.push_back(Pair("found", UniValue{true}));
-            retObj.push_back(Pair("payoutInfo", infoObj));
+            infoObj.pushKV("payoutType", GetPayoutTypeStr(payoutInfo.payoutType));
+            infoObj.pushKV("betBlockHeight", (uint64_t) payoutInfo.betKey.blockHeight);
+            infoObj.pushKV("betTxHash", payoutInfo.betKey.outPoint.hash.GetHex());
+            infoObj.pushKV("betTxOut", (uint64_t) payoutInfo.betKey.outPoint.n);
+            retObj.pushKV("found", UniValue{true});
+            retObj.pushKV("payoutInfo", infoObj);
         }
         else {
-            retObj.push_back(Pair("found", UniValue{false}));
-            retObj.push_back(Pair("payoutInfo", UniValue{UniValue::VOBJ}));
+            retObj.pushKV("found", UniValue{false});
+            retObj.pushKV("payoutInfo", UniValue{UniValue::VOBJ});
         }
 
         responseArr.push_back(retObj);
@@ -417,21 +417,21 @@ UniValue getchaingamesinfo(const JSONRPCRequest& request)
 
     int potSize = totalFoundCGBets*entryFee;
 
-    obj.push_back(Pair("pot-size", potSize));
-    obj.push_back(Pair("entry-fee", entryFee));
-    obj.push_back(Pair("start-block", gameStartBlock));
-    obj.push_back(Pair("start-time", gameStartTime));
-    obj.push_back(Pair("total-bets", totalFoundCGBets));
-    obj.push_back(Pair("result-trigger-block", resultHeight));
+    obj.pushKV("pot-size", potSize);
+    obj.pushKV("entry-fee", entryFee);
+    obj.pushKV("start-block", gameStartBlock);
+    obj.pushKV("start-time", gameStartTime);
+    obj.pushKV("total-bets", totalFoundCGBets);
+    obj.pushKV("result-trigger-block", resultHeight);
     if (winningBetFound) {
         CTxDestination address;
         if (ExtractDestination(winningBetOut.scriptPubKey, address)) {
-            obj.push_back(Pair("winner", EncodeDestination(address)));
-            obj.push_back(Pair("winnings", ValueFromAmount(winningBetOut.nValue)));
+            obj.pushKV("winner", EncodeDestination(address));
+            obj.pushKV("winnings", ValueFromAmount(winningBetOut.nValue));
         }
 
     }
-    obj.push_back(Pair("network", Params().NetworkIDString()));
+    obj.pushKV("network", Params().NetworkIDString());
 
     return obj;
 }
@@ -502,28 +502,28 @@ UniValue getalleventliabilities(const JSONRPCRequest& request)
 
         UniValue event(UniValue::VOBJ);
 
-        event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
-        event.push_back(Pair("event-status", "running"));
-        event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
-        event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
-        event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
-        event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
-        event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
-        event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
-        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-        event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
-        event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
-        event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
-        event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
-        event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
-        event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
-        event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
-        event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
-        event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
-        event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
+        event.pushKV("event-id", (uint64_t) plEvent.nEventId);
+        event.pushKV("event-status", "running");
+        event.pushKV("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets);
+        event.pushKV("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability);
+        event.pushKV("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets);
+        event.pushKV("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability);
+        event.pushKV("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets);
+        event.pushKV("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability);
+        event.pushKV("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets);
+        event.pushKV("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability);
+        event.pushKV("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets);
+        event.pushKV("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability);
+        event.pushKV("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets);
+        event.pushKV("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability);
+        event.pushKV("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets);
+        event.pushKV("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability);
+        event.pushKV("total-over-bets", (uint64_t) plEvent.nTotalOverBets);
+        event.pushKV("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability);
+        event.pushKV("total-under-bets", (uint64_t) plEvent.nTotalUnderBets);
+        event.pushKV("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability);
+        event.pushKV("total-push-bets", (uint64_t) plEvent.nTotalPushBets);
+        event.pushKV("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability);
 
         result.push_back(event);
     }
@@ -586,32 +586,32 @@ UniValue geteventliability(const JSONRPCRequest& request)
     CPeerlessExtendedEventDB plEvent;
     if (bettingsView->events->Read(EventKey{eventId}, plEvent)) {
 
-        event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
+        event.pushKV("event-id", (uint64_t) plEvent.nEventId);
         if (!bettingsView->results->Exists(ResultKey{eventId})) {
-            event.push_back(Pair("event-status", "running"));
-            event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
-            event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
-            event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
-            event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
-            event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
-            event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
-            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-            event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
-            event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
-            event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
-            event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
-            event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
-            event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
-            event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
-            event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
-            event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
-            event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
+            event.pushKV("event-status", "running");
+            event.pushKV("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets);
+            event.pushKV("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability);
+            event.pushKV("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets);
+            event.pushKV("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability);
+            event.pushKV("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets);
+            event.pushKV("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability);
+            event.pushKV("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets);
+            event.pushKV("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability);
+            event.pushKV("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets);
+            event.pushKV("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability);
+            event.pushKV("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets);
+            event.pushKV("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability);
+            event.pushKV("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets);
+            event.pushKV("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability);
+            event.pushKV("total-over-bets", (uint64_t) plEvent.nTotalOverBets);
+            event.pushKV("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability);
+            event.pushKV("total-under-bets", (uint64_t) plEvent.nTotalUnderBets);
+            event.pushKV("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability);
+            event.pushKV("total-push-bets", (uint64_t) plEvent.nTotalPushBets);
+            event.pushKV("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability);
         }
         else {
-            event.push_back(Pair("event-status", "resulted"));
+            event.pushKV("event-status", "resulted");
         }
     }
 
@@ -657,25 +657,25 @@ UniValue getfieldeventliability(const JSONRPCRequest& request)
     UniValue vEvent(UniValue::VOBJ);
     CFieldEventDB fEvent;
     if (bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
-        vEvent.push_back(Pair("event-id", (uint64_t) fEvent.nEventId));
+        vEvent.pushKV("event-id", (uint64_t) fEvent.nEventId);
         if (!bettingsView->fieldResults->Exists(FieldResultKey{eventId})) {
-            vEvent.push_back(Pair("event-status", "running"));
+            vEvent.pushKV("event-status", "running");
             UniValue vContenders(UniValue::VARR);
             for (const auto& contender : fEvent.contenders) {
                 UniValue vContender(UniValue::VOBJ);
-                vContender.push_back(Pair("contender-id", (uint64_t) contender.first));
-                vContender.push_back(Pair("outright-bets", (uint64_t) contender.second.nOutrightBets));
-                vContender.push_back(Pair("outright-liability", (uint64_t) contender.second.nOutrightPotentialLiability));
-                vContender.push_back(Pair("place-bets", (uint64_t) contender.second.nPlaceBets));
-                vContender.push_back(Pair("place-liability", (uint64_t) contender.second.nPlacePotentialLiability));
-                vContender.push_back(Pair("show-bets", (uint64_t) contender.second.nShowBets));
-                vContender.push_back(Pair("show-liability", (uint64_t) contender.second.nShowPotentialLiability));
+                vContender.pushKV("contender-id", (uint64_t) contender.first);
+                vContender.pushKV("outright-bets", (uint64_t) contender.second.nOutrightBets);
+                vContender.pushKV("outright-liability", (uint64_t) contender.second.nOutrightPotentialLiability);
+                vContender.pushKV("place-bets", (uint64_t) contender.second.nPlaceBets);
+                vContender.pushKV("place-liability", (uint64_t) contender.second.nPlacePotentialLiability);
+                vContender.pushKV("show-bets", (uint64_t) contender.second.nShowBets);
+                vContender.pushKV("show-liability", (uint64_t) contender.second.nShowPotentialLiability);
                 vContenders.push_back(vContender);
             }
-            vEvent.push_back(Pair("contenders", vContenders));
+            vEvent.pushKV("contenders", vContenders);
         }
         else {
-            vEvent.push_back(Pair("event-status", "resulted"));
+            vEvent.pushKV("event-status", "resulted");
         }
     }
 
@@ -752,27 +752,27 @@ UniValue listbetsdb(const JSONRPCRequest& request)
             auto &lockedEvent = uniBet.lockedEvents[i];
             UniValue uLeg(UniValue::VOBJ);
             UniValue uLockedEvent(UniValue::VOBJ);
-            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
-            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
-            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
-            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
-            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
-            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
-            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
-            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
-            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
-            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+            uLeg.pushKV("event-id", (uint64_t) leg.nEventId);
+            uLeg.pushKV("outcome", (uint64_t) leg.nOutcome);
+            uLockedEvent.pushKV("homeOdds", (uint64_t) lockedEvent.nHomeOdds);
+            uLockedEvent.pushKV("awayOdds", (uint64_t) lockedEvent.nAwayOdds);
+            uLockedEvent.pushKV("drawOdds", (uint64_t) lockedEvent.nDrawOdds);
+            uLockedEvent.pushKV("spreadPoints", (int64_t) lockedEvent.nSpreadPoints);
+            uLockedEvent.pushKV("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds);
+            uLockedEvent.pushKV("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds);
+            uLockedEvent.pushKV("totalPoints", (uint64_t) lockedEvent.nTotalPoints);
+            uLockedEvent.pushKV("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds);
+            uLockedEvent.pushKV("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds);
+            uLeg.pushKV("lockedEvent", uLockedEvent);
             uLegs.push_back(uLeg);
         }
-        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
-        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
-        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
-        uValue.push_back(Pair("legs", uLegs));
-        uValue.push_back(Pair("address", EncodeDestination(uniBet.playerAddress)));
-        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
-        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+        uValue.pushKV("betBlockHeight", (uint64_t) key.blockHeight);
+        uValue.pushKV("betTxHash", key.outPoint.hash.GetHex());
+        uValue.pushKV("betTxOut", (uint64_t) key.outPoint.n);
+        uValue.pushKV("legs", uLegs);
+        uValue.pushKV("address", EncodeDestination(uniBet.playerAddress));
+        uValue.pushKV("amount", ValueFromAmount(uniBet.betAmount));
+        uValue.pushKV("time", (uint64_t) uniBet.betTime);
         ret.push_back(uValue);
     }
 
@@ -866,20 +866,20 @@ UniValue listevents(const JSONRPCRequest& request)
 
         UniValue evt(UniValue::VOBJ);
 
-        evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
-        evt.push_back(Pair("sport", sport));
-        evt.push_back(Pair("tournament", tournament));
-        //evt.push_back(Pair("round", ""));
+        evt.pushKV("event_id", (uint64_t) plEvent.nEventId);
+        evt.pushKV("sport", sport);
+        evt.pushKV("tournament", tournament);
+        //evt.pushKV("round", "");
 
-        evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
-        evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
+        evt.pushKV("starting", (uint64_t) plEvent.nStartTime);
+        evt.pushKV("tester", (uint64_t) plEvent.nAwayTeam);
 
         UniValue teams(UniValue::VOBJ);
 
-        teams.push_back(Pair("home", homeTeam));
-        teams.push_back(Pair("away", awayTeam));
+        teams.pushKV("home", homeTeam);
+        teams.pushKV("away", awayTeam);
 
-        evt.push_back(Pair("teams", teams));
+        evt.pushKV("teams", teams);
 
         UniValue odds(UniValue::VARR);
 
@@ -887,28 +887,28 @@ UniValue listevents(const JSONRPCRequest& request)
         UniValue spreadOdds(UniValue::VOBJ);
         UniValue totalsOdds(UniValue::VOBJ);
 
-        mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
-        mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
-        mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
+        mlOdds.pushKV("mlHome", (uint64_t) plEvent.nHomeOdds);
+        mlOdds.pushKV("mlAway", (uint64_t) plEvent.nAwayOdds);
+        mlOdds.pushKV("mlDraw", (uint64_t) plEvent.nDrawOdds);
 
         if (plEvent.nEventCreationHeight < Params().GetConsensus().nWagerrProtocolV3StartHeight) {
-            spreadOdds.push_back(Pair("favorite", plEvent.fLegacyInitialHomeFavorite ? "home" : "away"));
+            spreadOdds.pushKV("favorite", plEvent.fLegacyInitialHomeFavorite ? "home" : "away");
         } else {
-            spreadOdds.push_back(Pair("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away"));
+            spreadOdds.pushKV("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away");
         }
-        spreadOdds.push_back(Pair("spreadPoints", (int64_t) plEvent.nSpreadPoints));
-        spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
-        spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
+        spreadOdds.pushKV("spreadPoints", (int64_t) plEvent.nSpreadPoints);
+        spreadOdds.pushKV("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds);
+        spreadOdds.pushKV("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds);
 
-        totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
-        totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
-        totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
+        totalsOdds.pushKV("totalsPoints", (uint64_t) plEvent.nTotalPoints);
+        totalsOdds.pushKV("totalsOver", (uint64_t) plEvent.nTotalOverOdds);
+        totalsOdds.pushKV("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds);
 
         odds.push_back(mlOdds);
         odds.push_back(spreadOdds);
         odds.push_back(totalsOdds);
 
-        evt.push_back(Pair("odds", odds));
+        evt.pushKV("odds", odds);
 
         result.push_back(evt);
     }
@@ -1022,9 +1022,9 @@ UniValue listchaingamesevents(const JSONRPCRequest& request)
                 if (validTx && cgBettingTx->GetTxType() == cgEventTxType) {
                     CChainGamesEventTx* cgEvent = (CChainGamesEventTx*) cgBettingTx.get();
                     UniValue evt(UniValue::VOBJ);
-                    evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                    evt.push_back(Pair("event-id", (uint64_t) cgEvent->nEventId));
-                    evt.push_back(Pair("entry-fee", (uint64_t) cgEvent->nEntryFee));
+                    evt.pushKV("tx-id", txHash.ToString().c_str());
+                    evt.pushKV("event-id", (uint64_t) cgEvent->nEventId);
+                    evt.pushKV("entry-fee", (uint64_t) cgEvent->nEntryFee);
                     ret.push_back(evt);
                 }
             }

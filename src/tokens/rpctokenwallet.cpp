@@ -121,7 +121,7 @@ static void MaybePushAddress(UniValue &entry, const CTxDestination &dest)
 {
     if (IsValidDestination(dest))
     {
-        entry.push_back(Pair("address", EncodeDestination(dest)));
+        entry.pushKV("address", EncodeDestination(dest));
     }
 }
 
@@ -132,12 +132,12 @@ static void AcentryToJSON(const CAccountingEntry &acentry, const std::string &st
     if (fAllAccounts || acentry.strAccount == strAccount)
     {
         UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("account", acentry.strAccount));
-        entry.push_back(Pair("category", "move"));
-        entry.push_back(Pair("time", acentry.nTime));
-        entry.push_back(Pair("amount", UniValue(acentry.nCreditDebit)));
-        entry.push_back(Pair("otheraccount", acentry.strOtherAccount));
-        entry.push_back(Pair("comment", acentry.strComment));
+        entry.pushKV("account", acentry.strAccount);
+        entry.pushKV("category", "move");
+        entry.pushKV("time", acentry.nTime);
+        entry.pushKV("amount", UniValue(acentry.nCreditDebit));
+        entry.pushKV("otheraccount", acentry.strOtherAccount);
+        entry.pushKV("comment", acentry.strComment);
         ret.push_back(entry);
     }
 }
@@ -165,23 +165,23 @@ void GetGroupedTransactions(CWallet * const pwallet,
 
             UniValue entry(UniValue::VOBJ);
             if (involvesWatchonly || (::IsMine(*pwallet, s.destination) & ISMINE_WATCH_ONLY))
-                entry.push_back(Pair("involvesWatchonly", true));
-            entry.push_back(Pair("account", strSentAccount));
+                entry.pushKV("involvesWatchonly", true);
+            entry.pushKV("account", strSentAccount);
             MaybePushAddress(entry, s.destination);
-            entry.push_back(Pair("category", "send"));
-            entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
+            entry.pushKV("category", "send");
+            entry.pushKV("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup));
             if (tokenGroupInfo.isAuthority()){
-                entry.push_back(Pair("tokenType", "authority"));
-                entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+                entry.pushKV("tokenType", "authority");
+                entry.pushKV("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags()));
             } else {
-                entry.push_back(Pair("tokenType", "amount"));
-                entry.push_back(Pair("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
-                entry.push_back(Pair("tokenValueSat", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
+                entry.pushKV("tokenType", "amount");
+                entry.pushKV("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
+                entry.pushKV("tokenValueSat", tokenGroupManager.get()->TokenValueFromAmount(-tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
             }
             if (pwallet->mapAddressBook.count(s.destination))
-                entry.push_back(Pair("label", pwallet->mapAddressBook[s.destination].name));
-            entry.push_back(Pair("vout", s.vout));
-            entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
+                entry.pushKV("label", pwallet->mapAddressBook[s.destination].name);
+            entry.pushKV("vout", s.vout);
+            entry.pushKV("fee", ValueFromAmount(-nFee));
             if (fLong)
                 WalletTxToJSON(wtx, entry);
             ret.push_back(entry);
@@ -201,34 +201,34 @@ void GetGroupedTransactions(CWallet * const pwallet,
             const CTokenGroupInfo tokenGroupInfo(r.grp, r.grpAmount);
                 UniValue entry(UniValue::VOBJ);
                 if (involvesWatchonly || (::IsMine(*pwallet, r.destination) & ISMINE_WATCH_ONLY))
-                    entry.push_back(Pair("involvesWatchonly", true));
-                entry.push_back(Pair("account", account));
+                    entry.pushKV("involvesWatchonly", true);
+                entry.pushKV("account", account);
                 MaybePushAddress(entry, r.destination);
                 if (wtx.IsCoinBase())
                 {
                     if (wtx.GetDepthInMainChain() < 1)
-                        entry.push_back(Pair("category", "orphan"));
+                        entry.pushKV("category", "orphan");
                     else if (wtx.GetBlocksToMaturity() > 0)
-                        entry.push_back(Pair("category", "immature"));
+                        entry.pushKV("category", "immature");
                     else
-                        entry.push_back(Pair("category", "generate"));
+                        entry.pushKV("category", "generate");
                 }
                 else
                 {
-                    entry.push_back(Pair("category", "receive"));
+                    entry.pushKV("category", "receive");
                 }
-                entry.push_back(Pair("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup)));
+                entry.pushKV("groupID", EncodeTokenGroup(tokenGroupInfo.associatedGroup));
                 if (tokenGroupInfo.isAuthority()){
-                    entry.push_back(Pair("tokenType", "authority"));
-                    entry.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags())));
+                    entry.pushKV("tokenType", "authority");
+                    entry.pushKV("tokenAuthorities", EncodeGroupAuthority(tokenGroupInfo.controllingGroupFlags()));
                 } else {
-                    entry.push_back(Pair("tokenType", "amount"));
-                    entry.push_back(Pair("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup)));
-                    entry.push_back(Pair("tokenValueSat", tokenGroupInfo.getAmount()));
+                    entry.pushKV("tokenType", "amount");
+                    entry.pushKV("tokenValue", tokenGroupManager.get()->TokenValueFromAmount(tokenGroupInfo.getAmount(), tokenGroupInfo.associatedGroup));
+                    entry.pushKV("tokenValueSat", tokenGroupInfo.getAmount());
                 }
                 if (pwallet->mapAddressBook.count(r.destination))
-                    entry.push_back(Pair("label", account));
-                entry.push_back(Pair("vout", r.vout));
+                    entry.pushKV("label", account);
+                entry.pushKV("vout", r.vout);
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
                 ret.push_back(entry);
@@ -317,24 +317,24 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
         {
             CTokenGroupID grpID = item.first;
             UniValue retobj(UniValue::VOBJ);
-            retobj.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
+            retobj.pushKV("groupID", EncodeTokenGroup(grpID));
 
             CTokenGroupCreation tgCreation;
             if (grpID.isSubgroup()) {
                 CTokenGroupID parentgrp = grpID.parentGroup();
                 std::vector<unsigned char> subgroupData = grpID.GetSubGroupData();
                 tokenGroupManager.get()->GetTokenGroupCreation(parentgrp, tgCreation);
-                retobj.push_back(Pair("parent_groupID", EncodeTokenGroup(parentgrp)));
-                retobj.push_back(Pair("subgroup_data", std::string(subgroupData.begin(), subgroupData.end())));
+                retobj.pushKV("parent_groupID", EncodeTokenGroup(parentgrp));
+                retobj.pushKV("subgroup_data", std::string(subgroupData.begin(), subgroupData.end()));
             } else {
                 tokenGroupManager.get()->GetTokenGroupCreation(grpID, tgCreation);
             }
-            retobj.push_back(Pair("ticker", tgDescGetTicker(*tgCreation.pTokenGroupDescription)));
-            retobj.push_back(Pair("name", tgDescGetName(*tgCreation.pTokenGroupDescription)));
+            retobj.pushKV("ticker", tgDescGetTicker(*tgCreation.pTokenGroupDescription));
+            retobj.pushKV("name", tgDescGetName(*tgCreation.pTokenGroupDescription));
 
-            retobj.push_back(Pair("balance", tokenGroupManager.get()->TokenValueFromAmount(item.second, item.first)));
+            retobj.pushKV("balance", tokenGroupManager.get()->TokenValueFromAmount(item.second, item.first));
             if (hasCapability(authorities[item.first], GroupAuthorityFlags::CTRL))
-                retobj.push_back(Pair("authorities", EncodeGroupAuthority(authorities[item.first])));
+                retobj.pushKV("authorities", EncodeGroupAuthority(authorities[item.first]));
 
             ret.push_back(retobj);
         }
@@ -362,10 +362,10 @@ extern UniValue gettokenbalance(const JSONRPCRequest& request)
         GroupAuthorityFlags authorities;
         GetGroupBalanceAndAuthorities(balance, authorities, grpID, dst, pwallet, nMinDepth);
         UniValue retobj(UniValue::VOBJ);
-        retobj.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-        retobj.push_back(Pair("balance", tokenGroupManager.get()->TokenValueFromAmount(balance, grpID)));
+        retobj.pushKV("groupID", EncodeTokenGroup(grpID));
+        retobj.pushKV("balance", tokenGroupManager.get()->TokenValueFromAmount(balance, grpID));
         if (hasCapability(authorities, GroupAuthorityFlags::CTRL))
-            retobj.push_back(Pair("authorities", EncodeGroupAuthority(authorities)));
+            retobj.pushKV("authorities", EncodeGroupAuthority(authorities));
         return retobj;
     }
 }
@@ -672,8 +672,8 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
     uint256 lastblock = pblockLast ? pblockLast->GetBlockHash() : uint256();
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("transactions", transactions));
-    ret.push_back(Pair("lastblock", lastblock.GetHex()));
+    ret.pushKV("transactions", transactions);
+    ret.pushKV("lastblock", lastblock.GetHex());
 
     return ret;
 }
@@ -808,8 +808,8 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
 
     authKeyReservation.KeepKey();
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-    ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
+    ret.pushKV("groupID", EncodeTokenGroup(grpID));
+    ret.pushKV("transaction", tx->GetHash().GetHex());
     return ret;
 }
 
@@ -958,8 +958,8 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
         CTransactionRef tx;
         ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
         authKeyReservation.KeepKey();
-        ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-        ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
+        ret.pushKV("groupID", EncodeTokenGroup(grpID));
+        ret.pushKV("transaction", tx->GetHash().GetHex());
     }
     return ret;
 }
@@ -1055,8 +1055,8 @@ extern UniValue configurenft(const JSONRPCRequest& request)
 
     authKeyReservation.KeepKey();
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("groupID", EncodeTokenGroup(grpID)));
-    ret.push_back(Pair("transaction", tx->GetHash().GetHex()));
+    ret.pushKV("groupID", EncodeTokenGroup(grpID));
+    ret.pushKV("transaction", tx->GetHash().GetHex());
     return ret;
 }
 
@@ -1230,12 +1230,12 @@ extern UniValue listtokenauthorities(const JSONRPCRequest& request)
         tokenGroupManager.get()->GetTokenGroupCreation(tgInfo.associatedGroup, tgCreation);
 
         UniValue retobj(UniValue::VOBJ);
-        retobj.push_back(Pair("groupID", EncodeTokenGroup(tgInfo.associatedGroup)));
-        retobj.push_back(Pair("txid", coin.tx->GetHash().ToString()));
-        retobj.push_back(Pair("vout", coin.i));
-        retobj.push_back(Pair("ticker", tgDescGetTicker(*tgCreation.pTokenGroupDescription)));
-        retobj.push_back(Pair("address", EncodeDestination(dest)));
-        retobj.push_back(Pair("tokenAuthorities", EncodeGroupAuthority(tgInfo.controllingGroupFlags())));
+        retobj.pushKV("groupID", EncodeTokenGroup(tgInfo.associatedGroup));
+        retobj.pushKV("txid", coin.tx->GetHash().ToString());
+        retobj.pushKV("vout", coin.i);
+        retobj.pushKV("ticker", tgDescGetTicker(*tgCreation.pTokenGroupDescription));
+        retobj.pushKV("address", EncodeDestination(dest));
+        retobj.pushKV("tokenAuthorities", EncodeGroupAuthority(tgInfo.controllingGroupFlags()));
         ret.push_back(retobj);
     }
     return ret;
@@ -1371,17 +1371,17 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
     GroupAuthorityFlags authoritiesToKeep = tgInfo.controllingGroupFlags() & ~authoritiesToDrop;
 
     UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("groupID", EncodeTokenGroup(tgInfo.associatedGroup)));
-    ret.push_back(Pair("transaction", txid.GetHex()));
-    ret.push_back(Pair("vout", voutN));
-    ret.push_back(Pair("coin", chosenCoins.at(0).ToString()));
-    ret.push_back(Pair("script", HexStr(script.begin(), script.end())));
-    ret.push_back(Pair("destination", EncodeDestination(dest)));
-    ret.push_back(Pair("authorities_former", strAuthorities));
-    ret.push_back(Pair("authorities_new", EncodeGroupAuthority(authoritiesToKeep)));
+    ret.pushKV("groupID", EncodeTokenGroup(tgInfo.associatedGroup));
+    ret.pushKV("transaction", txid.GetHex());
+    ret.pushKV("vout", voutN);
+    ret.pushKV("coin", chosenCoins.at(0).ToString());
+    ret.pushKV("script", HexStr(script.begin(), script.end()));
+    ret.pushKV("destination", EncodeDestination(dest));
+    ret.pushKV("authorities_former", strAuthorities);
+    ret.pushKV("authorities_new", EncodeGroupAuthority(authoritiesToKeep));
 
     if ((authoritiesToKeep == GroupAuthorityFlags::CTRL) || (authoritiesToKeep == GroupAuthorityFlags::NONE) || !hasCapability(authoritiesToKeep, GroupAuthorityFlags::CTRL)) {
-        ret.push_back(Pair("status", "Dropping all authorities"));
+        ret.pushKV("status", "Dropping all authorities");
     } else {
         // Construct the new authority
         CScript script = GetScriptForDestination(dest, grpID, (CAmount)authoritiesToKeep);
