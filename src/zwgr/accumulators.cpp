@@ -8,6 +8,7 @@
 #include "pos/checks.h"
 #include "spork.h"
 #include "tinyformat.h"
+#include "shutdown.h"
 #include "validation.h"
 #include "zwgr/accumulators.h"
 #include "zwgr/accumulatormap.h"
@@ -458,7 +459,7 @@ bool LockMethod(){
     while (nLockAttempts < 100) {
         TRY_LOCK(cs_main, lockMain);
         if(!lockMain) {
-            MilliSleep(50);
+            UninterruptibleSleep(std::chrono::milliseconds{50});
             nLockAttempts++;
             continue;
         }
