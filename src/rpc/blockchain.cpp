@@ -447,64 +447,6 @@ static UniValue syncwithvalidationinterfacequeue(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
-//! Search for a given set of pubkey scripts
-bool FindScriptPubKey(std::atomic<int>& scan_progress, const std::atomic<bool>& should_abort, int64_t& count, CCoinsViewCursor* cursor, const std::set<CScript>& needles, std::map<COutPoint, Coin>& out_results) {
-    scan_progress = 0;
-    count = 0;
-    while (cursor->Valid()) {
-        COutPoint key;
-        Coin coin;
-        if (!cursor->GetKey(key) || !cursor->GetValue(coin)) return false;
-        if (++count % 8192 == 0) {
-            boost::this_thread::interruption_point();
-            if (should_abort) {
-                // allow to abort the scan via the abort reference
-                return false;
-            }
-        }
-        if (count % 256 == 0) {
-            // update progress reference every 256 item
-            uint32_t high = 0x100 * *key.hash.begin() + *(key.hash.begin() + 1);
-            scan_progress = (int)(high * 100.0 / 65536.0 + 0.5);
-        }
-        if (needles.count(coin.out.scriptPubKey)) {
-            out_results.emplace(key, coin);
-        }
-       cursor->Next();
-    }
-    scan_progress = 100;
-    return true;
-}
-
-//! Search for a given set of pubkey scripts
-bool FindScriptPubKey(std::atomic<int>& scan_progress, const std::atomic<bool>& should_abort, int64_t& count, CCoinsViewCursor* cursor, const std::set<CScript>& needles, std::map<COutPoint, Coin>& out_results) {
-    scan_progress = 0;
-    count = 0;
-    while (cursor->Valid()) {
-        COutPoint key;
-        Coin coin;
-        if (!cursor->GetKey(key) || !cursor->GetValue(coin)) return false;
-        if (++count % 8192 == 0) {
-            boost::this_thread::interruption_point();
-            if (should_abort) {
-                // allow to abort the scan via the abort reference
-                return false;
-            }
-        }
-        if (count % 256 == 0) {
-            // update progress reference every 256 item
-            uint32_t high = 0x100 * *key.hash.begin() + *(key.hash.begin() + 1);
-            scan_progress = (int)(high * 100.0 / 65536.0 + 0.5);
-        }
-        if (needles.count(coin.out.scriptPubKey)) {
-            out_results.emplace(key, coin);
-        }
-        cursor->Next();
-    }
-    scan_progress = 100;
-    return true;
-}
-
 static UniValue getdifficulty(const JSONRPCRequest& request)
 {
     RPCHelpMan{"getdifficulty",
@@ -2663,7 +2605,7 @@ UniValue scantxoutset(const JSONRPCRequest& request)
 }
 
 //! Search for a given set of pubkey scripts
-bool FindTokenGroupID(std::atomic<int>& scan_progress, const std::atomic<bool>& should_abort, int64_t& count, CCoinsViewCursor* cursor, const CTokenGroupID& needle, std::map<COutPoint, Coin>& out_results) {
+bool FindTokenGroupID(std::atomic<int>& scan_progress, const std::atomic<bool>& should_abort, int64_t& count, CCoinsViewCursor* cursor, const CTokenGroupID& needle, std::map<COutPoint, Coin>& out_results, std::function<void()>& interruption_point) {
     scan_progress = 0;
     count = 0;
     while (cursor->Valid()) {
@@ -2671,7 +2613,7 @@ bool FindTokenGroupID(std::atomic<int>& scan_progress, const std::atomic<bool>& 
         Coin coin;
         if (!cursor->GetKey(key) || !cursor->GetValue(coin)) return false;
         if (++count % 8192 == 0) {
-            boost::this_thread::interruption_point();
+            interruption_point();
             if (should_abort) {
                 // allow to abort the scan via the abort reference
                 return false;
@@ -2756,6 +2698,7 @@ UniValue scantokens(const JSONRPCRequest& request)
         }
         std::set<CScript> needles;
         CAmount total_in = 0;
+        GroupAuthorityFlags total_authorities = GroupAuthorityFlags::NONE;
 
         if (!request.params[1].isStr()){
             throw JSONRPCError(RPC_INVALID_PARAMETER, "No token group ID specified");
@@ -2775,15 +2718,21 @@ UniValue scantokens(const JSONRPCRequest& request)
         g_scan_progress = 0;
         int64_t count = 0;
         std::unique_ptr<CCoinsViewCursor> pcursor;
+        CBlockIndex* tip;
         {
             LOCK(cs_main);
-            FlushStateToDisk();
-            pcursor = std::unique_ptr<CCoinsViewCursor>(pcoinsdbview->Cursor());
-            assert(pcursor);
+            ::ChainstateActive().ForceFlushStateToDisk();
+            pcursor = std::unique_ptr<CCoinsViewCursor>(::ChainstateActive().CoinsDB().Cursor());
+            CHECK_NONFATAL(pcursor);
+            tip = ::ChainActive().Tip();
+            CHECK_NONFATAL(tip);
         }
-        bool res = FindTokenGroupID(g_scan_progress, g_should_abort_scan, count, pcursor.get(), needle, coins);
+        NodeContext& node = EnsureNodeContext(request.context);
+        bool res = FindTokenGroupID(g_scan_progress, g_should_abort_scan, count, pcursor.get(), needle, coins, node.rpc_interruption_point);
         result.pushKV("success", res);
         result.pushKV("searched_items", count);
+        result.pushKV("height", tip->nHeight);
+        result.pushKV("bestblock", tip->GetBlockHash().GetHex());
 
         for (const auto& it : coins) {
             const COutPoint& outpoint = it.first;
@@ -2803,7 +2752,7 @@ UniValue scantokens(const JSONRPCRequest& request)
             if (IsValidDestination(dest)) {
                 unspent.pushKV("address", EncodeDestination(dest));
             }
-            unspent.pushKV("scriptPubKey", HexStr(txo.scriptPubKey.begin(), txo.scriptPubKey.end()));
+            unspent.pushKV("scriptPubKey", HexStr(txo.scriptPubKey));
             unspent.pushKV("amount", ValueFromAmount(txo.nValue));
             unspent.pushKV("amountSat", txo.nValue);
             if (tokenGroupInfo.isAuthority()){
