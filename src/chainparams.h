@@ -120,7 +120,7 @@ public:
 
     /** Betting on blockchain **/
     std::vector<COracle> Oracles() const { return vOracles; }
-    const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
+    std::vector<CQuickGamesView> QuickGamesArr() const { return quickGamesArr; }
 
     /** temp worarounds **/
     int SkipBetValidationStart() const { return nSkipBetValidationStart; }
