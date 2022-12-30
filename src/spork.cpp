@@ -113,9 +113,7 @@ void CSporkManager::ProcessSpork(const CNode* pfrom, std::string_view msg_type, 
 {
     if (msg_type != NetMsgType::SPORK) return;
 
-        if (pfrom->nVersion < MIN_SPORK_VERSION) {
-            return;
-        }
+    if (pfrom->nVersion < MIN_SPORK_VERSION) return;
 
     CSporkMessage spork;
     vRecv >> spork;
@@ -368,7 +366,7 @@ bool CSporkMessage::Sign(const CKey& key)
         LogPrintf("CSporkMessage::Sign -- SignMessage() failed\n");
         return false;
     }
-    if(!CMessageSigner::VerifyMessage(pubKeyId, vchSig, strMessage, strError)) {
+    if(std::string strError; !CMessageSigner::VerifyMessage(pubKeyId, vchSig, strMessage, strError)) {
         LogPrintf("CSporkMessage::Sign -- VerifyMessage() failed, error: %s\n", strError);
         return false;
     }
@@ -380,7 +378,7 @@ bool CSporkMessage::CheckSignature(const CKeyID& pubKeyId) const
 {
     std::string strMessage = std::to_string(nSporkID) + std::to_string(nValue) + std::to_string(nTimeSigned);
 
-    if (!CMessageSigner::VerifyMessage(pubKeyId, vchSig, strMessage, strError)){
+    if (std::string strError; !CMessageSigner::VerifyMessage(pubKeyId, vchSig, strMessage, strError)){
         LogPrint(BCLog::SPORK, "CSporkMessage::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
         return false;
     }
