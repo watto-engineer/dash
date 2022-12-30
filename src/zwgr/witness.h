@@ -56,7 +56,7 @@ public:
     CoinWitnessCacheData(CoinWitnessData* coinWitnessData);
     void SetNull();
 
-    SERIALIZE_METHODS(CoinWitnessData, obj)
+    SERIALIZE_METHODS(CoinWitnessCacheData, obj)
     {
         READWRITE(obj.denom);
         READWRITE(obj.nHeightCheckpoint);

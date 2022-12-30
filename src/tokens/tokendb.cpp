@@ -99,21 +99,21 @@ bool VerifyTokenDB(std::string &strError) {
         uint256 txHash = tgCreation.creationTransaction->GetHash();
 
         LOCK(cs_main);
-        auto pindex = mapBlockIndex.find(tgCreation.creationBlockHash);
-        if (pindex == mapBlockIndex.end()) {
+        auto pindex = LookupBlockIndex(tgCreation.creationBlockHash);
+        if (!pindex) {
             strError = "Cannot find token creation transaction's block";
             return error(strError.c_str());
         }
-        if (!::ChainActive().Contains(pindex->second)) {
+        if (!::ChainActive().Contains(pindex)) {
             strError = "Token creation not found in the current chain";
             return error(strError.c_str());
         }
-        if (fHavePruned && !(pindex->second->nStatus & BLOCK_HAVE_DATA) && pindex->second->nTx > 0) {
+        if (fHavePruned && !(pindex->nStatus & BLOCK_HAVE_DATA) && pindex->nTx > 0) {
             // Block is in the index, but it's data has been pruned
             continue;
         }
         CBlock block;
-        if (!ReadBlockFromDisk(block, pindex->second, Params().GetConsensus())) {
+        if (!ReadBlockFromDisk(block, pindex, Params().GetConsensus())) {
             strError = "Cannot locate token creation transaction's block";
             return error(strError.c_str());
         }

@@ -484,7 +484,7 @@ int SearchMintHeightOf(CBigNum value){
     if (!IsTransactionInChain(txid, nHeightTest))
         throw searchMintHeightException("searchForMintHeightOf:: mint tx "+ txid.GetHex() +" is not in chain");
 
-    return mapBlockIndex[hashBlock]->nHeight;
+    return LookupBlockIndex(hashBlock)->nHeight;
 }
 
 

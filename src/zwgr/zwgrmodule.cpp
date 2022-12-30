@@ -45,10 +45,10 @@ bool GetOutput(const uint256& hash, unsigned int index, CValidationState& state,
     CTransactionRef txPrev;
     uint256 hashBlock;
     if (!GetTransaction(hash, txPrev, Params().GetConsensus(), hashBlock, true)) {
-        return state.DoS(100, error("Output not found"));
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, error("Output not found"), REJECT_INVALID, "zwgr-bad-out");
     }
     if (index > txPrev->vout.size()) {
-        return state.DoS(100, error("Output not found, invalid index %d for %s",index, hash.GetHex()));
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, error("Output not found, invalid index %d for %s",index, hash.GetHex()), REJECT_INVALID, "zwgr-bad-out");
     }
     out = txPrev->vout[index];
     return true;
@@ -139,11 +139,11 @@ namespace ZWGRModule {
     {
         CTxOut prevOut;
         if(!GetOutput(txIn.prevout.hash, txIn.prevout.n ,state, prevOut)){
-            return state.DoS(100, error("%s: public zerocoin spend prev output not found, prevTx %s, index %d",
-                                        __func__, txIn.prevout.hash.GetHex(), txIn.prevout.n));
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: public zerocoin spend prev output not found, prevTx %s, index %d",
+                                        __func__, txIn.prevout.hash.GetHex(), txIn.prevout.n), REJECT_INVALID, "zwgr-bad-out");
         }
         if (!ZWGRModule::parseCoinSpend(txIn, tx, prevOut, publicSpend)) {
-            return state.Invalid(error("%s: invalid public coin spend parse %s\n", __func__,
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: invalid public coin spend parse %s\n", __func__,
                                        tx.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zwgr");
         }
         return true;

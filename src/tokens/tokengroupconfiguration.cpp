@@ -233,23 +233,23 @@ bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CToken
 bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
     if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-type");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-tx");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-tx");
     }
 
     CTokenGroupDescriptionRegular tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-payload");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-protx-payload");
     }
     if (tgDesc.nDecimalPos > 16) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-param");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-param");
     }
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionRegular::CURRENT_VERSION) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-version");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-version");
     }
 
     return true;
@@ -258,26 +258,26 @@ bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex*
 bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
     if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-type");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-tx");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-tx");
     }
 
     CTokenGroupDescriptionMGT tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-payload");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-protx-payload");
     }
     if (tgDesc.nDecimalPos > 16) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-param");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-param");
     }
     if (!tgDesc.blsPubKey.IsValid()) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-key");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-key");
     }
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionMGT::CURRENT_VERSION) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-version");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-version");
     }
 
     return true;
@@ -286,23 +286,23 @@ bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pin
 bool CheckGroupConfigurationTxNFT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
     if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-type");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-tx");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-tx");
     }
 
     CTokenGroupDescriptionNFT tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-protx-payload");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-protx-payload");
     }
     if (!tgDesc.vchData.size() > MAX_TX_NFT_DATA) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-data");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-data");
     }
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionNFT::CURRENT_VERSION) {
-        return state.DoS(100, false, REJECT_INVALID, "grp-bad-version");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, REJECT_INVALID, "grp-bad-version");
     }
 
     return true;

@@ -129,12 +129,9 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             uint256 blockId;
 
             blockId.SetHex(request.params[curparam].get_str());
-            BlockMap::iterator it = mapBlockIndex.find(blockId);
-            if (it != mapBlockIndex.end()) {
-                pindex = it->second;
-            } else {
+            pindex = LookupBlockIndex(blockId);
+            if (!pindex)
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Block not found");
-            }
         } else {
             pindex = ::ChainActive()[::ChainActive().Height()];
         }
@@ -370,8 +367,8 @@ void TokenTxToJSON(const CTransactionRef& tx, const uint256 hashBlock, UniValue&
 
     if (!hashBlock.IsNull()) {
         entry.pushKV("blockhash", hashBlock.GetHex());
-        BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
-        if (mi != mapBlockIndex.end() && (*mi).second) {
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
             CBlockIndex* pindex = (*mi).second;
             if (::ChainActive().Contains(pindex)) {
                 entry.pushKV("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight);
@@ -412,8 +409,8 @@ extern UniValue gettokentransaction(const JSONRPCRequest& request)
 
     if (!request.params[1].isNull()) {
         uint256 blockhash = ParseHashV(request.params[1], "parameter 2");
-        BlockMap::iterator it = mapBlockIndex.find(blockhash);
-        if (it == mapBlockIndex.end()) {
+        blockindex = LookupBlockIndex(blockhash);
+        if (!blockindex) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block hash not found");
         }
         blockindex = it->second;

@@ -5639,7 +5639,7 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
         throw std::runtime_error("Invalid bet's transaction id");
     }
 
-    CBlockIndex* blockindex = mapBlockIndex[hashBlock];
+    CBlockIndex* blockindex = LookupBlockIndex(hashBlock);
 
     if (!blockindex) {
         throw std::runtime_error("Invalid block index");

@@ -343,7 +343,7 @@ bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CV
 
     libzerocoin::CoinDenomination denomination = libzerocoin::AmountToZerocoinDenomination(txout.nValue);
     if (denomination == libzerocoin::ZQ_ERROR)
-        return state.DoS(100, error("TxOutToPublicCoin : txout.nValue is not correct"));
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "zwgr-bad-val");
 
     libzerocoin::PublicCoin checkPubCoin(Params().Zerocoin_Params(false), publicZerocoin, denomination);
     pubCoin = checkPubCoin;

@@ -46,7 +46,9 @@ bool CStakingManager::MintableCoins()
         if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
             continue;
 
-        CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
+        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->hashBlock);
+        if (!utxoBlock)
+            return false;
         //check for maturity (min age/depth)
         if (HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
             return true;
@@ -75,7 +77,9 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
         if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
             continue;
 
-        CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
+        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->hashBlock);
+        if (!utxoBlock)
+            continue;
         //check for maturity (min age/depth)
         if (!HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
             continue;

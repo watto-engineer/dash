@@ -636,9 +636,7 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
         uint256 blockId;
 
         blockId.SetHex(request.params[curparam].get_str());
-        BlockMap::iterator it = mapBlockIndex.find(blockId);
-        if (it != mapBlockIndex.end())
-            pindex = it->second;
+        pindex = LookupBlockIndex(blockId);
     }
 
     curparam++;
