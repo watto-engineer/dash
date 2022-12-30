@@ -476,9 +476,9 @@ int SearchMintHeightOf(CBigNum value){
     if (!zerocoinDB->ReadCoinMint(value, txid))
         throw searchMintHeightException("searchForMintHeightOf:: failed to read mint from db");
 
-    CTransactionRef txMinted;
     uint256 hashBlock;
-    if (!GetTransaction(txid, txMinted, Params().GetConsensus(), hashBlock))
+    CTransactionRef txMinted = GetTransaction(::ChainActive().Tip(), nullptr, txid, Params().GetConsensus(), hashBlock);
+    if (!txMinted)
         throw searchMintHeightException("searchForMintHeightOf:: failed to read tx");
 
     int nHeightTest;
@@ -617,8 +617,8 @@ bool calculateAccumulatedBlocksFor(
 
     // A certain amount of accumulated coins are required
     if (nMintsAdded < Params().GetConsensus().nRequiredAccumulation) {
-        strError = _(strprintf("Less than %d mints added, unable to create spend",
-                               Params().GetConsensus().nRequiredAccumulation).c_str());
+        strError = strprintf("Less than %d mints added, unable to create spend",
+                               Params().GetConsensus().nRequiredAccumulation).c_str();
         throw NotEnoughMintsException(strError);
     }
 
@@ -668,8 +668,8 @@ bool calculateAccumulatedBlocksFor(
 
     // A certain amount of accumulated coins are required
     if (nMintsAdded < Params().GetConsensus().nRequiredAccumulation) {
-        strError = _(strprintf("Less than %d mints added, unable to create spend",
-                               Params().GetConsensus().nRequiredAccumulation).c_str());
+        strError = strprintf("Less than %d mints added, unable to create spend",
+                               Params().GetConsensus().nRequiredAccumulation).c_str();
         throw NotEnoughMintsException(strError);
     }
 
@@ -828,8 +828,8 @@ bool GenerateAccumulatorWitness(
 
         // A certain amount of accumulated coins are required
         if (nMintsAdded < Params().GetConsensus().nRequiredAccumulation) {
-            strError = _(strprintf("Less than %d mints added, unable to create spend",
-                                   Params().GetConsensus().nRequiredAccumulation).c_str());
+            strError = strprintf("Less than %d mints added, unable to create spend",
+                                   Params().GetConsensus().nRequiredAccumulation).c_str();
             return error("%s : %s", __func__, strError);
         }
 
