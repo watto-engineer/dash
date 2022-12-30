@@ -185,7 +185,6 @@ CTxMemPool mempool(&feeEstimator);
 
 /** Proof of Stake */
 std::map<uint256, uint256> mapProofOfStake;
-const std::string strMessageMagic = "DarkNet Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -409,7 +408,7 @@ bool ContextualCheckTransaction(const CTransaction& tx, CValidationState &state,
                 tx.nType != TRANSACTION_QUORUM_COMMITMENT &&
                 tx.nType != TRANSACTION_GROUP_CREATION_REGULAR &&
                 tx.nType != TRANSACTION_GROUP_CREATION_MGT &&
-                tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
+                tx.nType != TRANSACTION_GROUP_CREATION_NFT &&
                 tx.nType != TRANSACTION_MNHF_SIGNAL) {
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-type");
             }
@@ -566,7 +565,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     }
     bool fV17Active_context = (unsigned int)::ChainActive().Height() >= Params().GetConsensus().V17DeploymentHeight;
     if (fV17Active_context && tx.ContainsZerocoins()) {
-        return state.Invalid(ValidationInvalidReason::RESTRICTED_FUNCTIONALITY, false, REJECT_INVALID, "bad-txns-xwagerr", "zerocoin has been disabled");
+        return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, false, REJECT_INVALID, "bad-txns-xwagerr", "zerocoin has been disabled");
     }
 
     if (!CheckTransaction(tx, state, true))
@@ -582,11 +581,11 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
-        return state.Invalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinbase");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "coinbase");
 
     // Coinstake is only valid in a block, not as a loose transaction
     if (tx.IsCoinStake())
-        return state.Invalid(ValidationInvalid::CONSENSUS, false, REJECT_INVALID, "coinstake");
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "coinstake");
 
     // Disallow any OP_GROUP txs from entering the mempool until OP_GROUP is enabled.
     // This ensures that someone won't create an invalid OP_GROUP tx that sits in the mempool until after activation,
@@ -717,7 +716,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
             return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false, REJECT_NONSTANDARD, "non-BIP68-final");
 
         CAmount nFees = 0;
-        if (!Consensus::CheckTxInputs(tx, state, view, GetSpendHeight(view), nFees)) {
+        if (!Consensus::CheckTxInputs(tx, state, view, GetSpendHeight(view), nFees, chainparams.GetConsensus())) {
             return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
         }
 
