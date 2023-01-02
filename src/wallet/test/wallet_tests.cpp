@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <interfaces/chain.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <node/context.h>
 #include <policy/policy.h>
 #include <rpc/server.h>

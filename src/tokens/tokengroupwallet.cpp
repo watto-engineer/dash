@@ -7,7 +7,7 @@
 
 #include "consensus/tokengroups.h"
 #include "consensus/validation.h"
-#include "dstencode.h"
+#include "key_io.h"
 #include <evo/specialtx.h>
 #include "net.h"
 #include "rpc/protocol.h"

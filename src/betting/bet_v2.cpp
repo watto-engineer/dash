@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <dstencode.h>
+#include <key_io.h>
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
 #include <betting/bet_common.h>

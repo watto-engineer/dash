@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chainparamsbase.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <pubkey.h>
 #include <rpc/util.h>
 #include <script/descriptor.h>

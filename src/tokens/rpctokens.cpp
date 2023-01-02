@@ -6,7 +6,7 @@
 
 #include "base58.h"
 #include "core_io.h"
-#include "dstencode.h"
+#include "key_io.h"
 #include <evo/specialtx.h>
 #include "init.h"
 #include "wagerraddrenc.h"

@@ -5,7 +5,7 @@
 #include <governance/object.h>
 #include <governance/validators.h>
 
-#include <dstencode.h>
+#include <key_io.h>
 #include <timedata.h>
 #include <tinyformat.h>
 #include <util/strencodings.h>

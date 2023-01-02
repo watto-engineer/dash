@@ -6,7 +6,7 @@
 
 #include <chainparams.h>
 #include <consensus/consensus.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <evo/mnauth.h>
 #include <httpserver.h>
 #include <init.h>

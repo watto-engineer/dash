@@ -5,7 +5,7 @@
 #define BITCOIN_GOVERNANCE_CLASSES_H
 
 #include <amount.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <governance/object.h>
 #include <script/script.h>
 #include <script/standard.h>

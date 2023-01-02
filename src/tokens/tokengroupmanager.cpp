@@ -7,7 +7,7 @@
 
 #include "chain.h"
 #include "coins.h"
-#include "dstencode.h"
+#include "key_io.h"
 #include "wagerraddrenc.h"
 #include "logging.h"
 #include "policy/policy.h"

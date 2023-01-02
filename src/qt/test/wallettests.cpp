@@ -6,7 +6,7 @@
 #include <qt/test/util.h>
 
 #include <coinjoin/client.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <interfaces/chain.h>
 #include <interfaces/node.h>
 #include <qt/bitcoinamountfield.h>

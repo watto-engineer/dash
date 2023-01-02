@@ -6,7 +6,7 @@
 #define BITCOIN_QT_TRANSACTIONRECORD_H
 
 #include <amount.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <uint256.h>
 #include <wallet/ismine.h>
 

@@ -25,4 +25,14 @@ std::string EncodeExtPubKey(const CExtPubKey& extpubkey);
 std::string EncodeLegacyAddr(const CTxDestination& dest, const CChainParams& params);
 CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params);
 
+CTxDestination DecodeDestination(const std::string &addr, const CChainParams &);
+std::string EncodeDestination(const CTxDestination &, const CChainParams &/*, const Config &*/);
+bool IsValidDestinationString(const std::string &addr, const CChainParams &params);
+
+// Temporary workaround. Don't rely on global state, pass all parameters in new
+// code.
+CTxDestination DecodeDestination(const std::string &addr);
+std::string EncodeDestination(const CTxDestination &);
+bool IsValidDestinationString(const std::string &addr);
+
 #endif // BITCOIN_KEY_IO_H

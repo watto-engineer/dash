@@ -13,7 +13,7 @@
 #include <chain.h>
 #include <consensus/validation.h>
 #include <core_io.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <httpserver.h>
 #include <interfaces/chain.h>
 #include <masternode/sync.h>

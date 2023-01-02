@@ -37,7 +37,7 @@
 #include <util/strencodings.h>
 #include <util/validation.h>
 #include <util/system.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <validation.h>
 #include <validationinterface.h>
 #include <versionbitsinfo.h>

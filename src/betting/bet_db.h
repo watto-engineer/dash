@@ -6,7 +6,7 @@
 #define WAGERR_BET_DB_H
 
 #include <chainparams.h>
-#include <dstencode.h>
+#include <key_io.h>
 //#include <util/system.h>
 #include <script/standard.h>
 #include <serialize.h>

@@ -6,7 +6,7 @@
 #include <clientversion.h>
 #include "coins.h"
 #include "consensus/tokengroups.h"
-#include "dstencode.h"
+#include "key_io.h"
 #include <evo/specialtx.h>
 #include "rpc/server.h"
 #include "wagerraddrenc.h"

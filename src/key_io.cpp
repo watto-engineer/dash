@@ -8,6 +8,7 @@
 #include <base58.h>
 #include <bech32.h>
 #include <chainparams.h>
+#include <wagerraddrenc.h>
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -147,12 +148,37 @@ std::string EncodeExtKey(const CExtKey& key)
     return ret;
 }
 
+CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params)
+{
+    return DecodeLegacyDestination(str, params);
+}
+
 std::string EncodeLegacyAddr(const CTxDestination& dest, const CChainParams& params)
 {
     return boost::apply_visitor(DestinationEncoder(params), dest);
 }
 
-CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params)
+CTxDestination DecodeDestination(const std::string &addr, const CChainParams &params)
 {
-    return DecodeLegacyDestination(str, params);
+    CTxDestination dst = DecodeWagerrAddr(addr, params);
+    if (IsValidDestination(dst))
+    {
+        return dst;
+    }
+    return DecodeLegacyAddr(addr, params);
 }
+
+bool IsValidDestinationString(const std::string &addr, const CChainParams &params)
+{
+    return IsValidDestination(DecodeDestination(addr, params));
+}
+
+std::string EncodeDestination(const CTxDestination &dst, const CChainParams &params/*, const Config &cfg*/)
+{
+    //return cfg.UseCashAddrEncoding() ? EncodeWagerrAddr(dst, params) : EncodeLegacyAddr(dst, params);
+    return EncodeLegacyAddr(dst, params);
+}
+
+std::string EncodeDestination(const CTxDestination &dst) { return EncodeDestination(dst, Params()/*, GetConfig()*/); }
+CTxDestination DecodeDestination(const std::string &addr) { return DecodeDestination(addr, Params()); }
+bool IsValidDestinationString(const std::string &addr) { return IsValidDestinationString(addr, Params()); }

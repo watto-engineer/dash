@@ -16,7 +16,7 @@
 #include <qt/recentrequeststablemodel.h>
 #include <qt/transactiontablemodel.h>
 
-#include <dstencode.h>
+#include <key_io.h>
 #include <interfaces/handler.h>
 #include <interfaces/node.h>
 #include <psbt.h>

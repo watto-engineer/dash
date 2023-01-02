@@ -4,7 +4,7 @@
 
 #include <key.h>
 
-#include <dstencode.h>
+#include <key_io.h>
 #include <key_io.h>
 #include <uint256.h>
 #include <util/system.h>

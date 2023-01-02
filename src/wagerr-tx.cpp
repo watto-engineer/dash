@@ -11,7 +11,7 @@
 #include <coins.h>
 #include <consensus/consensus.h>
 #include <core_io.h>
-#include <dstencode.h>
+#include <key_io.h>
 #include <key_io.h>
 #include <primitives/transaction.h>
 #include <script/script.h>
