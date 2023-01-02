@@ -10,6 +10,10 @@
 
 #include "chain.h"
 #include "chainparams.h"
+#include <governance/governance.h>
+#include <llmq/blockprocessor.h>
+#include <llmq/chainlocks.h>
+#include <llmq/instantsend.h>
 #include "miner.h"
 #include "pos/blocksignature.h"
 #include "pos/kernel.h"
@@ -18,7 +22,9 @@
 #include "pos/stakeinput.h"
 #include "pow.h"
 #include "rpc/protocol.h"
+#include "rpc/request.h"
 #include "script/tokengroup.h"
+#include <spork.h>
 #include "tokens/tokengroupmanager.h"
 #include "validation.h"
 #include "wallet/wallet.h"
@@ -30,7 +36,7 @@
 
 //#if ENABLE_MINER
 
-UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet)
+UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<ReserveDestination> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet)
 {
     const auto& params = Params().GetConsensus();
     const bool fRegtest = Params().NetworkIDString() == CBaseChainParams::REGTEST;
@@ -40,6 +46,10 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
     bool fCreatePosBlock;
     int nHeightEnd = 0;
     int nHeight = 0;
+    auto spk_man = pwallet->GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return false;
+    }
 
     {   // Don't keep cs_main locked
         LOCK(cs_main);
@@ -60,14 +70,14 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
             if (stakingManager->CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
                 // Coinstake found. Extract signing key from coinstake
-                pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
+                pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
             };
         } else {
             std::shared_ptr<CReserveScript> coinbase_script;
             if (!pwallet->GetScriptForPowMining(coinbase_script, coinbaseKey)) {
                 throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
             }
-            pblocktemplate = BlockAssembler(Params()).CreateNewBlock(coinbase_script->reserveScript);
+            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(coinbase_script->reserveScript);
         }
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
@@ -93,8 +103,9 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
                 LogPrint(BCLog::STAKING, "%s: failed to find key for PoS", __func__);
                 continue;
             }
+
             CKey key;
-            if (!pwallet->GetKey(keyID, key)) {
+            if (!spk_man->GetKey(keyID, key)) {
                 LogPrint(BCLog::STAKING, "%s: failed to get key from keystore", __func__);
                 continue;
             }
@@ -105,7 +116,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
         }
 
         std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-        if (!ProcessNewBlock(Params(), shared_pblock, true, nullptr))
+        if (!chainman.ProcessNewBlock(Params(), shared_pblock, true, nullptr))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
         ++nHeight;
         blockHashes.push_back(pblock->GetHash().GetHex());
@@ -113,7 +124,7 @@ UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGen
         //mark script as important because it was used at least for one coinbase output if the script came from the wallet
         if (keepScript)
         {
-            coinbaseKey->KeepKey();
+            coinbaseKey->KeepDestination();
         }
     }
     return blockHashes;

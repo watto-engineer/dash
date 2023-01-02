@@ -13,6 +13,7 @@
 #include <univalue.h>
 
 class CBlockIndex;
+class ChainstateManager;
 class CConnman;
 class CMutableTransaction;
 class CStakeInput;
@@ -56,7 +57,7 @@ public:
 
     void UpdatedBlockTip(const CBlockIndex* pindex);
 
-    void DoMaintenance(CConnman& connman);
+    void DoMaintenance(CConnman& connman, ChainstateManager& chainman);
 };
 
 #endif // STAKING_CLIENT_H

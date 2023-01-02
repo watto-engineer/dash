@@ -36,8 +36,7 @@ public:
     bool fEnableRewardManager;
     uint32_t nAutoCombineNThreshold;
 
-    bool IsReady();
-    bool IsCombining();
+    bool IsReady(CConnman& connman);
 
     bool IsAutoCombineEnabled();
     CAmount GetAutoCombineThresholdAmount();

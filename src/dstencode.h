@@ -9,7 +9,6 @@
 
 #include <string>
 
-class Config;
 class CChainParams;
 
 std::string EncodeDestination(const CTxDestination &, const CChainParams &/*, const Config &*/);

@@ -2569,7 +2569,7 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
         node.scheduler->scheduleEvery(std::bind(&DoCoinJoinMaintenance, std::ref(*node.connman)), 1 * 1000);
 
     if (stakingManager->fEnableStaking) {
-        node.scheduler->scheduleEvery(std::bind(&CStakingManager::DoMaintenance, std::ref(stakingManager), std::ref(*node.connman)), 5 * 1000);
+        node.scheduler->scheduleEvery(std::bind(&CStakingManager::DoMaintenance, std::ref(stakingManager), std::ref(*node.connman), std::ref(*node.chainman)), 5 * 1000);
     }
     if (rewardManager->fEnableRewardManager) {
         node.scheduler->scheduleEvery(std::bind(&CRewardManager::DoMaintenance, std::ref(rewardManager), std::ref(*node.connman)), 3 * 60 * 1000);

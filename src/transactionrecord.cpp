@@ -10,12 +10,11 @@
 #include <chain.h>
 #include <interfaces/wallet.h>
 
-#include <wallet/ismine.h>
 #include <timedata.h>
 #include <univalue.h>
 #include <validation.h>
 
-#include <llmq/quorums_chainlocks.h>
+#include <llmq/chainlocks.h>
 
 #include <stdint.h>
 
@@ -258,7 +257,7 @@ void TransactionRecord::updateStatus(const interfaces::WalletTxStatus& wtx, int 
     status.lockedByChainLocks = wtx.is_chainlocked;
     status.lockedByInstantSend = wtx.is_islocked;
 
-    const bool up_to_date = ((int64_t)QDateTime::currentMSecsSinceEpoch() / 1000 - block_time < MAX_BLOCK_TIME_GAP);
+    const bool up_to_date = (GetAdjustedTime() - block_time < MAX_BLOCK_TIME_GAP);
     if (up_to_date && !wtx.is_final) {
         if (wtx.lock_time < LOCKTIME_THRESHOLD) {
             status.status = TransactionStatus::OpenUntilBlock;
@@ -402,8 +401,7 @@ void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& has
     interfaces::WalletOrderForm iOrderForm;
     bool inMempool;
     int numBlocks;
-    int64_t adjustedTime;
-    interfaces::WalletTx iWtx = wallet->getWalletTxDetails(hash, iStatus, iOrderForm, inMempool, numBlocks, adjustedTime);
+    interfaces::WalletTx iWtx = wallet->getWalletTxDetails(hash, iStatus, iOrderForm, inMempool, numBlocks);
 
     std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(*wallet, iWtx);
     for(auto&& vRec: vRecs) {
@@ -422,10 +420,10 @@ void ListTransactionRecords(std::shared_ptr<CWallet> pwallet, const uint256& has
             if (clsig.IsNull()) {
                 chainlockHeight = 0;
             } else {
-                chainlockHeight = clsig.nHeight;
+                chainlockHeight = clsig.getHeight();
             }
-            if (vRec.statusUpdateNeeded(::::ChainActive().Height(), chainlockHeight))
-                vRec.updateStatus(iStatus, numBlocks, adjustedTime, chainlockHeight);
+            if (vRec.statusUpdateNeeded(::ChainActive().Height(), chainlockHeight))
+                vRec.updateStatus(iStatus, numBlocks, GetAdjustedTime(), chainlockHeight);
 
             entry.pushKV("depth", vRec.status.depth);
             entry.pushKV("status", vRec.GetTransactionStatus());

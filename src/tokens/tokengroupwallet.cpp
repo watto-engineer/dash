@@ -13,8 +13,8 @@
 #include "rpc/protocol.h"
 #include "script/tokengroup.h"
 #include "tokens/tokengroupmanager.h"
-#include "utilmoneystr.h"
-#include "utilstrencodings.h"
+#include "util/moneystr.h"
+#include "util/strencodings.h"
 #include "validation.h" // for cs_main
 #include "wallet/wallet.h"
 #include "wallet/fees.h"
@@ -285,7 +285,7 @@ CAmount GroupCoinSelection(const std::vector<COutput> &coins, CAmount amt, std::
     return cur;
 }
 
-bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey)
+bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, ReserveDestination &childAuthorityKey)
 {
     // The melting authority is consumed.  A wallet can decide to create a child authority or not.
     // In this simple wallet, we will always create a new melting authority if we spend a renewable
@@ -313,7 +313,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     CAmount totalGroupedAvailable = 0;
 
     CMutableTransaction tx;
-    CReserveKey groupChangeKeyReservation(wallet);
+    ReserveDestination groupChangeKeyReservation(wallet);
 
     {
         // Add group outputs based on the passed recipient data to the tx.
@@ -386,7 +386,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     }
 
     // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
-    CReserveKey dummy(wallet);
+    ReserveDestination dummy(wallet);
     CValidationState state;
     if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the "
@@ -394,7 +394,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
                                              "wallet.dat and coins were spent in the copy but not marked as spent "
                                              "here.");
 
-    groupChangeKeyReservation.KeepKey();
+    groupChangeKeyReservation.KeepDestination();
 }
 template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionRegular>& ptgDesc);
@@ -409,7 +409,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     CAmount totalGroupedAvailable = 0;
 
     CMutableTransaction tx;
-    CReserveKey groupChangeKeyReservation(wallet);
+    ReserveDestination groupChangeKeyReservation(wallet);
 
     {
         // Add group outputs based on the passed recipient data to the tx.
@@ -476,7 +476,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     }
 
     // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
-    CReserveKey dummy(wallet);
+    ReserveDestination dummy(wallet);
     CValidationState state;
     if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the "
@@ -484,7 +484,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
                                              "wallet.dat and coins were spent in the copy but not marked as spent "
                                              "here.");
 
-    groupChangeKeyReservation.KeepKey();
+    groupChangeKeyReservation.KeepDestination();
 }
 
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet)
@@ -585,12 +585,12 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
 
         chosenCoins.push_back(authority);
 
-        CReserveKey childAuthorityKey(wallet);
+        ReserveDestination childAuthorityKey(wallet);
         RenewAuthority(authority, outputs, childAuthorityKey);
         // by passing a fewer tokens available than are actually in the inputs, there is a surplus.
         // This surplus will be melted.
         ConstructTx(txNew, chosenCoins, outputs, totalNeeded, grpID, wallet);
-        childAuthorityKey.KeepKey();
+        childAuthorityKey.KeepDestination();
     }
 }
 

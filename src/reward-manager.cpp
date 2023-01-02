@@ -6,8 +6,10 @@
 #include "reward-manager.h"
 
 #include "init.h"
-#include "masternode/masternode-sync.h"
+#include "masternode/sync.h"
+#include <net.h>
 #include "policy/policy.h"
+#include <util/translation.h>
 #include "validation.h"
 #include "wallet/wallet.h"
 
@@ -20,14 +22,14 @@ CRewardManager::CRewardManager() :
         fEnableRewardManager(false), nAutoCombineNThreshold(10) {
 }
 
-bool CRewardManager::IsReady() {
+bool CRewardManager::IsReady(CConnman& connman) {
     if (!fEnableRewardManager) return false;
 
     if (pwallet == nullptr || pwallet->IsLocked()) {
         return false;
     }
-    bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
-    if (!fHaveConnections || !masternodeSync.IsSynced()) {
+    bool fHaveConnections = connman.GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+    if (!fHaveConnections || !masternodeSync->IsSynced()) {
         return false;
     }
     const CBlockIndex* tip = ::ChainActive().Tip();
@@ -51,11 +53,6 @@ CAmount CRewardManager::GetAutoCombineThresholdAmount()
     CAmount nAutoCombineAmountThreshold;
     pwallet->GetAutoCombineSettings(fEnable, nAutoCombineAmountThreshold);
     return nAutoCombineAmountThreshold;
-}
-
-bool CRewardManager::IsCombining()
-{
-    return IsReady() && IsAutoCombineEnabled();
 }
 
 // TODO: replace with pwallet->FilterCoins()
@@ -153,12 +150,11 @@ void CRewardManager::AutocombineDust() {
 
         // Create the transaction and commit it to the network
         CTransactionRef tx;
-        CReserveKey keyChange(pwallet); // this change address does not end up being used, because change is returned with coin control switch
-        std::string strErr;
+        bilingual_str strErr;
         CAmount nFeeRet = 0;
 
-        if (!pwallet->CreateTransaction(vecSend, tx, keyChange, nFeeRet, nChangePosRet, strErr, coinControl)) {
-            LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
+        if (!pwallet->CreateTransaction(vecSend, tx, nFeeRet, nChangePosRet, strErr, coinControl)) {
+            LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr.translated);
             continue;
         }
 
@@ -167,10 +163,7 @@ void CRewardManager::AutocombineDust() {
             continue;
 
         CValidationState state;
-        if (!pwallet->CommitTransaction(tx, {}, {}, {}, keyChange, g_connman.get(), state)) {
-            LogPrintf("AutoCombineDust transaction commit failed\n");
-            continue;
-        }
+        pwallet->CommitTransaction(tx, {}, {});
 
         LogPrintf("AutoCombineDust sent transaction\n");
         // Max one transaction per cycle
@@ -179,7 +172,7 @@ void CRewardManager::AutocombineDust() {
 }
 
 void CRewardManager::DoMaintenance(CConnman& connman) {
-    if (!IsReady()) {
+    if (!IsReady(connman)) {
         UninterruptibleSleep(std::chrono::milliseconds{5 * 60 * 1000}); // Wait 5 minutes
         return;
     }

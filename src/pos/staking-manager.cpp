@@ -6,7 +6,11 @@
 #include "staking-manager.h"
 
 #include "init.h"
-#include "masternode/masternode-sync.h"
+#include <governance/governance.h>
+#include <llmq/blockprocessor.h>
+#include <llmq/chainlocks.h>
+#include <llmq/instantsend.h>
+#include "masternode/sync.h"
 #include "miner.h"
 #include "net.h"
 #include "policy/policy.h"
@@ -15,6 +19,8 @@
 #include "pos/stakeinput.h"
 #include "pow.h"
 #include "script/sign.h"
+#include "shutdown.h"
+#include <spork.h>
 #include "validation.h"
 #include "wallet/wallet.h"
 
@@ -46,7 +52,7 @@ bool CStakingManager::MintableCoins()
         if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
             continue;
 
-        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->hashBlock);
+        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->m_confirm.hashBlock);
         if (!utxoBlock)
             return false;
         //check for maturity (min age/depth)
@@ -77,7 +83,7 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
         if (out.tx->tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
             continue;
 
-        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->hashBlock);
+        CBlockIndex* utxoBlock = LookupBlockIndex(out.tx->m_confirm.hashBlock);
         if (!utxoBlock)
             continue;
         //check for maturity (min age/depth)
@@ -171,7 +177,7 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
     coinstakeTx->vout.push_back(CTxOut(0, scriptEmpty));
 
     // Choose coins to use
-    CAmount nBalance = pwallet->GetBalance();
+    CAmount nBalance = pwallet->GetBalance().m_mine_trusted;
 
     if (nBalance > 0 && nBalance <= nReserveBalance)
         return false;
@@ -217,7 +223,7 @@ bool CStakingManager::CreateCoinStake(const CBlockIndex* pindexPrev, std::shared
             }
 
             // Limit size
-            unsigned int nBytes = ::GetSerializeSize(*coinstakeTx, SER_NETWORK, CTransaction::CURRENT_VERSION);
+            unsigned int nBytes = ::GetSerializeSize(*coinstakeTx, CTransaction::CURRENT_VERSION);
             if (nBytes >= MAX_STANDARD_TX_SIZE)
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
@@ -264,13 +270,13 @@ void CStakingManager::UpdatedBlockTip(const CBlockIndex* pindex)
     LogPrint(BCLog::STAKING, "CStakingManager::UpdatedBlockTip -- height: %d\n", pindex->nHeight);
 }
 
-void CStakingManager::DoMaintenance(CConnman& connman)
+void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainman)
 {
     if (!fEnableStaking) return; // Should never happen
 
     CBlockIndex* pindexPrev = ::ChainActive().Tip();
-    bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
-    if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync.IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance()) {
+    bool fHaveConnections = connman.GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+    if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync->IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance().m_mine_trusted) {
         nLastCoinStakeSearchInterval = 0;
         UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute
         return;
@@ -328,7 +334,7 @@ void CStakingManager::DoMaintenance(CConnman& connman)
     if (CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
         // Coinstake found. Extract signing key from coinstake
         try {
-            pblocktemplate = BlockAssembler(Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
+            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
         } catch (const std::exception& e) {
             LogPrint(BCLog::STAKING, "%s: error creating block, waiting.. - %s", __func__, e.what());
             UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute
@@ -348,8 +354,12 @@ void CStakingManager::DoMaintenance(CConnman& connman)
         LogPrint(BCLog::STAKING, "%s: failed to find key for PoS", __func__);
         return;
     }
+    auto spk_man = pwallet->GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        return;
+    }
     CKey key;
-    if (!pwallet->GetKey(keyID, key)) {
+    if (!spk_man->GetKey(keyID, key)) {
         LogPrint(BCLog::STAKING, "%s: failed to get key from keystore", __func__);
         return;
     }
@@ -360,7 +370,7 @@ void CStakingManager::DoMaintenance(CConnman& connman)
 
     /// Process block
     std::shared_ptr<const CBlock> shared_pblock = std::make_shared<const CBlock>(*pblock);
-    if (!ProcessNewBlock(Params(), shared_pblock, true, nullptr)) {
+    if (!chainman.ProcessNewBlock(Params(), shared_pblock, true, nullptr)) {
         fLastLoopOrphan = true;
         LogPrint(BCLog::STAKING, "%s: ProcessNewBlock, block not accepted", __func__);
         UninterruptibleSleep(std::chrono::milliseconds{10 * 1000}); // Wait 10 seconds

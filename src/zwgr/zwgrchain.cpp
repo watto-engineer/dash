@@ -231,23 +231,23 @@ bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& tx
 std::string ReindexZerocoinDB()
 {
     if (!zerocoinDB->WipeCoins("spends") || !zerocoinDB->WipeCoins("mints")) {
-        return _("Failed to wipe zerocoinDB");
+        return "Failed to wipe zerocoinDB";
     }
 
-    uiInterface.ShowProgress(_("Reindexing zerocoin database..."), 0, false);
+    uiInterface.ShowProgress("Reindexing zerocoin database...", 0, false);
 
     CBlockIndex* pindex = ::ChainActive()[Params().GetConsensus().nBlockZerocoinV2];
     std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpendInfo;
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMintInfo;
     while (pindex) {
-        uiInterface.ShowProgress(_("Reindexing zerocoin database..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().nBlockZerocoinV2) / (double)(::ChainActive().Height() - Params().GetConsensus().nBlockZerocoinV2) * 100))), false);
+        uiInterface.ShowProgress("Reindexing zerocoin database...", std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().nBlockZerocoinV2) / (double)(::ChainActive().Height() - Params().GetConsensus().nBlockZerocoinV2) * 100))), false);
 
         if (pindex->nHeight % 1000 == 0)
             LogPrintf("Reindexing zerocoin : block %d...\n", pindex->nHeight);
 
         CBlock block;
         if (!ReadBlockFromDisk(block, pindex, Params().GetConsensus())) {
-            return _("Reindexing zerocoin failed");
+            return "Reindexing zerocoin failed";
         }
 
         for (const CTransactionRef& tx : block.vtx) {
@@ -268,7 +268,7 @@ std::string ReindexZerocoinDB()
                                 PublicCoinSpend publicSpend(params);
                                 CValidationState state;
                                 if (!ZWGRModule::ParseZerocoinPublicSpend(in, *tx, state, publicSpend)){
-                                    return _("Failed to parse public spend");
+                                    return "Failed to parse public spend";
                                 }
                                 vSpendInfo.push_back(std::make_pair(publicSpend, txid));
                             } else {
@@ -297,7 +297,7 @@ std::string ReindexZerocoinDB()
         // Flush the zerocoinDB to disk every 100 blocks
         if (pindex->nHeight % 100 == 0) {
             if ((!vSpendInfo.empty() && !zerocoinDB->WriteCoinSpendBatch(vSpendInfo)) || (!vMintInfo.empty() && !zerocoinDB->WriteCoinMintBatch(vMintInfo)))
-                return _("Error writing zerocoinDB to disk");
+                return "Error writing zerocoinDB to disk";
             vSpendInfo.clear();
             vMintInfo.clear();
         }
@@ -308,7 +308,7 @@ std::string ReindexZerocoinDB()
 
     // Final flush to disk in case any remaining information exists
     if ((!vSpendInfo.empty() && !zerocoinDB->WriteCoinSpendBatch(vSpendInfo)) || (!vMintInfo.empty() && !zerocoinDB->WriteCoinMintBatch(vMintInfo)))
-        return _("Error writing zerocoinDB to disk");
+        return "Error writing zerocoinDB to disk";
 
     uiInterface.ShowProgress("", 100, false);
 
@@ -448,12 +448,12 @@ void AddWrappedSerialsInflation()
     if (pindex->nHeight > ::ChainActive().Height())
         return;
 
-    uiInterface.ShowProgress(_("Adding Wrapped Serials supply..."), 0, false);
+    uiInterface.ShowProgress("Adding Wrapped Serials supply...", 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
             int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - Params().GetConsensus().nFakeSerialBlockheightEnd) * 100 / (::ChainActive().Height() - Params().GetConsensus().nFakeSerialBlockheightEnd))));
-            uiInterface.ShowProgress(_("Adding Wrapped Serials supply..."), percent, false);
+            uiInterface.ShowProgress("Adding Wrapped Serials supply...", percent, false);
         }
 
         // Add inflated denominations to block index mapSupply
@@ -476,13 +476,13 @@ void RecalculateZWGRMinted()
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
     CBlockIndex *pindex = ::ChainActive()[consensusParams.nZerocoinStartHeight];
-    uiInterface.ShowProgress(_("Recalculating minted ZWGR..."), 0, false);
+    uiInterface.ShowProgress("Recalculating minted ZWGR...", 0, false);
     while (true) {
         // Log Message and feedback message every 1000 blocks
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
             int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - consensusParams.nZerocoinStartHeight) * 100 / (::ChainActive().Height() - consensusParams.nZerocoinStartHeight))));
-            uiInterface.ShowProgress(_("Recalculating minted ZWGR..."), percent, false);
+            uiInterface.ShowProgress("Recalculating minted ZWGR...", percent, false);
         }
 
         //overwrite possibly wrong vMintsInBlock data
@@ -510,12 +510,12 @@ void RecalculateZWGRSpent()
 {
     const Consensus::Params& consensusParams = Params().GetConsensus();
     CBlockIndex* pindex = ::ChainActive()[consensusParams.nZerocoinStartHeight];
-    uiInterface.ShowProgress(_("Recalculating spent ZWGR..."), 0, false);
+    uiInterface.ShowProgress("Recalculating spent ZWGR...", 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
             int percent = std::max(1, std::min(99, (int)((double)(pindex->nHeight - consensusParams.nZerocoinStartHeight) * 100 / (::ChainActive().Height() - consensusParams.nZerocoinStartHeight))));
-            uiInterface.ShowProgress(_("Recalculating spent ZWGR..."), percent, false);
+            uiInterface.ShowProgress("Recalculating spent ZWGR...", percent, false);
         }
 
         //Rewrite zWGR supply
@@ -564,12 +564,12 @@ bool RecalculateWGRSupply(int nHeightStart)
     CBlockIndex* pindex = ::ChainActive()[nHeightStart];
     CAmount nSupplyPrev = pindex->pprev->nMoneySupply;
 
-    uiInterface.ShowProgress(_("Recalculating WGR supply..."), 0, false);
+    uiInterface.ShowProgress("Recalculating WGR supply...", 0, false);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
             int percent = std::max(1, std::min(99, (int)((double)((pindex->nHeight - nHeightStart) * 100) / (::ChainActive().Height() - nHeightStart))));
-            uiInterface.ShowProgress(_("Recalculating WGR supply..."), percent, false);
+            uiInterface.ShowProgress("Recalculating WGR supply...", percent, false);
         }
 
         CBlock block;
@@ -590,9 +590,9 @@ bool RecalculateWGRSupply(int nHeightStart)
                 }
 
                 COutPoint prevout = tx->vin[i].prevout;
-                CTransactionRef txPrev;
                 uint256 hashBlock;
-                if (!GetTransaction(prevout.hash, txPrev, Params().GetConsensus(), hashBlock, true))
+                CTransactionRef txPrev = GetTransaction(::ChainActive().Tip(), nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+                if (!txPrev)
                     assert(!"Recalculating zerocoins upply failed: cannot get transaction");
                 nValueIn += txPrev->vout[prevout.n].nValue;
             }

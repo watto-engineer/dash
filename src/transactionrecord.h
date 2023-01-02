@@ -7,9 +7,8 @@
 
 #include <amount.h>
 #include <dstencode.h>
-#include <script/ismine.h>
 #include <uint256.h>
-
+#include <wallet/ismine.h>
 
 namespace interfaces {
 class Node;

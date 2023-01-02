@@ -42,7 +42,7 @@ public:
     std::string operator()(const CNoDestination& no) const { return {}; }
 };
 
-CTxDestination DecodeDestination(const std::string& str, const CChainParams& params)
+CTxDestination DecodeLegacyDestination(const std::string& str, const CChainParams& params)
 {
     std::vector<unsigned char> data;
     uint160 hash;
@@ -154,5 +154,5 @@ std::string EncodeLegacyAddr(const CTxDestination& dest, const CChainParams& par
 
 CTxDestination DecodeLegacyAddr(const std::string& str, const CChainParams& params)
 {
-    return DecodeDestination(str, params);
+    return DecodeLegacyDestination(str, params);
 }

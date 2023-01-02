@@ -13,6 +13,7 @@
 #include <univalue.h>
 
 #include <pos/staking-manager.h>
+#include <reward-manager.h>
 #include <scheduler.h>
 #include <tokens/rpctokenwallet.h>
 #include <util/check.h>

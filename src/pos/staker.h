@@ -11,12 +11,14 @@
 
 #include <univalue.h>
 
+class ChainstateManager;
 class CWallet;
 class CBlockIndex;
 class CMutableTransaction;
-class CReserveKey;
+class ReserveDestination;
+class CTxMemPool;
 
 /** Generate mixed POS/POW blocks (mine or stake) */
-UniValue generateHybridBlocks(std::shared_ptr<CReserveKey> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
+UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<ReserveDestination> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
 
 #endif // POS_STAKER_H

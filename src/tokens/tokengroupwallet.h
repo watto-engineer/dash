@@ -35,7 +35,7 @@ template <typename TokenGroupDescription>
 CTokenGroupID findGroupId(const COutPoint &input, const TokenGroupDescription& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
 
 CAmount GroupCoinSelection(const std::vector<COutput> &coins, CAmount amt, std::vector<COutput> &chosenCoins);
-bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, CReserveKey &childAuthorityKey);
+bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, ReserveDestination &childAuthorityKey);
 
 template <typename TokenGroupDescription>
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,

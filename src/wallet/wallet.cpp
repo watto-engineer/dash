@@ -4326,7 +4326,7 @@ void ReserveDestination::ReturnDestination()
     address = CNoDestination();
 }
 
-bool CWallet::GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey)
+bool CWallet::GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey)
 {
     CPubKey pubkey;
     if (!reservedKey->GetReservedKey(pubkey, false))
@@ -4337,7 +4337,7 @@ bool CWallet::GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, con
     return true;
 }
 
-bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<CReserveKey> &reservedKey, const CReward &reward)
+bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey, const CReward &reward)
 {
     CPubKey pubkey;
     if (!reservedKey->GetReservedKey(pubkey, false))
@@ -4355,9 +4355,9 @@ bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, 
     return true;
 }
 
-bool CWallet::GetKeyForMining(std::shared_ptr<CReserveKey> &reservedKey, CPubKey &reservedPubkey)
+bool CWallet::GetKeyForMining(std::shared_ptr<ReserveDestination> &reservedKey, CPubKey &reservedPubkey)
 {
-    std::shared_ptr<CReserveKey> rKey = std::make_shared<CReserveKey>(this);
+    std::shared_ptr<ReserveDestination> rKey = std::make_shared<ReserveDestination>(this);
     CPubKey pubkey;
     if (!rKey->GetReservedKey(pubkey, false))
         return false;

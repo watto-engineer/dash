@@ -15,8 +15,8 @@
 #include "script/tokengroup.h"
 #include "tokens/tokengroupdocument.h"
 #include "tokens/tokengroupmanager.h"
-#include "utilmoneystr.h"
-#include "utilstrencodings.h"
+#include "util/moneystr.h"
+#include "util/strencodings.h"
 #include "validation.h"
 #include "wallet/coincontrol.h"
 #include "wallet/rpcwallet.h"
@@ -782,7 +782,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
 
     std::vector<CRecipient> outputs;
 
-    CReserveKey authKeyReservation(pwallet);
+    ReserveDestination authKeyReservation(pwallet);
     CTxDestination authDest;
     CScript opretScript;
 
@@ -804,7 +804,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     CTransactionRef tx;
     ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
 
-    authKeyReservation.KeepKey();
+    authKeyReservation.KeepDestination();
     UniValue ret(UniValue::VOBJ);
     ret.pushKV("groupID", EncodeTokenGroup(grpID));
     ret.pushKV("transaction", tx->GetHash().GetHex());
@@ -847,7 +847,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     bool fStickyMelt = false;
     bool confirmed = false;
 
-    CReserveKey authKeyReservation(pwallet);
+    ReserveDestination authKeyReservation(pwallet);
     CTxDestination authDest;
     CScript opretScript;
     std::vector<CRecipient> outputs;
@@ -955,7 +955,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
     if (confirmed) {
         CTransactionRef tx;
         ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
-        authKeyReservation.KeepKey();
+        authKeyReservation.KeepDestination();
         ret.pushKV("groupID", EncodeTokenGroup(grpID));
         ret.pushKV("transaction", tx->GetHash().GetHex());
     }
@@ -1029,7 +1029,7 @@ extern UniValue configurenft(const JSONRPCRequest& request)
 
     std::vector<CRecipient> outputs;
 
-    CReserveKey authKeyReservation(pwallet);
+    ReserveDestination authKeyReservation(pwallet);
     CTxDestination authDest;
     CScript opretScript;
 
@@ -1051,7 +1051,7 @@ extern UniValue configurenft(const JSONRPCRequest& request)
     CTransactionRef tx;
     ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
 
-    authKeyReservation.KeepKey();
+    authKeyReservation.KeepDestination();
     UniValue ret(UniValue::VOBJ);
     ret.pushKV("groupID", EncodeTokenGroup(grpID));
     ret.pushKV("transaction", tx->GetHash().GetHex());
@@ -1168,7 +1168,7 @@ extern UniValue createtokenauthorities(const JSONRPCRequest& request)
         }
     }
 
-    CReserveKey renewAuthorityKey(pwallet);
+    ReserveDestination renewAuthorityKey(pwallet);
     RenewAuthority(chosenCoins[0], outputs, renewAuthorityKey);
 
     { // Construct the new authority
@@ -1179,7 +1179,7 @@ extern UniValue createtokenauthorities(const JSONRPCRequest& request)
 
     CTransactionRef tx;
     ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
-    renewAuthorityKey.KeepKey();
+    renewAuthorityKey.KeepDestination();
     return tx->GetHash().GetHex();
 }
 
@@ -1483,14 +1483,14 @@ extern UniValue minttoken(const JSONRPCRequest& request)
     std::vector<COutput> chosenCoins;
     chosenCoins.push_back(authority);
 
-    CReserveKey childAuthorityKey(pwallet);
+    ReserveDestination childAuthorityKey(pwallet);
     RenewAuthority(authority, outputs, childAuthorityKey);
 
     // I don't "need" tokens even though they are in the output because I'm minting, which is why
     // the token quantities are 0
     CTransactionRef tx;
     ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
-    childAuthorityKey.KeepKey();
+    childAuthorityKey.KeepDestination();
     return tx->GetHash().GetHex();
 }
 

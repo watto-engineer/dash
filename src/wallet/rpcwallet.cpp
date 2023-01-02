@@ -16,6 +16,7 @@
 #include <dstencode.h>
 #include <httpserver.h>
 #include <interfaces/chain.h>
+#include <masternode/sync.h>
 #include <node/context.h>
 #include <policy/feerate.h>
 #include <policy/fees.h>
@@ -245,20 +246,64 @@ UniValue getnewaddress(const JSONRPCRequest& request)
     if (!request.params[0].isNull())
         label = LabelFromValue(request.params[0]);
 
-    std::shared_ptr<CReserveKey> coinbase_key;
-    CPubKey coinbase_pubkey;
-    if (!pwallet->GetKeyForMining(coinbase_key, coinbase_pubkey)){
-        throw JSONRPCError(RPC_INTERNAL_ERROR, "No key for coinbase available");
-    }
     CTxDestination dest;
     std::string error;
     if (!pwallet->GetNewDestination(label, dest, error)) {
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, error);
     }
     return EncodeDestination(dest);
-//    return generateHybridBlocks(coinbase_key, num_generate, max_tries, true, pwallet);
 }
 
+#if ENABLE_MINER
+UniValue generate(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
+        throw std::runtime_error(
+            "generate nblocks ( maxtries )\n"
+            "\nMine up to nblocks blocks immediately (before the RPC call returns) to an address in the wallet.\n"
+            "\nArguments:\n"
+            "1. nblocks      (numeric, required) How many blocks are generated immediately.\n"
+            "2. maxtries     (numeric, optional) How many iterations to try (default = 1000000).\n"
+            "\nResult:\n"
+            "[ blockhashes ]     (array) hashes of blocks generated\n"
+            "\nExamples:\n"
+            "\nGenerate 11 blocks\n"
+            + HelpExampleCli("generate", "11")
+        );
+    }
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    int num_generate = request.params[0].get_int();
+    uint64_t max_tries = std::numeric_limits<uint64_t>::max();
+    if (!request.params[1].isNull()) {
+        max_tries = request.params[1].get_int();
+    }
+
+    std::shared_ptr<ReserveDestination> coinbase_key;
+    CPubKey coinbase_pubkey;
+    if (!pwallet->GetKeyForMining(coinbase_key, coinbase_pubkey)){
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "No key for coinbase available");
+    }
+
+    // If the keypool is exhausted, no script is returned at all.  Catch this.
+    if (!coinbase_key) {
+        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+    }
+
+    const CTxMemPool& mempool = EnsureMemPool(request.context);
+    ChainstateManager& chainman = EnsureChainman(request.context);
+
+    return generateHybridBlocks(chainman, coinbase_key, num_generate, max_tries, true, pwallet);
+}
+#else
+UniValue generate(const JSONRPCRequest& request)
+{
+    throw JSONRPCError(RPC_METHOD_NOT_FOUND, "This call is not available because RPC miner isn't compiled");
+}
+#endif //ENABLE_MINING
 static UniValue getrawchangeaddress(const JSONRPCRequest& request)
 {
     RPCHelpMan{"getrawchangeaddress",
@@ -390,24 +435,20 @@ static CTransactionRef BurnWithData(CWallet * const pwallet, const CScript& data
     }
 
     // Create and send the transaction
-    CReserveKey reservekey(pwallet);
     CAmount nFeeRequired;
-    std::string strError;
+    bilingual_str strError;
     std::vector<CRecipient> vecSend;
     int nChangePosRet = -1;
     CRecipient recipient = {data, nValue, fSubtractFeeFromAmount};
     vecSend.push_back(recipient);
     CTransactionRef tx;
-    if (!pwallet->CreateTransaction(vecSend, tx, reservekey, nFeeRequired, nChangePosRet, strError, coin_control)) {
+    if (!pwallet->CreateTransaction(vecSend, tx, nFeeRequired, nChangePosRet, strError, coin_control)) {
         if (!fSubtractFeeFromAmount && nValue + nFeeRequired > curBalance)
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired));
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+        throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
     }
     CValidationState state;
-    if (!pwallet->CommitTransaction(tx, std::move(mapValue), {} /* orderForm */, std::move(fromAccount), reservekey, g_connman.get(), state)) {
-        strError = strprintf("Error: The transaction was rejected! Reason given: %s", FormatStateMessage(state));
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
-    }
+    pwallet->CommitTransaction(tx, std::move(mapValue), {});
     return tx;
 }
 
@@ -3675,7 +3716,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     bool fWalletUnlocked = !pwallet->IsLocked(true);
     bool fMintableCoins = stakingManager->MintableCoins();
     bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance();
-    bool fMnSync = masternodeSync.IsSynced();
+    bool fMnSync = masternodeSync->IsSynced();
     bool fStakingStatus = stakingManager->IsStaking();
 
     UniValue obj(UniValue::VOBJ);
