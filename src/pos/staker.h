@@ -19,6 +19,6 @@ class ReserveDestination;
 class CTxMemPool;
 
 /** Generate mixed POS/POW blocks (mine or stake) */
-UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<ReserveDestination> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
+UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<CReserveScript> coinbase_script, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet = nullptr);
 
 #endif // POS_STAKER_H

@@ -56,13 +56,6 @@ void TokenGroupCreationToJSON(const CTokenGroupID &tgID, const CTokenGroupCreati
 
 extern UniValue tokeninfo(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() < 1)
         throw std::runtime_error(
             "tokeninfo [list, all, stats, groupid, ticker, name] ( \"specifier \" ) ( \"creation_data\" ) ( \"nft_data\" )\n"
@@ -121,7 +114,7 @@ extern UniValue tokeninfo(const JSONRPCRequest& request)
             ret.push_back(entry);
         }
     } else if (operation == "stats") {
-        LOCK2(cs_main, pwallet->cs_wallet);
+        LOCK(cs_main);
 
         CBlockIndex *pindex = NULL;
 
@@ -442,13 +435,6 @@ extern UniValue gettokentransaction(const JSONRPCRequest& request)
 
 extern UniValue getsubgroupid(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() < 1)
         throw std::runtime_error(
             "getsubgroupid \"groupid\" \"data\" \n"

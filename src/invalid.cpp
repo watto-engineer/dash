@@ -5,7 +5,7 @@
 
 #include "invalid.h"
 #include "invalid_scripts.json.h"
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 namespace invalid_out
 {

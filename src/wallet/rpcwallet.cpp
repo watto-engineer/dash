@@ -156,14 +156,14 @@ WalletContext& EnsureWalletContext(const util::Ref& context)
 void EnsureEnoughWagerr(CWallet * const pwallet, CAmount total)
 {
 
-    CAmount nBalance = pwallet->GetBalance();
+    CAmount nBalance = pwallet->GetBalance().m_mine_trusted;
 
     if (total > nBalance) {
          throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Error: Not enough funds in wallet or account");
     }
 }
 
-void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
+void WalletTxToJSON(interfaces::Chain& chain, const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain();
     bool fLocked = llmq::quorumInstantSendManager->IsLocked(wtx.GetHash());
@@ -282,21 +282,24 @@ UniValue generate(const JSONRPCRequest& request)
         max_tries = request.params[1].get_int();
     }
 
-    std::shared_ptr<ReserveDestination> coinbase_key;
-    CPubKey coinbase_pubkey;
-    if (!pwallet->GetKeyForMining(coinbase_key, coinbase_pubkey)){
-        throw JSONRPCError(RPC_INTERNAL_ERROR, "No key for coinbase available");
+    LegacyScriptPubKeyMan* spk_man = pwallet->GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "This type of wallet does not support this command");
     }
+    spk_man->TopUpKeyPool();
 
-    // If the keypool is exhausted, no script is returned at all.  Catch this.
-    if (!coinbase_key) {
-        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+    CTxDestination coinbaseDest;
+    std::string error;
+    if (!spk_man->GetNewDestination(coinbaseDest, error)){
+        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, error);
     }
+    std::shared_ptr<CReserveScript> coinbase_script = std::make_shared<CReserveScript>();
+    coinbase_script->reserveScript = GetScriptForDestination(coinbaseDest);
 
     const CTxMemPool& mempool = EnsureMemPool(request.context);
     ChainstateManager& chainman = EnsureChainman(request.context);
 
-    return generateHybridBlocks(chainman, coinbase_key, num_generate, max_tries, true, pwallet);
+    return generateHybridBlocks(chainman, mempool, coinbase_script, num_generate, max_tries, true, pwallet);
 }
 #else
 UniValue generate(const JSONRPCRequest& request)
@@ -417,7 +420,7 @@ static CTransactionRef SendMoney(CWallet* const pwallet, const CTxDestination& a
 
 static CTransactionRef BurnWithData(CWallet * const pwallet, const CScript& data, CAmount nValue, bool fSubtractFeeFromAmount, const CCoinControl& coin_control, mapValue_t mapValue, std::string fromAccount)
 {
-    CAmount curBalance = pwallet->GetBalance();
+    CAmount curBalance = pwallet->GetBalance().m_mine_trusted;
 
     // Check amount
     if (nValue <= 0)
@@ -444,7 +447,7 @@ static CTransactionRef BurnWithData(CWallet * const pwallet, const CScript& data
     CTransactionRef tx;
     if (!pwallet->CreateTransaction(vecSend, tx, nFeeRequired, nChangePosRet, strError, coin_control)) {
         if (!fSubtractFeeFromAmount && nValue + nFeeRequired > curBalance)
-            strError = strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired));
+            strError = Untranslated(strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired)));
         throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
     }
     CValidationState state;
@@ -936,27 +939,30 @@ static UniValue getunconfirmedbalance(const JSONRPCRequest &request)
 
 UniValue getextendedbalance(const JSONRPCRequest &request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() > 0)
         throw std::runtime_error(
                "getextendedbalance\n"
                 "Returns extended balance information\n");
 
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
     LOCK2(cs_main, pwallet->cs_wallet);
+
+    const auto bal = pwallet->GetBalance();
 
     UniValue obj(UniValue::VOBJ);
     obj.pushKV("blocks", (int)::ChainActive().Height());
-    obj.pushKV("balance", ValueFromAmount(pwallet->GetBalance()));
-    obj.pushKV("balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedBalance()));
-    obj.pushKV("balance_immature", ValueFromAmount(pwallet->GetImmatureBalance()));
-    obj.pushKV("watchonly_balance_unconfirmed", ValueFromAmount(pwallet->GetUnconfirmedWatchOnlyBalance()));
-    obj.pushKV("watchonly_balance_immature", ValueFromAmount(pwallet->GetImmatureWatchOnlyBalance()));
+    obj.pushKV("balance", ValueFromAmount(bal.m_mine_trusted));
+    obj.pushKV("balance_unconfirmed", ValueFromAmount(bal.m_mine_untrusted_pending));
+    obj.pushKV("balance_immature", ValueFromAmount(bal.m_mine_immature));
+    obj.pushKV("watchonly_balance_unconfirmed", ValueFromAmount(bal.m_watchonly_untrusted_pending));
+    obj.pushKV("watchonly_balance_immature", ValueFromAmount(bal.m_watchonly_immature));
     obj.pushKV("balance_unlocked", ValueFromAmount(pwallet->GetUnlockedBalance()));
     obj.pushKV("balance_locked", ValueFromAmount(pwallet->GetLockedBalance()));
     obj.pushKV("watchonly_balance_locked", ValueFromAmount(pwallet->GetLockedWatchOnlyBalance()));
@@ -1661,13 +1667,6 @@ static UniValue listtransactions(const JSONRPCRequest& request)
 
 UniValue listtransactionrecords(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
                 "listtransactionrecords ( \"account\" count from includeWatchonly)\n"
@@ -1712,6 +1711,14 @@ UniValue listtransactionrecords(const JSONRPCRequest& request)
                 "\nAs a json rpc call\n" +
                 HelpExampleRpc("listtransactionrecords", "\"tabby\", 20, 100"));
 
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
     LOCK2(cs_main, pwallet->cs_wallet);
 
     std::string strAccount = "*";
@@ -1739,12 +1746,9 @@ UniValue listtransactionrecords(const JSONRPCRequest& request)
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
+        CWalletTx* const pwtx = (*it).second;
         if (pwtx != 0){}
             ListTransactionRecords(wallet, pwtx->GetHash(), strAccount, 0, true, ret, filter);
-        CAccountingEntry* const pacentry = (*it).second.second;
-        if (pacentry != 0)
-            AcentryToJSON(*pacentry, strAccount, ret);
 
         if ((int)ret.size() >= (nCount + nFrom)) break;
     }
@@ -2206,7 +2210,6 @@ static UniValue walletpassphrase(const JSONRPCRequest& request)
     if (nSleepTime != 0)
     {
         pwallet->nRelockTime = GetTime() + nSleepTime;
-        RPCRunLater(strprintf("lockwallet(%s)", pwallet->GetName()), std::bind(LockWallet, pwallet), nSleepTime);
     }
 
     // Keep a weak pointer to the wallet so that it is possible to unload the
@@ -3584,14 +3587,18 @@ UniValue signrawtransactionwithwallet(const JSONRPCRequest& request)
     return SignTransaction(mtx, &*pwallet->GetLegacyScriptPubKeyMan(), coins, request.params[2]);
 }
 
+std::string HelpRequiringPassphrase(CWallet * const pwallet)
+{
+    return pwallet && pwallet->IsCrypted()
+        ? "\nRequires wallet passphrase to be set with walletpassphrase call."
+        : "";
+}
+
 UniValue setstakesplitthreshold(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
 
     if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
@@ -3610,6 +3617,8 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
 
             "\nExamples:\n" +
             HelpExampleCli("setstakesplitthreshold", "5000") + HelpExampleRpc("setstakesplitthreshold", "5000"));
+
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -3632,13 +3641,6 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
 }
 UniValue autocombinedust(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     bool fEnable;
     size_t nParamsSize = request.params.size();
     if (nParamsSize >= 1)
@@ -3656,6 +3658,12 @@ UniValue autocombinedust(const JSONRPCRequest& request)
 
             "\nExamples:\n" +
             HelpExampleCli("autocombinedust", "true 500") + HelpExampleRpc("autocombinedust", "true 500"));
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    LOCK(pwallet->cs_wallet);
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -3683,13 +3691,6 @@ UniValue autocombinedust(const JSONRPCRequest& request)
 
 UniValue getstakingstatus(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
             "getstakingstatus\n"
@@ -3709,13 +3710,17 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
 
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
     LOCK2(cs_main, pwallet->cs_wallet);
 
     bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
     bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     bool fWalletUnlocked = !pwallet->IsLocked(true);
     bool fMintableCoins = stakingManager->MintableCoins();
-    bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance();
+    bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance().m_mine_trusted;
     bool fMnSync = masternodeSync->IsSynced();
     bool fStakingStatus = stakingManager->IsStaking();
 
@@ -4329,11 +4334,8 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
 UniValue placebet(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
 
     if (request.fHelp || request.params.size() < 3 || request.params.size() > 5)
         throw std::runtime_error(
@@ -4359,7 +4361,10 @@ UniValue placebet(const JSONRPCRequest& request)
             HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
             HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
 
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
+
     LOCK2(cs_main, mempool.cs);
     LOCK(pwallet->cs_wallet);
 
@@ -4415,11 +4420,8 @@ UniValue placebet(const JSONRPCRequest& request)
 UniValue placeparlaybet(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
 
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
         throw std::runtime_error(
@@ -4450,7 +4452,10 @@ UniValue placeparlaybet(const JSONRPCRequest& request)
             HelpExampleCli("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
             HelpExampleRpc("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
 
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
+
     LOCK2(cs_main, mempool.cs);
     LOCK(pwallet->cs_wallet);
 
@@ -4521,11 +4526,8 @@ UniValue placeparlaybet(const JSONRPCRequest& request)
 
 UniValue placefieldbet(const JSONRPCRequest& request) {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
 
     if (request.fHelp || request.params.size() < 4 || request.params.size() > 6) {
         throw std::runtime_error(
@@ -4552,6 +4554,10 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
             HelpExampleCli("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\"") +
             HelpExampleRpc("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\""));
     }
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
 
     if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
@@ -4631,11 +4637,8 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
 
 UniValue placefieldparlaybet(const JSONRPCRequest& request) {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
 
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 4) {
         throw std::runtime_error(
@@ -4667,6 +4670,10 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
             HelpExampleCli("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 2, \"marketType\": 2, \"contenderId\": 200}]\" 25 \"Parlay bet\" \"seans outpost\"") +
             HelpExampleRpc("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 322,\"marketType\": 2, \"contenderId\": 200}]\", 25, \"Parlay bet\", \"seans outpost\""));
     }
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
 
     if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
@@ -4747,13 +4754,6 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
 // TODO: The first parameter for account isn't used.
 UniValue listbets(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
             "listbets ( \"account\" count from includeWatchonly)\n"
@@ -4776,6 +4776,12 @@ UniValue listbets(const JSONRPCRequest& request)
             "\nExamples:\n"
             "\nList the most recent 10 bets in the systems\n" +
             HelpExampleCli("listbets", ""));
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    LOCK(pwallet->cs_wallet);
 
     std::string strAccount = "*";
     if (request.params.size() > 0)
@@ -4804,7 +4810,7 @@ UniValue listbets(const JSONRPCRequest& request)
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
+        CWalletTx* const pwtx = (*it).second;
         if (pwtx != 0) {
 
             uint256 txHash = (*pwtx).GetHash();
@@ -4945,15 +4951,15 @@ UniValue getbet(const JSONRPCRequest& request)
             HelpExampleCli("getbet", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\" true") +
             HelpExampleRpc("getbet", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\""));
 
-    LOCK(cs_main);
+    const NodeContext& node = EnsureNodeContext(request.context);
 
     uint256 txHash;
     txHash.SetHex(request.params[0].get_str());
-    CBlockIndex* blockindex = nullptr;
+    CBlockIndex* blockindex = ::ChainActive().Tip();
 
-    CTransactionRef tx;
     uint256 hash_block;
-    if (!GetTransaction(txHash, tx, Params().GetConsensus(), hash_block, true, blockindex)) {
+    CTransactionRef tx = GetTransaction(blockindex, node.mempool, txHash, Params().GetConsensus(), hash_block);
+    if (!tx) {
         std::string errmsg;
         if (blockindex) {
             if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
@@ -4961,9 +4967,7 @@ UniValue getbet(const JSONRPCRequest& request)
             }
             errmsg = "No such transaction found in the provided block";
         } else {
-            errmsg = fTxIndex
-              ? "No such mempool or blockchain transaction"
-              : "No such mempool transaction. Use -txindex to enable blockchain transaction queries";
+            errmsg = "No such mempool or blockchain transaction";
         }
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
     }
@@ -5235,7 +5239,7 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::op
 
         if (_pwalletMain) {
             CTxDestination dest = uniBet.playerAddress;
-            isminetype scriptType = IsMine(*_pwalletMain, dest);
+            isminetype scriptType = _pwalletMain->IsMine(dest);
             if (scriptType == ISMINE_NO)
                 continue;
             if (scriptType == ISMINE_WATCH_ONLY && !includeWatchonly)
@@ -5669,14 +5673,16 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
                 "\nExamples:\n" +
                 HelpExampleCli("getbetbytxid", "1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d"));
 
+    const NodeContext& node = EnsureNodeContext(request.context);
+
     uint256 txHash;
     txHash.SetHex(request.params[0].get_str());
 
     LOCK(cs_main);
 
-    CTransactionRef tx;
     uint256 hashBlock;
-    if (!GetTransaction(txHash, tx, Params().GetConsensus(), hashBlock, true)) {
+    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), nullptr, txHash, Params().GetConsensus(), hashBlock);
+    if (!tx) {
         throw std::runtime_error("Invalid bet's transaction id");
     }
 
@@ -5767,13 +5773,6 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
 
 UniValue listchaingamesbets(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     // TODO The command-line parameters for this command aren't handled as.
     // described, either the documentation or the behaviour of this command
     // should be corrected when time allows.
@@ -5799,6 +5798,12 @@ UniValue listchaingamesbets(const JSONRPCRequest& request)
             "\nExamples:\n"
             "\nList the most recent 10 bets in the systems\n" +
             HelpExampleCli("listchaingamebets", ""));
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    LOCK(pwallet->cs_wallet);
 
     std::string strAccount = "*";
     if (request.params.size() > 0)
@@ -5827,7 +5832,7 @@ UniValue listchaingamesbets(const JSONRPCRequest& request)
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
+        CWalletTx* const pwtx = (*it).second;
 
         if (pwtx != 0) {
 
@@ -5881,13 +5886,6 @@ UniValue listchaingamesbets(const JSONRPCRequest& request)
 
 UniValue getmybets(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() > 4)
         throw std::runtime_error(
                 "getmybets\n"
@@ -5946,6 +5944,11 @@ UniValue getmybets(const JSONRPCRequest& request)
                 "\nExamples:\n" +
                 HelpExampleCli("getmybets", ""));
 
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    LOCK2(cs_main, pwallet->cs_wallet);
 
     boost::optional<std::string> accountName = {};
     if (request.params.size() >= 1)
@@ -5962,8 +5965,6 @@ UniValue getmybets(const JSONRPCRequest& request)
     bool includeWatchonly = false;
     if (request.params.size() == 4)
         includeWatchonly = request.params[3].get_bool();
-
-    LOCK2(cs_main, pwallet->cs_wallet);
 
     return GetBets(count, from, pwallet, accountName, includeWatchonly);
 }
@@ -5982,7 +5983,7 @@ UniValue GetQuickGamesBets(uint32_t count, uint32_t from, CWallet *_pwalletMain,
 
         if (_pwalletMain) {
             CTxDestination dest = qgBet.playerAddress;
-            isminetype scriptType = IsMine(*_pwalletMain, dest);
+            isminetype scriptType = _pwalletMain->IsMine(dest);
             if (scriptType == ISMINE_NO)
                 continue;
             if (scriptType == ISMINE_WATCH_ONLY && !includeWatchonly)
@@ -6079,13 +6080,6 @@ UniValue getallqgbets(const JSONRPCRequest& request)
 
 UniValue getmyqgbets(const JSONRPCRequest& request)
 {
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    CWallet* const pwallet = wallet.get();
-
-    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
-        return NullUniValue;
-    }
-
     if (request.fHelp || request.params.size() > 2)
         throw std::runtime_error(
                 "getmyqgbets\n"
@@ -6118,6 +6112,16 @@ UniValue getmyqgbets(const JSONRPCRequest& request)
                 "\nExamples:\n" +
                 HelpExampleCli("getmyqgbets", "15"));
 
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
+    LOCK2(cs_main, pwallet->cs_wallet);
+
     boost::optional<std::string> accountName = {};
     if (request.params.size() >= 1)
         accountName = request.params[0].get_str();
@@ -6133,8 +6137,6 @@ UniValue getmyqgbets(const JSONRPCRequest& request)
     bool includeWatchonly = false;
     if (request.params.size() == 4)
         includeWatchonly = request.params[3].get_bool();
-
-    LOCK2(cs_main, pwallet->cs_wallet);
 
     return GetQuickGamesBets(count, from, pwallet, accountName, includeWatchonly);
 }

@@ -1623,16 +1623,17 @@ CAmount CWalletTx::GetLockedWatchOnlyCredit(const bool& fUseCache) const
     return GetLockedCredit(fUseCache, ISMINE_WATCH_ONLY);
 }
 
-Amount CWallet::GetChange(const CTransaction& tx) const
-
-   CAmount nChange = 0;
-   for (const CTxOut& txout : tx.vout)
-   {
-       nChange += GetChange(txout);
-       if (!MoneyRange(nChange))
-           throw std::runtime_error(std::string(__func__) + ": value out of range");
-   }
-   return nChange;
+CAmount CWallet::GetChange(const CTransaction& tx) const
+{
+    CAmount nChange = 0;
+    for (const CTxOut& txout : tx.vout)
+    {
+        nChange += GetChange(txout);
+        if (!MoneyRange(nChange))
+            throw std::runtime_error(std::string(__func__) + ": value out of range");
+    }
+    return nChange;
+}
 
 bool CWallet::IsHDEnabled() const
 {
@@ -1894,14 +1895,12 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
 void CWalletTx::GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
     std::list<CGroupedOutputEntry> &listSent,
     CAmount &nFee,
-    std::string &strSentAccount,
     const isminefilter &filter,
     std::function<bool(const CTokenGroupInfo&)> func) const
 {
     nFee = 0;
     listReceived.clear();
     listSent.clear();
-    strSentAccount = strFromAccount;
 
     // Compute fee:
     CAmount nDebit = GetDebit(filter);
@@ -1960,13 +1959,11 @@ void CWalletTx::GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
 void CWalletTx::GetAmounts(std::list<CGroupedOutputEntry> &listReceived,
     std::list<CGroupedOutputEntry> &listSent,
     CAmount &nFee,
-    std::string &strSentAccount,
     const isminefilter &filter) const
 {
     nFee = 0;
     listReceived.clear();
     listSent.clear();
-    strSentAccount = strFromAccount;
 
     // Compute fee:
     CAmount nDebit = GetDebit(filter);
@@ -2624,7 +2621,7 @@ CAmount CWallet::GetAnonymizableBalance(bool fSkipDenominated, bool fSkipUnconfi
     return nTotal;
 }
 
-Amount CWallet::GetUnlockedBalance() const
+CAmount CWallet::GetUnlockedBalance() const
 {
     CAmount nTotal = 0;
     {
@@ -2740,7 +2737,6 @@ unsigned int CWallet::FilterCoins(std::vector<COutput> &vCoins,
                 continue;
 
             if ((pcoin->IsGenerated() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
-+            if (pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain();
@@ -3127,13 +3123,13 @@ bool CWallet::SelectCoins(const std::vector<COutput>& vAvailableCoins, const CAm
     return res;
 }
 
-bool CWallet::SignTransaction(CMutableTransaction &tx)
+bool CWallet::SignTransaction(CMutableTransaction &mtx)
 {
     AssertLockHeld(cs_wallet); // mapWallet
 
-    CTransaction txNewConst(tx);
+    CTransaction txNewConst(mtx);
     int nIn = 0;
-    for (const auto &input : tx.vin)
+    for (const auto &input : mtx.vin)
     {
         std::map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(input.prevout.hash);
         if (mi == mapWallet.end() || input.prevout.n >= mi->second.tx->vout.size())
@@ -3141,13 +3137,27 @@ bool CWallet::SignTransaction(CMutableTransaction &tx)
             return false;
         }
         const CScript &scriptPubKey = mi->second.tx->vout[input.prevout.n].scriptPubKey;
-        SignatureData sigdata;
+        const CAmount& amount = mi->second.tx->vout[input.prevout.n].nValue;
 
-        if (!ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, SIGHASH_ALL), scriptPubKey, sigdata)) {
+        const SigningProvider* provider = GetSigningProvider();
+        SignatureData sigdata = DataFromTransaction(mtx, nIn, mi->second.tx->vout[input.prevout.n]);
+
+        if (!ProduceSignature(*provider, MutableTransactionSignatureCreator(&mtx, nIn, amount, SIGHASH_SINGLE), scriptPubKey, sigdata)) {
             return error("%s: Signing transaction failed\n", __func__);
         } else {
-            UpdateTransaction(tx, nIn, sigdata);
+            UpdateInput(mtx.vin[nIn], sigdata);
         }
+
+        ScriptError serror = SCRIPT_ERR_OK;
+        if (!VerifyScript(mtx.vin[nIn].scriptSig, scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&txNewConst, nIn, amount), &serror)) {
+            if (serror == SCRIPT_ERR_INVALID_STACK_OPERATION) {
+                // Unable to sign input and verification failed (possible attempt to partially sign).
+                return error("%s: Unable to sign input, invalid stack size (possibly missing key)\n", __func__);
+            } else {
+                return error("%s: Unable to sign input (%s)\n", __func__, ScriptErrorString(serror));
+            }
+        }
+
         nIn++;
     }
     return true;
@@ -4324,47 +4334,6 @@ void ReserveDestination::ReturnDestination()
     nIndex = -1;
     vchPubKey = CPubKey();
     address = CNoDestination();
-}
-
-bool CWallet::GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey)
-{
-    CPubKey pubkey;
-    if (!reservedKey->GetReservedKey(pubkey, false))
-        return false;
-
-    script = reservedKey;
-    script->reserveScript = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
-    return true;
-}
-
-bool CWallet::GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey, const CReward &reward)
-{
-    CPubKey pubkey;
-    if (!reservedKey->GetReservedKey(pubkey, false))
-        return false;
-
-    script = reservedKey;
-    CTxDestination dst = pubkey.GetID();
-
-    std::map<CTokenGroupID, CAmount>::const_iterator it = reward.tokenAmounts.begin();
-    if (it == reward.tokenAmounts.end()) {
-        script->reserveScript = CScript();
-    } else {
-        script->reserveScript = GetScriptForDestination(dst, it->first, it->second);
-    }
-    return true;
-}
-
-bool CWallet::GetKeyForMining(std::shared_ptr<ReserveDestination> &reservedKey, CPubKey &reservedPubkey)
-{
-    std::shared_ptr<ReserveDestination> rKey = std::make_shared<ReserveDestination>(this);
-    CPubKey pubkey;
-    if (!rKey->GetReservedKey(pubkey, false))
-        return false;
-
-    reservedKey = rKey;
-    reservedPubkey = pubkey;
-    return true;
 }
 
 void CWallet::LockCoin(const COutPoint& output)

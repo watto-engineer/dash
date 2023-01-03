@@ -33,8 +33,8 @@ struct DiceBetInfo {
         READWRITE(bet_type);
         SER_READ(obj, obj.betType = (QuickGamesDiceBetType) bet_type);
 
-        if (type != qgDiceEven && type != qgDiceOdd) {
-            READWRITE(betNumber);
+        if (bet_type != qgDiceEven && bet_type != qgDiceOdd) {
+            READWRITE(obj.betNumber);
         }
     }
 };

@@ -531,14 +531,12 @@ public:
     void GetAmounts(std::list<CGroupedOutputEntry> &listReceived,
         std::list<CGroupedOutputEntry> &listSent,
         CAmount &nFee,
-        std::string &strSentAccount,
         const isminefilter &filter) const;
 
     // Get transactions for the passed group
     void GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
         std::list<CGroupedOutputEntry> &listSent,
         CAmount &nFee,
-        std::string &strSentAccount,
         const isminefilter &filter,
         std::function<bool(const CTokenGroupInfo&)> func) const;
 
@@ -1174,9 +1172,6 @@ public:
 
     bool DelAddressBook(const CTxDestination& address);
 
-    bool GetScriptForPowMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey);
-    bool GetScriptForHybridMining(std::shared_ptr<CReserveScript> &script, const std::shared_ptr<ReserveDestination> &reservedKey, const CReward &reward);
-    bool GetKeyForMining(std::shared_ptr<ReserveDestination> &reservedKey, CPubKey &pubkey);
     unsigned int GetKeyPoolSize() const EXCLUSIVE_LOCKS_REQUIRED(cs_wallet);
 
     //! signify that a particular wallet feature is now used. this may change nWalletVersion and nWalletMaxVersion if those are lower

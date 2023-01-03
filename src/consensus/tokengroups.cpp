@@ -105,7 +105,6 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             else // this is an authority output
             {
                 gBalance[tokenGrp.associatedGroup].ctrlOutputPerms |= (GroupAuthorityFlags)tokenGrp.quantity;
-                anyOutputControlGroups = true;
             }
         }
     }
@@ -195,7 +194,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
     // Now pass thru the outputs ensuring balance or mint/melt permission
     for (auto &txo : gBalance)
     {
-        CBalance &bal = txo.second;
+        CTokenGroupBalance &bal = txo.second;
         // If it has an authority, with no input authority, check mint
         if (hasCapability(bal.ctrlOutputPerms, GroupAuthorityFlags::CTRL) &&
             (bal.ctrlPerms == GroupAuthorityFlags::NONE))
@@ -210,6 +209,12 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                 tgDesc.WriteHashable(mintGrp);
             } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
+                if (!GetTxPayload(tx, tgDesc)) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                }
+                tgDesc.WriteHashable(mintGrp);
+            } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
+                CTokenGroupDescriptionNFT tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
@@ -244,10 +249,6 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
-                // Invalid combination token
-                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
-                }
                 // NFT token
                 if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
@@ -255,6 +256,11 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL_NFT;
                 }
+                // Invalid combination token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
+                }
+
                 if (newGrpId.hasFlag(TokenGroupIdFlags::STICKY_MELT))
                 {
                     if (anyInputsGroupManagement) {
@@ -264,6 +270,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                             "No group management capability at any input address - unable to set stick_melt");
                     }
                 }
+            }
             else
             {
                 if (((uint64_t)bal.ctrlOutputPerms & (uint64_t)~GroupAuthorityFlags::ALL_BITS) != 0)

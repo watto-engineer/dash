@@ -1162,13 +1162,18 @@ void InitParameterInteraction(ArgsManager& args)
             LogPrintf("%s: parameter interaction: -whitelistforcerelay=1 -> setting -whitelistrelay=1\n", __func__);
     }
 
-    int64_t nPruneArg = args.GetArg("-prune", 0);
+    int64_t nPruneArg = 0; // args.GetArg("-prune", 0);
     if (nPruneArg > 0) {
         if (args.SoftSetBoolArg("-disablegovernance", true)) {
             LogPrintf("%s: parameter interaction: -prune=%d -> setting -disablegovernance=true\n", __func__, nPruneArg);
         }
         if (args.SoftSetBoolArg("-txindex", false)) {
             LogPrintf("%s: parameter interaction: -prune=%d -> setting -txindex=false\n", __func__, nPruneArg);
+        }
+    }
+    if (!args.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+        if (args.SoftSetBoolArg("-txindex", true)) {
+            LogPrintf("%s: betting functionality requires txindex -> setting -txindex=true\n", __func__);
         }
     }
 

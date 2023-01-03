@@ -52,6 +52,7 @@ const std::string POOL{"pool"};
 const std::string PURPOSE{"purpose"};
 const std::string PRIVATESEND_SALT{"ps_salt"};
 const std::string STAKE_SPLIT_THRESHOLD{"stakesplitthreshold"};
+const std::string AUTOCOMBINE_SETTINGS{"autocombinesettings"};
 const std::string TX{"tx"};
 const std::string VERSION{"version"};
 const std::string WATCHMETA{"watchmeta"};
@@ -498,19 +499,17 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         } else if (strType != DBKeys::BESTBLOCK && strType != DBKeys::BESTBLOCK_NOMERKLE &&
                    strType != DBKeys::MINVERSION && strType != DBKeys::ACENTRY && strType != DBKeys::VERSION) {
             wss.m_unknown_records++;
-        else if (strType == DBKeys::STAKE_SPLIT_THRESHOLD)
+        } else if (strType == DBKeys::STAKE_SPLIT_THRESHOLD)
         {
             uint64_t nStakeSplitThreshold;
             ssValue >> nStakeSplitThreshold;
             pwallet->LoadStakeSplitThreshold(nStakeSplitThreshold);
-        }
-        else if (strType == "autocombinesettings")
+        } else if (strType == "autocombinesettings")
         {
             std::pair<bool, CAmount> pSettings;
             ssValue >> pSettings;
             pwallet->LoadAutoCombineSettings(pSettings.first, pSettings.second);
-        }
-        else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
+        } else if (strType != "bestblock" && strType != "bestblock_nomerkle"){
             wss.m_unknown_records++;
         }
     } catch (const std::exception& e) {

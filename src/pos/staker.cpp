@@ -36,7 +36,7 @@
 
 //#if ENABLE_MINER
 
-UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<ReserveDestination> coinbaseKey, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet)
+UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, std::shared_ptr<CReserveScript> coinbase_script, int nGenerate, uint64_t nMaxTries, bool keepScript, CWallet * const pwallet)
 {
     const auto& params = Params().GetConsensus();
     const bool fRegtest = Params().NetworkIDString() == CBaseChainParams::REGTEST;
@@ -73,10 +73,6 @@ UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mem
                 pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
             };
         } else {
-            std::shared_ptr<CReserveScript> coinbase_script;
-            if (!pwallet->GetScriptForPowMining(coinbase_script, coinbaseKey)) {
-                throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-            }
             pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(coinbase_script->reserveScript);
         }
         if (!pblocktemplate.get())
@@ -124,7 +120,7 @@ UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mem
         //mark script as important because it was used at least for one coinbase output if the script came from the wallet
         if (keepScript)
         {
-            coinbaseKey->KeepDestination();
+            coinbase_script->KeepScript();
         }
     }
     return blockHashes;

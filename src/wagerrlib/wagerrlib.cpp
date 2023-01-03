@@ -13,7 +13,7 @@
 #include <script/interpreter.h>
 #include <script/script.h>
 #include <streams.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 
 #include <openssl/rand.h>
 #include <string>

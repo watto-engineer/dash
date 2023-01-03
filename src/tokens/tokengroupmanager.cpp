@@ -13,7 +13,7 @@
 #include "policy/policy.h"
 #include "rpc/protocol.h"
 #include "script/tokengroup.h"
-#include "utilstrencodings.h"
+#include "util/strencodings.h"
 #include "tokens/tokengroupconfiguration.h"
 
 std::shared_ptr<CTokenGroupManager> tokenGroupManager;

@@ -7,7 +7,7 @@
 #include <primitives/transaction.h>
 #include <rpc/server.h>
 #include <util.h>
-#include <utilstrencodings.h>
+#include <util/strencodings.h>
 #include <messagesigner.h>
 #include <univalue.h>
 

@@ -10,11 +10,12 @@
 #include "key_io.h"
 #include <evo/specialtx.h>
 #include "net.h"
-#include "rpc/protocol.h"
+#include "rpc/util.h"
 #include "script/tokengroup.h"
 #include "tokens/tokengroupmanager.h"
 #include "util/moneystr.h"
 #include "util/strencodings.h"
+#include "util/translation.h"
 #include "validation.h" // for cs_main
 #include "wallet/wallet.h"
 #include "wallet/fees.h"
@@ -295,9 +296,8 @@ bool RenewAuthority(const COutput &authority, std::vector<CRecipient> &outputs, 
     if (tg.allowsRenew())
     {
         // Get a new address from the wallet to put the new mint authority in.
-        CPubKey pubkey;
-        childAuthorityKey.GetReservedKey(pubkey, true);
-        CTxDestination authDest = pubkey.GetID();
+        CTxDestination authDest;
+        childAuthorityKey.GetReservedDestination(authDest, true);
         CScript script = GetScriptForDestination(authDest, tg.associatedGroup, (CAmount)(tg.controllingGroupFlags() & GroupAuthorityFlags::ALL_BITS));
         CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
         outputs.push_back(recipient);
@@ -340,20 +340,20 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 
         if (totalGroupedAvailable > totalGroupedNeeded) // need to make a group change output
         {
-            CPubKey newKey;
-            if (!groupChangeKeyReservation.GetReservedKey(newKey, true))
+            CTxDestination newDest;
+            if (!groupChangeKeyReservation.GetReservedDestination(newDest, true))
                 throw JSONRPCError(
                     RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
             CTxOut txout(GROUPED_SATOSHI_AMT,
-                GetScriptForDestination(newKey.GetID(), grpID, totalGroupedAvailable - totalGroupedNeeded));
+                GetScriptForDestination(newDest, grpID, totalGroupedAvailable - totalGroupedNeeded));
             tx.vout.push_back(txout);
         }
 
         // Now add fee
         CAmount fee;
         int nChangePosRet = -1;
-        std::string strError;
+        bilingual_str strError;
         bool lockUnspents;
         std::set<int> setSubtractFeeFromOutputs;
         CCoinControl coinControl;
@@ -365,7 +365,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
         };
 
         if (!wallet->FundTransaction(tx, fee, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
-            throw JSONRPCError(RPC_WALLET_ERROR, strError);
+            throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
         }
 
         if (!wallet->SignTransaction(tx))
@@ -388,11 +388,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
     ReserveDestination dummy(wallet);
     CValidationState state;
-    if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
-        throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the "
-                                             "coins in your wallet were already spent, such as if you used a copy of "
-                                             "wallet.dat and coins were spent in the copy but not marked as spent "
-                                             "here.");
+    wallet->CommitTransaction(txNew, {}, {});
 
     groupChangeKeyReservation.KeepDestination();
 }
@@ -436,26 +432,27 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 
         if (totalGroupedAvailable > totalGroupedNeeded) // need to make a group change output
         {
+            CTxDestination newDest;
             CPubKey newKey;
-            if (!groupChangeKeyReservation.GetReservedKey(newKey, true))
+            if (!groupChangeKeyReservation.GetReservedDestination(newDest, true))
                 throw JSONRPCError(
                     RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
             CTxOut txout(GROUPED_SATOSHI_AMT,
-                GetScriptForDestination(newKey.GetID(), grpID, totalGroupedAvailable - totalGroupedNeeded));
+                GetScriptForDestination(newDest, grpID, totalGroupedAvailable - totalGroupedNeeded));
             tx.vout.push_back(txout);
         }
 
         // Now add fee
         CAmount fee;
         int nChangePosRet = -1;
-        std::string strError;
+        bilingual_str strError;
         bool lockUnspents;
         std::set<int> setSubtractFeeFromOutputs;
         CCoinControl coinControl;
 
         if (!wallet->FundTransaction(tx, fee, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
-            throw JSONRPCError(RPC_WALLET_ERROR, strError);
+            throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
         }
 
         if (!wallet->SignTransaction(tx))
@@ -478,11 +475,7 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     // I'll manage my own keys because I have multiple.  Passing a valid key down breaks layering.
     ReserveDestination dummy(wallet);
     CValidationState state;
-    if (!wallet->CommitTransaction(txNew, {}, {}, {}, dummy, g_connman.get(), state))
-        throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the "
-                                             "coins in your wallet were already spent, such as if you used a copy of "
-                                             "wallet.dat and coins were spent in the copy but not marked as spent "
-                                             "here.");
+    wallet->CommitTransaction(txNew, {}, {});
 
     groupChangeKeyReservation.KeepDestination();
 }
@@ -553,7 +546,7 @@ void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount total
 
         if (nOptions == 0)
         {
-            strError = _("To melt coins, an authority output with melt capability is needed.");
+            strError = "To melt coins, an authority output with melt capability is needed.";
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
         }
         COutput authority(nullptr, 0, 0, false, false, false);
