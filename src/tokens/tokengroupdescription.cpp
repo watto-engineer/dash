@@ -6,7 +6,7 @@
 #include "tokens/tokengroupdescription.h"
 
 #include <consensus/consensus.h>
-#include "util.h"
+#include "util/strencodings.h"
 #include <rpc/protocol.h>
 #include <rpc/server.h>
 
@@ -42,7 +42,7 @@ void CTokenGroupDescriptionNFT::ToJson(UniValue& obj, const bool& fFull) const
     obj.pushKV("metadata_hash", documentHash.ToString());
     if (fFull) {
         obj.pushKV("data_filename", strDataFilename);
-        obj.pushKV("data_base64", EncodeBase64(vchData.data(), vchData.size()));
+        obj.pushKV("data_base64", EncodeBase64(vchData));
     }
 }
 

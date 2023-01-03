@@ -134,10 +134,10 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
     return TX_NONSTANDARD;
 }
 
-bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet)
+bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet, txnouttype &whichType)
 {
     std::vector<valtype> vSolutions;
-    txnouttype whichType = Solver(scriptPubKey, vSolutions);
+    whichType = Solver(scriptPubKey, vSolutions);
 
     if (whichType == TX_PUBKEY) {
         CPubKey pubKey(vSolutions[0]);

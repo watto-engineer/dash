@@ -49,31 +49,22 @@ public:
         READWRITE(obj.creationTransaction);
         READWRITE(obj.creationBlockHash);
         READWRITE(obj.tokenGroupInfo);
-        if (ser_action.ForRead()) {
-            if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-                CTokenGroupDescriptionRegular tgDesc;
-                READWRITE(tgDesc);
-                obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
-            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
-                CTokenGroupDescriptionMGT tgDesc;
-                READWRITE(tgDesc);
-                obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
-            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
-                CTokenGroupDescriptionNFT tgDesc;
-                READWRITE(tgDesc);
-                obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc);
-            }
-        } else {
-            if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
-                CTokenGroupDescriptionRegular *tgDesc = boost::get<CTokenGroupDescriptionRegular>(obj.pTokenGroupDescription.get());
-                READWRITE(*tgDesc);
-            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
-                CTokenGroupDescriptionMGT *tgDesc = boost::get<CTokenGroupDescriptionMGT>(obj.pTokenGroupDescription.get());
-                READWRITE(*tgDesc);
-            } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
-                CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(obj.pTokenGroupDescription.get());
-                READWRITE(*tgDesc);
-            }
+
+        if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_REGULAR) {
+            CTokenGroupDescriptionRegular tgDesc;
+            SER_WRITE(obj, tgDesc = boost::get<CTokenGroupDescriptionRegular>(*obj.pTokenGroupDescription));
+            READWRITE(tgDesc);
+            SER_READ(obj, obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc));
+        } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_MGT) {
+            CTokenGroupDescriptionMGT tgDesc;
+            SER_WRITE(obj, tgDesc = boost::get<CTokenGroupDescriptionMGT>(*obj.pTokenGroupDescription));
+            READWRITE(tgDesc);
+            SER_READ(obj, obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc));
+        } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_NFT) {
+            CTokenGroupDescriptionNFT tgDesc;
+            SER_WRITE(obj, tgDesc = boost::get<CTokenGroupDescriptionNFT>(*obj.pTokenGroupDescription));
+            READWRITE(tgDesc);
+            SER_READ(obj, obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc));
         }
     }
     bool operator==(const CTokenGroupCreation &c)

@@ -7,10 +7,10 @@
 #include <clientversion.h>
 #include <coins.h>
 #include <key_io.h>
+#include <logging.h>
 #include <wagerraddrenc.h>
 #include <tokens/groups.h>
 #include <streams.h>
-#include <util.h>
 
 CTokenGroupID NoGroup; // No group specified.
 
