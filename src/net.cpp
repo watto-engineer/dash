@@ -1,7 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2019 The Bitcoin Core developers
 // Copyright (c) 2019 The PIVX Core developers
-// Copyright (c) 2014-2022 The Wagerr Core developers
+// Copyright (c) 2018-2022 The Dash Core developers
+// Copyright (c) 2014-2022 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
