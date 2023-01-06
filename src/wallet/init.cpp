@@ -230,7 +230,7 @@ void WalletInit::InitCoinJoinSettings() const
 void WalletInit::InitStaking() const
 {
     std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    if (!HasWallets() || wallets.size() < 1) {
+    if (wallets.size() < 1) {
         stakingManager = std::shared_ptr<CStakingManager>(new CStakingManager());
         stakingManager->fEnableStaking = false;
         stakingManager->fEnableWAGERRStaking = false;
@@ -255,7 +255,7 @@ void WalletInit::InitRewardsManagement() const
 {
     rewardManager = std::shared_ptr<CRewardManager>(new CRewardManager());
     std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-    if (HasWallets() && wallets.size() >= 1) {
+    if (wallets.size() >= 1) {
         rewardManager->BindWallet(wallets[0].get());
         rewardManager->fEnableRewardManager = true;
     }

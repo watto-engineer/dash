@@ -444,7 +444,7 @@ BOOST_FIXTURE_TEST_CASE(dip3_protx, TestChainDIP3Setup)
     }
     BOOST_ASSERT(foundRevived);
 
-    sporkManager.UpdateSpork(SPORK_4_DIP0003_ENFORCED, DIP0003EnforcementHeightBackup, *g_connman);
+//    sporkManager.UpdateSpork(SPORK_4_DIP0003_ENFORCED, DIP0003EnforcementHeightBackup, *g_connman);
 //    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = DIP0003EnforcementHeightBackup;
 }
 

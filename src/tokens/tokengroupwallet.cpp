@@ -128,7 +128,7 @@ CAmount GetGroupBalance(const CTokenGroupID &grpID, const CTxDestination &dest, 
             {
                 CTxDestination address;
                 txnouttype whichType;
-                if (ExtractDestinationAndType(out->scriptPubKey, address, whichType))
+                if (ExtractDestination(out->scriptPubKey, address, whichType))
                 {
                     if (address == dest)
                         useit = true;
@@ -161,7 +161,7 @@ void GetGroupBalanceAndAuthorities(CAmount &balance, GroupAuthorityFlags &author
             {
                 CTxDestination address;
                 txnouttype whichType;
-                if (ExtractDestinationAndType(out->scriptPubKey, address, whichType))
+                if (ExtractDestination(out->scriptPubKey, address, whichType))
                 {
                     if (address == dest)
                         useit = true;
@@ -192,7 +192,7 @@ void GetGroupCoins(const CWallet *wallet, std::vector<COutput>& coins, CAmount& 
             if (!useit) {
                 CTxDestination address;
                 txnouttype whichType;
-                if (ExtractDestinationAndType(out->scriptPubKey, address, whichType)) {
+                if (ExtractDestination(out->scriptPubKey, address, whichType)) {
                     if (address == dest)
                         useit = true;
                 }
@@ -222,7 +222,7 @@ void GetGroupAuthority(const CWallet *wallet, std::vector<COutput>& coins, Group
             if (!useit) {
                 CTxDestination address;
                 txnouttype whichType;
-                if (ExtractDestinationAndType(out->scriptPubKey, address, whichType)) {
+                if (ExtractDestination(out->scriptPubKey, address, whichType)) {
                     if (address == dest)
                         useit = true;
                 }

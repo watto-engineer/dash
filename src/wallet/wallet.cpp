@@ -1868,7 +1868,7 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
         CTxDestination address;
 
         txnouttype whichType;
-        if (!ExtractDestinationAndType(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
+        if (!ExtractDestination(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
         {
             pwallet->WalletLogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n",
                                     this->GetHash().ToString());
@@ -1930,7 +1930,7 @@ void CWalletTx::GetGroupAmounts(std::list<CGroupedOutputEntry> &listReceived,
         // In either case, we need to get the destination address
         CTxDestination address;
         txnouttype whichType;
-        if (!ExtractDestinationAndType(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
+        if (!ExtractDestination(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
         {
             LogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n", this->GetHash().ToString());
             address = CNoDestination();
@@ -1993,7 +1993,7 @@ void CWalletTx::GetAmounts(std::list<CGroupedOutputEntry> &listReceived,
         // In either case, we need to get the destination address
         CTxDestination address;
         txnouttype whichType;
-        if (!ExtractDestinationAndType(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
+        if (!ExtractDestination(txout.scriptPubKey, address, whichType) && !txout.scriptPubKey.IsUnspendable())
         {
             LogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n", this->GetHash().ToString());
             address = CNoDestination();

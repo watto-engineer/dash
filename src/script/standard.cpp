@@ -164,7 +164,7 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet,
 bool ExtractDestination(const CScript &scriptPubKey, CTxDestination &addressRet)
 {
     txnouttype whichType;
-    return ExtractDestinationAndType(scriptPubKey, addressRet, whichType);
+    return ExtractDestination(scriptPubKey, addressRet, whichType);
 }
 bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<CTxDestination>& addressRet, int& nRequiredRet)
 {

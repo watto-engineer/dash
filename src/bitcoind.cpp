@@ -50,7 +50,7 @@ static bool AppInit(int argc, char* argv[])
 
     util::ThreadSetInternalName("init");
 
-    // If Qt is used, parameters/wagerr.conf are parsed in qt/wagerr.cpp's main()
+    // If Qt is used, parameters/wagerr.conf are parsed in qt/bitcoin.cpp's main()
     SetupServerArgs(node);
     ArgsManager& args = *Assert(node.args);
     std::string error;

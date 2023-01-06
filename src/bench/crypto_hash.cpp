@@ -80,7 +80,7 @@ static void HASH_1MB_QUARK(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(BUFFER_SIZE,0);
     bench.batch(in.size()).unit("byte").minEpochIterations(10).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -147,7 +147,7 @@ static void HASH_QUARK_0032b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(32,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -156,7 +156,7 @@ static void HASH_QUARK_0080b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(80,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -165,7 +165,7 @@ static void HASH_QUARK_0128b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(128,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -174,7 +174,7 @@ static void HASH_QUARK_0512b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(512,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -183,7 +183,7 @@ static void HASH_QUARK_1024b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(1024,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
@@ -192,7 +192,7 @@ static void HASH_QUARK_2048b_single(benchmark::Bench& bench)
     uint256 hash;
     std::vector<uint8_t> in(2048,0);
     bench.minEpochIterations(10000).run([&] {
-        hash = HashQUARK(in.begin(), in.end());
+        hash = HashQuark(in.begin(), in.end());
     });
 }
 
