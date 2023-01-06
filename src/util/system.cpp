@@ -725,7 +725,7 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/Wagerrcoin;
+    return pathRet / "Library/Application Support/Wagerrcoin";
 #else
     // Unix
     return pathRet / ".wagerrcoin";
