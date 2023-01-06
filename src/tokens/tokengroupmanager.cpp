@@ -12,6 +12,7 @@
 #include "logging.h"
 #include "policy/policy.h"
 #include "rpc/protocol.h"
+#include "rpc/request.h"
 #include "script/tokengroup.h"
 #include "util/strencodings.h"
 #include "tokens/tokengroupconfiguration.h"

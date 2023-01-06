@@ -8,8 +8,11 @@
 #include "core_io.h"
 #include "key_io.h"
 #include <evo/specialtx.h>
+#include <index/txindex.h>
 #include "init.h"
+#include <node/context.h>
 #include "wagerraddrenc.h"
+#include "rpc/blockchain.h"
 #include "rpc/protocol.h"
 #include "rpc/server.h"
 #include "script/tokengroup.h"
@@ -290,13 +293,13 @@ void TokenTxToUniv(const CTransactionRef& tx, const uint256& hashBlock, UniValue
     for (const CTxIn& txin : tx->vin) {
         UniValue in(UniValue::VOBJ);
         if (tx->IsCoinBase())
-            in.pushKV("coinbase", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()));
+            in.pushKV("coinbase", HexStr(txin.scriptSig));
         else {
             in.pushKV("txid", txin.prevout.hash.GetHex());
             in.pushKV("vout", (int64_t)txin.prevout.n);
             UniValue o(UniValue::VOBJ);
             o.pushKV("asm", ScriptToAsmStr(txin.scriptSig));
-            o.pushKV("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()));
+            o.pushKV("hex", HexStr(txin.scriptSig));
             in.pushKV("scriptSig", o);
         }
         in.pushKV("sequence", (int64_t)txin.nSequence);
@@ -362,13 +365,14 @@ void TokenTxToJSON(const CTransactionRef& tx, const uint256 hashBlock, UniValue&
         entry.pushKV("blockhash", hashBlock.GetHex());
         CBlockIndex* pindex = LookupBlockIndex(hashBlock);
         if (pindex) {
-            CBlockIndex* pindex = (*mi).second;
             if (::ChainActive().Contains(pindex)) {
+                entry.pushKV("height", pindex->nHeight);
                 entry.pushKV("confirmations", 1 + ::ChainActive().Height() - pindex->nHeight);
                 entry.pushKV("time", pindex->GetBlockTime());
                 entry.pushKV("blocktime", pindex->GetBlockTime());
             }
             else
+                entry.pushKV("height", -1);
                 entry.pushKV("confirmations", 0);
         }
     }
@@ -394,35 +398,43 @@ extern UniValue gettokentransaction(const JSONRPCRequest& request)
             + HelpExampleCli("gettokentransaction", "\"mytxid\" true \"myblockhash\"")
         );
 
-    LOCK(cs_main);
+    const NodeContext& node = EnsureNodeContext(request.context);
 
     bool in_active_chain = true;
     uint256 hash = ParseHashV(request.params[0], "parameter 1");
     CBlockIndex* blockindex = nullptr;
 
     if (!request.params[1].isNull()) {
+        LOCK(cs_main);
+
         uint256 blockhash = ParseHashV(request.params[1], "parameter 2");
         blockindex = LookupBlockIndex(blockhash);
         if (!blockindex) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block hash not found");
         }
-        blockindex = it->second;
         in_active_chain = ::ChainActive().Contains(blockindex);
     }
 
-    CTransactionRef tx;
+    bool f_txindex_ready = false;
+    if (g_txindex && !blockindex) {
+        f_txindex_ready = g_txindex->BlockUntilSyncedToCurrentChain();
+    }
+
     uint256 hash_block;
-    if (!GetTransaction(hash, tx, Params().GetConsensus(), hash_block, true)) {
+    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), node.mempool, hash, Params().GetConsensus(), hash_block);
+    if (!tx) {
         std::string errmsg;
         if (blockindex) {
             if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
                 throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
             }
             errmsg = "No such transaction found in the provided block";
+        } else if (!g_txindex) {
+            errmsg = "No such mempool transaction. Use -txindex or provide a block hash to enable blockchain transaction queries";
+        } else if (!f_txindex_ready) {
+            errmsg = "No such mempool transaction. Blockchain transactions are still in the process of being indexed";
         } else {
-            errmsg = fTxIndex
-              ? "No such mempool or blockchain transaction"
-              : "No such mempool transaction. Use -txindex to enable blockchain transaction queries";
+            errmsg = "No such mempool or blockchain transaction";
         }
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
     }
@@ -667,7 +679,7 @@ UniValue createrawtokentransaction(const JSONRPCRequest& request)
         rawTx.vout.push_back(txout);
     }
 
-    return EncodeHexTx(rawTx);
+    return EncodeHexTx(CTransaction(rawTx));
 }
 
 UniValue encodetokenmetadata(const JSONRPCRequest& request)
