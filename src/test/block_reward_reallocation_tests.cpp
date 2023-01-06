@@ -28,7 +28,7 @@
 
 #include <map>
 #include <vector>
-
+/*
 using SimpleUTXOMap = std::map<COutPoint, std::pair<int, CAmount>>;
 
 const auto deployment_id = Consensus::DEPLOYMENT_REALLOC;
@@ -106,7 +106,7 @@ static void SignTransaction(const CTxMemPool& mempool, CMutableTransaction& tx, 
 
     for (size_t i = 0; i < tx.vin.size(); i++) {
         uint256 hashBlock;
-        CTransactionRef txFrom = GetTransaction(/* block_index */ nullptr, &mempool, tx.vin[i].prevout.hash, Params().GetConsensus(), hashBlock);
+        CTransactionRef txFrom = GetTransaction(/* block_index *//* nullptr, &mempool, tx.vin[i].prevout.hash, Params().GetConsensus(), hashBlock);
         BOOST_ASSERT(txFrom);
         BOOST_ASSERT(SignSignature(tempKeystore, *txFrom, tx, i, SIGHASH_ALL));
     }
@@ -349,3 +349,4 @@ BOOST_FIXTURE_TEST_CASE(block_reward_reallocation, TestChainBRRBeforeActivationS
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+*/

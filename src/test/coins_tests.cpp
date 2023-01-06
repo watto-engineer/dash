@@ -775,14 +775,14 @@ BOOST_AUTO_TEST_CASE(ccoins_add)
      */
     CheckAddCoin(ABSENT, VALUE3, VALUE3, NO_ENTRY   , DIRTY|FRESH, false, false);
     CheckAddCoin(ABSENT, VALUE3, VALUE3, NO_ENTRY   , DIRTY      , true , false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, 0          , DIRTY|FRESH, false, false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, 0          , DIRTY      , true , false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, FRESH      , DIRTY|FRESH, false, false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, FRESH      , DIRTY|FRESH, true , false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, DIRTY      , DIRTY      , false, false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, DIRTY      , DIRTY      , true , false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, DIRTY|FRESH, DIRTY|FRESH, false, false);
-    CheckAddCoin(PRUNED, VALUE3, VALUE3, DIRTY|FRESH, DIRTY|FRESH, true , false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, 0          , DIRTY|FRESH, false, false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, 0          , DIRTY      , true , false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, FRESH      , DIRTY|FRESH, false, false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, FRESH      , DIRTY|FRESH, true , false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, DIRTY      , DIRTY      , false, false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, DIRTY      , DIRTY      , true , false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, DIRTY|FRESH, DIRTY|FRESH, false, false);
+    CheckAddCoin(SPENT , VALUE3, VALUE3, DIRTY|FRESH, DIRTY|FRESH, true , false);
     CheckAddCoin(VALUE2, VALUE3, FAIL  , 0          , NO_ENTRY   , false, false);
     CheckAddCoin(VALUE2, VALUE3, VALUE3, 0          , DIRTY      , true , false);
     CheckAddCoin(VALUE2, VALUE3, FAIL  , FRESH      , NO_ENTRY   , false, false);

@@ -901,7 +901,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             {
                 CTxDestination address;
                 txnouttype whichType;
-                if (ExtractDestinationAndType(out->scriptPubKey, address, whichType))
+                if (ExtractDestination(out->scriptPubKey, address, whichType))
                 {
                     if (address == dest){
                         if ((out->nValue < lowest))

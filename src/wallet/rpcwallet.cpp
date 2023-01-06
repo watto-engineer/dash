@@ -429,7 +429,7 @@ static CTransactionRef BurnWithData(CWallet * const pwallet, const CScript& data
     if (nValue > curBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
 
-    if (pwallet->GetBroadcastTransactions() && !g_connman) {
+    if (pwallet->GetBroadcastTransactions() && !pwallet->chain().p2pEnabled()) {
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
     }
 
@@ -3717,7 +3717,9 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     LOCK2(cs_main, pwallet->cs_wallet);
 
     bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
-    bool fHaveConnections = !g_connman ? false : g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+
+    NodeContext& node = EnsureNodeContext(request.context);
+    bool fHaveConnections = !node.connman ? false : node.connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     bool fWalletUnlocked = !pwallet->IsLocked(true);
     bool fMintableCoins = stakingManager->MintableCoins();
     bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance().m_mine_trusted;

@@ -158,7 +158,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
 //    const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : wallets[0].get()->GetSigningProvider();
     const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : *wallets[0]->GetSigningProvider();
-    if (HasWallets()) {
+    if (wallets.size() > 0) {
         nSplitValue = (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN);
     }
 #else
