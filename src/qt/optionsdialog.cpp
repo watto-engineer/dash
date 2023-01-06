@@ -10,7 +10,7 @@
 #include <qt/forms/ui_optionsdialog.h>
 
 #include <qt/appearancewidget.h>
-#include <qt/Wagerrunits.h>
+#include <qt/bitcoinunits.h>
 #include <qt/guiconstants.h>
 #include <qt/guiutil.h>
 #include <qt/optionsmodel.h>

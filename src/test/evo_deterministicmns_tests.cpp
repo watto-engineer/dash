@@ -313,7 +313,7 @@ BOOST_FIXTURE_TEST_CASE(dip3_protx, TestChainDIP3Setup)
     }
 
     int DIP0003EnforcementHeightBackup = sporkManager->GetSporkValue(SPORK_4_DIP0003_ENFORCED);
-    sporkManager->UpdateSpork(SPORK_4_DIP0003_ENFORCED, ::ChainActive().Height() + 1, *g_connman);
+//    sporkManager->UpdateSpork(SPORK_4_DIP0003_ENFORCED, ::ChainActive().Height() + 1, *g_connman);
 //    const_cast<Consensus::Params&>(Params().GetConsensus()).DIP0003EnforcementHeight = ::ChainActive().Height() + 1;
     CreateAndProcessBlock({}, coinbaseKey);
     deterministicMNManager->UpdatedBlockTip(::ChainActive().Tip());
