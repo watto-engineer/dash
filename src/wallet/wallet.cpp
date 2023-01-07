@@ -2625,7 +2625,7 @@ CAmount CWallet::GetUnlockedBalance() const
 {
     CAmount nTotal = 0;
     {
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (auto pcoin : GetSpendableTXs()) {
             if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
                 nTotal += pcoin->GetUnlockedCredit();
@@ -2638,7 +2638,7 @@ CAmount CWallet::GetLockedBalance() const
 {
     CAmount nTotal = 0;
     {
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (auto pcoin : GetSpendableTXs()) {
             if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
                 nTotal += pcoin->GetLockedCredit();
@@ -2651,7 +2651,7 @@ CAmount CWallet::GetLockedWatchOnlyBalance() const
 {
     CAmount nTotal = 0;
     {
-       LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         for (auto pcoin : GetSpendableTXs()) {
             if (pcoin->IsTrusted() && pcoin->GetDepthInMainChain() > 0)
                 nTotal += pcoin->GetLockedWatchOnlyCredit();
