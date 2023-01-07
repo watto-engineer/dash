@@ -64,9 +64,11 @@ struct CSporkDef
 };
 
 #define MAKE_SPORK_DEF(name, defaultValue) CSporkDef{name, defaultValue, #name}
-[[maybe_unused]] static constexpr std::array<CSporkDef, 8> sporkDefs = {
+[[maybe_unused]] static constexpr std::array<CSporkDef, 10> sporkDefs = {
     MAKE_SPORK_DEF(SPORK_2_INSTANTSEND_ENABLED,            4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_3_INSTANTSEND_BLOCK_FILTERING,    4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_4_DIP0003_ENFORCED,               4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_8_NEW_PROTOCOL_ENFORCEMENT,       4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_9_SUPERBLOCKS_ENABLED,            4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_17_QUORUM_DKG_ENABLED,            4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_19_CHAINLOCKS_ENABLED,            4070908800ULL), // OFF
