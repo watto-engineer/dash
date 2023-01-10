@@ -178,7 +178,7 @@ public:
     uint32_t nStatus{0};
 
     // proof-of-stake specific fields
-    unsigned int nFlags; // ppcoin: block index flags
+    unsigned int nFlags{0}; // ppcoin: block index flags
     enum {
         BLOCK_PROOF_OF_STAKE = (1 << 0), // is proof-of-stake block
         BLOCK_STAKE_ENTROPY = (1 << 1),  // entropy bit for stake modifier
@@ -189,12 +189,12 @@ public:
     unsigned int nStakeModifierChecksum{0}; // checksum of index; in-memeory only
 
     // Wagerr specific fields
-    int64_t nMint;
-    int64_t nMoneySupply;
+    int64_t nMint{0};
+    int64_t nMoneySupply{0};
 
     //! zerocoin specific fields
-    std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply;
-    std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
+    std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply{};
+    std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock{};
 
     //! block header
     int32_t nVersion{0};
@@ -209,45 +209,9 @@ public:
 
     //! (memory only) Maximum nTime in the chain up to and including this block.
     unsigned int nTimeMax{0};
-    void SetNull()
-    {
-        phashBlock = nullptr;
-        pprev = nullptr;
-        pskip = nullptr;
-        nHeight = 0;
-        nFile = 0;
-        nDataPos = 0;
-        nUndoPos = 0;
-        nChainWork = arith_uint256();
-        nTx = 0;
-        nChainTx = 0;
-        nStatus = 0;
-        nSequenceId = 0;
-        nTimeMax = 0;
-
-        nFlags = 0;
-
-        nStakeModifier = 0;
-        nStakeModifierV2 = uint256();
-        nStakeModifierChecksum = 0;
-
-        nMint = 0;
-        nMoneySupply = 0;
-
-        mapZerocoinSupply.clear();
-        vMintDenominationsInBlock.clear();
-        nAccumulatorCheckpoint = uint256();
-
-        nVersion       = 0;
-        hashMerkleRoot = uint256();
-        nTime          = 0;
-        nBits          = 0;
-        nNonce         = 0;
-    }
 
     CBlockIndex()
     {
-        SetNull();
     }
 
     explicit CBlockIndex(const CBlockHeader& block)
