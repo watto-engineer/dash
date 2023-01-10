@@ -4902,7 +4902,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
     // Verify blocks in the best chain
     if (nCheckDepth <= 0 || nCheckDepth > ::ChainActive().Height())
         nCheckDepth = ::ChainActive().Height();
-    nCheckLevel = std::max(0, std::min(4, nCheckLevel));
+    nCheckLevel = nCheckLevel == 3 ? 4 : nCheckLevel;
     LogPrintf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
     CCoinsViewCache coins(coinsview);
     CBettingsView bettingsViewCache(bettingsView.get());
