@@ -47,8 +47,13 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state, const boo
     // the underlying coins database.
     std::set<COutPoint> vInOutPoints;
     for (const auto& txin : tx.vin) {
-        if (!vInOutPoints.insert(txin.prevout).second)
+        if (vInOutPoints.count(txin.prevout))
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
+
+        //duplicate zcspend serials are checked in CheckZerocoinSpend()
+        if (!txin.IsZerocoinSpend()) {
+            vInOutPoints.insert(txin.prevout);
+        }
     }
 
     if (tx.IsCoinBase()) {

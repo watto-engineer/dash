@@ -74,7 +74,6 @@ bool CheckBlockSignature(const CBlock& block)
     if (fZStake) {
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1]->vin[0]);
         pubkey = spend.getPubKey();
-        return error ("%s: zerocoin functionality not implemented yet", __func__);
     } else {
         txnouttype whichType;
         std::vector<valtype> vSolutions;
