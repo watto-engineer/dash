@@ -374,7 +374,7 @@ bool initStakeInput(const CBlock& block, std::unique_ptr<CStake>& ionStake, std:
     } else {
         // First try finding the previous transaction in database
         uint256 hashBlock;
-        CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock);
+        CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
         if (!txPrev)
             return error("%s : INFO: read txPrev failed, tx id prev: %s, block id %s",
                          __func__, txin.prevout.hash.GetHex(), block.GetHash().GetHex());

@@ -477,7 +477,7 @@ int SearchMintHeightOf(CBigNum value){
         throw searchMintHeightException("searchForMintHeightOf:: failed to read mint from db");
 
     uint256 hashBlock;
-    CTransactionRef txMinted = GetTransaction(nullptr, nullptr, txid, Params().GetConsensus(), hashBlock);
+    CTransactionRef txMinted = GetTransaction(nullptr, nullptr, txid, Params().GetConsensus(), hashBlock, true);
     if (!txMinted)
         throw searchMintHeightException("searchForMintHeightOf:: failed to read tx");
 

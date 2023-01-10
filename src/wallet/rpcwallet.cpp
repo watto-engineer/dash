@@ -4957,20 +4957,11 @@ UniValue getbet(const JSONRPCRequest& request)
 
     uint256 txHash;
     txHash.SetHex(request.params[0].get_str());
-    CBlockIndex* blockindex = ::ChainActive().Tip();
 
     uint256 hash_block;
-    CTransactionRef tx = GetTransaction(blockindex, node.mempool, txHash, Params().GetConsensus(), hash_block);
+    CTransactionRef tx = GetTransaction(nullptr, node.mempool, txHash, Params().GetConsensus(), hash_block);
     if (!tx) {
-        std::string errmsg;
-        if (blockindex) {
-            if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
-                throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
-            }
-            errmsg = "No such transaction found in the provided block";
-        } else {
-            errmsg = "No such mempool or blockchain transaction";
-        }
+        std::string errmsg = "No such mempool or blockchain transaction";
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
     }
 

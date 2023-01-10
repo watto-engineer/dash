@@ -31,7 +31,7 @@ bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CT
     nWinnerPayments = 0;
 
     uint256 hashBlock;
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  prevout.hash, Params().GetConsensus(), hashBlock);
+    CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  prevout.hash, Params().GetConsensus(), hashBlock, true);
 
     if (txPrev) {
         stakeAmount = txPrev->vout[prevout.n].nValue + nExpectedMint;
@@ -152,7 +152,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     CTxDestination address;
     CTxDestination prevAddr;
     // if we cant extract playerAddress - skip tx
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock);
+    CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
 
     if (!txPrev ||
             !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
@@ -707,7 +707,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
     uint256 hashBlock;
     CTxDestination address;
     CTxDestination prevAddr;
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock);
+    CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
     // if we cant extract playerAddress - skip vout
     if (!txPrev ||
             !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {

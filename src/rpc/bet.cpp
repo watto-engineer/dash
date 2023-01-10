@@ -231,7 +231,7 @@ extern UniValue getpayoutinfo(const JSONRPCRequest& request)
         uint256 txHash = uint256S(find_value(obj, "txHash").get_str());
         uint32_t nOut = find_value(obj, "nOut").get_int();
         uint256 hashBlock;
-        CTransactionRef tx = GetTransaction(nullptr, nullptr, txHash, Params().GetConsensus(), hashBlock);
+        CTransactionRef tx = GetTransaction(nullptr, nullptr, txHash, Params().GetConsensus(), hashBlock, true);
         if (!tx) {
             vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;

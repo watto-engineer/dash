@@ -43,7 +43,7 @@ const uint256 PublicCoinSpend::signatureHash() const
 bool GetOutput(const uint256& hash, unsigned int index, CValidationState& state, CTxOut& out)
 {
     uint256 hashBlock;
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr, hash, Params().GetConsensus(), hashBlock);
+    CTransactionRef txPrev = GetTransaction(nullptr, nullptr, hash, Params().GetConsensus(), hashBlock, true);
     if (!txPrev) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, error("Output not found"), REJECT_INVALID, "zwgr-bad-out");
     }

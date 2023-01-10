@@ -300,7 +300,7 @@ CBlockIndex* CStake::GetIndexFrom()
     if (pindexFrom)
         return pindexFrom;
     uint256 hashBlock;
-    CTransactionRef tx = GetTransaction(nullptr, nullptr, txFrom->GetHash(), Params().GetConsensus(), hashBlock);
+    CTransactionRef tx = GetTransaction(nullptr, nullptr, txFrom->GetHash(), Params().GetConsensus(), hashBlock, true);
     if (!tx) {
         LogPrintf("%s : failed to find tx %s\n", __func__, txFrom->GetHash().GetHex());
         return nullptr;

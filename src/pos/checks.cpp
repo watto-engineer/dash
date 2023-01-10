@@ -15,7 +15,7 @@
 bool IsTransactionInChain(const uint256& txId, int& nHeightTx, CTransactionRef& tx)
 {
     uint256 hashBlock;
-    tx = GetTransaction(::ChainActive().Tip(), nullptr, txId, Params().GetConsensus(), hashBlock);
+    tx = GetTransaction(nullptr, nullptr, txId, Params().GetConsensus(), hashBlock, true);
     if (!tx)
         return false;
 

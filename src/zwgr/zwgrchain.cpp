@@ -591,7 +591,7 @@ bool RecalculateWGRSupply(int nHeightStart)
 
                 COutPoint prevout = tx->vin[i].prevout;
                 uint256 hashBlock;
-                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock, true);
                 if (!txPrev)
                     assert(!"Recalculating zerocoins upply failed: cannot get transaction");
                 nValueIn += txPrev->vout[prevout.n].nValue;

@@ -408,7 +408,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                 COutPoint prevout = txin.prevout;
 
                                 uint256 hashBlock;
-                                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+                                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock, true);
                                 if (txPrev) {
                                     ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
@@ -593,7 +593,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                                 totalBetAmount = totalBetAmount + betAmount;
                                 CTxDestination payoutAddress;
                                 uint256 hashBlock;
-                                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock);
+                                CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock, true);
 
                                 if (txPrev) {
                                     ExtractDestination( txPrev->vout[prevout.n].scriptPubKey, payoutAddress );

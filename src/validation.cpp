@@ -970,9 +970,18 @@ bool GetAddressUnspent(uint160 addressHash, int type,
     return true;
 }
 
-CTransactionRef GetTransaction(const CBlockIndex* const block_index, const CTxMemPool* const mempool, const uint256& hash, const Consensus::Params& consensusParams, uint256& hashBlock)
+CTransactionRef GetTransaction(const CBlockIndex* const block_index_in, const CTxMemPool* const mempool, const uint256& hash, const Consensus::Params& consensusParams, uint256& hashBlock, bool fUseView)
 {
     LOCK(cs_main);
+
+    const CBlockIndex* block_index = block_index_in;
+    if (fUseView) { // use coin database to locate block that contains transaction, and scan it
+        const Coin& coin = AccessByTxid(::ChainstateActive().CoinsTip(), hash);
+        if (coin.IsSpent()) {
+            return nullptr;
+        }
+        block_index = ::ChainActive()[coin.nHeight];
+    }
 
     if (block_index) {
         CBlock block;
