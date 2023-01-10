@@ -367,6 +367,8 @@ void PrepareShutdown(NodeContext& node)
         pTokenDB.reset();
         tokenGroupManager.reset();
         bettingsView.reset();
+        stakingManager.reset();
+        rewardManager.reset();
     }
     for (const auto& client : node.chain_clients) {
         client->stop();
