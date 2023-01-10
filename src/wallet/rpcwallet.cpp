@@ -5683,7 +5683,7 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
     LOCK(cs_main);
 
     uint256 hashBlock;
-    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), nullptr, txHash, Params().GetConsensus(), hashBlock);
+    CTransactionRef tx = GetTransaction(nullptr, nullptr, txHash, Params().GetConsensus(), hashBlock);
     if (!tx) {
         throw std::runtime_error("Invalid bet's transaction id");
     }

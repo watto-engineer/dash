@@ -300,18 +300,18 @@ CBlockIndex* CStake::GetIndexFrom()
     if (pindexFrom)
         return pindexFrom;
     uint256 hashBlock;
-    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), nullptr, txFrom->GetHash(), Params().GetConsensus(), hashBlock);
+    CTransactionRef tx = GetTransaction(nullptr, nullptr, txFrom->GetHash(), Params().GetConsensus(), hashBlock);
     if (!tx) {
+        LogPrintf("%s : failed to find tx %s\n", __func__, txFrom->GetHash().GetHex());
+        return nullptr;
+    } else {
         // If the index is in the chain, then set it as the "index from"
         CBlockIndex* pindex = LookupBlockIndex(hashBlock);
         if (pindex) {
             if (::ChainActive().Contains(pindex))
                 pindexFrom = pindex;
         }
-    } else {
-        LogPrintf("%s : failed to find tx %s\n", __func__, txFrom->GetHash().GetHex());
     }
-
     return pindexFrom;
 }
 

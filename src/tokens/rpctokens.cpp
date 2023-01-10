@@ -421,7 +421,7 @@ extern UniValue gettokentransaction(const JSONRPCRequest& request)
     }
 
     uint256 hash_block;
-    CTransactionRef tx = GetTransaction(::ChainActive().Tip(), node.mempool, hash, Params().GetConsensus(), hash_block);
+    CTransactionRef tx = GetTransaction(blockindex, node.mempool, hash, Params().GetConsensus(), hash_block);
     if (!tx) {
         std::string errmsg;
         if (blockindex) {
