@@ -195,7 +195,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     bool fDIP0003Active_context = nHeight >= chainparams.GetConsensus().DIP0003Height;
     bool fDIP0008Active_context = nHeight >= chainparams.GetConsensus().DIP0008Height;
 
-    pblock->nVersion = nHeight >= chainparams.GetConsensus().V17DeploymentHeight ?
+    pblock->nVersion = nHeight >= chainparams.GetConsensus().V18DeploymentHeight ?
         ComputeBlockVersion(pindexPrev, chainparams.GetConsensus(), fPos, chainparams.BIP9CheckMasternodesUpgraded())
         : VERSIONBITS_LAST_OLD_BLOCK_VERSION;
     // -regtest only: allow overriding block.nVersion with
@@ -266,18 +266,22 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         CBettingsView bettingsViewCache(bettingsView.get());
         nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
 
-        if (nHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+        uint8_t nWBPVersion = Params().GetConsensus().GetWBPVersion(nHeight);
+        switch (nWBPVersion) {
+        case 4:
+        case 3: {
             for (auto payout : mExpectedPayouts) {
                 vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
             }
-        } else {
+            break;
+        }
+        case 2: {
             /*
                 In V3, payouts are ordered by 1) blockheight, 2) outpoint (tx hash, output nr), 3) payout type.
                 Before V3, payouts were ordered by 1) bet type (first betting then chain games), 2) blockheight, 3) tx index nr
             */
             std::vector<LegacyPayout> vExpectedLegacyPayouts;
             for (auto payout : mExpectedPayouts) {
-
                 int nHeight = payout.first.betKey.blockHeight;
 
                 CBlock block;
@@ -299,6 +303,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             for (auto payout : vExpectedLegacyPayouts) {
                 vExpectedTxOuts.emplace_back(payout.txOut.nValue, payout.txOut.scriptPubKey);
             }
+            break;
+        }
+        default:
+            break;
         }
 
         FillBlockPayments(spork_manager, governance_manager, *pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);
@@ -379,7 +387,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev);
     pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus());
     pblock->nNonce         = 0;
-    if (nHeight < chainparams.GetConsensus().V17DeploymentHeight)
+    if (nHeight < chainparams.GetConsensus().V18DeploymentHeight)
         pblock->nAccumulatorCheckpoint =  pindexPrev ? pindexPrev->nAccumulatorCheckpoint : uint256();
     pblocktemplate->nPrevBits = pindexPrev->nBits;
     pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(*pblock->vtx[0]);

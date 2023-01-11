@@ -122,10 +122,6 @@ public:
     std::vector<COracle> Oracles() const { return vOracles; }
     std::vector<CQuickGamesView> QuickGamesArr() const { return quickGamesArr; }
 
-    /** temp worarounds **/
-    int SkipBetValidationStart() const { return nSkipBetValidationStart; }
-    int SkipBetValidationEnd() const { return nSkipBetValidationEnd; }
-
     const Consensus::LLMQParams& GetLLMQ(Consensus::LLMQType llmqType) const;
     bool HasLLMQ(Consensus::LLMQType llmqType) const;
 
@@ -167,9 +163,6 @@ protected:
 
     std::vector<CQuickGamesView> quickGamesArr;
 
-    // workarounds
-    int nSkipBetValidationEnd;
-    int nSkipBetValidationStart;
     void AddLLMQ(Consensus::LLMQType llmqType);
 };
 

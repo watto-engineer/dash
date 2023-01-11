@@ -18,8 +18,8 @@ Tests automated recovery of DKG data and the related command line parameters:
 
 # LLMQ types available in regtest
 llmq_test = 100
-llmq_test_v17 = 102
-llmq_type_strings = {llmq_test: 'llmq_test', llmq_test_v17: 'llmq_test_v17'}
+llmq_test_v18 = 102
+llmq_type_strings = {llmq_test: 'llmq_test', llmq_test_v18: 'llmq_test_v18'}
 
 
 class QuorumDataRecoveryTest(WagerrTestFramework):
@@ -138,12 +138,12 @@ class QuorumDataRecoveryTest(WagerrTestFramework):
             quorum_hash_recover = self.mine_quorum()
             # Get all their member masternodes
             member_mns_recover_test = self.get_member_mns(llmq_test, quorum_hash_recover)
-            member_mns_recover_dip0020 = self.get_member_mns(llmq_test_v17, quorum_hash_recover)
+            member_mns_recover_dip0020 = self.get_member_mns(llmq_test_v18, quorum_hash_recover)
             # All members should initially be valid
             self.test_mns(llmq_test, quorum_hash_recover, valid_mns=member_mns_recover_test)
-            self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_dip0020)
+            self.test_mns(llmq_test_v18, quorum_hash_recover, valid_mns=member_mns_recover_dip0020)
             try:
-                # As last resorts find one node which is in llmq_test but not in llmq_test_v17 and one other vice versa
+                # As last resorts find one node which is in llmq_test but not in llmq_test_v18 and one other vice versa
                 last_resort_test = self.get_subset_only_in_left(member_mns_recover_test, member_mns_recover_dip0020)[0]
                 last_resort_dip0020 = self.get_subset_only_in_left(member_mns_recover_dip0020, member_mns_recover_test)[0]
                 break
@@ -158,14 +158,14 @@ class QuorumDataRecoveryTest(WagerrTestFramework):
         self.restart_mns(exclude=exclude_members, reindex=True, qdata_recovery_enabled=False)
         # Validate all but one are invalid members now
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=[last_resort_test], all_mns=member_mns_recover_test)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=[last_resort_dip0020], all_mns=member_mns_recover_dip0020)
+        self.test_mns(llmq_test_v18, quorum_hash_recover, valid_mns=[last_resort_dip0020], all_mns=member_mns_recover_dip0020)
         # If recovery would be enabled it would trigger after the mocktime bump / mined block
         self.bump_mocktime(self.quorum_data_request_expiration_timeout + 1)
         node.generate(1)
         time.sleep(10)
         # Make sure they are still invalid
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=[last_resort_test], all_mns=member_mns_recover_test)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_dip0020, recover=True)
+        self.test_mns(llmq_test_v18, quorum_hash_recover, valid_mns=member_mns_recover_dip0020, recover=True)
         # Mining a block should not result in a chainlock now because the responsible quorum shouldn't have enough
         # valid members.
         self.wait_for_chainlocked_block(node, node.generate(1)[0], False, 5)
@@ -174,15 +174,15 @@ class QuorumDataRecoveryTest(WagerrTestFramework):
         # Validate that all invalid members recover. Note: recover=True leads to mocktime bumps and mining while waiting
         # which trigger CQuorumManger::TriggerQuorumDataRecoveryThreads()
         self.test_mns(llmq_test, quorum_hash_recover, valid_mns=member_mns_recover_test, recover=True)
-        self.test_mns(llmq_test_v17, quorum_hash_recover, valid_mns=member_mns_recover_dip0020, recover=True)
+        self.test_mns(llmq_test_v18, quorum_hash_recover, valid_mns=member_mns_recover_dip0020, recover=True)
         # Mining a block should result in a chainlock now because the quorum should be healed
         self.wait_for_chainlocked_block_all_nodes(node.getbestblockhash())
         logger.info("Test -llmq-qvvec-sync command line parameter")
         # Run with one type separated and then both possible (for regtest) together, both calls generate new quorums
         # and are restarting the nodes with the other parameters
         self.test_llmq_qvvec_sync([(llmq_test, 0)])
-        self.test_llmq_qvvec_sync([(llmq_test_v17, 1)])
-        self.test_llmq_qvvec_sync([(llmq_test, 0), (llmq_test_v17, 1)])
+        self.test_llmq_qvvec_sync([(llmq_test_v18, 1)])
+        self.test_llmq_qvvec_sync([(llmq_test, 0), (llmq_test_v18, 1)])
         logger.info("Test invalid command line parameter values")
         node.stop_node()
         node.wait_until_stopped()

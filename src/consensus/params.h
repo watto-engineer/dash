@@ -64,8 +64,8 @@ struct Params {
     int nGovernanceMinQuorum; // Min absolute vote count to trigger an action
     int nGovernanceFilterElements;
     int nMasternodeMinimumConfirmations;
-    /** Deployment of v17 Hard Fork */
-    int V17DeploymentHeight;
+    /** Deployment of v18 Hard Fork */
+    int V18DeploymentHeight;
     /** Block height and hash at which BIP34 becomes active */
     int BIP34Height;
     uint256 BIP34Hash;
@@ -118,6 +118,7 @@ struct Params {
     int nWagerrProtocolV2StartHeight;
     int nWagerrProtocolV3StartHeight;
     int nWagerrProtocolV4StartHeight;
+    int nWagerrProtocolV5StartHeight;
     int nQuickGamesEndHeight;
     int nMaturityV2StartHeight;
     int nKeysRotateHeight;
@@ -168,6 +169,10 @@ struct Params {
     int nBetPlaceTimeoutBlocks;
     uint32_t nMaxParlayLegs;
 
+    /** Workarounds */
+    int nSkipBetValidationStart; // Used on testnet
+    int nSkipBetValidationEnd;   // Used on testnet
+
     /** these parameters are only used on devnet and can be configured from the outside */
     int nMinimumDifficultyBlocks{0};
     int nHighSubsidyBlocks{0};
@@ -197,10 +202,18 @@ struct Params {
     int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
     uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
-    int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; }
-    int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; }
-    int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
-    int WagerrProtocolV4StartHeight() const { return nWagerrProtocolV4StartHeight; }
+    int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; } // Retired
+    int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; } // Legacy
+    int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; } // Current
+    int WagerrProtocolV4StartHeight() const { return nWagerrProtocolV4StartHeight; } // To integrate in V5
+    int WagerrProtocolV5StartHeight() const { return nWagerrProtocolV5StartHeight; } // Uses SpecialTX
+    uint8_t GetWBPVersion(const int64_t nHeight) const {
+        return (nHeight >= nWagerrProtocolV5StartHeight) ? 5 :
+                (nHeight >= nWagerrProtocolV4StartHeight) ? 4 :
+                (nHeight >= nWagerrProtocolV3StartHeight) ? 3 :
+                (nHeight >= nWagerrProtocolV2StartHeight) ? 2 :
+                (nHeight >= nWagerrProtocolV1StartHeight) ? 1 : 0;
+    }
     int QuickGamesEndHeight() const { return nQuickGamesEndHeight; }
 };
 } // namespace Consensus

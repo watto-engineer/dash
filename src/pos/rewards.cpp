@@ -326,13 +326,13 @@ void CBlockReward::SetRewards(const CAmount blockSubsidy, const CAmount mnReward
         } else {
             SetCoinbaseReward(blockSubsidy - mnRewardAmount - opRewardAmount);
         }
-        //AddFees(nFees);
+        AddReward(CReward::RewardType::REWARD_BURN, nFees);
     } else {
         SetMasternodeReward(mnRewardAmount);
         if (fPOS) {
             SetCoinstakeReward(blockSubsidy - GetMasternodeReward().amount);
         } else {
-            SetCoinbaseReward(blockSubsidy - GetMasternodeReward().amount);
+            SetCoinbaseReward(blockSubsidy - GetMasternodeReward().amount + nFees);
         }
     }
 }

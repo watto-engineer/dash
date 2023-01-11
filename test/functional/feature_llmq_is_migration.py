@@ -63,7 +63,7 @@ class LLMQISMigrationTest(WagerrTestFramework):
         self.log.info(q_list)
         assert len(q_list['llmq_test']) == 2
         assert len(q_list['llmq_test_instantsend']) == 2
-        assert len(q_list['llmq_test_v17']) == 0
+        assert len(q_list['llmq_test_v18']) == 0
         assert len(q_list['llmq_test_dip0024']) == 0
 
         txid1 = node.sendtoaddress(node.getnewaddress(), 1)
@@ -97,7 +97,7 @@ class LLMQISMigrationTest(WagerrTestFramework):
         self.log.info(q_list)
         assert len(q_list['llmq_test']) == 2
         assert 'llmq_test_instantsend' not in q_list
-        assert len(q_list['llmq_test_v17']) == 1
+        assert len(q_list['llmq_test_v18']) == 1
         assert len(q_list['llmq_test_dip0024']) == 2
 
         # Check that the earliest islock is still present

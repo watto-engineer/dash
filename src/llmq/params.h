@@ -27,7 +27,7 @@ enum class LLMQType : uint8_t {
     LLMQ_DEVNET = 101, // 12 members, 6 (50%) threshold, one per hour. Params might differ when -llmqdevnetparams is used
 
     // for testing activation of new quorums only
-    LLMQ_TEST_V17 = 102, // 3 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
+    LLMQ_TEST_V18 = 102, // 3 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
 
     // for testing only
     LLMQ_TEST_DIP0024 = 103, // 4 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
@@ -159,13 +159,13 @@ static constexpr std::array<LLMQParams, 11> available_llmqs = {
     },
 
     /**
-     * llmq_test (Dash Core 0.17) aka llmq_test_v17
+     * llmq_test (Dash Core 0.17) aka llmq_test_v18
      * This quorum is only used for testing
      *
      */
     LLMQParams{
-        .type = LLMQType::LLMQ_TEST_V17,
-        .name = "llmq_test_v17",
+        .type = LLMQType::LLMQ_TEST_V18,
+        .name = "llmq_test_v18",
         .useRotation = false,
         .size = 3,
         .minSize = 2,

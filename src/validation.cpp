@@ -567,8 +567,8 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
     if (pfMissingInputs) {
         *pfMissingInputs = false;
     }
-    bool fV17Active_context = (unsigned int)::ChainActive().Height() >= Params().GetConsensus().V17DeploymentHeight;
-    if (fV17Active_context && tx.ContainsZerocoins()) {
+    bool fV18Active_context = (unsigned int)::ChainActive().Height() >= Params().GetConsensus().V18DeploymentHeight;
+    if (fV18Active_context && tx.ContainsZerocoins()) {
         return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, false, REJECT_INVALID, "bad-txns-xwagerr", "zerocoin has been disabled");
     }
 
@@ -1924,7 +1924,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
 
-    if (pindexPrev->nHeight + 1 >= params.V17DeploymentHeight) {
+    if (pindexPrev->nHeight + 1 >= params.V18DeploymentHeight) {
         nVersion |= BlockTypeBits::BLOCKTYPE_STAKING;
     }
 
@@ -2009,7 +2009,7 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
         flags |= SCRIPT_VERIFY_NULLDUMMY;
     }
 
-    if (pindex->nHeight >= consensusparams.V17DeploymentHeight) {
+    if (pindex->nHeight >= consensusparams.V18DeploymentHeight) {
         flags |= SCRIPT_ENABLE_DIP0020_OPCODES;
     }
 
@@ -2234,7 +2234,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     std::vector<CTokenGroupCreation> newTokenGroups;
 
     bool fDIP0001Active_context = pindex->nHeight >= Params().GetConsensus().DIP0001Height;
-    bool fV17Active_context = pindex->nHeight >= Params().GetConsensus().V17DeploymentHeight;
+    bool fV18Active_context = pindex->nHeight >= Params().GetConsensus().V18DeploymentHeight;
 
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
     if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, view, fJustCheck, fScriptChecks)) {
@@ -2257,7 +2257,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
         nInputs += tx->vin.size();
 
-        if (fV17Active_context && tx->ContainsZerocoins()) {
+        if (fV18Active_context && tx->ContainsZerocoins()) {
             return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, false, REJECT_INVALID, "bad-txns-xwagerr", "zerocoin has been disabled");
         }
 
@@ -2398,7 +2398,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         }
 
         if (!CheckBettingTx(bettingsViewCache, *tx, pindex->nHeight)) {
-            if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().SkipBetValidationStart() && pindex->nHeight < Params().SkipBetValidationEnd())) {
+            if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
                 LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
             } else  {
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, error("ConnectBlock() : error when betting TX checking"), REJECT_INVALID, "bad-tx-bet");

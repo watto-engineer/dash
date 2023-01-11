@@ -437,32 +437,6 @@ bool CheckProofOfStake(const CBlock& block, uint256& hashProofOfStake, const CBl
     return true;
 }
 
-// Get stake modifier checksum
-unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
-{
-    assert(pindex->pprev || pindex->GetBlockHash() == Params().GetConsensus().hashGenesisBlock);
-    // Hash previous checksum with flags, hashProofOfStake and nStakeModifier
-    CDataStream ss(SER_GETHASH, 0);
-    if (pindex->pprev)
-        ss << pindex->pprev->nStakeModifierChecksum;
-    uint256 hashProofOfStake = mapProofOfStake[pindex->GetBlockHash()];
-    ss << pindex->nFlags << hashProofOfStake << pindex->nStakeModifier;
-    uint256 hashChecksum = Hash(ss.begin(), ss.end());
-    arith_uint256 arithHashChecksum = UintToArith256(hashChecksum);
-    arithHashChecksum >>= (256 - 32);
-    return arithHashChecksum.GetLow64();
-}
-
-// Check stake modifier hard checkpoints
-bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
-{
-    if (Params().NetworkIDString() != CBaseChainParams::MAIN) return true; // Testnet has no checkpoints
-    if (mapStakeModifierCheckpoints.count(nHeight)) {
-        return nStakeModifierChecksum == mapStakeModifierCheckpoints[nHeight];
-    }
-    return true;
-}
-
 // Timestamp for time protocol V2: slot duration 15 seconds
 int64_t GetTimeSlot(const int64_t nTime)
 {
@@ -479,9 +453,6 @@ bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex*
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
             return error("%s : ComputeNextStakeModifier() failed", __func__);
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            return error("%s : Rejected by stake modifier checkpoint height=%d, modifier=%sn", pindexNew->nHeight, std::to_string(nStakeModifier), __func__);
     } else {
         // compute v2 stake modifier
         ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);

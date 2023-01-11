@@ -319,7 +319,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
                 }
             }
         }
-        uint32_t odds = gameView.handler(qgBet.vBetInfo, UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]));
+        uint32_t odds = gameView.handler(qgBet.vBetInfo, hashProofOfStake);
         CAmount winningsPermille = qgBet.betAmount * odds;
         CAmount feePermille = winningsPermille > 0 ? (qgBet.betAmount * (odds - BET_ODDSDIVISOR) / 1000 * gameView.nFeePermille) : 0;
         CAmount payout = winningsPermille > 0 ? (winningsPermille - feePermille) / BET_ODDSDIVISOR : 0;
@@ -453,7 +453,19 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
             CBlockIndex *winBlockIndex = ::ChainActive()[nLastBlockHeight];
             arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[winBlockIndex->GetBlockHash()]);
-            if (hashProofOfStake == 0) hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+            if (hashProofOfStake == 0) {
+                CBlock block;
+                ReadBlockFromDisk(block, winBlockIndex, Params().GetConsensus());
+                if (block.IsProofOfStake()) {
+                    uint256 calculatedHashProofOfStake;
+
+                    if (CheckProofOfStake(block, calculatedHashProofOfStake, winBlockIndex)) {
+                        hashProofOfStake = UintToArith256(calculatedHashProofOfStake);
+                    } else {
+                        hashProofOfStake = UintToArith256(winBlockIndex->GetBlockHash());
+                    }
+                }
+            }
             arith_uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
             tempVal = tempVal * noOfBets;
             tempVal = hashProofOfStake - tempVal;           // remainder
