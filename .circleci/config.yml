@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   lint_all:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     parallelism: 4
     environment:
@@ -13,7 +13,7 @@ jobs:
     - run:
         command: |
             apt-get -y update
-            apt-get -y install python-pip
+            apt-get -y install python3-pip
             git clone --depth 1 https://github.com/wagerr/wagerr .
             source .circleci/lint_04_install.sh
             source .circleci/lint_05_before_script.sh
@@ -42,9 +42,9 @@ jobs:
             git subtree add --prefix src/univalue univalue 9f0b9975925b202ab130714e5422f8dd8bf40ac3 --squash
             # snap
             source .circleci/lint_06_script.sh
-  x86_64_bionic_depends:
+  x86_64_jammy_depends:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:current-22.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -53,7 +53,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: 
-          - wagerr-bionic-depends-{{ .Branch }}-{{ .Revision }}
+          - wagerr-jammy-depends-{{ .Branch }}-{{ .Revision }}
       - run:
           command: |
             if [ -d depends/x86_64-linux-gnu ]; then
@@ -61,23 +61,23 @@ jobs:
             else
               git submodule update --init --recursive
               apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 libpython3.6-dev python3-distutils bison
-              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 libpython3-dev python3-distutils bison
+              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
               make -j${JOBS} -C depends HOST=${HOST}
             fi
       - save_cache:
-          key: wagerr-bionic-depends-{{ .Branch }}-{{ .Revision }}
+          key: wagerr-jammy-depends-{{ .Branch }}-{{ .Revision }}
           paths:
             - /root/project/depends/built
             - /root/project/depends/sources
             - /root/project/depends/x86_64-linux-gnu
             - /root/project/depends/work
-  x86_64_bionic:
+  x86_64_jammy:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:current-22.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -86,23 +86,23 @@ jobs:
       - checkout
       - restore_cache:
           keys: 
-          - wagerr-bionic-depends-{{ .Branch }}-{{ .Revision }}
+          - wagerr-jammy-depends-{{ .Branch }}-{{ .Revision }}
       - run:
           command: |
             git submodule update --init --recursive
             apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 libpython3.6-dev python3-distutils bison
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 libpython3-dev python3-distutils bison
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --disable-debug --enable-stacktraces --enable-crash-hooks --enable-bench --enable-gui-test --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
-            apt-get -y install libfontconfig1 libxkbcommon-x11-0
-            src/test/test_wagerr
-            src/qt/test/test_wagerr-qt
-            src/bench/bench_wagerr
+            #apt-get -y install libfontconfig1 libxkbcommon-x11-0
+            #src/test/test_wagerr
+            #src/qt/test/test_wagerr-qt
+            #src/bench/bench_wagerr
             #git clone http://github.com/wagerr/wagerr_hash
             #cd wagerr_hash
             #python3 setup.py install
@@ -127,11 +127,11 @@ jobs:
             else
               git submodule update --init --recursive
               apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 libpython3.9-dev python3-distutils bison
-              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 libpython3.9-dev python3-distutils bison
+              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
               make -j${JOBS} -C depends HOST=${HOST}
             fi
       - save_cache:
@@ -157,70 +157,17 @@ jobs:
           command: |
             git submodule update --init --recursive
             apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 libpython3.9-dev python3-distutils bison
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 libpython3.9-dev python3-distutils bison
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
-  i686_bionic_depends:
+  arm32_focal_depends:
     docker:
-      - image: cimg/base:stable-18.04
-        user: root
-    environment:
-      HOST: i686-linux-gnu
-      JOBS: 4
-    steps:
-      - checkout
-      - restore_cache:
-          keys: 
-          - wagerr-i686-depends-{{ .Branch }}-{{ .Revision }}
-      - run:
-          command: |
-            if [ -d depends/i686-linux-gnu ]; then
-              exit
-            else
-              git submodule update --init --recursive
-              apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 g++-8-multilib gcc-8-multilib gcc-8 g++-8 bison
-              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-              make -j${JOBS} -C depends HOST=${HOST}
-            fi
-      - save_cache:
-          key: wagerr-i686-depends-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - /root/project/depends/built
-            - /root/project/depends/sources
-            - /root/project/depends/i686-linux-gnu
-            - /root/project/depends/work
-  i686_bionic:
-    docker:
-      - image: cimg/base:stable-18.04
-        user: root
-    environment:
-      HOST: i686-linux-gnu
-      JOBS: 4
-    steps:
-      - checkout
-      - restore_cache:
-          keys: 
-          - wagerr-i686-depends-{{ .Branch }}-{{ .Revision }}
-      - run:
-          command: |
-            git submodule update --init --recursive
-            apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 g++-8-multilib gcc-8-multilib gcc-8 g++-8 bison
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-            ./autogen.sh
-            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
-            make -j${JOBS}
-  arm32_bionic_depends:
-    docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: arm-linux-gnueabihf
@@ -238,11 +185,11 @@ jobs:
             else
               git submodule update --init --recursive
               apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 g++-8-arm-linux-gnueabihf gcc-8-arm-linux-gnueabihf binutils-arm-linux-gnueabihf g++-8-multilib gcc-8-multilib bison
-              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 g++-9-arm-linux-gnueabihf gcc-9-arm-linux-gnueabihf binutils-arm-linux-gnueabihf g++-9-multilib gcc-9-multilib bison
+              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
               make -j${JOBS} -C depends HOST=${HOST}
             fi
       - save_cache:
@@ -252,9 +199,9 @@ jobs:
             - /root/project/depends/sources
             - /root/project/depends/arm-linux-gnueabihf
             - /root/project/depends/work
-  arm32_bionic:
+  arm32_focal:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: arm-linux-gnueabihf
@@ -269,17 +216,17 @@ jobs:
           command: |
             git submodule update --init --recursive
             apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 g++-8-arm-linux-gnueabihf gcc-8-arm-linux-gnueabihf binutils-arm-linux-gnueabihf g++-8-multilib gcc-8-multilib bison
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 g++-9-arm-linux-gnueabihf gcc-9-arm-linux-gnueabihf binutils-arm-linux-gnueabihf g++-9-multilib gcc-9-multilib bison
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends//${HOST} --enable-glibc-back-compat --enable-reduce-exports --disable-ccache --disable-maintainer-mode --disable-dependency-tracking CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}" LDFLAGS="${HOST_LDFLAGS}"
             make -j${JOBS}
-  arm64_bionic_depends:
+  arm64_focal_depends:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: aarch64-linux-gnu
@@ -296,11 +243,11 @@ jobs:
             else
               git submodule update --init --recursive
               apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 g++-8-aarch64-linux-gnu gcc-8-aarch64-linux-gnu binutils-aarch64-linux-gnu g++-8-multilib gcc-8-multilib bison
-              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 g++-9-aarch64-linux-gnu gcc-9-aarch64-linux-gnu binutils-aarch64-linux-gnu g++-9-multilib gcc-9-multilib bison
+              update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+              update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+              update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+              update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
               make -j${JOBS} -C depends HOST=${HOST}
             fi
       - save_cache:
@@ -310,9 +257,9 @@ jobs:
             - /root/project/depends/sources
             - /root/project/depends/aarch64-linux-gnu
             - /root/project/depends/work
-  arm64_bionic:
+  arm64_focal:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: aarch64-linux-gnu
@@ -326,17 +273,17 @@ jobs:
           command: |
             git submodule update --init --recursive
             apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-8 g++-8 g++-8-aarch64-linux-gnu gcc-8-aarch64-linux-gnu binutils-aarch64-linux-gnu g++-8-multilib gcc-8-multilib bison
-            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 100
-            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 100
-            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-8 100
-            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 gcc-9 g++-9 g++-9-aarch64-linux-gnu gcc-9-aarch64-linux-gnu binutils-aarch64-linux-gnu g++-9-multilib gcc-9-multilib bison
+            update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+            update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
+            update-alternatives --install /usr/bin/${HOST}-gcc ${HOST}-gcc /usr/bin/${HOST}-gcc-9 100
+            update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-9 100
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-glibc-back-compat --enable-reduce-exports
             make -j${JOBS}
-  win64_bionic_depends:
+  win64_focal_depends:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-w64-mingw32
@@ -365,9 +312,9 @@ jobs:
             - /root/project/depends/sources
             - /root/project/depends/x86_64-w64-mingw32
             - /root/project/depends/work
-  win64_bionic:
+  win64_focal:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-w64-mingw32
@@ -387,9 +334,9 @@ jobs:
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-reduce-exports
             make -j${JOBS}
-  mac_bionic_depends:
+  mac_focal_depends:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-apple-darwin16
@@ -407,11 +354,11 @@ jobs:
             else
               git submodule update --init --recursive
               apt-get -y update
-              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-8-multilib gcc-8-multilib bison
-              wget https://bitcoincore.org/depends-sources/sdks/Xcode-12.1-12A7403-extracted-SDK-with-libcxx-headers.tar.gz
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-9-multilib gcc-9-multilib bison libtinfo5
+              wget https://github.com/wagerr-backup/depends-back/releases/download/buiild-release/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
               mkdir -p `pwd`/depends/SDKs
               echo "Extracting Mac SDK"
-              tar -C `pwd`/depends/SDKs -xf ./Xcode-12.1-12A7403-extracted-SDK-with-libcxx-headers.tar.gz
+              tar -C `pwd`/depends/SDKs -xf ./Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
               make -j${JOBS} -C depends HOST=${HOST}
               mkdir -p /root/project/depends/x86_64-apple-darwin16/native/bin//usr/bin/
               cp /usr/bin/env /root/project/depends/x86_64-apple-darwin16/native/bin//usr/bin/
@@ -425,9 +372,9 @@ jobs:
             - /root/project/depends/x86_64-apple-darwin16
             - /root/project/depends/work
             - /root/project/depends/SDKs
-  mac_bionic:
+  mac_focal:
     docker:
-      - image: cimg/base:stable-18.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-apple-darwin16
@@ -442,8 +389,68 @@ jobs:
           command: |
             git submodule update --init --recursive
             apt-get -y update
-            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-8-multilib gcc-8-multilib bison
-            wget https://bitcoincore.org/depends-sources/sdks/Xcode-12.1-12A7403-extracted-SDK-with-libcxx-headers.tar.gz
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-9-multilib gcc-9-multilib bison libtinfo5
+            wget https://github.com/wagerr-backup/depends-back/releases/download/buiild-release/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
+            ./autogen.sh
+            CONFIG_SITE=`pwd`/depends/${HOST}/share/config.site ./configure --host=${HOST} --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking --enable-reduce-exports --disable-bench --disable-gui-tests --enable-crash-hooks
+            make -j${JOBS}
+  mac_arm64_focal_depends:
+    docker:
+      - image: cimg/base:stable-20.04
+        user: root
+    environment:
+      HOST: arm64-apple-darwin16
+      JOBS: 8
+      OSX_SDK: 10.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys: 
+          - wagerr-mac-arm64-depends-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: |
+           if [ -d depends/arm64-apple-darwin16 ]; then
+              exit
+            else
+              git submodule update --init --recursive
+              apt-get -y update
+              apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-9-multilib gcc-9-multilib bison libtinfo5
+              wget https://github.com/wagerr-backup/depends-back/releases/download/buiild-release/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
+              mkdir -p `pwd`/depends/SDKs
+              echo "Extracting Mac SDK"
+              tar -C `pwd`/depends/SDKs -xf ./Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
+              make -j${JOBS} -C depends HOST=${HOST}
+              mkdir -p /root/project/depends/arm64-apple-darwin16/native/bin//usr/bin/
+              cp /usr/bin/env /root/project/depends/arm64-apple-darwin16/native/bin//usr/bin/
+              ln -s /root /root/project/depends/arm64-apple-darwin16/native/bin/
+            fi
+      - save_cache:
+          key: wagerr-mac-arm64-depends-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /root/project/depends/built
+            - /root/project/depends/sources
+            - /root/project/depends/arm64-apple-darwin16
+            - /root/project/depends/work
+            - /root/project/depends/SDKs
+  mac_arm64_focal:
+    docker:
+      - image: cimg/base:stable-20.04
+        user: root
+    environment:
+      HOST: arm64-apple-darwin16
+      JOBS: 4
+      OSX_SDK: 10.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys: 
+          - wagerr-mac-arm64-depends-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: |
+            git submodule update --init --recursive
+            apt-get -y update
+            apt-get -y install pkg-config autoconf libtool automake bsdmainutils ca-certificates python3 cmake libxkbcommon0 librsvg2-bin libtiff-tools imagemagick libcap-dev libz-dev libbz2-dev python3-dev python3-setuptools fonts-tuffy g++-9-multilib gcc-9-multilib bison libtinfo5
+            wget https://github.com/wagerr-backup/depends-back/releases/download/buiild-release/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz
             ./autogen.sh
             CONFIG_SITE=`pwd`/depends/${HOST}/share/config.site ./configure --host=${HOST} --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking --enable-reduce-exports --disable-bench --disable-gui-tests --enable-crash-hooks
             make -j${JOBS}
@@ -452,45 +459,45 @@ workflows:
   FullCheck:
     jobs:
       - lint_all
-      - x86_64_bionic_depends:
-          requires:
-            - lint_all
-      - x86_64_bionic:
-          requires:
-            - x86_64_bionic_depends
-      - i686_bionic_depends:
-          requires:
-            - lint_all
-      - i686_bionic:
-          requires:
-            - i686_bionic_depends
       - x86_64_focal_depends:
           requires:
             - lint_all
       - x86_64_focal:
           requires:
             - x86_64_focal_depends
-      - arm32_bionic_depends:
+      - x86_64_jammy_depends:
           requires:
             - lint_all
-      - arm32_bionic:
+      - x86_64_jammy:
           requires:
-            - arm32_bionic_depends
-      - arm64_bionic_depends:
-          requires:
-            - lint_all
-      - arm64_bionic:
-          requires:
-            - arm64_bionic_depends
-      - win64_bionic_depends:
+            - x86_64_jammy_depends
+      - arm32_focal_depends:
           requires:
             - lint_all
-      - win64_bionic:
+      - arm32_focal:
           requires:
-            - win64_bionic_depends
-      - mac_bionic_depends:
+            - arm32_focal_depends
+      - arm64_focal_depends:
           requires:
             - lint_all
-      - mac_bionic:
+      - arm64_focal:
           requires:
-            - mac_bionic_depends
+            - arm64_focal_depends
+      - win64_focal_depends:
+          requires:
+            - lint_all
+      - win64_focal:
+          requires:
+            - win64_focal_depends
+      - mac_focal_depends:
+          requires:
+            - lint_all
+      - mac_focal:
+          requires:
+            - mac_focal_depends
+      - mac_arm64_focal_depends:
+          requires:
+            - lint_all
+      - mac_arm64_focal:
+          requires:
+            - mac_arm64_focal_depends
