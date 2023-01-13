@@ -1,11 +1,25 @@
---- a/share/genbuild.sh	2021-07-02 14:42:34.929275467 +0100
-+++ b/share/genbuild.sh	2021-07-02 14:43:24.141157299 +0100
-@@ -36,7 +36,7 @@
+From 3d62f4d11246fd536343b14ae37681f9f7083b91 Mon Sep 17 00:00:00 2001
+From: wagerr-builder <104495875+wagerr-builder@users.noreply.github.com>
+Date: Fri, 13 Jan 2023 13:30:15 +0000
+Subject: [PATCH] genbuild
+
+---
+ share/genbuild.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/share/genbuild.sh b/share/genbuild.sh
+index 804d56eff..95503e9e3 100755
+--- a/share/genbuild.sh
++++ b/share/genbuild.sh
+@@ -32,7 +32,7 @@ if [ "${BITCOIN_GENBUILD_NO_GIT}" != "1" ] && [ -e "$(command -v git)" ] && [ "$
  
      # otherwise generate suffix from git, i.e. string like "59887e8-dirty"
-     SUFFIX=$(git rev-parse --short HEAD)
--    git diff-index --quiet HEAD -- || SUFFIX="$SUFFIX-dirty"
-+    git diff-index --quiet HEAD -- || SUFFIX="$SUFFIX-snap"
+     GIT_COMMIT=$(git rev-parse --short HEAD)
+-    git diff-index --quiet HEAD -- || GIT_COMMIT="$GIT_COMMIT-dirty"
++    git diff-index --quiet HEAD -- || GIT_COMMIT="$GIT_COMMIT-snap"
  fi
  
- if [ -n "$DESC" ]; then
+ if [ -n "$GIT_TAG" ]; then
+-- 
+2.25.1
+

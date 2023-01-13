@@ -1,6 +1,6 @@
 # Copyright (c) 2018-2021 The Wagerr developers
 name: wagerr
-base: core18
+base: core20
 version: 5.0.0
 summary:   wagerr, digital currency for media content
 description: |
@@ -29,71 +29,71 @@ description: |
   - twitter (https://twitter.com/wagerr)
   - instagram (https://www.instagram.com/wagerr/)
   - facebook (https://www.facebook.com/wagerr)
-grade: devel
+grade: stable
 confinement: strict
 apps:
   daemon:
-    command: wagerrd
+    command: bin/wagerrd
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-testnet:
-    command: wagerrd --testnet
+    command: bin/wagerrd --testnet
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd_testnet.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-regtest:
-    command: wagerrd --regtest
+    command: bin/wagerrd --regtest
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd_regtest.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt:
-    command: wagerr-qt
+    command: bin/wagerr-qt
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: wagerr-qt.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-testnet:
-    command: wagerr-qt --testnet
+    command: bin/wagerr-qt --testnet
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: wagerr-qt_testnet.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-regtest:
-    command: wagerr-qt --regtest
+    command: bin/wagerr-qt --regtest
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: wagerr-qt_regtest.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli:
-    command: wagerr-cli
+    command: bin/wagerr-cli
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-testnet:
-    command: wagerr-cli --testnet
+    command: bin/wagerr-cli --testnet
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-regtest:
-    command: wagerr-cli --regtest
+    command: bin/wagerr-cli --regtest
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   tx:
-    command: wagerr-tx
+    command: bin/wagerr-tx
     plugs: [home]
   test:
-    command: test_wagerr
+    command: bin/test_wagerr
     plugs: [home]
   testqt:
-    command: test_wagerr-qt
+    command: bin/test_wagerr-qt
     plugs: [home]
 parts:
   wagerr:
@@ -270,10 +270,8 @@ parts:
     build-packages:
       - curl
       - wget
-      - gcc
-      - gcc-8
-      - g++
-      - g++-8
+      - gcc-9
+      - g++-9
       - make
       - autoconf
       - automake
@@ -294,7 +292,7 @@ parts:
       - light-themes
       - shared-mime-info
       - libqt5gui5
-      - libgdk-pixbuf2.0-0
+      - libgtk2.0-0
       - libqt5svg5 # for loading icon themes which are svg
       - locales-all
       - qtwayland5
