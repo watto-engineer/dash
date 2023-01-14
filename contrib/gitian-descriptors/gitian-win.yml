@@ -3,12 +3,12 @@ name: "wagerr-win-5.0.99"
 enable_cache: true
 distro: "debian"
 suites:
-- "buster"
+- "bullseye"
 architectures:
 - "amd64"
 packages:
 - "curl"
-- "g++"
+- "g++-9"
 - "git"
 - "pkg-config"
 - "autoconf"
