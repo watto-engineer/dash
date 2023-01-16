@@ -7,6 +7,7 @@
         <file alias="connect_2">res/icons/connect2_16.png</file>
         <file alias="connect_3">res/icons/connect3_16.png</file>
         <file alias="connect_4">res/icons/connect4_16.png</file>
+        <file alias="governance">res/icons/governance.png</file>
         <file alias="overview">res/icons/overview.png</file>
         <file alias="send">res/icons/send.png</file>
         <file alias="receive">res/icons/receive.png</file>
