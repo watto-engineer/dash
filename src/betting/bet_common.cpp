@@ -16,30 +16,105 @@
  * @param txin  TX vin input hash.
  * @return      Bool
  */
-bool IsValidOracleTx(const CTxIn &txin, int nHeight)
+bool IsValidOracleTx(const CCoinsViewCache &view, const CTransactionRef &tx, int nHeight)
 {
+    int64_t nTime0 = GetTimeMicros();
+
+    if (tx->IsCoinBase() || tx->IsCoinStake()) {
+        return false;
+    }
+
+    int64_t nTime1 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / view 1: %.2fms\n", 0.001 * (nTime1 - nTime0));
+
+    const CTxIn &txin = tx->vin[0];
+
+    return IsValidOracleTxIn(txin, nHeight);
+/*
     COutPoint prevout = txin.prevout;
     std::vector<COracle> oracles = Params().Oracles();
 
+    int64_t nTime2 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / view 1: %.2fms\n", 0.001 * (nTime2 - nTime1));
+
+    const Coin& coin = AccessByTxid(view, prevout.hash);
+    int64_t nTime3 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / view 2: %.2fms\n", 0.001 * (nTime3 - nTime2));
+
+    if (coin.out.IsEmpty()) return false;
+
+    txnouttype type;
+    std::vector<CTxDestination> prevAddrs;
+    int nRequired;
+    if (ExtractDestinations(coin.out.scriptPubKey, type, prevAddrs, nRequired)) {
+        int64_t nTime4 = GetTimeMicros();
+        LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / view 3: %.2fms\n", 0.001 * (nTime4 - nTime3));
+        for (const CTxDestination &prevAddr : prevAddrs) {
+            const std::string strPrevAddr = EncodeDestination(prevAddr, Params());
+            LogPrintf("%s - prevAddr: %s\n", __func__, strPrevAddr);
+            if (std::find_if(oracles.begin(), oracles.end(), [strPrevAddr, nHeight](COracle oracle){
+                return oracle.IsMyOracleTx(strPrevAddr, nHeight);
+            }) != oracles.end()) {
+                return true;
+            }
+        }
+        int64_t nTime5 = GetTimeMicros();
+        LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / view 4: %.2fms\n", 0.001 * (nTime5 - nTime4));
+    }
+
+    return false;
+*/
+}
+
+bool IsValidOraclePrevTxOut(const CTxOut &prevTxOut, int nHeight) {
+    std::vector<COracle> oracles = Params().Oracles();
+
+    txnouttype type;
+    std::vector<CTxDestination> prevAddrs;
+    int nRequired;
+
+    if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
+        int64_t nTime3 = GetTimeMicros();
+        for (const CTxDestination &prevAddr : prevAddrs) {
+            const std::string strPrevAddr = EncodeDestination(prevAddr, Params());
+            LogPrintf("%s - prevAddr: %s\n", __func__, strPrevAddr);
+            if (std::find_if(oracles.begin(), oracles.end(), [strPrevAddr, nHeight](COracle oracle){
+                return oracle.IsMyOracleTx(strPrevAddr, nHeight);
+            }) != oracles.end()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Validate the transaction to ensure it has been posted by an oracle node.
+ *
+ * @param txin  TX vin input hash.
+ * @return      Bool
+ */
+bool IsValidOracleTxIn(const CTxIn &txin, int nHeight)
+{
+    int64_t nTime0 = GetTimeMicros();
+
+    COutPoint prevout = txin.prevout;
+
+    int64_t nTime1 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / 1: %.2fms\n", 0.001 * (nTime1 - nTime0));
+
     uint256 hashBlock;
     CTransactionRef txPrev = GetTransaction(nullptr, nullptr, prevout.hash, Params().GetConsensus(), hashBlock, true);
+    int64_t nTime2 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / 2: %.2fms\n", 0.001 * (nTime2 - nTime1));
     if (txPrev) {
         const CTxOut &prevTxOut = txPrev->vout[prevout.n];
 
-        txnouttype type;
-        std::vector<CTxDestination> prevAddrs;
-        int nRequired;
+        bool fIsOracle = IsValidOraclePrevTxOut(prevTxOut, nHeight);
 
-        if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
-            for (const CTxDestination &prevAddr : prevAddrs) {
-                const std::string strPrevAddr = EncodeDestination(prevAddr, Params());
-                if (std::find_if(oracles.begin(), oracles.end(), [strPrevAddr, nHeight](COracle oracle){
-                    return oracle.IsMyOracleTx(strPrevAddr, nHeight);
-                }) != oracles.end()) {
-                    return true;
-                }
-            }
-        }
+        int64_t nTime3 = GetTimeMicros();
+        LogPrint(BCLog::BENCHMARK, "      - IsValidOracleTx / 3: %.2fms\n", 0.001 * (nTime3 - nTime2));
+        return fIsOracle;
     }
 
     return false;
@@ -75,23 +150,16 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
  *
  * @return results vector.
  */
-std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
+std::vector<CPeerlessResultDB> GetPLResults(const CCoinsViewCache &view, const CBlock& block, int nLastBlockHeight)
 {
     std::vector<CPeerlessResultDB> results;
 
     bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
 
-    // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
-
-    CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
-
     for (CTransactionRef tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
-        const CTxIn &txin  = tx->vin[0];
-        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
+        LogPrintf("%s - current tx: %s\n", __func__, tx->GetHash().GetHex());
+        bool validResultTx = IsValidOracleTx(view, tx, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
@@ -120,7 +188,7 @@ std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
  *
  * @return results vector.
  */
-std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
+std::vector<CFieldResultDB> GetFieldResults(const CCoinsViewCache &view, int nLastBlockHeight)
 {
     std::vector<CFieldResultDB> results;
 
@@ -135,8 +203,7 @@ std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
 
     for (CTransactionRef tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
-        const CTxIn &txin  = tx->vin[0];
-        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
+        bool validResultTx = IsValidOracleTx(view, tx, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
@@ -166,21 +233,28 @@ std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
  * @param height The block we want to check for the result.
  * @return results array.
  */
-bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults)
+bool GetCGLottoEventResults(const CBlock& block, const CCoinsViewCache &view, const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults)
 {
+    int64_t nTime0 = GetTimeMicros();
+    int64_t nTime1 = nTime0;
+    int64_t nTime1_1;
+    int64_t nTime1_2;
+    int64_t nTime1_3;
+    int64_t nTime2 = nTime1;
+    uint64_t nTxCounter = 0;
+
     chainGameResults.clear();
 
-    // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
-
-    CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
-
     for (CTransactionRef tx : block.vtx) {
+        nTime1_1 = GetTimeMicros(); nTxCounter++;
+        LogPrint(BCLog::BENCHMARK, "      - GetCGLottoEventResults / 1_1: %.2fms (%.2fms / tx)\n", 0.001 * (nTime1_1 - nTime0), 0.001 * (nTime1_1 - nTime0) / nTxCounter);
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
-        const CTxIn &txin = tx->vin[0];
+        nTime1_2 = GetTimeMicros();
+        LogPrint(BCLog::BENCHMARK, "      - GetCGLottoEventResults / 1_2: %.2fms (%.2fms / tx)\n", 0.001 * (nTime1_2 - nTime0), 0.001 * (nTime1_2 - nTime0) / nTxCounter);
 
-        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
+        bool validResultTx = IsValidOracleTx(view, tx, nLastBlockHeight);
+        nTime1_3 = GetTimeMicros();
+        LogPrint(BCLog::BENCHMARK, "      - GetCGLottoEventResults / 1_3: %.2fms (%.2fms / tx)\n", 0.001 * (nTime1_3 - nTime0), 0.001 * (nTime1_3 - nTime0) / nTxCounter);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
@@ -196,6 +270,8 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
             }
         }
     }
+    nTime2 = GetTimeMicros();
+    LogPrint(BCLog::BENCHMARK, "      - GetCGLottoEventResults / 2: %.2fms\n", 0.001 * (nTime2 - nTime1));
 
     return (chainGameResults.size() > 0);
 }

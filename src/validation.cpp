@@ -837,7 +837,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
                     __func__, hash.ToString(), FormatStateMessage(state));
         }
 
-        if (!CheckBettingTx(bettingsViewCache, tx, ::ChainActive().Height())) {
+        if (!CheckBettingTx(view, bettingsViewCache, tx, ::ChainActive().Height())) {
             return error("AcceptToMemoryPool: Error when betting TX checking!");
         }
 
@@ -970,17 +970,24 @@ bool GetAddressUnspent(uint160 addressHash, int type,
     return true;
 }
 
-CTransactionRef GetTransaction(const CBlockIndex* const block_index_in, const CTxMemPool* const mempool, const uint256& hash, const Consensus::Params& consensusParams, uint256& hashBlock, bool fUseView)
+CTransactionRef GetTransaction(const CBlockIndex* const block_index, const CTxMemPool* const mempool, const uint256& hash, const Consensus::Params& consensusParams, uint256& hashBlock, bool fUseView)
 {
     LOCK(cs_main);
 
-    const CBlockIndex* block_index = block_index_in;
     if (fUseView) { // use coin database to locate block that contains transaction, and scan it
         const Coin& coin = AccessByTxid(::ChainstateActive().CoinsTip(), hash);
-        if (coin.IsSpent()) {
-            return nullptr;
+        CBlockIndex* block_index_view = ::ChainActive()[coin.nHeight];
+        if (block_index_view) {
+            CBlock block;
+            if (ReadBlockFromDisk(block, block_index_view, consensusParams)) {
+                for (const auto& tx : block.vtx) {
+                    if (tx->GetHash() == hash) {
+                        hashBlock = block_index_view->GetBlockHash();
+                        return tx;
+                    }
+                }
+            }
         }
-        block_index = ::ChainActive()[coin.nHeight];
     }
 
     if (block_index) {
@@ -1840,7 +1847,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
     }
 
     /* Undo betting data */
-    if (!BettingUndo(bettingsViewCache, pindex->nHeight, block.vtx))
+    if (!BettingUndo(view, bettingsViewCache, pindex->nHeight, block.vtx))
         return DISCONNECT_FAILED;
 
     // move best block pointer to prevout block
@@ -2023,6 +2030,7 @@ static int64_t nTimeForks = 0;
 static int64_t nTimeVerify = 0;
 static int64_t nTimeISFilter = 0;
 static int64_t nTimeSubsidy = 0;
+static int64_t nTimeBetRewards = 0;
 static int64_t nTimeValueValid = 0;
 static int64_t nTimePayeeValid = 0;
 static int64_t nTimeProcessSpecial = 0;
@@ -2030,8 +2038,14 @@ static int64_t nTimeWagerrSpecific = 0;
 static int64_t nTimeConnect = 0;
 static int64_t nTimeIndex = 0;
 static int64_t nTimeCallbacks = 0;
+static int64_t nTimeProcessBettingTx = 0;
+static int64_t nTimeUndoBettingData = 0;
 static int64_t nTimeTotal = 0;
 static int64_t nBlocksTotal = 0;
+
+void LogPause(){
+    LogPrintf("Investigate here!\n");
+}
 
 /** Apply the effects of this block (with given index) on the UTXO set represented by coins.
  *  Validity checks that depend on the UTXO set are also done; ConnectBlock()
@@ -2167,6 +2181,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                 }
             }
         }
+    }
+
+    if (pindex->nHeight >= 767351) {
+        LogPause();
     }
 
     /// WAGERR: Check superblock start
@@ -2397,7 +2415,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             control.Add(vChecks);
         }
 
-        if (!CheckBettingTx(bettingsViewCache, *tx, pindex->nHeight)) {
+        if (!CheckBettingTx(view, bettingsViewCache, *tx, pindex->nHeight)) {
             if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
                 LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
             } else  {
@@ -2496,22 +2514,36 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime5_2 = GetTimeMicros(); nTimeSubsidy += nTime5_2 - nTime5_1;
     LogPrint(BCLog::BENCHMARK, "      - GetBlockSubsidy: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_2 - nTime5_1), nTimeSubsidy * MICRO, nTimeSubsidy * MILLI / nBlocksTotal);
 
-    if (pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV2StartHeight()) {
-        // Validation of V2 and V3 betting mints
+    int64_t nTime5_3a = nTime5_2;
 
-        std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
-        CAmount nExpectedBetMint = GetBettingPayouts(bettingsViewCache, pindex->nHeight, mExpectedPayouts);
-        blockReward.AddReward(CReward::REWARD_BETTING, nExpectedBetMint);
+    switch (chainparams.GetConsensus().GetWBPVersion(pindex->nHeight)) {
+    case WBP05:
+        break;
+    case WBP04:
+    case WBP03:
+    case WBP02:
+        {
+            std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
+            CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->nHeight, mExpectedPayouts);
+            blockReward.AddReward(CReward::REWARD_BETTING, nExpectedBetMint);
 
-        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
-            return state.Invalid(ValidationInvalidReason::CONSENSUS, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
+            nTime5_3a = GetTimeMicros(); nTimeBetRewards += nTime5_3a - nTime5_2;
+            LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3a - nTime5_2), nTimeBetRewards * MICRO, nTimeBetRewards * MILLI / nBlocksTotal);
+
+            if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
+            }
+            break;
         }
-    }
-    if (pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV1StartHeight()) {
+    case WBP01:
         // Protocol V1 has been retired
-    } else {
-        if (!IsBlockValueValid(*sporkManager, *governance, block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
-            return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
+        break;
+    default:
+        {
+            if (!IsBlockValueValid(*sporkManager, *governance, block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
+                return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
+            }
+            break;
         }
     }
 
@@ -2603,20 +2635,26 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
     evoDb->WriteBestBlock(pindex->GetBlockHash());
 
+    int64_t nTime7 = GetTimeMicros(); nTimeCallbacks += nTime7 - nTime6;
+    LogPrint(BCLog::BENCHMARK, "    - Callbacks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime7 - nTime6), nTimeCallbacks * MICRO, nTimeCallbacks * MILLI / nBlocksTotal);
+
     // Look through the block for any events, results or mapping TX.
     if (pindex->nHeight > chainparams.GetConsensus().WagerrProtocolV2StartHeight()) {
         for (const CTransactionRef& tx : block.vtx) {
-            ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV3StartHeight());
+            ProcessBettingTx(view, bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV3StartHeight());
         }
+
+        int64_t nTime8 = GetTimeMicros(); nTimeProcessBettingTx += nTime8 - nTime7;
+        LogPrint(BCLog::BENCHMARK, "    - ProcessBettingTx: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime8 - nTime7), nTimeProcessBettingTx * MICRO, nTimeProcessBettingTx * MILLI / nBlocksTotal);
+
         if (!(pindex->nHeight % (chainparams.MaxBettingUndoDepth() - 1))) {
             int heightLimit = pindex->nHeight - chainparams.MaxBettingUndoDepth();
             bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
         }
+        int64_t nTime9 = GetTimeMicros(); nTimeUndoBettingData += nTime9 - nTime8;
+        LogPrint(BCLog::BENCHMARK, "    - UndoBettingData: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime9 - nTime8), nTimeUndoBettingData * MICRO, nTimeUndoBettingData * MILLI / nBlocksTotal);
     }
     bettingsViewCache.SetLastHeight(pindex->nHeight);
-
-    int64_t nTime7 = GetTimeMicros(); nTimeCallbacks += nTime7 - nTime6;
-    LogPrint(BCLog::BENCHMARK, "    - Callbacks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime7 - nTime6), nTimeCallbacks * MICRO, nTimeCallbacks * MILLI / nBlocksTotal);
 
     boost::posix_time::ptime finish = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration diff = finish - start;
@@ -3068,8 +3106,27 @@ bool CChainState::ConnectTip(CValidationState& state, const CChainParams& chainp
         LogPrint(BCLog::BENCHMARK, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime3 - nTime2) * MILLI, nTimeConnectTotal * MICRO, nTimeConnectTotal * MILLI / nBlocksTotal);
         bool flushed = view.Flush();
         assert(flushed);
+        auto betsIt = bettingsView->bets->NewIterator();
+        for(betsIt->SeekToLast(); betsIt->Valid(); betsIt->Prev()) {
+            PeerlessBetKey key;
+            CPeerlessBetDB uniBet;
+            CBettingDB::BytesToDbType(betsIt->Value(), uniBet);
+            CBettingDB::BytesToDbType(betsIt->Key(), key);
+            LogPrintf("bettingsViewCache.bets->BeforeFlush(): %d, %s - %d @ %d (%d) \n", key.blockHeight, key.outPoint.ToString(), uniBet.betAmount, uniBet.legs[0].nEventId, uniBet.legs[0].nOutcome);
+        }
+
         bool betsFlushed = bettingsViewCache.Flush();
         assert(betsFlushed);
+
+        betsIt = bettingsView->bets->NewIterator();
+        for(betsIt->SeekToLast(); betsIt->Valid(); betsIt->Prev()) {
+            PeerlessBetKey key;
+            CPeerlessBetDB uniBet;
+            CBettingDB::BytesToDbType(betsIt->Value(), uniBet);
+            CBettingDB::BytesToDbType(betsIt->Key(), key);
+            LogPrintf("bettingsViewCache.bets->AfterFlush(): %d, %s - %d @ %d (%d) \n", key.blockHeight, key.outPoint.ToString(), uniBet.betAmount, uniBet.legs[0].nEventId, uniBet.legs[0].nOutcome);
+        }
+
         dbTx->Commit();
     }
     int64_t nTime4 = GetTimeMicros(); nTimeFlush += nTime4 - nTime3;

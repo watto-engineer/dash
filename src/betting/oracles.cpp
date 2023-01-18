@@ -5,6 +5,7 @@
 #include <betting/oracles.h>
 #include <chainparams.h>
 #include <key_io.h>
+#include <logging.h>
 #include <script/standard.h>
 #include <base58.h>
 
@@ -17,6 +18,7 @@ bool COracle::IsActive(const int& nHeight)
 // Validate the tx
 bool COracle::IsMyOracleTx(const std::string txAddress, const int& nTxHeight)
 {
+    LogPrintf("%s -   current: %s this: %s - %d\n", __func__, txAddress, this->strAddress, nTxHeight);
     if (!this->IsActive(nTxHeight)) return false;
     return txAddress == this->strAddress;
 }

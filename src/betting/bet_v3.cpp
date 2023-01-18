@@ -58,14 +58,14 @@ uint32_t GetBetSearchStartHeight(int nHeight) {
  *
  * @return payout vector, payouts info vector.
  */
-void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetPLBetPayoutsV3(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
     uint64_t refundOdds{BET_ODDSDIVISOR};
 
     // Get all the results posted in the prev block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(nLastBlockHeight);
+    std::vector<CPeerlessResultDB> results = GetPLResults(view, block, nLastBlockHeight);
 
     bool fWagerrProtocolV3 = nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight();
 
@@ -94,6 +94,9 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
             CBettingDB::BytesToDbType(it->Key(), uniBetKey);
             CBettingDB::BytesToDbType(it->Value(), uniBet);
             // skip if bet is already handled
+            LogPrintf("%s - UniBetKey: { blockHeight=%s, outpoint=%s } UniBetValue: { eventID: %d, outcome: %d, playerAddress: %s, betAmount: %d }\n", __func__,
+                    uniBetKey.blockHeight, uniBetKey.outPoint.ToString(),
+                    uniBet.legs[0].nEventId, uniBet.legs[0].nOutcome, EncodeDestination(uniBet.playerAddress), uniBet.betAmount);
             if (fWagerrProtocolV3 && uniBet.IsCompleted()) continue;
 
             bool completedBet = false;
@@ -378,14 +381,22 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
     LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
 }
 
-void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetCGLottoBetPayoutsV3(const CBlock& block, const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
+
+    int64_t nTime0 = GetTimeMicros();
+    int64_t nTime1 = nTime0;
+    int64_t nTime2 = nTime1;
+    int64_t nTime3 = nTime2;
+    int64_t nTime4 = nTime3;
 
     // Get all the results posted in the prev block.
     std::vector<CChainGamesResultDB> results;
 
-    GetCGLottoEventResults(nLastBlockHeight, results);
+    GetCGLottoEventResults(block, view, nLastBlockHeight, results);
+
+    nTime1 = GetTimeMicros();
 
     std::vector<std::pair<ChainGamesBetKey, CChainGamesBetDB>> vEntriesToUpdate;
 
@@ -499,10 +510,18 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
             vEntriesToUpdate.insert(vEntriesToUpdate.end(), candidates.begin(), candidates.end());
         }
     }
+    nTime2 = GetTimeMicros();
 
     for (auto pair : vEntriesToUpdate) {
         bettingsViewCache.chainGamesLottoBets->Update(pair.first, pair.second);
     }
+    nTime3 = GetTimeMicros();
+    nTime4 = nTime3;
+
+    LogPrint(BCLog::BENCHMARK, "      - GetCGLottoBetPayoutsV3 / 1: %.2fms\n", 0.001 * (nTime1 - nTime0));
+    LogPrint(BCLog::BENCHMARK, "      - GetCGLottoBetPayoutsV3 / 2: %.2fms\n", 0.001 * (nTime2 - nTime1));
+    LogPrint(BCLog::BENCHMARK, "      - GetCGLottoBetPayoutsV3 / 3: %.2fms\n", 0.001 * (nTime3 - nTime2));
+    LogPrint(BCLog::BENCHMARK, "      - GetCGLottoBetPayoutsV3 / 4: %.2fms\n", 0.001 * (nTime4 - nTime3));
 
     LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
 }
@@ -512,11 +531,11 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
  * But coin tx outs were undid early in native bitcoin core.
  * @return
  */
-bool UndoPLBetPayouts(CBettingsView &bettingsViewCache, int height)
+bool UndoPLBetPayouts(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, int height)
 {
     int nCurrentHeight = ::ChainActive().Height();
     // Get all the results posted in the previous block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(height - 1);
+    std::vector<CPeerlessResultDB> results = GetPLResults(view, block, height - 1);
 
     LogPrintf("Start undo payouts...\n");
 

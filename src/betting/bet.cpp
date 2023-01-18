@@ -140,14 +140,15 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     return true;
 }
 
-bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
+bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
     // if is not wagerr v3 - do not check tx
     if (height < Params().GetConsensus().WagerrProtocolV3StartHeight()) return true;
 
+    if (!HasOpReturnOutput(tx)) return true;
+
     // Get player address
     const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
     uint256 hashBlock;
     CTxDestination address;
     CTxDestination prevAddr;
@@ -159,6 +160,8 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
         return true;
     }
     address = prevAddr;
+
+    const bool validOracleTx{IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height)};
 
     for (const CTxOut &txOut : tx.vout) {
         // parse betting TX
@@ -696,13 +699,14 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     return true;
 }
 
-void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
+void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
 {
     LogPrint(BCLog::BETTING, "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx->GetHash().GetHex());
 
+    if (!HasOpReturnOutput(*tx)) return;
+
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx->vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
     // Get player address
     uint256 hashBlock;
     CTxDestination address;
@@ -714,6 +718,8 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
         return;
     }
     address = prevAddr;
+
+    const bool validOracleTx{IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height)};
 
     for (size_t i = 0; i < tx->vout.size(); i++) {
         const CTxOut &txOut = tx->vout[i];
@@ -810,6 +816,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
                         continue;
                     }
 
+                    LogPrintf("bettingsViewCache.bets->Write(PeerlessBetKey, bet): %d, %s - %d @ %d (%d) \n", height, outPoint.ToString(), betAmount, plBet.nEventId, plBet.nOutcome);
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, {plBet}, {plCachedEvent}, blockTime));
                 }
                 else {
@@ -1579,37 +1586,72 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
     LogPrint(BCLog::BETTING, "ProcessBettingTx: end\n");
 }
 
-CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
+CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
 {
-    if (nNewBlockHeight < Params().GetConsensus().WagerrProtocolV2StartHeight()) return 0;
-
     CAmount expectedMint = 0;
     std::vector<CBetOut> vExpectedPayouts;
     std::vector<CPayoutInfoDB> vPayoutsInfo;
 
+    int64_t nTime0 = GetTimeMicros();
+    int64_t nTime1 = nTime0;
+    int64_t nTime2 = nTime1;
+    int64_t nTime3 = nTime2;
+    int64_t nTime4 = nTime3;
+
+    // Get the previous block so we can look for any results in it.
+    CBlockIndex *resultsBocksIndex = NULL;
+    resultsBocksIndex = ::ChainActive()[nNewBlockHeight-1];
+
+    CBlock block;
+    bool fFoundBlock = ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
+    if (!fFoundBlock) {
+        LogPrint(BCLog::BETTING, "Unable to read block at height %d\n", resultsBocksIndex->nHeight);
+    }
+
     // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-    if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
-
-        GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetCGLottoBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+    switch (Params().GetConsensus().GetWBPVersion(nNewBlockHeight)) {
+        case WBP05:
+            //GetPLBetPayoutsV5(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            break;
+        case WBP04:
+            // V4 events are handled as a special case of the V3 protocol
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime1 = GetTimeMicros();
+            GetCGLottoBetPayoutsV3(block, view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime2 = GetTimeMicros();
+            GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime3 = GetTimeMicros();
             // collect field bets payouts
-            GetFieldBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-        }
+            GetFieldBetPayoutsV4(view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime4 = GetTimeMicros();
+            break;
+        case WBP03:
+            // V4 events are handled as a special case of the V3 protocol
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime1 = GetTimeMicros();
+            nTime2 = nTime1;
+            GetCGLottoBetPayoutsV3(block, view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime3 = GetTimeMicros();
+            GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime4 = GetTimeMicros();
+            break;
+        case WBP02:
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime1 = GetTimeMicros();
+            nTime2 = nTime1;
+            GetCGLottoBetPayoutsV2(block, view, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            nTime3 = GetTimeMicros();
+            nTime4 = nTime3;
+        case WBP01:
+        default:
+            break;
     }
-    else {
-
-        GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetCGLottoBetPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-    }
+    LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts / PL: %.2fms\n", 0.001 * (nTime1 - nTime0));
+    LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts / Lt: %.2fms\n", 0.001 * (nTime2 - nTime1));
+    LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts / CG: %.2fms\n", 0.001 * (nTime3 - nTime2));
+    LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts / FB: %.2fms\n", 0.001 * (nTime4 - nTime3));
 
     assert(vExpectedPayouts.size() == vPayoutsInfo.size());
-
     mExpectedPayouts.clear();
 
     for (unsigned int i = 0; i < vExpectedPayouts.size(); i++) {
@@ -1681,11 +1723,10 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
     return bettingsViewCache.EraseBettingUndo(undoKey);
 }
 
-bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const uint32_t height)
+bool UndoBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const uint32_t height)
 {
     // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx->vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
+    const bool validOracleTx{IsValidOracleTx(view, tx, height)};
 
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx->GetHash().GetHex());
 
@@ -2261,12 +2302,19 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     return true;
 }
 
-bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx)
+bool BettingUndo(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx)
 {
         // Revert betting dats
     if (height > Params().GetConsensus().WagerrProtocolV2StartHeight()) {
+        // Get the previous block so we can look for any results in it.
+        CBlockIndex *resultsBocksIndex = NULL;
+        resultsBocksIndex = ::ChainActive()[height-1];
+
+        CBlock block;
+        ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
+
         // revert complete bet payouts marker
-        if (!UndoPLBetPayouts(bettingsViewCache, height)) {
+        if (!UndoPLBetPayouts(view, block, bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data is inconsistent");
             return false;
         }
@@ -2275,7 +2323,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
             return false;
         }
         if (height > Params().GetConsensus().WagerrProtocolV4StartHeight()) {
-            if (!UndoFieldBetPayouts(bettingsViewCache, height)) {
+            if (!UndoFieldBetPayouts(view, bettingsViewCache, height)) {
                 error("DisconnectBlock(): undo payout data for field bets is inconsistent");
                 return false;
             }
@@ -2287,7 +2335,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
 
         // undo betting txs in back order
         for (auto it = vtx.crbegin(); it != vtx.crend(); it++) {
-            if (!UndoBettingTx(bettingsViewCache, *it, height)) {
+            if (!UndoBettingTx(view, bettingsViewCache, *it, height)) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");
                 return false;
             }
