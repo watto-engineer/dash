@@ -10,6 +10,8 @@
 #include <base58.h>
 #include <amount.h>
 
+class CBlock;
+class CCoinsViewCache;
 class CPeerlessResultDB;
 class CChainGamesResultDB;
 class CPeerlessLegDB;
@@ -191,21 +193,23 @@ class CBetOut : public CTxOut {
 };
 
 /** Ensures a TX has come from an OMNO wallet. **/
-bool IsValidOracleTx(const CTxIn &txin, int nHeight);
+bool IsValidOracleTxIn(const CTxIn &txin, int nHeight);
+bool IsValidOracleTx(const CCoinsViewCache &view, const CTransactionRef &tx, int nHeight);
+bool IsValidOraclePrevTxOut(const CTxOut &prevTxOut, int nHeight);
 
 //* Calculates the amount of coins paid out to bettors and the amount of coins to burn, based on bet amount and odds **/
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
 /** Check a given block to see if it contains a Peerless result TX. **/
-std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight);
+std::vector<CPeerlessResultDB> GetPLResults(const CCoinsViewCache &view, const CBlock& block, int nLastBlockHeight);
 
 /**
  * Check a given block to see if it contains a Field result TX.
  */
-std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight);
+std::vector<CFieldResultDB> GetFieldResults(const CCoinsViewCache &view, int nLastBlockHeight);
 
 /** Find chain games lotto result. **/
-bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);
+bool GetCGLottoEventResults(const CBlock& block, const CCoinsViewCache &view, const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);
 
 /**
  * Check winning condition for current bet considering locked event and event result.

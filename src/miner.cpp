@@ -264,49 +264,51 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
         CCoinsViewCache &view = ::ChainstateActive().CoinsTip();
         CBettingsView bettingsViewCache(bettingsView.get());
-        nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
+        nBetPayout += GetBettingPayouts(view, bettingsViewCache, nHeight, mExpectedPayouts);
 
-        uint8_t nWBPVersion = Params().GetConsensus().GetWBPVersion(nHeight);
-        switch (nWBPVersion) {
-        case 4:
-        case 3: {
-            for (auto payout : mExpectedPayouts) {
-                vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
-            }
-            break;
-        }
-        case 2: {
-            /*
-                In V3, payouts are ordered by 1) blockheight, 2) outpoint (tx hash, output nr), 3) payout type.
-                Before V3, payouts were ordered by 1) bet type (first betting then chain games), 2) blockheight, 3) tx index nr
-            */
-            std::vector<LegacyPayout> vExpectedLegacyPayouts;
-            for (auto payout : mExpectedPayouts) {
-                int nHeight = payout.first.betKey.blockHeight;
-
-                CBlock block;
-                int vtxNr = -1;
-                if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, ::ChainActive()[nHeight], Params().GetConsensus())) {
-                    for (size_t i = 0; i < block.vtx.size(); i++) {
-                        const CTransactionRef& tx = block.vtx[i];
-                        if (tx->GetHash() == payout.first.betKey.outPoint.hash) {
-                            vtxNr = i;
-                            break;
-                        }
-                    }
-                } else {
-                    LogPrintf("%s: failed locate bet\n", __func__);
+        switch (Params().GetConsensus().GetWBPVersion(nHeight)) {
+            case WBP05:
+                break;
+            case WBP04:
+            case WBP03:
+                for (auto payout : mExpectedPayouts) {
+                    vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
                 }
-                vExpectedLegacyPayouts.emplace_back((uint16_t)payout.first.payoutType, payout.first.betKey.blockHeight, vtxNr, payout.second);
-            }
-            std::sort(vExpectedLegacyPayouts.begin(), vExpectedLegacyPayouts.end());
-            for (auto payout : vExpectedLegacyPayouts) {
-                vExpectedTxOuts.emplace_back(payout.txOut.nValue, payout.txOut.scriptPubKey);
-            }
-            break;
-        }
-        default:
-            break;
+                break;
+            case WBP02:
+                {
+                    /*
+                        In V3, payouts are ordered by 1) blockheight, 2) outpoint (tx hash, output nr), 3) payout type.
+                        Before V3, payouts were ordered by 1) bet type (first betting then chain games), 2) blockheight, 3) tx index nr
+                    */
+                    std::vector<LegacyPayout> vExpectedLegacyPayouts;
+                    for (auto payout : mExpectedPayouts) {
+                        int nHeight = payout.first.betKey.blockHeight;
+
+                        CBlock block;
+                        int vtxNr = -1;
+                        if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, ::ChainActive()[nHeight], Params().GetConsensus())) {
+                            for (size_t i = 0; i < block.vtx.size(); i++) {
+                                const CTransactionRef& tx = block.vtx[i];
+                                if (tx->GetHash() == payout.first.betKey.outPoint.hash) {
+                                    vtxNr = i;
+                                    break;
+                                }
+                            }
+                        } else {
+                            LogPrintf("%s: failed locate bet\n", __func__);
+                        }
+                        vExpectedLegacyPayouts.emplace_back((uint16_t)payout.first.payoutType, payout.first.betKey.blockHeight, vtxNr, payout.second);
+                    }
+                    std::sort(vExpectedLegacyPayouts.begin(), vExpectedLegacyPayouts.end());
+                    for (auto payout : vExpectedLegacyPayouts) {
+                        vExpectedTxOuts.emplace_back(payout.txOut.nValue, payout.txOut.scriptPubKey);
+                    }
+                    break;
+                }
+            case WBP01:
+            default:
+                break;
         }
 
         FillBlockPayments(spork_manager, governance_manager, *pCoinstakeTx, nHeight, blockReward, pblocktemplate->voutMasternodePayments, pblocktemplate->voutSuperblockPayments);

@@ -87,12 +87,12 @@ int64_t GetCGBlockPayoutsV2(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& n
  *
  * @return payout vector.
  */
-void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetBetPayoutsV2(const CCoinsViewCache &view, const CBlock& block, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    int nLastBlockHeight = ::ChainActive().Height();
+    int nLastBlockHeight = nNewBlockHeight - 1;
 
     // Get all the results posted in the latest block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(nNewBlockHeight - 1);
+    std::vector<CPeerlessResultDB> results = GetPLResults(view, block, nLastBlockHeight);
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {
@@ -151,8 +151,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
 
             for (CTransactionRef &tx : block.vtx) {
                 // Ensure TX has it been posted by Oracle wallet.
-                const CTxIn &txin = tx->vin[0];
-                bool validOracleTx = IsValidOracleTx(txin, nHeight);
+                bool validOracleTx = false;
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx->vout.size(); i++) {
 
@@ -164,6 +163,11 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                     if (bettingTx == nullptr) continue;
 
                     auto txType = bettingTx->GetTxType();
+
+                    if (txType != plBetTxType && tx->vout.size() <= 2) {
+                        validOracleTx = IsValidOracleTx(view, tx, nHeight);
+                    }
+
                     // Peerless event OP RETURN transaction.
                     if (validOracleTx && txType == plEventTxType) {
                         CPeerlessEventTx* pe = (CPeerlessEventTx*) bettingTx.get();
@@ -502,13 +506,13 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
  *
  * @return payout vector.
  */
-void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetCGLottoBetPayoutsV2(const CBlock& block, const CCoinsViewCache &view, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
     // get results from prev block
     std::vector<CChainGamesResultDB> allChainGames;
-    GetCGLottoEventResults(nLastBlockHeight, allChainGames);
+    GetCGLottoEventResults(block, view, nLastBlockHeight, allChainGames);
 
     // Find payout for each CGLotto game
     for (unsigned int currResult = 0; currResult < allChainGames.size(); currResult++) {
@@ -543,8 +547,6 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
                 uint256 txHash = tx->GetHash();
 
-                bool validTX = IsValidOracleTx(txin, BlocksIndex->nHeight);
-
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx->vout.size(); i++) {
 
@@ -565,7 +567,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
                     auto txType = cgBettingTx->GetTxType();
 
                     // Find most recent CGLotto event
-                    if (validTX && txType == cgEventTxType) {
+                    if (txType == cgEventTxType && IsValidOracleTx(view, tx, BlocksIndex->nHeight)) {
 
                         CChainGamesEventTx* chainGameEvt = (CChainGamesEventTx*) cgBettingTx.get();
                         if (chainGameEvt->nEventId == currentEventID) {
