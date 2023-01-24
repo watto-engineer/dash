@@ -2023,8 +2023,6 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
     return flags;
 }
 
-
-
 static int64_t nTimeCheck = 0;
 static int64_t nTimeForks = 0;
 static int64_t nTimeVerify = 0;
@@ -2057,6 +2055,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     assert(m_clhandler);
     assert(m_isman);
     assert(m_quorum_block_processor);
+
     int64_t nTimeStart = GetTimeMicros();
 
     // Check it again in case a previous version let a bad block in
@@ -3324,10 +3323,13 @@ static bool NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
     return fNotify;
 }
 
-static void LimitValidationInterfaceQueue() LOCKS_EXCLUDED(cs_main) {
+static void LimitValidationInterfaceQueue(int nHeight) LOCKS_EXCLUDED(cs_main) {
     AssertLockNotHeld(cs_main);
 
-    if (GetMainSignals().CallbacksPending() > 10) {
+    // Added while betting requires txindex
+    int WBPVersion = Params().GetConsensus().GetWBPVersion(nHeight);
+    int callbacksLimit = g_txindex && WBPVersion <= 4 && WBPVersion > 0 ? 0 : 10;
+    if (GetMainSignals().CallbacksPending() > callbacksLimit) {
         SyncWithValidationInterfaceQueue();
     }
 }
@@ -3359,12 +3361,7 @@ bool CChainState::ActivateBestChain(CValidationState &state, const CChainParams&
         // Note that if a validationinterface callback ends up calling
         // ActivateBestChain this may lead to a deadlock! We should
         // probably have a DEBUG_LOCKORDER test for this in the future.
-        LimitValidationInterfaceQueue();
-
-        // Added while betting requires txindex
-        if (g_txindex) {
-            g_txindex->BlockUntilSyncedToCurrentChain();
-        }
+        LimitValidationInterfaceQueue(m_chain.Height());
 
         {
             LOCK2(cs_main, ::mempool.cs); // Lock transaction pool for at least as long as it takes for connectTrace to be consumed
@@ -3527,12 +3524,7 @@ bool CChainState::InvalidateBlock(CValidationState& state, const CChainParams& c
         if (ShutdownRequested()) break;
 
         // Make sure the queue of validation callbacks doesn't grow unboundedly.
-        LimitValidationInterfaceQueue();
-
-        // Added while betting requires tx index
-        if (g_txindex) {
-            g_txindex->BlockUntilSyncedToCurrentChain();
-        }
+        LimitValidationInterfaceQueue(m_chain.Height());
 
         LOCK(cs_main);
         LOCK(::mempool.cs); // Lock for as long as disconnectpool is in scope to make sure UpdateMempoolForReorg is called after DisconnectTip without unlocking in between
