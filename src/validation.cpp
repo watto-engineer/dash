@@ -1763,7 +1763,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
         }
 
         // restore inputs
-        if (i > 0) { // not coinbases
+        if (i > 0 && !tx.HasZerocoinSpendInputs()) { // not coinbases or zerocoin spend
             CTxUndo &txundo = blockUndo.vtxundo[i-1];
             if (txundo.vprevout.size() != tx.vin.size()) {
                 error("DisconnectBlock(): transaction and undo data inconsistent");
@@ -2367,10 +2367,9 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                     if (!TxOutToPublicCoin(out, coin, state))
                         return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx->GetHash().GetHex()), REJECT_INVALID, "bad-xwagerr");
 
-                    if (!ContextualCheckZerocoinMint(coin, pindex))
-                        return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: zerocoin mint failed contextual check", __func__), REJECT_INVALID, "bad-xwagerr");
-
-                    vMints.emplace_back(std::make_pair(coin, tx->GetHash()));
+                    if (ContextualCheckZerocoinMint(coin, pindex)) {
+                        vMints.emplace_back(std::make_pair(coin, tx->GetHash()));
+                    }
                 }
             }
 

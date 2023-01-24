@@ -218,10 +218,9 @@ bool CheckZerocoinSpendTx(CBlockIndex *pindex, CValidationState& state, const CT
             if (!TxOutToPublicCoin(out, coin, state))
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: failed final check of zerocoinmint for tx %s", __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-xwagerr");
 
-            if (!ContextualCheckZerocoinMint(coin, pindex))
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, error("%s: zerocoin mint failed contextual check", __func__), REJECT_INVALID, "bad-xwagerr");
-
-            vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
+            if (ContextualCheckZerocoinMint(coin, pindex)) {
+                vMints.emplace_back(std::make_pair(coin, tx.GetHash()));
+            }
         }
     }
     return true;
