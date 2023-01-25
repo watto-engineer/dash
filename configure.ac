@@ -103,7 +103,6 @@ dnl Python 3.5 is specified in .python-version and should be used if available, 
 AC_PATH_PROGS([PYTHON], [python3.5 python3.6 python3.7 python3.8 python3 python])
 AC_PATH_PROG(GENHTML, genhtml)
 AC_PATH_PROG([GIT], [git])
-AC_PATH_PROG(CCACHE,ccache)
 AC_PATH_PROG(XGETTEXT,xgettext)
 AC_PATH_PROG(HEXDUMP,hexdump)
 AC_PATH_TOOL(READELF, readelf)
@@ -188,12 +187,6 @@ AC_ARG_ENABLE([reduce-exports],
   [attempt to reduce exported symbols in the resulting executables (default is no)])],
   [use_reduce_exports=$enableval],
   [use_reduce_exports=no])
-
-AC_ARG_ENABLE([ccache],
-  [AS_HELP_STRING([--disable-ccache],
-  [do not use ccache for building (default is to use if found)])],
-  [use_ccache=$enableval],
-  [use_ccache=auto])
 
 dnl Suppress warnings from external headers (e.g. Boost, Qt).
 dnl May be useful if warnings from external headers clutter the build output
@@ -1548,26 +1541,6 @@ fi
 AC_MSG_RESULT($build_bitcoin_libs)
 
 AC_LANG_POP
-
-if test "x$use_ccache" != "xno"; then
-  AC_MSG_CHECKING(if ccache should be used)
-  if test x$CCACHE = x; then
-    if test "x$use_ccache" = "xyes"; then
-      AC_MSG_ERROR([ccache not found.]);
-    else
-      use_ccache=no
-    fi
-  else
-    use_ccache=yes
-    CC="$ac_cv_path_CCACHE $CC"
-    CXX="$ac_cv_path_CCACHE $CXX"
-  fi
-  AC_MSG_RESULT($use_ccache)
-  if test "x$use_ccache" = "xyes"; then
-    AX_CHECK_COMPILE_FLAG([-fdebug-prefix-map=A=B],[DEBUG_CXXFLAGS="$DEBUG_CXXFLAGS -fdebug-prefix-map=\$(abs_top_srcdir)=."],,[[$CXXFLAG_WERROR]])
-    AX_CHECK_PREPROC_FLAG([-fmacro-prefix-map=A=B],[DEBUG_CPPFLAGS="$DEBUG_CPPFLAGS -fmacro-prefix-map=\$(abs_top_srcdir)=."],,[[$CXXFLAG_WERROR]])
-  fi
-fi
 
 dnl bignum value
 set_bignum=$req_bignum
