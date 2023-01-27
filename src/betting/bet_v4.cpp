@@ -9,7 +9,7 @@
 #include <validation.h>
 #include <base58.h>
 
-void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetFieldBetPayoutsV4(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
@@ -21,7 +21,7 @@ void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
     uint64_t refundOdds{BET_ODDSDIVISOR};
 
     // Get all the results posted in the prev block.
-    std::vector<CFieldResultDB> results = GetFieldResults(nLastBlockHeight);
+    std::vector<CFieldResultDB> results = GetFieldResults(view, nLastBlockHeight);
 
     CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
@@ -203,11 +203,11 @@ void GetFieldBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
  * But coin tx outs were undid early in native bitcoin core.
  * @return
  */
-bool UndoFieldBetPayouts(CBettingsView &bettingsViewCache, int height)
+bool UndoFieldBetPayouts(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, int height)
 {
     int nCurrentHeight = ::ChainActive().Height();
     // Get all the results posted in the previous block.
-    std::vector<CFieldResultDB> results = GetFieldResults(height - 1);
+    std::vector<CFieldResultDB> results = GetFieldResults(view, height - 1);
 
     LogPrintf("Start undo payouts...\n");
 

@@ -442,23 +442,14 @@ typedef struct PeerlessBetKey {
         return blockHeight == rhs.blockHeight && outPoint == rhs.outPoint;
     }
 
-    template <typename Stream>
-    void Serialize(Stream& s) const
+    SERIALIZE_METHODS(PeerlessBetKey, obj)
     {
         uint32_t be_val;
-        be_val = htonl(blockHeight);
-        ser_writedata32(s, be_val);
-        
-    }
 
-    template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        uint32_t be_val;
-        be_val = ser_readdata32(s);
-        blockHeight = ntohl(be_val);
+        SER_WRITE(obj, be_val = htonl(obj.blockHeight));
+        READWRITE(be_val, obj.outPoint);
+        SER_READ(obj, obj.blockHeight = ntohl(be_val));
     }
-
 } PeerlessBetKey;
 
 class CPeerlessLegDB
@@ -471,21 +462,13 @@ public:
     explicit CPeerlessLegDB() {}
     explicit CPeerlessLegDB(uint32_t eventId, OutcomeType outcome) : nEventId(eventId), nOutcome(outcome) {}
 
-    template <typename Stream>
-    void Serialize(Stream& s) const
+    SERIALIZE_METHODS(CPeerlessLegDB, obj)
     {
         uint8_t outcome;
-        outcome = (uint8_t) nOutcome;
-        ser_writedata8(s, outcome);
-        
-    }
 
-    template <typename Stream>
-    void Unserialize(Stream& s)
-    {
-        uint8_t outcome;
-        outcome = ser_readdata8(s);
-        nOutcome = (OutcomeType) outcome;
+        SER_WRITE(obj, outcome = (uint8_t) obj.nOutcome);
+        READWRITE(obj.nEventId, outcome);
+        SER_READ(obj, obj.nOutcome = (OutcomeType) outcome);
     }
 
 };

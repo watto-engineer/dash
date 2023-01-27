@@ -9,6 +9,7 @@
 #include <serialize.h>
 
 class CTxOut;
+class CTransaction;
 
 #define BTX_FORMAT_VERSION 0x01
 #define BTX_PREFIX 'B'
@@ -38,6 +39,8 @@ typedef enum BetTxTypes{
     fUpdateMarginTxType      = 0x15,  // Field event update margin transaction type identifier
     fUpdateModifiersTxType   = 0x16,  // Field event update modifiers transaction type identifier.
 } BetTxTypes;
+
+bool HasOpReturnOutput(const CTransaction &tx);
 
 // class for serialization common betting header from opcode
 class CBettingTxHeader

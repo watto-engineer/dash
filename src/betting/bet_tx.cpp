@@ -8,6 +8,16 @@
 #include <util/memory.h>
 #include <version.h>
 
+bool HasOpReturnOutput(const CTransaction &tx) {
+    for (size_t i = 0; i < tx.vout.size(); i++) {
+        const CScript& script = tx.vout[i].scriptPubKey;
+        if (script.size() > 0 && *script.begin() == OP_RETURN) {
+            return true;
+        }
+    }
+    return false;
+}
+
 template<typename BettingTxTypeName>
 std::unique_ptr<CBettingTx> DeserializeBettingTx(CDataStream &ss)
 {

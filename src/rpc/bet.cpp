@@ -356,14 +356,14 @@ UniValue getchaingamesinfo(const JSONRPCRequest& request)
     int height = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? ::ChainActive().Height() - 10500 : ::ChainActive().Height() - 14400;
     BlocksIndex = ::ChainActive()[height];
 
+    CBlock block;
     while (BlocksIndex) {
-        CBlock block;
         ReadBlockFromDisk(block, BlocksIndex, Params().GetConsensus());
 
         for (CTransactionRef& tx : block.vtx) {
 
             const CTxIn &txin = tx->vin[0];
-            bool validTx = IsValidOracleTx(txin, height);
+            bool validTx = IsValidOracleTxIn(txin, height);
 
             // Check each TX out for values
             for (unsigned int i = 0; i < tx->vout.size(); i++) {
@@ -406,7 +406,7 @@ UniValue getchaingamesinfo(const JSONRPCRequest& request)
     if (resultHeight > Params().GetConsensus().nWagerrProtocolV2StartHeight && fShowWinner) {
         std::vector<CBetOut> vExpectedCGLottoPayouts;
         std::vector<CPayoutInfoDB> vPayoutsInfo;
-        GetCGLottoBetPayoutsV2(resultHeight, vExpectedCGLottoPayouts, vPayoutsInfo);
+        GetCGLottoBetPayoutsV2(block, ::ChainstateActive().CoinsTip(), resultHeight, vExpectedCGLottoPayouts, vPayoutsInfo);
         for (auto lottoPayouts : vExpectedCGLottoPayouts) {
             if (!winningBetFound && lottoPayouts.nEventId == eventID) {
                 winningBetOut = lottoPayouts;
@@ -1008,7 +1008,7 @@ UniValue listchaingamesevents(const JSONRPCRequest& request)
             uint256 txHash = tx->GetHash();
 
             const CTxIn &txin = tx->vin[0];
-            bool validTx = IsValidOracleTx(txin, height);
+            bool validTx = IsValidOracleTxIn(txin, height);
 
             // Check each TX out for values
             for (unsigned int i = 0; i < tx->vout.size(); i++) {

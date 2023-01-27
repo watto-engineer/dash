@@ -27,7 +27,6 @@ packages:
 - "python3-dev"
 - "python3-setuptools"
 - "fonts-tuffy"
-- "ccache"
 - "cmake"
 - "xorriso"
 - "libtinfo5"
@@ -52,21 +51,6 @@ script: |
     export SOURCES_PATH=${GBUILD_COMMON_CACHE}
     export BASE_CACHE=${GBUILD_PACKAGE_CACHE}/depends
     mkdir -p ${BASE_CACHE} ${SOURCES_PATH}
-
-    # Setup ccache to use correct cache directories
-    CONFIGFLAGS="${CONFIGFLAGS} --enable-ccache"
-    export CCACHE_DIR=${GBUILD_PACKAGE_CACHE}/ccache
-    if [ -f ${GBUILD_PACKAGE_CACHE}/ccache.tar ]; then
-      pushd ${GBUILD_PACKAGE_CACHE}
-      tar xf ccache.tar
-      rm ccache.tar
-      popd
-    fi
-    # instead of compressing ccache.tar, we let ccache handle it by itself
-    # Otherwise we end up uncompressing/compressing a lot of cache files which we actually never use
-    export CCACHE_COMPRESS=1
-  else
-    CONFIGFLAGS="${CONFIGFLAGS} --disable-ccache"
   fi
 
   export ZERO_AR_DATE=1
@@ -173,11 +157,3 @@ script: |
   done
   mv ${OUTDIR}/${DISTNAME}-${i}.tar.gz ${OUTDIR}/${DISTNAME}-${i}-osx64.tar.gz
   mv ${OUTDIR}/${DISTNAME}-${i}-debug.tar.gz ${OUTDIR}/${DISTNAME}-${i}-osx64-debug.tar.gz
-
-  # Compress ccache (otherwise the assert file will get too huge)
-  if [ "$CCACHE_DIR" != "" ]; then
-    pushd ${GBUILD_PACKAGE_CACHE}
-    tar cf ccache.tar ccache
-    rm -rf ccache
-    popd
-  fi

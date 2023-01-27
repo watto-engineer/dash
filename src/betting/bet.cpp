@@ -140,25 +140,12 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     return true;
 }
 
-bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
+bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
     // if is not wagerr v3 - do not check tx
     if (height < Params().GetConsensus().WagerrProtocolV3StartHeight()) return true;
 
-    // Get player address
-    const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
-    uint256 hashBlock;
-    CTxDestination address;
-    CTxDestination prevAddr;
-    // if we cant extract playerAddress - skip tx
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
-
-    if (!txPrev ||
-            !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
-        return true;
-    }
-    address = prevAddr;
+    if (!HasOpReturnOutput(tx)) return true;
 
     for (const CTxOut &txOut : tx.vout) {
         // parse betting TX
@@ -374,346 +361,356 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 }
                 break;
             }
-            case mappingTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
-
-                auto mappingType = MappingType(mapTx->nMType);
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
-                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
-                {
-                    return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
-                }
-
-                if (bettingsViewCache.mappings->Exists(MappingKey{mappingType, mapTx->nId}))
-                    return error("CheckBettingTX: trying to create existed mapping!");
-                break;
-            }
-            case plEventTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
-
-                if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId}))
-                    return error("CheckBettingTX: trying to create existed event id %lu!", plEventTx->nEventId);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{sportMapping, (uint32_t) plEventTx->nSport}))
-                    return error("CheckBettingTX: trying to create event with unknown sport id %lu!", plEventTx->nSport);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) plEventTx->nTournament}))
-                    return error("CheckBettingTX: trying to create event with unknown tournament id %lu!", plEventTx->nTournament);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) plEventTx->nStage}))
-                    return error("CheckBettingTX: trying to create event with unknown round id %lu!", plEventTx->nStage);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nHomeTeam}))
-                    return error("CheckBettingTX: trying to create event with unknown home team id %lu!", plEventTx->nHomeTeam);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nAwayTeam}))
-                    return error("CheckBettingTX: trying to create event with unknown away team id %lu!", plEventTx->nAwayTeam);
-
-                /*
-                if (!CHECK_ODDS(plEventTx->nHomeOdds))
-                    return error("CheckBettingTX: invalid home odds %lu!", plEventTx->nHomeOdds);
-
-                if (!CHECK_ODDS(plEventTx->nAwayOdds))
-                    return error("CheckBettingTX: invalid away odds %lu!", plEventTx->nAwayOdds);
-
-                if (!CHECK_ODDS(plEventTx->nDrawOdds))
-                    return error("CheckBettingTX: invalid draw odds %lu!", plEventTx->nDrawOdds);
-                */
-
-                break;
-            }
-            case fEventTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-
-                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId}))
-                    return error("CheckBettingTX: trying to create existed field event id %lu!", fEventTx->nEventId);
-
-                if (fEventTx->nGroupType < FieldEventGroupType::other || fEventTx->nGroupType > FieldEventGroupType::animalRacing)
-                    return error("CheckBettingTx: trying to create field event with bad group type %lu!", fEventTx->nGroupType);
-
-                if (fEventTx->nMarketType < FieldEventMarketType::all_markets || fEventTx->nMarketType > FieldEventMarketType::outrightOnly)
-                    return error("CheckBettingTx: trying to create field event with bad market type %lu!", fEventTx->nMarketType);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{individualSportMapping, (uint32_t) fEventTx->nSport}))
-                    return error("CheckBettingTX: trying to create field event with unknown individual sport id %lu!", fEventTx->nSport);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) fEventTx->nTournament}))
-                    return error("CheckBettingTX: trying to create field event with unknown tournament id %lu!", fEventTx->nTournament);
-
-                if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) fEventTx->nStage}))
-                    return error("CheckBettingTX: trying to create field event with unknown round id %lu!", fEventTx->nStage);
-
-                for (const auto& contender : fEventTx->mContendersInputOdds) {
-                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
-                        return error("CheckBettingTx: trying to create field event with unknown contender %lu!", contender.first);
-                }
-
-                break;
-            }
-            case fUpdateOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
-
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
-                    return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
-
-                for (const auto& contender : fUpdateOddsTx->mContendersInputOdds) {
-                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
-                        return error("CheckBettingTx: trying to update odds for unknown contender %lu!", contender.first);
-                }
-
-                break;
-            }
-            case fUpdateModifiersTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldUpdateModifiersTx* fUpdateOddsTx = (CFieldUpdateModifiersTx*) bettingTx.get();
-
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
-                    return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
-
-                for (const auto& contender : fUpdateOddsTx->mContendersModifires) {
-                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
-                        return error("CheckBettingTx: trying to update modifier for unknown contender %lu!", contender.first);
-                }
-
-                break;
-            }
-            case fUpdateMarginTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
-
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateMarginTx->nEventId}))
-                    return error("CheckBettingTX: trying to updating margin for not existed field event id %lu!", fUpdateMarginTx->nEventId);
-
-                break;
-            }
-            case fZeroingOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
-
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fZeroingOddsTx->nEventId}))
-                    return error("CheckBettingTX: trying to zeroing odds for not existed field event id %lu!", fZeroingOddsTx->nEventId);
-
-                break;
-            }
-            case fResultTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
-
-                if (fResultTx->nResultType != ResultType::standardResult &&
-                        fResultTx->nResultType != ResultType::eventRefund &&
-                        fResultTx->nResultType != ResultType::eventClosed)
-                    return error("CheckBettingTX: unsupported result type for field event: %d!", fResultTx->nResultType);
-
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result not existed field event id %lu!", fResultTx->nEventId);
-
-                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result already resulted field event id %lu!", fResultTx->nEventId);
-
-                CFieldEventDB fEvent;
-                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fEvent)) {
-                    return error("CheckBettingTX: cannot read event %lu!", fResultTx->nEventId);
-                }
-
-                for (const auto& result : fResultTx->contendersResults) {
-                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, (uint32_t) result.first}))
-                        return error("CheckBettingTx: trying to create result for field event with unknown contender %lu!", result.first);
-
-                    if (fEvent.contenders.find(result.first) == fEvent.contenders.end())
-                        return error("CheckBettingTx: there is no contender %lu in event %lu!", result.first, fResultTx->nEventId);
-
-                    if (result.second != ContenderResult::place1 &&
-                        result.second != ContenderResult::place2 &&
-                        result.second != ContenderResult::place3 &&
-                        result.second != ContenderResult::DNF    &&
-                        result.second != ContenderResult::DNR )
-                    {
-                        return error("CheckBettingTx: trying to create result for field event with unknown result %lu!", result.second);
-                    }
-                }
-
-                break;
-            }
-            case plResultTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
-
-                if (!bettingsViewCache.events->Exists(EventKey{plResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result not existed event id %lu!", plResultTx->nEventId);
-
-                if (bettingsViewCache.results->Exists(ResultKey{plResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result already resulted event id %lu!", plResultTx->nEventId);
-                break;
-            }
-            case plUpdateOddsTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
-
-                if (!bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId}))
-                    return error("CheckBettingTX: trying to update not existed event id %lu!", plUpdateOddsTx->nEventId);
-
-                /*
-                if (!CHECK_ODDS(plUpdateOddsTx->nHomeOdds))
-                    return error("CheckBettingTX: invalid home odds %lu!", plUpdateOddsTx->nHomeOdds);
-
-                if (!CHECK_ODDS(plUpdateOddsTx->nAwayOdds))
-                    return error("CheckBettingTX: invalid away odds %lu!", plUpdateOddsTx->nAwayOdds);
-
-                if (!CHECK_ODDS(plUpdateOddsTx->nDrawOdds))
-                    return error("CheckBettingTX: invalid draw odds %lu!", plUpdateOddsTx->nDrawOdds);
-                */
-
-                break;
-            }
-            case cgEventTxType:
-            {
-                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
-                    return error("CheckBettingTX : Chain games transactions are disabled");
-                }
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
-
-                if (bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgEventTx->nEventId}))
-                    return error("CheckBettingTX: trying to create existed chain games event id %lu!", cgEventTx->nEventId);
-
-                break;
-            }
-            case cgResultTxType:
-            {
-                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
-                    return error("CheckBettingTX : Chain games transactions are disabled");
-                }
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
-
-                if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result not existed chain games event id %lu!", cgResultTx->nEventId);
-
-                if (bettingsViewCache.chainGamesLottoResults->Exists(ResultKey{cgResultTx->nEventId}))
-                    return error("CheckBettingTX: trying to result already resulted chain games event id %lu!", cgResultTx->nEventId);
-
-                break;
-            }
-            case plSpreadsEventTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
-
-                if (!bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId}))
-                    return error("CheckBettingTX: trying to create spreads at not existed event id %lu!", plSpreadsEventTx->nEventId);
-
-                /*
-                if (!CHECK_ODDS(plSpreadsEventTx->nHomeOdds))
-                    return error("CheckBettingTX: invalid spreads home odds %lu!", plSpreadsEventTx->nHomeOdds);
-
-                if (!CHECK_ODDS(plSpreadsEventTx->nAwayOdds))
-                    return error("CheckBettingTX: invalid spreads away odds %lu!", plSpreadsEventTx->nAwayOdds);
-                */
-
-                break;
-            }
-            case plTotalsEventTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
-
-                if (!bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId}))
-                    return error("CheckBettingTX: trying to create totals at not existed event id %lu!", plTotalsEventTx->nEventId);
-
-                /*
-                if (!CHECK_ODDS(plTotalsEventTx->nOverOdds))
-                    return error("CheckBettingTX: invalid totals over odds %lu!", plTotalsEventTx->nOverOdds);
-
-                if (!CHECK_ODDS(plTotalsEventTx->nUnderOdds))
-                    return error("CheckBettingTX: invalid totals under odds %lu!", plTotalsEventTx->nUnderOdds);
-                */
-
-                break;
-            }
-            case plEventPatchTxType:
-            {
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
-
-                if (!bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId}))
-                    return error("CheckBettingTX: trying to patch not existed event id %lu!", plEventPatchTx->nEventId);
-
-                break;
-            }
-            case plEventZeroingOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
-                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
-
-                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
-
-                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
-                    if (!bettingsViewCache.events->Exists(EventKey{eventId}))
-                        return error("CheckBettingTX: trying to update not existed event id %lu!", eventId);
-                }
-
-                break;
-            }
             default:
-                continue;
+            {
+                // Get player address
+                const CTxIn& txin{tx.vin[0]};
+                uint256 hashBlock;
+                CTxDestination address;
+                CTxDestination prevAddr;
+                // if we cant extract playerAddress - skip tx
+                CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
+
+                if (!txPrev ||
+                        !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+                    return true;
+                }
+                address = prevAddr;
+
+                bool validOracleTx{IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height)};
+                switch(bettingTx->GetTxType()) {
+                    case mappingTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
+
+                        auto mappingType = MappingType(mapTx->nMType);
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
+                        (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                        {
+                            return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
+                        }
+
+                        if (bettingsViewCache.mappings->Exists(MappingKey{mappingType, mapTx->nId}))
+                            return error("CheckBettingTX: trying to create existed mapping!");
+                        break;
+                    }
+                    case plEventTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
+
+                        if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId}))
+                            return error("CheckBettingTX: trying to create existed event id %lu!", plEventTx->nEventId);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{sportMapping, (uint32_t) plEventTx->nSport}))
+                            return error("CheckBettingTX: trying to create event with unknown sport id %lu!", plEventTx->nSport);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) plEventTx->nTournament}))
+                            return error("CheckBettingTX: trying to create event with unknown tournament id %lu!", plEventTx->nTournament);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) plEventTx->nStage}))
+                            return error("CheckBettingTX: trying to create event with unknown round id %lu!", plEventTx->nStage);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nHomeTeam}))
+                            return error("CheckBettingTX: trying to create event with unknown home team id %lu!", plEventTx->nHomeTeam);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nAwayTeam}))
+                            return error("CheckBettingTX: trying to create event with unknown away team id %lu!", plEventTx->nAwayTeam);
+
+                        /*
+                        if (!CHECK_ODDS(plEventTx->nHomeOdds))
+                            return error("CheckBettingTX: invalid home odds %lu!", plEventTx->nHomeOdds);
+
+                        if (!CHECK_ODDS(plEventTx->nAwayOdds))
+                            return error("CheckBettingTX: invalid away odds %lu!", plEventTx->nAwayOdds);
+
+                        if (!CHECK_ODDS(plEventTx->nDrawOdds))
+                            return error("CheckBettingTX: invalid draw odds %lu!", plEventTx->nDrawOdds);
+                        */
+
+                        break;
+                    }
+                    case fEventTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+
+                        if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId}))
+                            return error("CheckBettingTX: trying to create existed field event id %lu!", fEventTx->nEventId);
+
+                        if (fEventTx->nGroupType < FieldEventGroupType::other || fEventTx->nGroupType > FieldEventGroupType::animalRacing)
+                            return error("CheckBettingTx: trying to create field event with bad group type %lu!", fEventTx->nGroupType);
+
+                        if (fEventTx->nMarketType < FieldEventMarketType::all_markets || fEventTx->nMarketType > FieldEventMarketType::outrightOnly)
+                            return error("CheckBettingTx: trying to create field event with bad market type %lu!", fEventTx->nMarketType);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{individualSportMapping, (uint32_t) fEventTx->nSport}))
+                            return error("CheckBettingTX: trying to create field event with unknown individual sport id %lu!", fEventTx->nSport);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) fEventTx->nTournament}))
+                            return error("CheckBettingTX: trying to create field event with unknown tournament id %lu!", fEventTx->nTournament);
+
+                        if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) fEventTx->nStage}))
+                            return error("CheckBettingTX: trying to create field event with unknown round id %lu!", fEventTx->nStage);
+
+                        for (const auto& contender : fEventTx->mContendersInputOdds) {
+                            if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
+                                return error("CheckBettingTx: trying to create field event with unknown contender %lu!", contender.first);
+                        }
+
+                        break;
+                    }
+                    case fUpdateOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
+                            return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
+
+                        for (const auto& contender : fUpdateOddsTx->mContendersInputOdds) {
+                            if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
+                                return error("CheckBettingTx: trying to update odds for unknown contender %lu!", contender.first);
+                        }
+
+                        break;
+                    }
+                    case fUpdateModifiersTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldUpdateModifiersTx* fUpdateOddsTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
+                            return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
+
+                        for (const auto& contender : fUpdateOddsTx->mContendersModifires) {
+                            if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
+                                return error("CheckBettingTx: trying to update modifier for unknown contender %lu!", contender.first);
+                        }
+
+                        break;
+                    }
+                    case fUpdateMarginTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateMarginTx->nEventId}))
+                            return error("CheckBettingTX: trying to updating margin for not existed field event id %lu!", fUpdateMarginTx->nEventId);
+
+                        break;
+                    }
+                    case fZeroingOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fZeroingOddsTx->nEventId}))
+                            return error("CheckBettingTX: trying to zeroing odds for not existed field event id %lu!", fZeroingOddsTx->nEventId);
+
+                        break;
+                    }
+                    case fResultTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                        if (fResultTx->nResultType != ResultType::standardResult &&
+                                fResultTx->nResultType != ResultType::eventRefund &&
+                                fResultTx->nResultType != ResultType::eventClosed)
+                            return error("CheckBettingTX: unsupported result type for field event: %d!", fResultTx->nResultType);
+
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result not existed field event id %lu!", fResultTx->nEventId);
+
+                        if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result already resulted field event id %lu!", fResultTx->nEventId);
+
+                        CFieldEventDB fEvent;
+                        if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fEvent)) {
+                            return error("CheckBettingTX: cannot read event %lu!", fResultTx->nEventId);
+                        }
+
+                        for (const auto& result : fResultTx->contendersResults) {
+                            if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, (uint32_t) result.first}))
+                                return error("CheckBettingTx: trying to create result for field event with unknown contender %lu!", result.first);
+
+                            if (fEvent.contenders.find(result.first) == fEvent.contenders.end())
+                                return error("CheckBettingTx: there is no contender %lu in event %lu!", result.first, fResultTx->nEventId);
+
+                            if (result.second != ContenderResult::place1 &&
+                                result.second != ContenderResult::place2 &&
+                                result.second != ContenderResult::place3 &&
+                                result.second != ContenderResult::DNF    &&
+                                result.second != ContenderResult::DNR )
+                            {
+                                return error("CheckBettingTx: trying to create result for field event with unknown result %lu!", result.second);
+                            }
+                        }
+
+                        break;
+                    }
+                    case plResultTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result not existed event id %lu!", plResultTx->nEventId);
+
+                        if (bettingsViewCache.results->Exists(ResultKey{plResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result already resulted event id %lu!", plResultTx->nEventId);
+                        break;
+                    }
+                    case plUpdateOddsTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId}))
+                            return error("CheckBettingTX: trying to update not existed event id %lu!", plUpdateOddsTx->nEventId);
+
+                        /*
+                        if (!CHECK_ODDS(plUpdateOddsTx->nHomeOdds))
+                            return error("CheckBettingTX: invalid home odds %lu!", plUpdateOddsTx->nHomeOdds);
+
+                        if (!CHECK_ODDS(plUpdateOddsTx->nAwayOdds))
+                            return error("CheckBettingTX: invalid away odds %lu!", plUpdateOddsTx->nAwayOdds);
+
+                        if (!CHECK_ODDS(plUpdateOddsTx->nDrawOdds))
+                            return error("CheckBettingTX: invalid draw odds %lu!", plUpdateOddsTx->nDrawOdds);
+                        */
+
+                        break;
+                    }
+                    case cgEventTxType:
+                    {
+                        if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
+                            return error("CheckBettingTX : Chain games transactions are disabled");
+                        }
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                        if (bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgEventTx->nEventId}))
+                            return error("CheckBettingTX: trying to create existed chain games event id %lu!", cgEventTx->nEventId);
+
+                        break;
+                    }
+                    case cgResultTxType:
+                    {
+                        if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
+                            return error("CheckBettingTX : Chain games transactions are disabled");
+                        }
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result not existed chain games event id %lu!", cgResultTx->nEventId);
+
+                        if (bettingsViewCache.chainGamesLottoResults->Exists(ResultKey{cgResultTx->nEventId}))
+                            return error("CheckBettingTX: trying to result already resulted chain games event id %lu!", cgResultTx->nEventId);
+
+                        break;
+                    }
+                    case plSpreadsEventTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId}))
+                            return error("CheckBettingTX: trying to create spreads at not existed event id %lu!", plSpreadsEventTx->nEventId);
+
+                        /*
+                        if (!CHECK_ODDS(plSpreadsEventTx->nHomeOdds))
+                            return error("CheckBettingTX: invalid spreads home odds %lu!", plSpreadsEventTx->nHomeOdds);
+
+                        if (!CHECK_ODDS(plSpreadsEventTx->nAwayOdds))
+                            return error("CheckBettingTX: invalid spreads away odds %lu!", plSpreadsEventTx->nAwayOdds);
+                        */
+
+                        break;
+                    }
+                    case plTotalsEventTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId}))
+                            return error("CheckBettingTX: trying to create totals at not existed event id %lu!", plTotalsEventTx->nEventId);
+
+                        /*
+                        if (!CHECK_ODDS(plTotalsEventTx->nOverOdds))
+                            return error("CheckBettingTX: invalid totals over odds %lu!", plTotalsEventTx->nOverOdds);
+
+                        if (!CHECK_ODDS(plTotalsEventTx->nUnderOdds))
+                            return error("CheckBettingTX: invalid totals under odds %lu!", plTotalsEventTx->nUnderOdds);
+                        */
+
+                        break;
+                    }
+                    case plEventPatchTxType:
+                    {
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId}))
+                            return error("CheckBettingTX: trying to patch not existed event id %lu!", plEventPatchTx->nEventId);
+
+                        break;
+                    }
+                    case plEventZeroingOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
+                        if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                        CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                        for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                            if (!bettingsViewCache.events->Exists(EventKey{eventId}))
+                                return error("CheckBettingTX: trying to update not existed event id %lu!", eventId);
+                        }
+
+                        break;
+                    }
+                    default:
+                        continue;
+                }
+            }
         }
     }
     return true;
 }
 
-void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
+void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const CBlockIndex* pindex, const CBlock &block, const bool wagerrProtocolV3)
 {
+    const int64_t blockTime = block.GetBlockTime();
     LogPrint(BCLog::BETTING, "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx->GetHash().GetHex());
 
-    // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx->vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
-    // Get player address
-    uint256 hashBlock;
-    CTxDestination address;
-    CTxDestination prevAddr;
-    CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
-    // if we cant extract playerAddress - skip vout
-    if (!txPrev ||
-            !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
-        return;
-    }
-    address = prevAddr;
+    if (!HasOpReturnOutput(*tx)) return;
+
+    const int height = pindex->nHeight;
 
     for (size_t i = 0; i < tx->vout.size(); i++) {
         const CTxOut &txOut = tx->vout[i];
@@ -721,6 +718,26 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
         auto bettingTx = ParseBettingTx(txOut);
 
         if (bettingTx == nullptr) continue;
+
+        const CTxIn& txin{tx->vin[0]};
+        CTxDestination address;
+        CTxDestination prevAddr;
+        uint256 hashBlock;
+        CTransactionRef txPrev = GetTransaction(nullptr, nullptr, txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
+        // if we cant extract playerAddress - skip vout
+        if (!txPrev || !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+            for (const auto& blockTx : block.vtx) {
+                if (blockTx->GetHash() == txin.prevout.hash) {
+                    if (!ExtractDestination(blockTx->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+                        return;
+                    } else {
+                        txPrev = blockTx;
+                        break;
+                    }
+                }
+            }
+        }
+        address = prevAddr;
 
         CAmount betAmount{txOut.nValue};
         COutPoint outPoint{tx->GetHash(), (uint32_t) i};
@@ -1079,537 +1096,558 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& t
                 }
                 break;
             }
-
-            /* Oracle's tx types */
-
-            case mappingTxType:
-            {
-                if (!validOracleTx) break;
-
-                CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
-
-                auto mappingType = MappingType(mapTx->nMType);
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
-                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
-                {
-                    break;
-                }
-
-                LogPrint(BCLog::BETTING, "CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
-                if (!bettingsViewCache.mappings->Write(MappingKey{mappingType, mapTx->nId}, CMappingDB{mapTx->sName})) {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to write new mapping!\n");
-                }
-                break;
-            }
-            case plEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
-                    plEventTx->nEventId,
-                    plEventTx->nSport,
-                    plEventTx->nTournament,
-                    plEventTx->nStage,
-                    plEventTx->nHomeTeam,
-                    plEventTx->nAwayTeam,
-                    plEventTx->nHomeOdds,
-                    plEventTx->nAwayOdds,
-                    plEventTx->nDrawOdds);
-
-                CPeerlessExtendedEventDB plEvent;
-                plEvent.ExtractDataFromTx(*plEventTx);
-
-                if (!wagerrProtocolV3) {
-                    plEvent.nEventCreationHeight = height;
-                    plEvent.fLegacyInitialHomeFavorite =  plEventTx->nHomeOdds < plEventTx->nAwayOdds ? true : false;
-                }
-
-                EventKey eventKey{plEvent.nEventId};
-
-                if (!bettingsViewCache.events->Write(eventKey, plEvent)) {
-                    CPeerlessExtendedEventDB plEventToPatch;
-                    if (!wagerrProtocolV3 &&
-                            bettingsViewCache.events->Read(eventKey, plEventToPatch)) {
-                        LogPrint(BCLog::BETTING, "CPeerlessEvent - Legacy - try to patch with new event data: id: %lu, time: %lu\n", plEvent.nEventId, plEvent.nStartTime);
-                        // save prev event state to undo
-                        bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEventToPatch}, (uint32_t)height}});
-
-                        plEventToPatch.nStartTime = plEvent.nStartTime;
-                        plEventToPatch.nSport = plEvent.nSport;
-                        plEventToPatch.nTournament = plEvent.nTournament;
-                        plEventToPatch.nStage = plEvent.nStage;
-                        plEventToPatch.nHomeTeam = plEvent.nHomeTeam;
-                        plEventToPatch.nAwayTeam = plEvent.nAwayTeam;
-                        plEventToPatch.nHomeOdds = plEvent.nHomeOdds;
-                        plEventToPatch.nAwayOdds = plEvent.nAwayOdds;
-                        plEventToPatch.nDrawOdds = plEvent.nDrawOdds;
-
-                        if (!bettingsViewCache.events->Update(eventKey, plEventToPatch)) {
-                            // should not happen ever
-                            LogPrintf("Failed to update event!\n");
-                        }
-                    } else {
-                        if (!wagerrProtocolV3) {
-                            // save failed tx to db, for avoiding undo issues
-                            bettingsViewCache.SaveFailedTx(bettingTxId);
-                        }
-                        LogPrintf("Failed to write new event!\n");
-                    }
-                }
-                break;
-            }
-            case fEventTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu, marketType: %lu\n",
-                    fEventTx->nEventId,
-                    fEventTx->nSport,
-                    fEventTx->nTournament,
-                    fEventTx->nStage,
-                    fEventTx->nGroupType,
-                    fEventTx->nMarketType
-                );
-                for (auto& contender : fEventTx->mContendersInputOdds) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
-
-                CFieldEventDB fEvent;
-                fEvent.ExtractDataFromTx(*fEventTx);
-                fEvent.CalcOdds();
-
-                FieldEventKey eventKey{fEvent.nEventId};
-                if (!bettingsViewCache.fieldEvents->Write(eventKey, fEvent))
-                    LogPrintf("Failed to write new event!\n");
-
-                break;
-            }
-            case fUpdateOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
-                for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
-
-                FieldEventKey fEventKey{fUpdateOddsTx->nEventId};
-                CFieldEventDB fEvent;
-                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-
-                    fEvent.ExtractDataFromTx(*fUpdateOddsTx);
-                    fEvent.CalcOdds();
-
-                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                        LogPrintf("Failed to update field event!\n");
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
-            }
-            case fUpdateModifiersTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
-                for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
-
-                FieldEventKey fEventKey{fUpdateModifiersTx->nEventId};
-                CFieldEventDB fEvent;
-                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-
-                    fEvent.ExtractDataFromTx(*fUpdateModifiersTx);
-                    fEvent.CalcOdds();
-
-                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                        LogPrintf("Failed to update field event!\n");
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
-            }
-            case fUpdateMarginTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
-
-                FieldEventKey fEventKey{fUpdateMarginTx->nEventId};
-                CFieldEventDB fEvent;
-                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-
-                    fEvent.ExtractDataFromTx(*fUpdateMarginTx);
-                    fEvent.CalcOdds();
-
-                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                        LogPrintf("Failed to update field event!\n");
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
-            }
-            case fZeroingOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
-
-                FieldEventKey fEventKey{fZeroingOddsTx->nEventId};
-                CFieldEventDB fEvent;
-                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-
-                    for (auto& contender : fEvent.contenders) {
-                        contender.second.nInputOdds = 0;
-                        contender.second.nOutrightOdds = 0;
-                        contender.second.nPlaceOdds = 0;
-                        contender.second.nShowOdds = 0;
-                    }
-
-                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                        LogPrintf("Failed to update field event!\n");
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
-            }
-            case fResultTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
-                for (auto& contender : fResultTx->contendersResults) {
-                    LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
-                }
-
-                CFieldEventDB fieldEvent;
-                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fieldEvent)) {
-                    LogPrintf("Failed to find field event!\n");
-                    break;
-                }
-
-                CFieldResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
-                for (auto& contender : fieldEvent.contenders) {
-                    if (fResultTx->contendersResults.find(contender.first) != fResultTx->contendersResults.end()) {
-                        fEventResult.contendersResults.emplace(contender.first, fResultTx->contendersResults[contender.first]);
-                    }
-                    else {
-                        fEventResult.contendersResults.emplace(contender.first, ContenderResult::DNF);
-                    }
-                }
-
-                if (!bettingsViewCache.fieldResults->Write(FieldResultKey{fEventResult.nEventId}, fEventResult)) {
-                    LogPrintf("Failed to write field result!\n");
-                    break;
-                }
-
-                break;
-            }
-            case plResultTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
-                    plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore);
-
-                CPeerlessResultDB plResult{plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore};
-
-                if (!bettingsViewCache.events->Exists(EventKey{plResult.nEventId})) {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to find event!\n");
-                    break;
-                }
-
-                if (!bettingsViewCache.results->Write(ResultKey{plResult.nEventId}, plResult)) {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to write result!\n");
-                    break;
-                }
-                break;
-            }
-            case plUpdateOddsTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
-
-                EventKey eventKey{plUpdateOddsTx->nEventId};
-                CPeerlessExtendedEventDB plEvent;
-                // First check a peerless event exists in DB.
-                if (bettingsViewCache.events->Read(eventKey, plEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
-
-                    plEvent.ExtractDataFromTx(*plUpdateOddsTx);
-
-                    // Update the event in the DB.
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                        LogPrintf("Failed to update event!\n");
-                }
-                else {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case cgEventTxType:
-            {
-                if (!wagerrProtocolV3) break;
-                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
-                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
-                    break;
-                }
-                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
-
-                EventKey eventKey{cgEventTx->nEventId};
-                if (!bettingsViewCache.chainGamesLottoEvents->Write(
-                        eventKey,
-                        CChainGamesEventDB{ cgEventTx->nEventId, cgEventTx->nEntryFee })) {
-                    LogPrintf("Failed to write new event!\n");
-                    break;
-                }
-                break;
-            }
-            case cgResultTxType:
-            {
-                if (!wagerrProtocolV3) break;
-                if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
-                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
-                    break;
-                }
-
-                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CChainGamesResultTx: nEventId: %d\n", cgResultTx->nEventId);
-
-                if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
-                    LogPrintf("Failed to find event!\n");
-                    break;
-                }
-                if (!bettingsViewCache.chainGamesLottoResults->Write(
-                        ResultKey{cgResultTx->nEventId},
-                        CChainGamesResultDB{ cgResultTx->nEventId })) {
-                    LogPrintf("Failed to write result!\n");
-                    break;
-                }
-                break;
-            }
-            case plSpreadsEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
-                    plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
-
-                CPeerlessExtendedEventDB plEvent;
-                EventKey eventKey{plSpreadsEventTx->nEventId};
-                // First check a peerless event exists in the event index.
-                if (bettingsViewCache.events->Read(eventKey, plEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
-
-                    plEvent.ExtractDataFromTx(*plSpreadsEventTx);
-                    // Update the event in the DB.
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                        LogPrintf("Failed to update event!\n");
-                }
-                else {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case plTotalsEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
-
-                LogPrint(BCLog::BETTING, "CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
-                    plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
-
-                CPeerlessExtendedEventDB plEvent;
-                EventKey eventKey{plTotalsEventTx->nEventId};
-                // First check a peerless event exists in the event index.
-                if (bettingsViewCache.events->Read(eventKey, plEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
-
-                    plEvent.ExtractDataFromTx(*plTotalsEventTx);
-
-                    // Update the event in the DB.
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                        LogPrintf("Failed to update event!\n");
-                }
-                else {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case plEventPatchTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
-                CPeerlessExtendedEventDB plEvent;
-                EventKey eventKey{plEventPatchTx->nEventId};
-                // First check a peerless event exists in DB
-                if (bettingsViewCache.events->Read(eventKey, plEvent)) {
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
-
-                    plEvent.ExtractDataFromTx(*plEventPatchTx);
-
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                        LogPrintf("Failed to update event!\n");
-                }
-                else {
-                    if (!wagerrProtocolV3) {
-                        // save failed tx to db, for avoiding undo issues
-                        bettingsViewCache.SaveFailedTx(bettingTxId);
-                    }
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case plEventZeroingOddsTxType:
-            {
-                if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
-                if (!validOracleTx) break;
-
-                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
-
-                std::stringstream eventIdsStream;
-                std::vector<CBettingUndoDB> vUndos;
-                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
-                    eventIdsStream << eventId << " ";
-                    EventKey eventKey{eventId};
-                    CPeerlessExtendedEventDB plEvent;
-                    // Check a peerless event exists in DB.
-                    if (bettingsViewCache.events->Read(eventKey, plEvent)) {
-                        // save prev event state to undo
-                        vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
-
-                        plEvent.nHomeOdds = 0;
-                        plEvent.nAwayOdds = 0;
-                        plEvent.nDrawOdds = 0;
-                        plEvent.nSpreadHomeOdds = 0;
-                        plEvent.nSpreadAwayOdds = 0;
-                        plEvent.nTotalOverOdds  = 0;
-                        plEvent.nTotalUnderOdds = 0;
-
-                        // Update the event in the DB.
-                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                            LogPrintf("Failed to update event!\n");
-                    }
-                }
-
-                LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
-
-                if (!vUndos.empty()) {
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
-                }
-
-                break;
-            }
             default:
-                break;
+            {
+                // Ensure the event TX has come from Oracle wallet.
+                const bool validOracleTx{IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height)};
+                if (!validOracleTx) break;
+
+                /* Oracle's tx types */
+                switch(bettingTx->GetTxType()) {
+                    case mappingTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
+
+                        auto mappingType = MappingType(mapTx->nMType);
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight() &&
+                        (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                        {
+                            break;
+                        }
+
+                        LogPrint(BCLog::BETTING, "CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
+                        if (!bettingsViewCache.mappings->Write(MappingKey{mappingType, mapTx->nId}, CMappingDB{mapTx->sName})) {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to write new mapping!\n");
+                        }
+                        break;
+                    }
+                    case plEventTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                            plEventTx->nEventId,
+                            plEventTx->nSport,
+                            plEventTx->nTournament,
+                            plEventTx->nStage,
+                            plEventTx->nHomeTeam,
+                            plEventTx->nAwayTeam,
+                            plEventTx->nHomeOdds,
+                            plEventTx->nAwayOdds,
+                            plEventTx->nDrawOdds);
+
+                        CPeerlessExtendedEventDB plEvent;
+                        plEvent.ExtractDataFromTx(*plEventTx);
+
+                        if (!wagerrProtocolV3) {
+                            plEvent.nEventCreationHeight = height;
+                            plEvent.fLegacyInitialHomeFavorite =  plEventTx->nHomeOdds < plEventTx->nAwayOdds ? true : false;
+                        }
+
+                        EventKey eventKey{plEvent.nEventId};
+
+                        if (!bettingsViewCache.events->Write(eventKey, plEvent)) {
+                            CPeerlessExtendedEventDB plEventToPatch;
+                            if (!wagerrProtocolV3 &&
+                                    bettingsViewCache.events->Read(eventKey, plEventToPatch)) {
+                                LogPrint(BCLog::BETTING, "CPeerlessEvent - Legacy - try to patch with new event data: id: %lu, time: %lu\n", plEvent.nEventId, plEvent.nStartTime);
+                                // save prev event state to undo
+                                bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEventToPatch}, (uint32_t)height}});
+
+                                plEventToPatch.nStartTime = plEvent.nStartTime;
+                                plEventToPatch.nSport = plEvent.nSport;
+                                plEventToPatch.nTournament = plEvent.nTournament;
+                                plEventToPatch.nStage = plEvent.nStage;
+                                plEventToPatch.nHomeTeam = plEvent.nHomeTeam;
+                                plEventToPatch.nAwayTeam = plEvent.nAwayTeam;
+                                plEventToPatch.nHomeOdds = plEvent.nHomeOdds;
+                                plEventToPatch.nAwayOdds = plEvent.nAwayOdds;
+                                plEventToPatch.nDrawOdds = plEvent.nDrawOdds;
+
+                                if (!bettingsViewCache.events->Update(eventKey, plEventToPatch)) {
+                                    // should not happen ever
+                                    LogPrintf("Failed to update event!\n");
+                                }
+                            } else {
+                                if (!wagerrProtocolV3) {
+                                    // save failed tx to db, for avoiding undo issues
+                                    bettingsViewCache.SaveFailedTx(bettingTxId);
+                                }
+                                LogPrintf("Failed to write new event!\n");
+                            }
+                        }
+                        break;
+                    }
+                    case fEventTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu, marketType: %lu\n",
+                            fEventTx->nEventId,
+                            fEventTx->nSport,
+                            fEventTx->nTournament,
+                            fEventTx->nStage,
+                            fEventTx->nGroupType,
+                            fEventTx->nMarketType
+                        );
+                        for (auto& contender : fEventTx->mContendersInputOdds) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        CFieldEventDB fEvent;
+                        fEvent.ExtractDataFromTx(*fEventTx);
+                        fEvent.CalcOdds();
+
+                        FieldEventKey eventKey{fEvent.nEventId};
+                        if (!bettingsViewCache.fieldEvents->Write(eventKey, fEvent))
+                            LogPrintf("Failed to write new event!\n");
+
+                        break;
+                    }
+                    case fUpdateOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
+                        for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        FieldEventKey fEventKey{fUpdateOddsTx->nEventId};
+                        CFieldEventDB fEvent;
+                        if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                            fEvent.ExtractDataFromTx(*fUpdateOddsTx);
+                            fEvent.CalcOdds();
+
+                            if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                                LogPrintf("Failed to update field event!\n");
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fUpdateModifiersTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                        for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        FieldEventKey fEventKey{fUpdateModifiersTx->nEventId};
+                        CFieldEventDB fEvent;
+                        if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                            fEvent.ExtractDataFromTx(*fUpdateModifiersTx);
+                            fEvent.CalcOdds();
+
+                            if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                                LogPrintf("Failed to update field event!\n");
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fUpdateMarginTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
+
+                        FieldEventKey fEventKey{fUpdateMarginTx->nEventId};
+                        CFieldEventDB fEvent;
+                        if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                            fEvent.ExtractDataFromTx(*fUpdateMarginTx);
+                            fEvent.CalcOdds();
+
+                            if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                                LogPrintf("Failed to update field event!\n");
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fZeroingOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+
+                        FieldEventKey fEventKey{fZeroingOddsTx->nEventId};
+                        CFieldEventDB fEvent;
+                        if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                            for (auto& contender : fEvent.contenders) {
+                                contender.second.nInputOdds = 0;
+                                contender.second.nOutrightOdds = 0;
+                                contender.second.nPlaceOdds = 0;
+                                contender.second.nShowOdds = 0;
+                            }
+
+                            if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                                LogPrintf("Failed to update field event!\n");
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fResultTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                        for (auto& contender : fResultTx->contendersResults) {
+                            LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
+                        }
+
+                        CFieldEventDB fieldEvent;
+                        if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fieldEvent)) {
+                            LogPrintf("Failed to find field event!\n");
+                            break;
+                        }
+
+                        CFieldResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
+                        for (auto& contender : fieldEvent.contenders) {
+                            if (fResultTx->contendersResults.find(contender.first) != fResultTx->contendersResults.end()) {
+                                fEventResult.contendersResults.emplace(contender.first, fResultTx->contendersResults[contender.first]);
+                            }
+                            else {
+                                fEventResult.contendersResults.emplace(contender.first, ContenderResult::DNF);
+                            }
+                        }
+
+                        if (!bettingsViewCache.fieldResults->Write(FieldResultKey{fEventResult.nEventId}, fEventResult)) {
+                            LogPrintf("Failed to write field result!\n");
+                            break;
+                        }
+
+                        break;
+                    }
+                    case plResultTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
+                            plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore);
+
+                        CPeerlessResultDB plResult{plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore};
+
+                        if (!bettingsViewCache.events->Exists(EventKey{plResult.nEventId})) {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to find event!\n");
+                            break;
+                        }
+
+                        if (!bettingsViewCache.results->Write(ResultKey{plResult.nEventId}, plResult)) {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to write result!\n");
+                            break;
+                        }
+                        break;
+                    }
+                    case plUpdateOddsTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
+
+                        EventKey eventKey{plUpdateOddsTx->nEventId};
+                        CPeerlessExtendedEventDB plEvent;
+                        // First check a peerless event exists in DB.
+                        if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+
+                            plEvent.ExtractDataFromTx(*plUpdateOddsTx);
+
+                            // Update the event in the DB.
+                            if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                                LogPrintf("Failed to update event!\n");
+                        }
+                        else {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
+                    }
+                    case cgEventTxType:
+                    {
+                        if (!wagerrProtocolV3) break;
+                        if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
+                            LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                            break;
+                        }
+                        CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
+
+                        EventKey eventKey{cgEventTx->nEventId};
+                        if (!bettingsViewCache.chainGamesLottoEvents->Write(
+                                eventKey,
+                                CChainGamesEventDB{ cgEventTx->nEventId, cgEventTx->nEntryFee })) {
+                            LogPrintf("Failed to write new event!\n");
+                            break;
+                        }
+                        break;
+                    }
+                    case cgResultTxType:
+                    {
+                        if (!wagerrProtocolV3) break;
+                        if (height >= Params().GetConsensus().QuickGamesEndHeight()) {
+                            LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                            break;
+                        }
+
+                        CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CChainGamesResultTx: nEventId: %d\n", cgResultTx->nEventId);
+
+                        if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
+                            LogPrintf("Failed to find event!\n");
+                            break;
+                        }
+                        if (!bettingsViewCache.chainGamesLottoResults->Write(
+                                ResultKey{cgResultTx->nEventId},
+                                CChainGamesResultDB{ cgResultTx->nEventId })) {
+                            LogPrintf("Failed to write result!\n");
+                            break;
+                        }
+                        break;
+                    }
+                    case plSpreadsEventTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
+                            plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
+
+                        CPeerlessExtendedEventDB plEvent;
+                        EventKey eventKey{plSpreadsEventTx->nEventId};
+                        // First check a peerless event exists in the event index.
+                        if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+
+                            plEvent.ExtractDataFromTx(*plSpreadsEventTx);
+                            // Update the event in the DB.
+                            if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                                LogPrintf("Failed to update event!\n");
+                        }
+                        else {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
+                    }
+                    case plTotalsEventTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
+
+                        LogPrint(BCLog::BETTING, "CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
+                            plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
+
+                        CPeerlessExtendedEventDB plEvent;
+                        EventKey eventKey{plTotalsEventTx->nEventId};
+                        // First check a peerless event exists in the event index.
+                        if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+
+                            plEvent.ExtractDataFromTx(*plTotalsEventTx);
+
+                            // Update the event in the DB.
+                            if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                                LogPrintf("Failed to update event!\n");
+                        }
+                        else {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
+                    }
+                    case plEventPatchTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
+                        CPeerlessExtendedEventDB plEvent;
+                        EventKey eventKey{plEventPatchTx->nEventId};
+                        // First check a peerless event exists in DB
+                        if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                            // save prev event state to undo
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+
+                            plEvent.ExtractDataFromTx(*plEventPatchTx);
+
+                            if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                                LogPrintf("Failed to update event!\n");
+                        }
+                        else {
+                            if (!wagerrProtocolV3) {
+                                // save failed tx to db, for avoiding undo issues
+                                bettingsViewCache.SaveFailedTx(bettingTxId);
+                            }
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
+                    }
+                    case plEventZeroingOddsTxType:
+                    {
+                        if (::ChainActive().Height() < Params().GetConsensus().WagerrProtocolV4StartHeight()) break;
+                        if (!validOracleTx) break;
+
+                        CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                        std::stringstream eventIdsStream;
+                        std::vector<CBettingUndoDB> vUndos;
+                        for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                            eventIdsStream << eventId << " ";
+                            EventKey eventKey{eventId};
+                            CPeerlessExtendedEventDB plEvent;
+                            // Check a peerless event exists in DB.
+                            if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                                // save prev event state to undo
+                                vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
+
+                                plEvent.nHomeOdds = 0;
+                                plEvent.nAwayOdds = 0;
+                                plEvent.nDrawOdds = 0;
+                                plEvent.nSpreadHomeOdds = 0;
+                                plEvent.nSpreadAwayOdds = 0;
+                                plEvent.nTotalOverOdds  = 0;
+                                plEvent.nTotalUnderOdds = 0;
+
+                                // Update the event in the DB.
+                                if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                                    LogPrintf("Failed to update event!\n");
+                            }
+                        }
+
+                        LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                        if (!vUndos.empty()) {
+                            bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                        }
+
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
         }
     }
     LogPrint(BCLog::BETTING, "ProcessBettingTx: end\n");
 }
 
-CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
+CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
 {
-    if (nNewBlockHeight < Params().GetConsensus().WagerrProtocolV2StartHeight()) return 0;
-
     CAmount expectedMint = 0;
     std::vector<CBetOut> vExpectedPayouts;
     std::vector<CPayoutInfoDB> vPayoutsInfo;
 
-    // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-    if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight()) {
+    // Get the previous block so we can look for any results in it.
+    CBlockIndex *resultsBocksIndex = NULL;
+    resultsBocksIndex = ::ChainActive()[nNewBlockHeight-1];
 
-        GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetCGLottoBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        if (nNewBlockHeight >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
-            // collect field bets payouts
-            GetFieldBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-        }
+    CBlock block;
+    bool fFoundBlock = ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
+    if (!fFoundBlock) {
+        LogPrint(BCLog::BETTING, "Unable to read block at height %d\n", resultsBocksIndex->nHeight);
+        return 0;
     }
-    else {
 
-        GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
-
-        GetCGLottoBetPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+    // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
+    switch (Params().GetConsensus().GetWBPVersion(nNewBlockHeight)) {
+        case WBP05:
+            //GetPLBetPayoutsV5(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            break;
+        case WBP04:
+            // V4 events are handled as a special case of the V3 protocol
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetCGLottoBetPayoutsV3(block, view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            // collect field bets payouts
+            GetFieldBetPayoutsV4(view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            break;
+        case WBP03:
+            // V4 events are handled as a special case of the V3 protocol
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetCGLottoBetPayoutsV3(block, view, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            break;
+        case WBP02:
+            GetPLBetPayoutsV3(view, block, bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+            GetCGLottoBetPayoutsV2(block, view, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+        case WBP01:
+        default:
+            break;
     }
 
     assert(vExpectedPayouts.size() == vPayoutsInfo.size());
-
     mExpectedPayouts.clear();
 
     for (unsigned int i = 0; i < vExpectedPayouts.size(); i++) {
@@ -1681,12 +1719,8 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
     return bettingsViewCache.EraseBettingUndo(undoKey);
 }
 
-bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, const uint32_t height)
+bool UndoBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const uint32_t height)
 {
-    // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx->vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin, height)};
-
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx->GetHash().GetHex());
 
     bool wagerrProtocolV3 = height >= (uint32_t)Params().GetConsensus().WagerrProtocolV3StartHeight();
@@ -1858,377 +1892,385 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransactionRef& tx, 
                 }
                 break;
             }
-
-            /* Oracle's tx types */
-
-            case mappingTxType:
+            default:
             {
+
+                // Ensure the event TX has come from Oracle wallet.
+                const bool validOracleTx{IsValidOracleTx(view, tx, height)};
                 if (!validOracleTx) break;
 
-                CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
-                auto mappingType = MappingType(mapTx->nMType);
-                if ((mappingType == individualSportMapping || mappingType == contenderMapping ) &&
-                    !wagerrProtocolV4)
-                {
-                    return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
-                }
+                /* Oracle's tx types */
+                switch(bettingTx->GetTxType()){
+                    case mappingTxType:
+                    {
+                        if (!validOracleTx) break;
 
-                LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
+                        CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
+                        auto mappingType = MappingType(mapTx->nMType);
+                        if ((mappingType == individualSportMapping || mappingType == contenderMapping ) &&
+                            !wagerrProtocolV4)
+                        {
+                            return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
+                        }
 
-                MappingKey key{mappingType, mapTx->nId};
-                if (bettingsViewCache.mappings->Exists(key)) {
-                    if (!bettingsViewCache.mappings->Erase(key)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                        LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
+
+                        MappingKey key{mappingType, mapTx->nId};
+                        if (bettingsViewCache.mappings->Exists(key)) {
+                            if (!bettingsViewCache.mappings->Erase(key)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        break;
                     }
-                }
-                break;
-            }
-            case plEventTxType:
-            {
-                if (!validOracleTx) break;
+                    case plEventTxType:
+                    {
+                        if (!validOracleTx) break;
 
-                CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
+                        CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
 
-                LogPrintf("CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
-                    plEventTx->nEventId,
-                    plEventTx->nSport,
-                    plEventTx->nTournament,
-                    plEventTx->nStage,
-                    plEventTx->nHomeTeam,
-                    plEventTx->nAwayTeam,
-                    plEventTx->nHomeOdds,
-                    plEventTx->nAwayOdds,
-                    plEventTx->nDrawOdds);
+                        LogPrintf("CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                            plEventTx->nEventId,
+                            plEventTx->nSport,
+                            plEventTx->nTournament,
+                            plEventTx->nStage,
+                            plEventTx->nHomeTeam,
+                            plEventTx->nAwayTeam,
+                            plEventTx->nHomeOdds,
+                            plEventTx->nAwayOdds,
+                            plEventTx->nDrawOdds);
 
-                if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId})) {
-                    // try to undo legacy event patch
-                    if (!wagerrProtocolV3 && bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
-                        if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId})) {
+                            // try to undo legacy event patch
+                            if (!wagerrProtocolV3 && bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
+                                if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                    LogPrintf("Revert failed!\n");
+                                    return false;
+                                }
+                            }
+                            else if (!bettingsViewCache.events->Erase(EventKey{plEventTx->nEventId})) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+
+                        break;
+                    }
+                    case fEventTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
+                            fEventTx->nEventId,
+                            fEventTx->nSport,
+                            fEventTx->nTournament,
+                            fEventTx->nStage,
+                            fEventTx->nGroupType
+                        );
+                        for (auto& contender : fEventTx->mContendersInputOdds) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId})) {
+                            if (!bettingsViewCache.fieldEvents->Erase(FieldEventKey{fEventTx->nEventId})) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+
+                        break;
+                    }
+                    case fUpdateOddsTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
+                        for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateOddsTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fUpdateModifiersTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                        for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
+                            LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
+                        }
+
+                        if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateModifiersTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fUpdateMarginTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
+                        if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateMarginTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fZeroingOddsTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+                        LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+
+                        if (bettingsViewCache.fieldEvents->Exists(EventKey{fZeroingOddsTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find field event!\n");
+                        }
+
+                        break;
+                    }
+                    case fResultTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
+
+                        CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                        if (fResultTx->nResultType != ResultType::standardResult &&
+                                fResultTx->nResultType != ResultType::eventRefund &&
+                                fResultTx->nResultType != ResultType::eventClosed)
+                            break;
+                        if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
+                            break;
+
+                        LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                        for (auto& contender : fResultTx->contendersResults) {
+                            LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
+                        }
+
+                        if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId})) {
+                            if (!bettingsViewCache.fieldResults->Erase(FieldResultKey{fResultTx->nEventId})) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find result!\n");
+                        }
+
+                        break;
+                    }
+                    case plResultTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
+
+                        LogPrintf("CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
+                            plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore);
+
+                        if (bettingsViewCache.results->Exists(ResultKey{plResultTx->nEventId})) {
+                            if (!bettingsViewCache.results->Erase(ResultKey{plResultTx->nEventId})) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find result!\n");
+                        }
+                        break;
+                    }
+                    case plUpdateOddsTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
+
+                        LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                            plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
+
+                        if (bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
+                    }
+                    case cgEventTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        if (!wagerrProtocolV3) break;
+
+                        CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                        LogPrintf("CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
+
+                        if (!bettingsViewCache.chainGamesLottoEvents->Erase(EventKey{cgEventTx->nEventId})) {
                             LogPrintf("Revert failed!\n");
                             return false;
                         }
+                        break;
                     }
-                    else if (!bettingsViewCache.events->Erase(EventKey{plEventTx->nEventId})) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                    case cgResultTxType:
+                    {
+                        if (!validOracleTx) break;
+
+                        if (!wagerrProtocolV3) break;
+
+                        CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                        LogPrintf("CChainGamesEventTx: nEventId: %d\n", cgResultTx->nEventId);
+
+                        if (!bettingsViewCache.chainGamesLottoResults->Erase(ResultKey{cgResultTx->nEventId})) {
+                            LogPrintf("Revert failed!\n");
+                            return false;
+                        }
+                        break;
                     }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
+                    case plSpreadsEventTxType:
+                    {
+                        if (!validOracleTx) break;
 
-                break;
-            }
-            case fEventTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
+                        CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
 
-                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
-                    fEventTx->nEventId,
-                    fEventTx->nSport,
-                    fEventTx->nTournament,
-                    fEventTx->nStage,
-                    fEventTx->nGroupType
-                );
-                for (auto& contender : fEventTx->mContendersInputOdds) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
+                        LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
+                            plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
 
-                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId})) {
-                    if (!bettingsViewCache.fieldEvents->Erase(FieldEventKey{fEventTx->nEventId})) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                        if (bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
                     }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
+                    case plTotalsEventTxType:
+                    {
+                        if (!validOracleTx) break;
 
-                break;
-            }
-            case fUpdateOddsTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
+                        CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
 
-                CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
-                for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
+                        LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
+                            plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
 
-                if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateOddsTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                        if (bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+
+                        break;
                     }
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
+                    case plEventPatchTxType:
+                    {
+                        if (!validOracleTx) break;
 
-                break;
-            }
-            case fUpdateModifiersTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
+                        CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
+                        LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
 
-                CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
-                for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
-                    LogPrint(BCLog::BETTING, "%lu : %lu\n", contender.first, contender.second);
-                }
-
-                if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateModifiersTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                        if (bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId})) {
+                            if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Failed to find event!\n");
+                        }
+                        break;
                     }
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
+                    case plEventZeroingOddsTxType:
+                    {
+                        if (!wagerrProtocolV4) break;
+                        if (!validOracleTx) break;
 
-                break;
-            }
-            case fUpdateMarginTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
+                        CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
 
-                CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
-                if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateMarginTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
+                        std::stringstream eventIdsStream;
+                        for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                            eventIdsStream << eventId << " ";
+                        }
+                        LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                        bool isEventsExists = true;
+                        for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                            if (!bettingsViewCache.events->Exists(EventKey{eventId})) {
+                                isEventsExists = false;
+                            }
+                        }
+
+                        if (isEventsExists) {
+                            if(!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                                LogPrintf("Revert failed!\n");
+                                return false;
+                            }
+                        }
+                        else {
+                            LogPrintf("Not all events exists\n");
+                        }
+
+                        break;
                     }
+                    default:
+                        break;
                 }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
             }
-            case fZeroingOddsTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
-
-                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
-                LogPrint(BCLog::BETTING, "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
-
-                if (bettingsViewCache.fieldEvents->Exists(EventKey{fZeroingOddsTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find field event!\n");
-                }
-
-                break;
-            }
-            case fResultTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
-
-                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
-
-                if (fResultTx->nResultType != ResultType::standardResult &&
-                        fResultTx->nResultType != ResultType::eventRefund &&
-                        fResultTx->nResultType != ResultType::eventClosed)
-                    break;
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
-                    break;
-
-                LogPrint(BCLog::BETTING, "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
-                for (auto& contender : fResultTx->contendersResults) {
-                    LogPrint(BCLog::BETTING, "id %lu : place %lu\n", contender.first, contender.second);
-                }
-
-                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId})) {
-                    if (!bettingsViewCache.fieldResults->Erase(FieldResultKey{fResultTx->nEventId})) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find result!\n");
-                }
-
-                break;
-            }
-            case plResultTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
-
-                LogPrintf("CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n",
-                    plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore);
-
-                if (bettingsViewCache.results->Exists(ResultKey{plResultTx->nEventId})) {
-                    if (!bettingsViewCache.results->Erase(ResultKey{plResultTx->nEventId})) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find result!\n");
-                }
-                break;
-            }
-            case plUpdateOddsTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
-
-                LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
-                    plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
-
-                if (bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case cgEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                if (!wagerrProtocolV3) break;
-
-                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
-
-                LogPrintf("CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
-
-                if (!bettingsViewCache.chainGamesLottoEvents->Erase(EventKey{cgEventTx->nEventId})) {
-                    LogPrintf("Revert failed!\n");
-                    return false;
-                }
-                break;
-            }
-            case cgResultTxType:
-            {
-                if (!validOracleTx) break;
-
-                if (!wagerrProtocolV3) break;
-
-                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
-
-                LogPrintf("CChainGamesEventTx: nEventId: %d\n", cgResultTx->nEventId);
-
-                if (!bettingsViewCache.chainGamesLottoResults->Erase(ResultKey{cgResultTx->nEventId})) {
-                    LogPrintf("Revert failed!\n");
-                    return false;
-                }
-                break;
-            }
-            case plSpreadsEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
-
-                LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
-                    plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
-
-                if (bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case plTotalsEventTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
-
-                LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
-                    plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
-
-                if (bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
-
-                break;
-            }
-            case plEventPatchTxType:
-            {
-                if (!validOracleTx) break;
-
-                CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
-                LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
-
-                if (bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
-                break;
-            }
-            case plEventZeroingOddsTxType:
-            {
-                if (!wagerrProtocolV4) break;
-                if (!validOracleTx) break;
-
-                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
-
-                std::stringstream eventIdsStream;
-                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
-                    eventIdsStream << eventId << " ";
-                }
-                LogPrint(BCLog::BETTING, "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
-
-                bool isEventsExists = true;
-                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
-                    if (!bettingsViewCache.events->Exists(EventKey{eventId})) {
-                        isEventsExists = false;
-                    }
-                }
-
-                if (isEventsExists) {
-                    if(!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                }
-                else {
-                    LogPrintf("Not all events exists\n");
-                }
-
-                break;
-            }
-            default:
-                break;
         }
     }
 
@@ -2261,12 +2303,19 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     return true;
 }
 
-bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx)
+bool BettingUndo(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx)
 {
         // Revert betting dats
     if (height > Params().GetConsensus().WagerrProtocolV2StartHeight()) {
+        // Get the previous block so we can look for any results in it.
+        CBlockIndex *resultsBocksIndex = NULL;
+        resultsBocksIndex = ::ChainActive()[height-1];
+
+        CBlock block;
+        ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
+
         // revert complete bet payouts marker
-        if (!UndoPLBetPayouts(bettingsViewCache, height)) {
+        if (!UndoPLBetPayouts(view, block, bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data is inconsistent");
             return false;
         }
@@ -2275,7 +2324,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
             return false;
         }
         if (height > Params().GetConsensus().WagerrProtocolV4StartHeight()) {
-            if (!UndoFieldBetPayouts(bettingsViewCache, height)) {
+            if (!UndoFieldBetPayouts(view, bettingsViewCache, height)) {
                 error("DisconnectBlock(): undo payout data for field bets is inconsistent");
                 return false;
             }
@@ -2287,7 +2336,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
 
         // undo betting txs in back order
         for (auto it = vtx.crbegin(); it != vtx.crend(); it++) {
-            if (!UndoBettingTx(bettingsViewCache, *it, height)) {
+            if (!UndoBettingTx(view, bettingsViewCache, *it, height)) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");
                 return false;
             }
