@@ -2,7 +2,7 @@
 name: "wagerr-win-signer"
 distro: "debian"
 suites:
-- "buster"
+- "bullseye"
 architectures:
 - "amd64"
 packages:

@@ -3,7 +3,7 @@ name: "wagerr-osx-5.0.99"
 enable_cache: true
 distro: "debian"
 suites:
-- "buster"
+- "bullseye"
 architectures:
 - "amd64"
 packages:
