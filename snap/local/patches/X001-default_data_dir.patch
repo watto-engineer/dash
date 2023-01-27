@@ -1,6 +1,17 @@
---- a/src/util.cpp	2021-07-16 14:05:25.916474113 +0100
-+++ b/src/util.cpp	2021-07-16 14:08:16.343511483 +0100
-@@ -671,7 +671,7 @@
+From 4ddf8880768f27a58961863cde2931a42a906646 Mon Sep 17 00:00:00 2001
+From: wagerr-builder <104495875+wagerr-builder@users.noreply.github.com>
+Date: Fri, 13 Jan 2023 13:22:18 +0000
+Subject: [PATCH] default data dir
+
+---
+ src/util/system.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/util/system.cpp b/src/util/system.cpp
+index b6484ab39..859029a6f 100644
+--- a/src/util/system.cpp
++++ b/src/util/system.cpp
+@@ -719,7 +719,7 @@ fs::path GetDefaultDataDir()
      return GetSpecialFolderPath(CSIDL_APPDATA) / "Wagerrcoin";
  #else
      fs::path pathRet;
@@ -9,3 +20,6 @@
      if (pszHome == nullptr || strlen(pszHome) == 0)
          pathRet = fs::path("/");
      else
+-- 
+2.25.1
+
