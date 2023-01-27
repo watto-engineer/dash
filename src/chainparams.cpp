@@ -718,7 +718,7 @@ public:
         consensus.nStakeMinAge = 0;
 
         // ATP parameters
-        consensus.WagerrAddrPrefix = "wagerrtest";
+        consensus.WagerrAddrPrefix = "wagerrdev";
         consensus.strTokenManagementKey = "TGRnrYZg52LwL3U2LLAUGiFE6xhqontQa9";
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Zerocoin
@@ -763,10 +763,10 @@ public:
         UpdateDevnetSubsidyAndDiffParametersFromArgs(args);
         genesis = CreateGenesisBlock(1518696184, 4638953, 0x207fffff, 1, 0 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x91f308fb406eafaee88b929632a4b2191ad6a832d2bdd896d474347c80fe165b"));
+        assert(consensus.hashGenesisBlock == uint256S("0x174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530"));
         assert(genesis.hashMerkleRoot == uint256S("0xc4d06cf72583752c23b819fa8d8cededd1dad5733d413ea1f123f98a7db6af13"));
 
-        devnetGenesis = FindDevNetGenesisBlock(genesis, 50 * COIN);
+        devnetGenesis = FindDevNetGenesisBlock(genesis, 0 * COIN);
         consensus.hashDevnetGenesisBlock = devnetGenesis.GetHash();
 
         vFixedSeeds.clear();
@@ -848,7 +848,7 @@ public:
 
         checkpointData = (CCheckpointData) {
             {
-                { 0, uint256S("0x174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
+                { 0, uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
                 { 1, devnetGenesis.GetHash() },
             }
         };
