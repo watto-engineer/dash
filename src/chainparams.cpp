@@ -197,6 +197,7 @@ public:
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V18DeploymentHeight;
+        consensus.DIP0024Height = consensus.V18DeploymentHeight;
 
         consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
@@ -367,11 +368,11 @@ public:
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
-            std::string("Dice"), // Game name
+            "Dice", // Game name
             QuickGamesType::qgDice, // game type
             &quickgames::DiceHandler, // game bet handler
             &quickgames::DiceBetInfoParser, // bet info parser
-            std::string("Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe"), // Dev address
+            "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe", // Dev address
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 
@@ -427,8 +428,8 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V18DeploymentHeight = 826130;
-        consensus.BIP34Height = 1;
+        consensus.V18DeploymentHeight = 1100000;
+        consensus.BIP34Height = 3963;
         consensus.BIP34Hash = uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12");
         consensus.BIP65Height = 600;
         consensus.BIP66Height = 1; // 0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12
@@ -439,6 +440,7 @@ public:
 //        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = consensus.V18DeploymentHeight;
+        consensus.DIP0024Height = consensus.V18DeploymentHeight;
 
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
@@ -494,7 +496,7 @@ public:
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
         consensus.nZerocoinStartTime = std::numeric_limits<int>::max();
-        consensus.nBlockZerocoinV2 = std::numeric_limits<int>::max();
+        consensus.nBlockZerocoinV2 = 600;
         consensus.nPublicZCSpends = std::numeric_limits<int>::max();
         consensus.nFakeSerialBlockheightEnd = -1;
         consensus.nSupplyBeforeFakeSerial = 0;
@@ -605,11 +607,11 @@ public:
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
-            std::string("Dice"), // Game name
+            "Dice", // Game name
             QuickGamesType::qgDice, // game type
             &quickgames::DiceHandler, // game bet handler
             &quickgames::DiceBetInfoParser, // bet info parser
-            std::string("TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY"), // Dev address
+            "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY", // Dev address
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 
@@ -667,6 +669,7 @@ public:
 //        consensus.DIP0003EnforcementHeight = 2; // DIP0003 activated immediately on devnet
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 2; // DIP0008 activated immediately on devnet
+        consensus.DIP0024Height = consensus.V18DeploymentHeight;
         consensus.BRRHeight = 300;
         consensus.MinBIP9WarningHeight = 2018; // dip8 activation height + miner confirmation window
 
@@ -835,11 +838,11 @@ public:
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
-            std::string("Dice"), // Game name
+            "Dice", // Game name
             QuickGamesType::qgDice, // game type
             &quickgames::DiceHandler, // game bet handler
             &quickgames::DiceBetInfoParser, // bet info parser
-            std::string("TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs"), // Dev address
+            "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs", // Dev address
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 
@@ -954,6 +957,7 @@ public:
 //        consensus.DIP0003EnforcementHeight = 500;
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 432;
+        consensus.DIP0024Height = consensus.V18DeploymentHeight;
         consensus.BRRHeight = 2500; // see block_reward_reallocation_tests
         consensus.MinBIP9WarningHeight = 0;
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
@@ -961,6 +965,13 @@ public:
         consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
+
+        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 25;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
+
 
         // Wagerr specific parameters
         // Proof of Stake parameters
@@ -1103,11 +1114,11 @@ public:
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
-            std::string("Dice"), // Game name
+            "Dice", // Game name
             QuickGamesType::qgDice, // game type
             &quickgames::DiceHandler, // game bet handler
             &quickgames::DiceBetInfoParser, // bet info parser
-            std::string("TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs"), // Dev address
+            "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs", // Dev address
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 

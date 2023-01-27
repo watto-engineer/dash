@@ -109,7 +109,7 @@ static UniValue gobject_check(const JSONRPCRequest& request)
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
         LOCK(cs_main);
-        bool fAllowScript = (VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE);
+        bool fAllowScript = ::ChainActive().Height() >= Params().GetConsensus().DIP0024Height;
         CProposalValidator validator(strDataHex, fAllowScript);
         if (!validator.Validate())  {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
@@ -185,7 +185,7 @@ static UniValue gobject_prepare(const JSONRPCRequest& request)
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
         LOCK(cs_main);
-        bool fAllowScript = (VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE);
+        bool fAllowScript = ::ChainActive().Height() >= Params().GetConsensus().DIP0024Height;
         CProposalValidator validator(strDataHex, fAllowScript);
         if (!validator.Validate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
@@ -223,7 +223,7 @@ static UniValue gobject_prepare(const JSONRPCRequest& request)
 
     CTransactionRef tx;
 
-    bool fork_active = WITH_LOCK(cs_main, return VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE);
+    bool fork_active = ::ChainActive().Height() >= Params().GetConsensus().DIP0024Height;
 
     if (!pwallet->GetBudgetSystemCollateralTX(tx, govobj.GetHash(), govobj.GetMinCollateralFee(fork_active), outpoint)) {
         std::string err = "Error making collateral transaction for governance object. Please check your wallet balance and make sure your wallet is unlocked.";
@@ -355,7 +355,7 @@ static UniValue gobject_submit(const JSONRPCRequest& request)
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
         LOCK(cs_main);
-        bool fAllowScript = (VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE);
+        bool fAllowScript = ::ChainActive().Height() >= Params().GetConsensus().DIP0024Height;
         CProposalValidator validator(strDataHex, fAllowScript);
         if (!validator.Validate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
@@ -1176,7 +1176,7 @@ static UniValue getgovernanceinfo(const JSONRPCRequest& request)
 
     UniValue obj(UniValue::VOBJ);
     obj.pushKV("governanceminquorum", Params().GetConsensus().nGovernanceMinQuorum);
-    bool fork_active = VersionBitsState(pindex, Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024, versionbitscache) == ThresholdState::ACTIVE;
+    bool fork_active = nBlockHeight >= Params().GetConsensus().DIP0024Height;
     obj.pushKV("proposalfee", ValueFromAmount(fork_active ? GOVERNANCE_PROPOSAL_FEE_TX : GOVERNANCE_PROPOSAL_FEE_TX_OLD));
     obj.pushKV("superblockcycle", Params().GetConsensus().nSuperblockCycle);
     obj.pushKV("superblockmaturitywindow", Params().GetConsensus().nSuperblockMaturityWindow);

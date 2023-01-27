@@ -17,7 +17,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-const auto deployment_id = Consensus::DEPLOYMENT_DIP0020;
+const auto deployment_id = Consensus::DEPLOYMENT_TESTDUMMY;
 constexpr int window{100}, th_start{80}, th_end{60};
 
 static constexpr int threshold(int attempt)

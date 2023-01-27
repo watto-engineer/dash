@@ -91,7 +91,7 @@ bool IsBlockValueValid(const CSporkManager& sporkManager, CGovernanceManager& go
        blockReward.AddReward(CReward::RewardType::REWARD_COINSTAKE, coinstakeValueIn);
     }
     // Check for token authorities
-    if (IsAnyOutputGroupedAuthority(*block.vtx[0])) {
+    if (IsAnyOutputGrouped(*block.vtx[0])) {
         strErrorRet = strprintf("token authority in coinbase transaction at height %d", nBlockHeight);
         return false;
     }

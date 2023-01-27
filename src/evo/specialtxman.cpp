@@ -50,7 +50,7 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
         case TRANSACTION_GROUP_CREATION_NFT:
             return CheckGroupConfigurationTxNFT(tx, pindexPrev, state, view);
         case TRANSACTION_MNHF_SIGNAL:
-            return VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE && CheckMNHFTx(tx, pindexPrev, state);
+            return pindexPrev->nHeight + 1 >= Params().GetConsensus().DIP0024Height && CheckMNHFTx(tx, pindexPrev, state);
         }
     } catch (const std::exception& e) {
         LogPrintf("%s -- failed: %s\n", __func__, e.what());

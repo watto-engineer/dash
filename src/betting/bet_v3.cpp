@@ -303,7 +303,7 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
             continue;
 
         // handle bet by specific game handler from quick games framework
-        const CQuickGamesView& gameView = Params().QuickGamesArr()[qgBet.gameType];
+        const CQuickGamesView gameView = Params().QuickGamesArr()[qgBet.gameType];
         // if odds == 0 - bet lose, if odds > OddsDivisor - bet win, if odds == BET_ODDSDIVISOR - bet refunded
         arith_uint256 hashProofOfStake = UintToArith256(mapProofOfStake[blockIndex->GetBlockHash()]);
         if (hashProofOfStake == 0) {

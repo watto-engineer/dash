@@ -16,9 +16,6 @@ namespace Consensus {
 
 enum DeploymentPos {
     DEPLOYMENT_TESTDUMMY,
-    DEPLOYMENT_DIP0020, // Deployment of DIP0020, DIP0021 and LMQ_100_67 quorums
-    DEPLOYMENT_DIP0024, // Deployment of DIP0024 (Quorum Rotation) and decreased governance proposal fee
-    // NOTE: Also add new deployments to VersionBitsDeploymentInfo in versionbits.cpp
     MAX_VERSION_BITS_DEPLOYMENTS
 };
 
@@ -82,6 +79,8 @@ struct Params {
     /** Block height at which DIP0003 becomes active */
     int DIP0003Height;
     /** Block height at which DIP0003 becomes enforced */
+    int DIP0024Height;
+    /** Block height at which DIP0024 becomes enforced */
 //    int DIP0003EnforcementHeight;
     uint256 DIP0003EnforcementHash;
     /** Block height at which DIP0008 becomes active */

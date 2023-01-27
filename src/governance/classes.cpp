@@ -531,7 +531,7 @@ void CSuperblock::ParsePaymentSchedule(const std::string& strPaymentAddresses, c
 
     // TODO: script addresses limit here and cs_main lock in
     // CGovernanceManager::InitOnLoad()once DIP0024 is active
-    bool fAllowScript = (VersionBitsTipState(Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0024) == ThresholdState::ACTIVE);
+    bool fAllowScript = nBlockHeight >= Params().GetConsensus().DIP0024Height;
     for (int i = 0; i < (int)vecParsed1.size(); i++) {
         CTxDestination dest = DecodeDestination(vecParsed1[i]);
         if (!IsValidDestination(dest)) {

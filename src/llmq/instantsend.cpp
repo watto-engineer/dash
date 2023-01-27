@@ -1318,11 +1318,10 @@ void CInstantSendManager::NotifyChainLock(const CBlockIndex* pindexChainLock)
 
 void CInstantSendManager::UpdatedBlockTip(const CBlockIndex* pindexNew)
 {
+    bool fDIP0020Active = pindexNew->pprev && pindexNew->pprev->nHeight >= Params().GetConsensus().V18DeploymentHeight;
     if (!fUpgradedDB) {
-        if (WITH_LOCK(cs_llmq_vbc, return VersionBitsState(pindexNew, Params().GetConsensus(), Consensus::DEPLOYMENT_DIP0020, llmq_versionbitscache) == ThresholdState::ACTIVE)) {
-            db.Upgrade();
-            fUpgradedDB = true;
-        }
+        db.Upgrade();
+        fUpgradedDB = true;
     }
 
     bool fDIP0008Active = pindexNew->pprev && pindexNew->pprev->nHeight >= Params().GetConsensus().DIP0008Height;

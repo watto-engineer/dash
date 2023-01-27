@@ -2533,12 +2533,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         // Protocol V1 has been retired
         break;
     default:
-        {
-            if (!IsBlockValueValid(*sporkManager, *governance, block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
-                return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
-            }
-            break;
-        }
+        break;
+    }
+    if (!IsBlockValueValid(*sporkManager, *governance, block, pindex->nHeight, blockReward, coinstakeValueIn, strError)) {
+        return state.Invalid(ValidationInvalidReason::NONE, error("ConnectBlock(WAGERR): %s", strError), REJECT_INVALID, "bad-cb-amount");
     }
 
     // track money supply and mint amount info
