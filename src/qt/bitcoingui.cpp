@@ -700,7 +700,9 @@ void BitcoinGUI::createToolBars()
 
         if (settings.value("fShowGovernanceTab").toBool()) {
             governanceButton = new QToolButton(this);
-            governanceButton->setText(tr("&Governance"));
+            governanceButton->setToolButtonStyle( Qt::ToolButtonTextUnderIcon);
+            governanceButton->setText(tr("Governance"));
+            governanceButton->setIcon(QIcon(":/icons/governance"));
             governanceButton->setStatusTip(tr("View Governance Proposals"));
             tabGroup->addButton(governanceButton);
             connect(governanceButton, &QToolButton::clicked, this, &BitcoinGUI::gotoGovernancePage);
