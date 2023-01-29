@@ -254,59 +254,6 @@ UniValue getnewaddress(const JSONRPCRequest& request)
     return EncodeDestination(dest);
 }
 
-#if ENABLE_MINER
-UniValue generate(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2) {
-        throw std::runtime_error(
-            "generate nblocks ( maxtries )\n"
-            "\nMine up to nblocks blocks immediately (before the RPC call returns) to an address in the wallet.\n"
-            "\nArguments:\n"
-            "1. nblocks      (numeric, required) How many blocks are generated immediately.\n"
-            "2. maxtries     (numeric, optional) How many iterations to try (default = 1000000).\n"
-            "\nResult:\n"
-            "[ blockhashes ]     (array) hashes of blocks generated\n"
-            "\nExamples:\n"
-            "\nGenerate 11 blocks\n"
-            + HelpExampleCli("generate", "11")
-        );
-    }
-
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-    CWallet* const pwallet = wallet.get();
-
-    int num_generate = request.params[0].get_int();
-    uint64_t max_tries = std::numeric_limits<uint64_t>::max();
-    if (!request.params[1].isNull()) {
-        max_tries = request.params[1].get_int();
-    }
-
-    LegacyScriptPubKeyMan* spk_man = pwallet->GetLegacyScriptPubKeyMan();
-    if (!spk_man) {
-        throw JSONRPCError(RPC_WALLET_ERROR, "This type of wallet does not support this command");
-    }
-    spk_man->TopUpKeyPool();
-
-    CTxDestination coinbaseDest;
-    std::string error;
-    if (!spk_man->GetNewDestination(coinbaseDest, error)){
-        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, error);
-    }
-    std::shared_ptr<CReserveScript> coinbase_script = std::make_shared<CReserveScript>();
-    coinbase_script->reserveScript = GetScriptForDestination(coinbaseDest);
-
-    const CTxMemPool& mempool = EnsureMemPool(request.context);
-    ChainstateManager& chainman = EnsureChainman(request.context);
-
-    return generateHybridBlocks(chainman, mempool, coinbase_script, num_generate, max_tries, true, pwallet);
-}
-#else
-UniValue generate(const JSONRPCRequest& request)
-{
-    throw JSONRPCError(RPC_METHOD_NOT_FOUND, "This call is not available because RPC miner isn't compiled");
-}
-#endif //ENABLE_MINING
 static UniValue getrawchangeaddress(const JSONRPCRequest& request)
 {
     RPCHelpMan{"getrawchangeaddress",
@@ -3689,7 +3636,7 @@ UniValue autocombinedust(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue getstakingstatus(const JSONRPCRequest& request)
+extern UniValue getstakingstatus(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
@@ -3713,8 +3660,6 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
-
-    LOCK2(cs_main, pwallet->cs_wallet);
 
     bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
 

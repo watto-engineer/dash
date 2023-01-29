@@ -235,6 +235,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 // modifier about a selection interval later than the coin generating the kernel
 bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
 {
+    LOCK(cs_main);
     nStakeModifier = 0;
     const CBlockIndex* pindexFrom = LookupBlockIndex(hashBlockFrom);
     if (!pindexFrom)
@@ -455,6 +456,8 @@ bool SetPOSParameters(const CBlock& block, CValidationState& state, CBlockIndex*
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
     } else {
         // compute v2 stake modifier
+        if (block.vtx.size() < 1)
+            return error("%s : This should be a POS block", __func__);
         ComputeStakeModifierV2(pindexNew, block.vtx[1]->vin[0].prevout.hash);
     }
     return true;

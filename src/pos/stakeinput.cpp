@@ -305,6 +305,7 @@ CBlockIndex* CStake::GetIndexFrom()
         LogPrintf("%s : failed to find tx %s\n", __func__, txFrom->GetHash().GetHex());
         return nullptr;
     } else {
+        LOCK(cs_main);
         // If the index is in the chain, then set it as the "index from"
         CBlockIndex* pindex = LookupBlockIndex(hashBlock);
         if (pindex) {

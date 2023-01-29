@@ -60,6 +60,10 @@ UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mem
     UniValue blockHashes(UniValue::VARR);
     while (nHeight < nHeightEnd)
     {
+        if (pwallet) {
+            pwallet->BlockUntilSyncedToCurrentChain();
+        }
+
         fPosPhase = IsProofOfStakeHeight(nHeight + 1, params);
         // If nHeight > POS start, wallet should be enabled.
 
@@ -70,10 +74,10 @@ UniValue generateHybridBlocks(ChainstateManager& chainman, const CTxMemPool& mem
             std::shared_ptr<CStakeInput> coinstakeInputPtr = std::shared_ptr<CStakeInput>(new CStake);
             if (stakingManager->CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
                 // Coinstake found. Extract signing key from coinstake
-                pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
+                pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime, pwallet);
             };
         } else {
-            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(coinbase_script->reserveScript);
+            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(coinbase_script->reserveScript, nullptr, nullptr, 0, pwallet);
         }
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");

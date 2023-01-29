@@ -26,6 +26,7 @@ class CGovernanceManager;
 class CScript;
 class CStakeInput;
 class CSporkManager;
+class CWallet;
 
 namespace Consensus { struct Params; };
 namespace llmq {
@@ -180,7 +181,7 @@ public:
 
     /** Construct a new block template with coinbase to scriptPubKeyIn */
     std::unique_ptr<CBlockTemplate> CreateNewBlock(const CScript& scriptPubKeyIn,
-            std::shared_ptr<CMutableTransaction> pCoinstakeTx = nullptr, std::shared_ptr<CStakeInput> coinstakeInput = nullptr, uint64_t nTxNewTime = 0);
+            std::shared_ptr<CMutableTransaction> pCoinstakeTx = nullptr, std::shared_ptr<CStakeInput> coinstakeInput = nullptr, uint64_t nTxNewTime = 0, CWallet * const pwallet = nullptr);
 
     static Optional<int64_t> m_last_block_num_txs;
     static Optional<int64_t> m_last_block_size;

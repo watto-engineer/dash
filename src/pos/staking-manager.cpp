@@ -67,7 +67,7 @@ bool CStakingManager::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >&
 {
     if (pwallet == nullptr) return false;
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
     //Add WAGERR
     std::vector<COutput> vCoins;
     CCoinControl coin_control;
@@ -335,7 +335,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
     if (CreateCoinStake(::ChainActive().Tip(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime)) {
         // Coinstake found. Extract signing key from coinstake
         try {
-            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime);
+            pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime, pwallet.get());
         } catch (const std::exception& e) {
             LogPrint(BCLog::STAKING, "%s: error creating block, waiting.. - %s", __func__, e.what());
             UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute

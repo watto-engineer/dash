@@ -151,18 +151,18 @@ bool BlockAssembler::SplitCoinstakeVouts(std::shared_ptr<CMutableTransaction> co
 }
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn,
-                                    std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, uint64_t nTxNewTime)
+                                    std::shared_ptr<CMutableTransaction> pCoinstakeTx, std::shared_ptr<CStakeInput> coinstakeInput, uint64_t nTxNewTime, CWallet * const pwallet)
 {
     CAmount nSplitValue = MAX_MONEY;
 #ifdef ENABLE_WALLET
-    std::vector<std::shared_ptr<CWallet>> wallets = GetWallets();
-//    const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : wallets[0].get()->GetSigningProvider();
-    const SigningProvider& signingProvider = wallets.size() < 1 ? SigningProvider() : *wallets[0]->GetSigningProvider();
-    if (wallets.size() > 0) {
-        nSplitValue = (CAmount)(wallets[0]->GetStakeSplitThreshold() * COIN);
+    if (!pwallet) {
+        throw std::runtime_error(strprintf("CreateCoinStake : unable to sign with no wallets"));
     }
+    LOCK(pwallet->cs_wallet);
+    const SigningProvider* signingProvider = pwallet->GetSigningProvider();
+    nSplitValue = (CAmount)(pwallet->GetStakeSplitThreshold() * COIN);
 #else
-    const SigningProvider& signingProvider = SigningProvider();
+    const SigningProvider* signingProvider = new SigningProvider();
 #endif
 
     bool fPos = (pCoinstakeTx != nullptr);
@@ -329,7 +329,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             coinstakeInput->GetScriptPubKeyKernel(coinstakeInScript);
             CTransactionRef coinstakeTxFrom;
             coinstakeInput->GetTxFrom(coinstakeTxFrom);
-            if (!SignSignature(signingProvider, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_ALL))
+            if (!SignSignature(*signingProvider, *coinstakeTxFrom, *pCoinstakeTx, nIn++, SIGHASH_SINGLE))
                 throw std::runtime_error(strprintf("CreateCoinStake : failed to sign coinstake"));
         }
     } else {

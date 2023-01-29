@@ -315,6 +315,8 @@ static void gobject_submit_help(const JSONRPCRequest& request)
 
 static UniValue gobject_submit(const JSONRPCRequest& request)
 {
+    const NodeContext& node = EnsureNodeContext(request.context);
+
     gobject_submit_help(request);
 
     if(!masternodeSync->IsBlockchainSynced()) {
@@ -402,7 +404,6 @@ static UniValue gobject_submit(const JSONRPCRequest& request)
 
     LogPrintf("gobject(submit) -- Adding locally created governance object - %s\n", strHash);
 
-    const NodeContext& node = EnsureNodeContext(request.context);
     if (fMissingConfirmations) {
         governance->AddPostponedObject(govobj);
         govobj.Relay(*node.connman);

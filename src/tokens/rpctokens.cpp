@@ -362,6 +362,8 @@ void TokenTxToJSON(const CTransactionRef& tx, const uint256 hashBlock, UniValue&
     TokenTxToUniv(tx, uint256(), entry);
 
     if (!hashBlock.IsNull()) {
+        LOCK(cs_main);
+
         entry.pushKV("blockhash", hashBlock.GetHex());
         CBlockIndex* pindex = LookupBlockIndex(hashBlock);
         if (pindex) {
