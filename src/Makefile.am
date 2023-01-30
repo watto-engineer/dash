@@ -489,6 +489,7 @@ libbitcoin_server_a_SOURCES = \
   pos/checks.cpp \
   pos/kernel.cpp \
   pos/rewards.cpp \
+  pos/staker.cpp \
   pos/stakeinput.cpp \
   pow.cpp \
   rest.cpp \
