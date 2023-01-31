@@ -6,13 +6,22 @@
 #define WAGERR_BET_TX_H
 
 //#include <util/system.h>
+#include <clientversion.h>
+#include <script/script.h>
 #include <serialize.h>
+#include <streams.h>
 
 class CTxOut;
 class CTransaction;
 
-#define BTX_FORMAT_VERSION 0x01
 #define BTX_PREFIX 'B'
+
+typedef enum BetTxVersions {
+    BetTxVersion4   = 0x01,
+    BetTxVersion5   = 0x02,
+} BetTxVersions;
+
+const uint8_t BetTxVersion_CURRENT = BetTxVersion4;
 
 // The supported betting TX types.
 typedef enum BetTxTypes{
@@ -49,6 +58,9 @@ public:
     uint8_t prefix;
     uint8_t version;
     uint8_t txType;
+
+    CBettingTxHeader() : prefix(BTX_PREFIX), version(BetTxVersion_CURRENT), txType(0) {};
+    CBettingTxHeader(uint8_t version, uint8_t txType) : prefix(BTX_PREFIX), version(version), txType(txType) {};
 
     size_t GetSerializeSize(int nType, int nVersion) const {
         return 3;
@@ -566,5 +578,29 @@ public:
 };
 
 std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut);
+
+template<typename BetTx>
+CScript EncodeBettingTx(const BetTx& bettingTx, CBettingTxHeader header) {
+    switch (header.version) {
+        case BetTxVersion4:
+        {
+            CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+            ss << (uint8_t) BTX_PREFIX << (uint8_t) BetTxVersion4 << (uint8_t) header.txType << bettingTx;
+            std::vector<unsigned char> betData;
+            for (auto it = ss.begin(); it < ss.end(); ++it) {
+                betData.emplace_back((unsigned char)(*it));
+            }
+            CScript betScript = CScript() << OP_RETURN << betData;
+            return betScript;
+        }
+        case BetTxVersion5:
+        {
+            return CScript();
+        }
+        default:
+            break;
+    }
+    return CScript();
+}
 
 #endif

@@ -57,7 +57,7 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
         return nullptr;
     ss >> header;
     if (header.prefix != BTX_PREFIX ||
-            header.version != BTX_FORMAT_VERSION)
+            header.version != BetTxVersion_CURRENT)
         return nullptr;
 
     // deserialize opcode data to tx classes

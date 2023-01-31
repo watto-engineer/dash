@@ -4165,11 +4165,12 @@ UniValue placebet(const JSONRPCRequest& request)
 
     // Make sure the results are valid at least up to the most recent block
     // the user could have gotten from another RPC command prior to now
-    pwallet->BlockUntilSyncedToCurrentChain();
+//    pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, mempool.cs);
-    LOCK(pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
+    LOCK(mempool.cs);
 
+    EnsureWalletIsUnlocked(pwallet);
     CAmount nAmount = AmountFromValue(request.params[2]);
 
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
@@ -4187,7 +4188,6 @@ UniValue placebet(const JSONRPCRequest& request)
     bool fSubtractFeeFromAmount = false;
     CCoinControl coin_control;
 
-    EnsureWalletIsUnlocked(pwallet);
     EnsureEnoughWagerr(pwallet, nAmount);
 
     uint32_t eventId = static_cast<uint32_t>(request.params[0].get_int64());
@@ -4208,12 +4208,8 @@ UniValue placebet(const JSONRPCRequest& request)
     }
 
     CPeerlessBetTx plBet(eventId, outcome);
-
-    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) plBetTxType << plBet;
-    std::vector<unsigned char> betData;
-    ss >> betData;
-    CScript betScript = CScript() << OP_RETURN << betData;
+    CBettingTxHeader betTxHeader(BetTxVersion4, plBetTxType);
+    CScript betScript = EncodeBettingTx(plBet, betTxHeader);
 
     CTransactionRef tx = BurnWithData(pwallet, betScript, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue), {} /* fromAccount */);
     return tx->GetHash().GetHex();
@@ -4296,11 +4292,8 @@ UniValue placeparlaybet(const JSONRPCRequest& request)
         parlayBetTx.legs.emplace_back(eventId, outcome);
     }
 
-    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) plParlayBetTxType << parlayBetTx;
-    std::vector<unsigned char> betData;
-    ss >> betData;
-    CScript betScript = CScript() << OP_RETURN << betData;
+    CBettingTxHeader betTxHeader(BetTxVersion4, plParlayBetTxType);
+    CScript betScript = EncodeBettingTx(parlayBetTx, betTxHeader);
 
     CAmount nAmount = AmountFromValue(request.params[1]);
 
@@ -4420,19 +4413,9 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
 
     CFieldBetTx fBetTx{eventId, static_cast<uint8_t>(marketType), contenderId};
 
-    // TODO `address` isn't used when adding the following transaction to the
-    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
-    // Ideally an alternative function, such as `BurnMoney`, would be developed
-    // and used, which would take the `OP_RETURN` value in place of the address
-    // value.
-    // Note that, during testing, the `opReturn` value is added to the
-    // blockchain incorrectly if its length is less than 5. This behaviour would
-    // ideally be investigated and corrected/justified when time allows.
-    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fBetTxType << fBetTx;
-    std::vector<unsigned char> betData;
-    ss >> betData;
-    CScript betScript = CScript() << OP_RETURN << betData;
+    // BurnWithData does not account for the use of VARINT with data smaller than 5 bytes
+    CBettingTxHeader betTxHeader(BetTxVersion4, fBetTxType);
+    CScript betScript = EncodeBettingTx(fBetTx, betTxHeader);
 
     CTransactionRef tx = BurnWithData(pwallet, betScript, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue), {} /* fromAccount */);
     return tx->GetHash().GetHex();
@@ -4542,11 +4525,8 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
         fParlayBetTx.legs.emplace_back(eventId, marketType, contenderId);
     }
 
-    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fParlayBetTxType << fParlayBetTx;
-    std::vector<unsigned char> betData;
-    ss >> betData;
-    CScript betScript = CScript() << OP_RETURN << betData;
+    CBettingTxHeader betTxHeader(BetTxVersion4, fParlayBetTxType);
+    CScript betScript = EncodeBettingTx(fParlayBetTx, betTxHeader);
 
     CTransactionRef tx = BurnWithData(pwallet, betScript, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue), {} /* fromAccount */);
     return tx->GetHash().GetHex();
