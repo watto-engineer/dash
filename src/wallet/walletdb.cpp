@@ -643,8 +643,8 @@ DBErrors WalletBatch::LoadWallet(CWallet* pwallet)
     for (const uint256& hash : wss.vWalletUpgrade)
         WriteTx(pwallet->mapWallet.at(hash));
 
-    // Rewrite encrypted wallets of versions 0.4.0 and 0.5.0rc:
-    if (wss.fIsEncrypted && (last_client == 40000 || last_client == 50000))
+    // Rewrite encrypted wallets of versions before 0.5.0:
+    if (wss.fIsEncrypted && (last_client < 50000))
         return DBErrors::NEED_REWRITE;
 
     if (last_client < CLIENT_VERSION) // Update

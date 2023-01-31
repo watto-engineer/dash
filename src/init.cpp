@@ -2141,7 +2141,6 @@ bool AppInitMain(const util::Ref& context, NodeContext& node, interfaces::BlockA
                 bool fReindexTokens = gArgs.GetBoolArg("-reindex-tokens", false);
                 if (!fReindexTokens) {
                     // ATP: load token data
-                    uiInterface.InitMessage(_("Loading token data...").translated);
                     std::string strError;
                     if (!pTokenDB->LoadTokensFromDB(strError)) {
                         strLoadError = Untranslated(strError);

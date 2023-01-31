@@ -1269,7 +1269,7 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
     // This function removes authority for a tokengroupID at a specific UTXO
     EnsureWalletIsUnlocked(pwallet);
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
     unsigned int curparam = 0;
     std::vector<COutput> availableCoins;
     std::vector<COutput> chosenCoins;
@@ -1602,7 +1602,7 @@ UniValue listunspenttokens(const JSONRPCRequest& request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     int curparam = 0;
 
@@ -1812,7 +1812,7 @@ UniValue signtokenmetadata(const JSONRPCRequest& request)
     if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     RPCTypeCheck(request.params, {UniValue::VSTR, UniValue::VSTR});
 

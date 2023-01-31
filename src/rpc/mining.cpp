@@ -26,6 +26,7 @@
 #include <pos/staker.h>
 #include <pos/staking-manager.h>
 #include <pow.h>
+#include <reward-manager.h>
 #include <rpc/blockchain.h>
 #include <rpc/mining.h>
 #include <rpc/server.h>
@@ -1330,6 +1331,151 @@ static UniValue estimaterawfee(const JSONRPCRequest& request)
     return result;
 }
 
+
+UniValue setstakesplitthreshold(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+            "setstakesplitthreshold value\n"
+            "\nThis will set the output size of your stakes to never be below this number\n" +
+            HelpRequiringPassphrase(pwallet) + "\n"
+
+            "\nArguments:\n"
+            "1. value   (numeric, required) Threshold value between 1 and 999999\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"threshold\": n,    (numeric) Threshold value set\n"
+            "  \"saved\": true|false    (boolean) 'true' if successfully saved to the wallet file\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("setstakesplitthreshold", "5000") + HelpExampleRpc("setstakesplitthreshold", "5000"));
+
+    LOCK(pwallet->cs_wallet);
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    uint64_t nStakeSplitThreshold = request.params[0].get_int64();
+
+    if (nStakeSplitThreshold > 999999)
+        throw std::runtime_error("Value out of range, max allowed is 999999");
+
+    LOCK(pwallet->cs_wallet);
+
+    UniValue result(UniValue::VOBJ);
+    if (!pwallet->SetStakeSplitThreshold(nStakeSplitThreshold)) {
+        throw std::runtime_error(std::string(__func__) + ": writing generated key failed");
+    }
+
+    result.pushKV("threshold", int(pwallet->GetStakeSplitThreshold()));
+    result.pushKV("saved", "true");
+
+    return result;
+}
+UniValue autocombinedust(const JSONRPCRequest& request)
+{
+    bool fEnable;
+    size_t nParamsSize = request.params.size();
+    if (nParamsSize >= 1)
+        fEnable = request.params[0].get_bool();
+
+    if (request.fHelp || nParamsSize < 1 || (!fEnable && nParamsSize > 1) || nParamsSize > 2)
+        throw std::runtime_error(
+            "autocombinedust enable ( threshold )\n"
+            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Wagerr address\n"
+            "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees.\n"
+
+            "\nArguments:\n"
+            "1. enable                  (boolean, required) Enable auto combine (true) or disable (false)\n"
+            "2. threshold amount        (numeric, optional) Coins with an aggregated value of this amount will be combined (default: 0)\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("autocombinedust", "true 500") + HelpExampleRpc("autocombinedust", "true 500"));
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    LOCK(pwallet->cs_wallet);
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    CAmount nThresholdAmount = 0;
+
+    if (fEnable) {
+        nThresholdAmount = request.params[1].get_int64();
+        if (nThresholdAmount < 0)
+            throw std::runtime_error("Value out of range, minimum allowed is 0");
+    }
+
+    LOCK(pwallet->cs_wallet);
+
+    UniValue result(UniValue::VOBJ);
+    if (!pwallet->SetAutoCombineSettings(fEnable, nThresholdAmount)) {
+        throw std::runtime_error("Changed settings in wallet but failed to save to database\n");
+    }
+
+
+    result.pushKV("threshold", int(rewardManager->GetAutoCombineThresholdAmount()));
+    result.pushKV("enabled", rewardManager->IsAutoCombineEnabled());
+
+    return result;
+}
+
+extern UniValue getstakingstatus(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            "getstakingstatus\n"
+            "\nReturns an object containing various staking information.\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
+            "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
+            "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
+            "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
+            "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
+            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
+            "  \"staking status\": true|false,     (boolean) if the wallet is staking or not\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
+
+    NodeContext& node = EnsureNodeContext(request.context);
+    bool fHaveConnections = !node.connman ? false : node.connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
+    bool fWalletUnlocked = !pwallet->IsLocked(true);
+    bool fMintableCoins = stakingManager->MintableCoins();
+    bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance().m_mine_trusted;
+    bool fMnSync = masternodeSync->IsSynced();
+    bool fStakingStatus = stakingManager->IsStaking();
+
+    UniValue obj(UniValue::VOBJ);
+    obj.pushKV("validtime", fValidTime);
+    obj.pushKV("haveconnections", fHaveConnections);
+    if (pwallet) {
+        obj.pushKV("walletunlocked", fWalletUnlocked);
+        obj.pushKV("mintablecoins", fMintableCoins);
+        obj.pushKV("enoughcoins", fEnoughCoins);
+    }
+    obj.pushKV("mnsync", fMnSync);
+    obj.pushKV("staking_status", fStakingStatus);
+
+    return obj;
+}
+
 // clang-format off
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
@@ -1346,11 +1492,21 @@ static const CRPCCommand commands[] =
     { "generating",         "generatetoaddress",      &generatetoaddress,      {"nblocks","address","maxtries"} },
     { "generating",         "generatetodescriptor",   &generatetodescriptor,   {"num_blocks","descriptor","maxtries"} },
     { "generating",         "generateblock",          &generateblock,          {"address","transactions"} },
+    { "generating",         "getstakingstatus",       &getstakingstatus,       {} },
+    { "generating",         "setstakesplitthreshold", &setstakesplitthreshold, {"value"} },
 #else
     { "hidden",             "generatetoaddress",      &generatetoaddress,      {"nblocks","address","maxtries"} }, // Hidden as it isn't functional, just an error to let people know if miner isn't compiled
     { "hidden",             "generatetodescriptor",   &generatetodescriptor,   {"num_blocks","descriptor","maxtries"} },
     { "hidden",             "generateblock",          &generateblock,          {"address","transactions"} },
+    { "hidden",             "getstakingstatus",       &getstakingstatus,       {} },
+    { "hidden",             "setstakesplitthreshold", &setstakesplitthreshold, {"value"} },
 #endif // ENABLE_MINER
+
+#if ENABLE_WALLET
+    { "wallet",             "autocombinedust",        &autocombinedust,        {"enable", "threshold"} },
+#else
+    { "hidden",             "autocombinedust",        &autocombinedust,        {"enable", "threshold"} },
+#endif // ENABLE_WALLET
 
     { "util",               "estimatesmartfee",       &estimatesmartfee,       {"conf_target", "estimate_mode"} },
 

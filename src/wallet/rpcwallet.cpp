@@ -899,7 +899,7 @@ UniValue getextendedbalance(const JSONRPCRequest &request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     const auto bal = pwallet->GetBalance();
 
@@ -1666,7 +1666,7 @@ UniValue listtransactionrecords(const JSONRPCRequest& request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     std::string strAccount = "*";
     if (request.params.size() > 0)
@@ -3540,151 +3540,6 @@ std::string HelpRequiringPassphrase(CWallet * const pwallet)
         ? "\nRequires wallet passphrase to be set with walletpassphrase call."
         : "";
 }
-
-UniValue setstakesplitthreshold(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-    CWallet* const pwallet = wallet.get();
-
-    if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "setstakesplitthreshold value\n"
-            "\nThis will set the output size of your stakes to never be below this number\n" +
-            HelpRequiringPassphrase(pwallet) + "\n"
-
-            "\nArguments:\n"
-            "1. value   (numeric, required) Threshold value between 1 and 999999\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"threshold\": n,    (numeric) Threshold value set\n"
-            "  \"saved\": true|false    (boolean) 'true' if successfully saved to the wallet file\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("setstakesplitthreshold", "5000") + HelpExampleRpc("setstakesplitthreshold", "5000"));
-
-    LOCK(pwallet->cs_wallet);
-
-    EnsureWalletIsUnlocked(pwallet);
-
-    uint64_t nStakeSplitThreshold = request.params[0].get_int64();
-
-    if (nStakeSplitThreshold > 999999)
-        throw std::runtime_error("Value out of range, max allowed is 999999");
-
-    LOCK(pwallet->cs_wallet);
-
-    UniValue result(UniValue::VOBJ);
-    if (!pwallet->SetStakeSplitThreshold(nStakeSplitThreshold)) {
-        throw std::runtime_error(std::string(__func__) + ": writing generated key failed");
-    }
-
-    result.pushKV("threshold", int(pwallet->GetStakeSplitThreshold()));
-    result.pushKV("saved", "true");
-
-    return result;
-}
-UniValue autocombinedust(const JSONRPCRequest& request)
-{
-    bool fEnable;
-    size_t nParamsSize = request.params.size();
-    if (nParamsSize >= 1)
-        fEnable = request.params[0].get_bool();
-
-    if (request.fHelp || nParamsSize < 1 || (!fEnable && nParamsSize > 1) || nParamsSize > 2)
-        throw std::runtime_error(
-            "autocombinedust enable ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Wagerr address\n"
-            "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees.\n"
-
-            "\nArguments:\n"
-            "1. enable                  (boolean, required) Enable auto combine (true) or disable (false)\n"
-            "2. threshold amount        (numeric, optional) Coins with an aggregated value of this amount will be combined (default: 0)\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("autocombinedust", "true 500") + HelpExampleRpc("autocombinedust", "true 500"));
-
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-    CWallet* const pwallet = wallet.get();
-
-    LOCK(pwallet->cs_wallet);
-
-    EnsureWalletIsUnlocked(pwallet);
-
-    CAmount nThresholdAmount = 0;
-
-    if (fEnable) {
-        nThresholdAmount = request.params[1].get_int64();
-        if (nThresholdAmount < 0)
-            throw std::runtime_error("Value out of range, minimum allowed is 0");
-    }
-
-    LOCK(pwallet->cs_wallet);
-
-    UniValue result(UniValue::VOBJ);
-    if (!pwallet->SetAutoCombineSettings(fEnable, nThresholdAmount)) {
-        throw std::runtime_error("Changed settings in wallet but failed to save to database\n");
-    }
-
-
-    result.pushKV("threshold", int(rewardManager->GetAutoCombineThresholdAmount()));
-    result.pushKV("enabled", rewardManager->IsAutoCombineEnabled());
-
-    return result;
-}
-
-extern UniValue getstakingstatus(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getstakingstatus\n"
-            "\nReturns an object containing various staking information.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
-            "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
-            "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
-            "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
-            "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
-            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
-            "  \"staking status\": true|false,     (boolean) if the wallet is staking or not\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
-
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-    CWallet* const pwallet = wallet.get();
-
-    bool fValidTime = ::ChainActive().Tip()->nTime > 1471482000;
-
-    NodeContext& node = EnsureNodeContext(request.context);
-    bool fHaveConnections = !node.connman ? false : node.connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
-    bool fWalletUnlocked = !pwallet->IsLocked(true);
-    bool fMintableCoins = stakingManager->MintableCoins();
-    bool fEnoughCoins = stakingManager->nReserveBalance <= pwallet->GetBalance().m_mine_trusted;
-    bool fMnSync = masternodeSync->IsSynced();
-    bool fStakingStatus = stakingManager->IsStaking();
-
-    UniValue obj(UniValue::VOBJ);
-    obj.pushKV("validtime", fValidTime);
-    obj.pushKV("haveconnections", fHaveConnections);
-    if (pwallet) {
-        obj.pushKV("walletunlocked", fWalletUnlocked);
-        obj.pushKV("mintablecoins", fMintableCoins);
-        obj.pushKV("enoughcoins", fEnoughCoins);
-    }
-    obj.pushKV("mnsync", fMnSync);
-    obj.pushKV("staking_status", fStakingStatus);
-
-    return obj;
-}
-
 static UniValue rescanblockchain(const JSONRPCRequest& request)
 {
     RPCHelpMan{"rescanblockchain",
@@ -4510,7 +4365,7 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     CAmount nAmount = AmountFromValue(request.params[3]);
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
@@ -4626,7 +4481,7 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     CAmount nAmount = AmountFromValue(request.params[1]);
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
@@ -4751,7 +4606,7 @@ UniValue listbets(const JSONRPCRequest& request)
 
     UniValue result{UniValue::VARR};
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     const CWallet::TxItems & txOrdered{pwallet->wtxOrdered};
 
@@ -5764,7 +5619,7 @@ UniValue listchaingamesbets(const JSONRPCRequest& request)
 
     UniValue ret(UniValue::VARR);
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     const CWallet::TxItems & txOrdered = pwallet->wtxOrdered;
 
@@ -5886,7 +5741,7 @@ UniValue getmybets(const JSONRPCRequest& request)
     if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     boost::optional<std::string> accountName = {};
     if (request.params.size() >= 1)
@@ -6058,7 +5913,7 @@ UniValue getmyqgbets(const JSONRPCRequest& request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
 
     boost::optional<std::string> accountName = {};
     if (request.params.size() >= 1)
@@ -6107,9 +5962,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "getwalletinfo",                    &getwalletinfo,                 {} },
     { "wallet",             "importaddress",                    &importaddress,                 {"address","label","rescan","p2sh"} },
     { "wallet",             "importelectrumwallet",             &importelectrumwallet,          {"filename", "index"} },
-    { "wallet",             "getstakingstatus",                 &getstakingstatus,              {} },
-    { "wallet",             "setstakesplitthreshold",           &setstakesplitthreshold,        {"value"} },
-    { "wallet",             "autocombinedust",                  &autocombinedust,               {"enable", "threshold"} },
     { "wallet",             "importmulti",                      &importmulti,                   {"requests","options"} },
     { "wallet",             "importprivkey",                    &importprivkey,                 {"privkey","label","rescan"} },
     { "wallet",             "importprunedfunds",                &importprunedfunds,             {"rawtransaction","txoutproof"} },
@@ -6146,7 +5998,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "walletpassphrase",                 &walletpassphrase,              {"passphrase","timeout","stakingonly"} },
     { "wallet",             "walletprocesspsbt",                &walletprocesspsbt,             {"psbt","sign","sighashtype","bip32derivs"} },
     { "wallet",             "walletcreatefundedpsbt",           &walletcreatefundedpsbt,        {"inputs","outputs","locktime","options","bip32derivs"} },
-    { "wallet",             "autocombinedust",                  &autocombinedust,               {"enable", "threshold"} },
 
     { "wallet",             "placebet",                         &placebet,                      {} },
     { "wallet",             "placeparlaybet",                   &placeparlaybet,                {} },

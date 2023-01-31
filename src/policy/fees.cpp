@@ -863,7 +863,7 @@ bool CBlockPolicyEstimator::Write(CAutoFile& fileout) const
 {
     try {
         LOCK(m_cs_fee_estimator);
-        fileout << 140100; // version required to read: 0.14.1 or later
+        fileout << 50000; // version required to read: 0.14.1 or later
         fileout << CLIENT_VERSION; // version that wrote the file
         fileout << nBestSeenHeight;
         if (BlockSpan() > HistoricalBlockSpan()/2) {
@@ -898,9 +898,9 @@ bool CBlockPolicyEstimator::Read(CAutoFile& filein)
         // structures aren't corrupted if there is an exception.
         filein >> nFileBestSeenHeight;
 
-        if (nVersionRequired < 140100) {
+        if (nVersionRequired < 50000) {
             LogPrintf("%s: incompatible old fee estimation data (non-fatal). Version: %d\n", __func__, nVersionRequired);
-        } else { // New format introduced in 140100
+        } else { // New format introduced in 50000
             unsigned int nFileHistoricalFirst, nFileHistoricalBest;
             filein >> nFileHistoricalFirst >> nFileHistoricalBest;
             if (nFileHistoricalFirst > nFileHistoricalBest || nFileHistoricalBest > nFileBestSeenHeight) {
