@@ -173,13 +173,13 @@ void CRewardManager::AutocombineDust() {
 
 void CRewardManager::DoMaintenance(CConnman& connman) {
     if (!IsReady(connman)) {
-        UninterruptibleSleep(std::chrono::milliseconds{5 * 60 * 1000}); // Wait 5 minutes
+        UninterruptibleSleep(std::chrono::milliseconds{5 * 1000}); // Wait 5 minutes
         return;
     }
 
     if (IsAutoCombineEnabled()) {
         AutocombineDust();
-        int randsleep = GetRandInt(5 * 60 * 1000);
-        UninterruptibleSleep(std::chrono::milliseconds{randsleep}); // Sleep between 3 and 8 minutes
+        int randsleep = GetRandInt(30 * 1000);
+        UninterruptibleSleep(std::chrono::milliseconds{randsleep});
     }
 }

@@ -4258,8 +4258,8 @@ UniValue placeparlaybet(const JSONRPCRequest& request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK2(cs_main, mempool.cs);
-    LOCK(pwallet->cs_wallet);
+    LOCK2(pwallet->cs_wallet, cs_main);
+    LOCK(mempool.cs);
 
     CPeerlessParlayBetTx parlayBetTx;
     UniValue legsArr = request.params[0].get_array();
@@ -4366,6 +4366,7 @@ UniValue placefieldbet(const JSONRPCRequest& request) {
     }
 
     LOCK2(pwallet->cs_wallet, cs_main);
+    LOCK(mempool.cs);
 
     CAmount nAmount = AmountFromValue(request.params[3]);
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
@@ -4482,6 +4483,7 @@ UniValue placefieldparlaybet(const JSONRPCRequest& request) {
     }
 
     LOCK2(pwallet->cs_wallet, cs_main);
+    LOCK(mempool.cs);
 
     CAmount nAmount = AmountFromValue(request.params[1]);
     // Validate bet amount so its between 25 - 10000 WGR inclusive.

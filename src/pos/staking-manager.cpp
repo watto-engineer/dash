@@ -279,7 +279,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
     bool fHaveConnections = connman.GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync->IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance().m_mine_trusted) {
         nLastCoinStakeSearchInterval = 0;
-        UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute
+        UninterruptibleSleep(std::chrono::milliseconds{10 * 1000});
         return;
     }
 
@@ -290,7 +290,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
     if (!fPosPhase) {
         // no POS for at least 1 block
         nLastCoinStakeSearchInterval = 0;
-        UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute
+        UninterruptibleSleep(std::chrono::milliseconds{10 * 1000});
         return;
     }
 
@@ -315,7 +315,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
         // No mintable coins
         nLastCoinStakeSearchInterval = 0;
         LogPrint(BCLog::STAKING, "%s: No mintable coins, waiting..\n", __func__);
-        UninterruptibleSleep(std::chrono::milliseconds{5 * 60 * 1000}); // Wait 5 minutes
+        UninterruptibleSleep(std::chrono::milliseconds{5 * 1000});
         return;
     }
 
