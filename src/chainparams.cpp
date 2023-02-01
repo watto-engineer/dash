@@ -601,8 +601,10 @@ public:
         vOracles = {
             { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
             { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, consensus.nWagerrProtocolV2StartHeight, consensus.nKeysRotateHeight },
-            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, 1063000 },
+            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, consensus.nKeysRotateHeight, 1063000 },
+            { "TBXdNxNw1t2kcCEWigDiDyVm3mG3TWCDz4", strDevPayoutAddrNew, strOMNOPayoutAddrNew, 1063000, std::numeric_limits<int>::max() },
+            { "TSGvJLHNrNne96KMYsnF6L8nFnKSa2Vm2o", strDevPayoutAddrNew, strOMNOPayoutAddrNew, 1063000, std::numeric_limits<int>::max() },
         };
 
         quickGamesArr.clear();
