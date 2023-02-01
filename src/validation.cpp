@@ -990,10 +990,6 @@ CTransactionRef GetTransaction(const CBlockIndex* const block_index, const CTxMe
         CTransactionRef ptx = mempool->get(hash);
         if (ptx) return ptx;
     }
-    if (g_txindex) {
-        CTransactionRef tx;
-        if (g_txindex->FindTx(hash, hashBlock, tx)) return tx;
-    }
     if (fUseView) { // use coin database to locate block that contains transaction, and scan it
         const Coin& coin = AccessByTxid(::ChainstateActive().CoinsTip(), hash);
         CBlockIndex* block_index_view = ::ChainActive()[coin.nHeight];
@@ -1008,6 +1004,10 @@ CTransactionRef GetTransaction(const CBlockIndex* const block_index, const CTxMe
                 }
             }
         }
+    }
+    if (g_txindex) {
+        CTransactionRef tx;
+        if (g_txindex->FindTx(hash, hashBlock, tx)) return tx;
     }
 
     return nullptr;
@@ -3325,7 +3325,7 @@ static void LimitValidationInterfaceQueue(int nHeight) LOCKS_EXCLUDED(cs_main) {
 
     // Added while betting requires txindex
     int WBPVersion = Params().GetConsensus().GetWBPVersion(nHeight);
-    int callbacksLimit = g_txindex && WBPVersion <= 4 && WBPVersion > 0 ? 0 : 10;
+    int callbacksLimit = g_txindex && WBPVersion <= 4 && WBPVersion > 0 ? 1 : 10;
     if (GetMainSignals().CallbacksPending() > callbacksLimit) {
         SyncWithValidationInterfaceQueue();
     }
