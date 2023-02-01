@@ -4995,6 +4995,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
             } else {
                 nGoodTransactions += block.vtx.size();
             }
+            coins.Flush();
             bettingsViewCache.Flush();
         }
         if (ShutdownRequested())

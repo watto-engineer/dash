@@ -210,7 +210,7 @@ enum opcodetype
 };
 
 // Maximum value that an opcode can be
-static const unsigned int MAX_OPCODE = OP_CHECKDATASIGVERIFY;
+static const unsigned int MAX_OPCODE = OP_ZEROCOINPUBLICSPEND;
 
 const char* GetOpName(opcodetype opcode);
 

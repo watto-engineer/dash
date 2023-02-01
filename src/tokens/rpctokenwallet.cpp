@@ -753,7 +753,7 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     chosenCoins.push_back(coin);
 
     std::shared_ptr<CTokenGroupDescriptionRegular> tgDesc;
-    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed) || !confirmed) {
+    if (!ParseGroupDescParamsRegular(request, curparam, tgDesc, confirmed)) {
         return false;
     }
 
@@ -772,6 +772,11 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
 
     TokenGroupIdFlags tgFlags = TokenGroupIdFlags::NONE;
     CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("groupID", EncodeTokenGroup(grpID));
+    if (!confirmed) {
+        return ret;
+    }
 
     CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL | grpNonce);
     CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
@@ -782,8 +787,6 @@ extern UniValue configuretoken(const JSONRPCRequest& request)
     ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
 
     reservedest.KeepDestination();
-    UniValue ret(UniValue::VOBJ);
-    ret.pushKV("groupID", EncodeTokenGroup(grpID));
     ret.pushKV("transaction", tx->GetHash().GetHex());
     return ret;
 }
@@ -1411,8 +1414,7 @@ extern UniValue minttoken(const JSONRPCRequest& request)
     // the user could have gotten from another RPC command prior to now
     pwallet->BlockUntilSyncedToCurrentChain();
 
-    LOCK(cs_main); // to maintain locking order
-    LOCK(pwallet->cs_wallet); // because I am reserving UTXOs for use in a tx
+    LOCK2(pwallet->cs_wallet, cs_main); // 1) to maintain locking order 2) because I am reserving UTXOs for use in a tx
 
     EnsureWalletIsUnlocked(pwallet);
 
@@ -1867,8 +1869,8 @@ static const CRPCCommand commands[] =
     { "tokens",             "melttoken",                &melttoken,                 {} },
 };
 
-void RegisterTokenWalletRPCCommands(CRPCTable &t)
+void RegisterTokenWalletRPCCommands(CRPCTable &tableRPC)
 {
     for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
-        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
 }

@@ -56,7 +56,7 @@ bool CTokenGroupCreation::ValidateDescription() {
 // Validation is performed before data is written to the database
 template <typename T>
 void TGFilterTickerCharacters(T& tgDesc) {
-    std::regex regexTicker("^[a-zA-Z]+$"); // only letters
+    std::regex regexTicker("^[a-zA-Z0-9]+$"); // only letters and numbers
     std::regex regexUrl(R"((https?|ftp)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
@@ -64,7 +64,7 @@ void TGFilterTickerCharacters(T& tgDesc) {
     if (tgDesc.strTicker != "" &&
             !std::regex_match(tgDesc.strTicker, matchResult, regexTicker)) {
         // Token ticker can only contain letters
-        tgDesc.strTicker = "";
+        tgDesc.strTicker = "<FILTERED>";
     }
 }
 template void TGFilterTickerCharacters(CTokenGroupDescriptionRegular& tgDesc);
@@ -79,7 +79,7 @@ void TGFilterNameCharacters(T& tgDesc) {
     if (tgDesc.strName != "" &&
             !std::regex_match(tgDesc.strName, matchResult, regexName)) {
         // Token name can only contain letters, numbers and spaces. At least 2 characters. No space at beginning or end
-        tgDesc.strName = "";
+        tgDesc.strName = "<FILTERED>";
     }
 }
 template void TGFilterNameCharacters(CTokenGroupDescriptionRegular& tgDesc);
@@ -88,14 +88,14 @@ template void TGFilterNameCharacters(CTokenGroupDescriptionNFT& tgDesc);
 
 template <typename T>
 void TGFilterURLCharacters(T& tgDesc) {
-    std::regex regexUrl(R"((https?|ftp)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
+    std::regex regexUrl(R"((http?|ftp|wagerr)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
 
     if (tgDesc.strDocumentUrl != "" &&
             !std::regex_match(tgDesc.strDocumentUrl, matchResult, regexUrl)) {
         // Token description document URL cannot be parsed
-        tgDesc.strDocumentUrl = "";
+        tgDesc.strDocumentUrl = tgDesc.strDocumentUrl + " (non-standard URL)";
     }
 }
 template void TGFilterURLCharacters(CTokenGroupDescriptionRegular& tgDesc);

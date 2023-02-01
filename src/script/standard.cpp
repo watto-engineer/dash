@@ -78,6 +78,59 @@ static bool MatchMultisig(const CScript& script, unsigned int& required, std::ve
     return (it + 1 == script.end());
 }
 
+static bool MatchPayToGrpPubkeyHash(const CScript& script1, valtype& pubkeyhash, valtype& group, valtype& groupQty)
+{
+    const CScript& script2 = CScript() << OP_GRP_DATA << OP_GRP_DATA << OP_GROUP << OP_DROP
+                                                                << OP_DROP << OP_DUP << OP_HASH160 << OP_PUBKEYHASH
+                                                                << OP_EQUALVERIFY << OP_CHECKSIG;
+    group.clear();
+    groupQty.clear();
+
+    opcodetype opcode1, opcode2;
+    std::vector<unsigned char> vch1, vch2;
+
+    // Compare
+    CScript::const_iterator pc1 = script1.begin();
+    CScript::const_iterator pc2 = script2.begin();
+    while (true)
+    {
+        if (pc1 == script1.end() && pc2 == script2.end())
+        {
+            // Found a match
+            return true;
+        }
+        if (!script1.GetOp(pc1, opcode1, vch1))
+            break;
+        if (!script2.GetOp(pc2, opcode2, vch2))
+            break;
+
+        if (opcode2 == OP_PUBKEYHASH)
+        {
+            if (vch1.size() != sizeof(uint160))
+                break;
+            pubkeyhash = std::move(vch1);
+        }
+        else if (opcode2 == OP_GRP_DATA)
+        {
+            // Expect that there is some data in the script at this point
+            if (vch1.size() == 0)
+                break;
+            if (group.empty())
+                group = vch1; // group id is first
+            else
+                groupQty = vch1; // quantity is second
+        }
+        else if (opcode1 != opcode2 || vch1 != vch2)
+        {
+            // Others must match exactly
+            break;
+        }
+    }
+    group.clear();
+    groupQty.clear();
+    return false;
+}
+
 txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned char>>& vSolutionsRet)
 {
     vSolutionsRet.clear();
@@ -122,12 +175,16 @@ txnouttype Solver(const CScript& scriptPubKey, std::vector<std::vector<unsigned 
 
     std::vector<unsigned char> group;
     std::vector<unsigned char> groupQty;
-    // group will always be the last entity in vSolutionsRet
-    // group quantity will be the second to last
-    if (!group.empty())
-    {
-        vSolutionsRet.push_back(groupQty);
-        vSolutionsRet.push_back(group);
+    if (MatchPayToGrpPubkeyHash(scriptPubKey, data, group, groupQty)) {
+        // group will always be the last entity in vSolutionsRet
+        // group quantity will be the second to last
+        if (!group.empty())
+        {
+            vSolutionsRet.push_back(std::move(data));
+            vSolutionsRet.push_back(std::move(groupQty));
+            vSolutionsRet.push_back(std::move(group));
+        }
+        return TX_GRP_PUBKEYHASH;
     }
 
     vSolutionsRet.clear();

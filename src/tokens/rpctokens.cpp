@@ -894,7 +894,7 @@ static const CRPCCommand commands[] =
     { "tokens",             "verifytokenmetadata",   &verifytokenmetadata,    {"hex_data","creation_address", "signature"} },
 };
 
-void RegisterTokensRPCCommands(CRPCTable &t)
+void RegisterTokenRPCCommands(CRPCTable &t)
 {
     for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
         t.appendCommand(commands[vcidx].name, &commands[vcidx]);

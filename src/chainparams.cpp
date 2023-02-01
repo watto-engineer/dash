@@ -658,7 +658,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V18DeploymentHeight = 1;
+        consensus.V18DeploymentHeight = 600;
         consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
         consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
         consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
@@ -979,7 +979,6 @@ public:
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = 400;
         consensus.nBlockTimeProtocolV2 = 500;
-        consensus.ATPStartHeight = consensus.V18DeploymentHeight;
 
         // Proof of stake parameters
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
@@ -994,7 +993,10 @@ public:
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V18DeploymentHeight;
         consensus.ATPStartHeight = consensus.V18DeploymentHeight;
+
+        // ATP parameters
         consensus.WagerrAddrPrefix = "wagerrreg";
+        consensus.strTokenManagementKey = "TDn9ZfHrYvRXyXC6KxRgN6ZRXgJH2JKZWe"; // TCH8Qby7krfugb2sFWzHQSEmTxBgzBSLkgPtt5EUnzDqfaX9dcsS
         consensus.nOpGroupNewRequiredConfirmations = 1;
         // Other
         consensus.nMaturityV1 = 100;

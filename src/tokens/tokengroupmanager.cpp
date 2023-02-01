@@ -109,10 +109,10 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
             tgGVTCreation.reset();
         }
 
-        std::map<CTokenGroupID, CTokenGroupCreation>::iterator iter = mapTokenGroups.find(tokenGroupInfo.associatedGroup);
+        auto iter = mapTokenGroups.find(tokenGroupInfo.associatedGroup);
         if (iter != mapTokenGroups.end()) {
+            toRemoveTokenGroupID = (*iter).first;
             mapTokenGroups.erase(iter);
-            toRemoveTokenGroupID = iter->first;
             return true;
         }
     }

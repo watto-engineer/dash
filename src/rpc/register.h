@@ -29,8 +29,10 @@ void RegisterGovernanceRPCCommands(CRPCTable &tableRPC);
 void RegisterEvoRPCCommands(CRPCTable &tableRPC);
 /** Register Quorums RPC commands */
 void RegisterQuorumsRPCCommands(CRPCTable &tableRPC);
-/** Register Tokens RPC commands */
-void RegisterTokensRPCCommands(CRPCTable &tableRPC);
+/** Register Token RPC commands */
+void RegisterTokenRPCCommands(CRPCTable &tableRPC);
+/** Register Token Wallet RPC commands */
+void RegisterTokenWalletRPCCommands(CRPCTable &tableRPC);
 /** Register Betting RPC commands */
 void RegisterBettingRPCCommands(CRPCTable &tableRPC);
 
@@ -46,7 +48,8 @@ static inline void RegisterAllCoreRPCCommands(CRPCTable &t)
     RegisterGovernanceRPCCommands(t);
     RegisterEvoRPCCommands(t);
     RegisterQuorumsRPCCommands(t);
-    RegisterTokensRPCCommands(t);
+    RegisterTokenRPCCommands(t);
+    RegisterTokenWalletRPCCommands(t);
     RegisterBettingRPCCommands(t);
 }
 
