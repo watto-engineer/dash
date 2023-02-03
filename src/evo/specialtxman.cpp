@@ -13,6 +13,8 @@
 #include <hash.h>
 #include <llmq/blockprocessor.h>
 #include <tokens/tokengroupconfiguration.h>
+#include <tokens/tokengroupmanager.h>
+#include <tokens/tokendb.h>
 
 #include <llmq/commitment.h>
 #include <primitives/block.h>
@@ -46,7 +48,12 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
         case TRANSACTION_GROUP_CREATION_REGULAR:
             return CheckGroupConfigurationTxRegular(tx, pindexPrev, state, view);
         case TRANSACTION_GROUP_CREATION_MGT:
-            return CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
+            if (!CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view))
+            {
+                CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
+                return false;
+            }
+            return true;
         case TRANSACTION_GROUP_CREATION_NFT:
             return CheckGroupConfigurationTxNFT(tx, pindexPrev, state, view);
         case TRANSACTION_MNHF_SIGNAL:
@@ -79,6 +86,7 @@ bool ProcessSpecialTx(const CTransaction& tx, const CBlockIndex* pindex, CValida
     case TRANSACTION_GROUP_CREATION_REGULAR:
     case TRANSACTION_GROUP_CREATION_MGT:
     case TRANSACTION_GROUP_CREATION_NFT:
+        return true; // handled per block
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
     }
@@ -105,7 +113,7 @@ bool UndoSpecialTx(const CTransaction& tx, const CBlockIndex* pindex)
     case TRANSACTION_GROUP_CREATION_REGULAR:
     case TRANSACTION_GROUP_CREATION_MGT:
     case TRANSACTION_GROUP_CREATION_NFT:
-        return true; // handled per tx
+        return true; // handled per block
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
     }
@@ -155,6 +163,11 @@ bool ProcessSpecialTxsInBlock(const CBlock& block, const CBlockIndex* pindex, ll
             return false;
         }
 
+        if (!tokenGroupManager->CollectTokensFromBlock(block, pindex, state, view, fJustCheck)) {
+            // pass the state returned by the function above
+            return false;
+        }
+
         int64_t nTime4 = GetTimeMicros();
         nTimeDMN += nTime4 - nTime3;
         LogPrint(BCLog::BENCHMARK, "        - deterministicMNManager: %.2fms [%.2fs]\n", 0.001 * (nTime4 - nTime3), nTimeDMN * 0.000001);
@@ -194,6 +207,11 @@ bool UndoSpecialTxsInBlock(const CBlock& block, const CBlockIndex* pindex, llmq:
         if (!quorum_block_processor.UndoBlock(block, pindex)) {
             return false;
         }
+
+        if (!tokenGroupManager->UndoBlock(block, pindex)) {
+            return false;
+        }
+
     } catch (const std::exception& e) {
         return error(strprintf("%s -- failed: %s\n", __func__, e.what()).c_str());
     }

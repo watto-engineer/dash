@@ -33,6 +33,9 @@ public:
     bool LoadTokensFromDB(std::string& strError); // populates mapTokenGroups
 };
 
+/** Global variable that points to the token database */
+extern std::unique_ptr<CTokenDB> pTokenDB;
+
 bool ReindexTokenDB(std::string &strError); // Drops db, scans for token creations, but does not populate mapTokenGroups
 bool VerifyTokenDB(std::string &strError); // Fetches all tokens from the DB and verifies that their configuration transactions are valid
 

@@ -16,6 +16,7 @@
 #include "script/tokengroup.h"
 #include "util/strencodings.h"
 #include "tokens/tokengroupconfiguration.h"
+#include "tokens/tokendb.h"
 
 std::shared_ptr<CTokenGroupManager> tokenGroupManager;
 
@@ -55,6 +56,8 @@ bool CTokenGroupManager::MatchesGVT(CTokenGroupID tgID) {
 }
 
 bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups) {
+    AssertLockHeld(cs_main);
+
     for (auto tokenGroupCreation : newTokenGroups) {
         if (!tokenGroupCreation.ValidateDescription()) {
             LogPrint(BCLog::TOKEN, "%s - Validation of token %s failed", __func__, EncodeTokenGroup(tokenGroupCreation.tokenGroupInfo.associatedGroup));
@@ -326,3 +329,85 @@ bool CTokenGroupManager::CheckFees(const CTransaction &tx, const std::unordered_
     }
     return true;
 }
+
+bool CTokenGroupManager::CollectTokensFromBlock(const CBlock& block, const CBlockIndex* pindex, CValidationState& _state, const CCoinsViewCache& view, bool fJustCheck)
+{
+    AssertLockHeld(cs_main);
+
+    const auto& consensusParams = Params().GetConsensus();
+    bool fATPActive = pindex->nHeight >= consensusParams.ATPStartHeight;
+    if (!fATPActive) {
+        return true;
+    }
+
+    LOCK(cs);
+
+    newTokenGroups.clear();
+
+    // Get new token groups from block
+    for (const auto& ptx : block.vtx) {
+        if (ptx->nVersion != 3)
+            continue;
+
+        switch (ptx->nType)
+        {
+            case TRANSACTION_GROUP_CREATION_REGULAR:
+            case TRANSACTION_GROUP_CREATION_MGT:
+            case TRANSACTION_GROUP_CREATION_NFT:
+            {
+                CTokenGroupCreation newTokenGroupCreation;
+                if (!CreateTokenGroup(ptx, block.GetHash(), newTokenGroupCreation)) {
+                    return _state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-op-group");
+                } else {
+                    newTokenGroups.push_back(newTokenGroupCreation);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return true;
+}
+
+void CTokenGroupManager::ApplyTokensFromBlock()
+{
+    AssertLockHeld(cs_main);
+
+    LOCK(cs);
+
+    pTokenDB->WriteTokenGroupsBatch(newTokenGroups);
+    tokenGroupManager->AddTokenGroups(newTokenGroups);
+    newTokenGroups.clear();
+}
+
+bool CTokenGroupManager::UndoBlock(const CBlock& block, const CBlockIndex* pindex)
+{
+    AssertLockHeld(cs_main);
+
+    const auto& consensusParams = Params().GetConsensus();
+    bool fATPActive = pindex->nHeight >= consensusParams.ATPStartHeight;
+    if (!fATPActive) {
+        return true;
+    }
+
+    LOCK(cs);
+
+    std::vector<CTokenGroupID> toRemoveTokenGroupIDs;
+    for (const auto& ptx : block.vtx) {
+        if (ptx->nVersion != 3)
+            continue;
+
+        CTokenGroupID toRemoveTokenGroupID;
+        if (!tokenGroupManager.get()->RemoveTokenGroup(*ptx, toRemoveTokenGroupID))
+            continue;
+        toRemoveTokenGroupIDs.push_back(toRemoveTokenGroupID);
+    }
+
+    if (!pTokenDB->EraseTokenGroupBatch(toRemoveTokenGroupIDs)) {
+        return false;
+    }
+
+    return true;
+}
+

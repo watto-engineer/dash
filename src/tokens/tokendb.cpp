@@ -10,6 +10,8 @@
 
 #include <boost/thread.hpp>
 
+std::unique_ptr<CTokenDB> pTokenDB;
+
 CTokenDB::CTokenDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "tokens", nCacheSize, fMemory, fWipe) {}
 
 bool CTokenDB::WriteTokenGroupsBatch(const std::vector<CTokenGroupCreation>& tokenGroups) {
@@ -81,7 +83,7 @@ bool CTokenDB::LoadTokensFromDB(std::string& strError) {
     std::vector<CTokenGroupCreation> vTokenGroups;
     FindTokenGroups(vTokenGroups, strError);
 
-    tokenGroupManager.get()->AddTokenGroups(vTokenGroups);
+    tokenGroupManager->AddTokenGroups(vTokenGroups);
     return true;
 }
 
@@ -141,7 +143,7 @@ bool ReindexTokenDB(std::string &strError) {
         strError = "Failed to reset token database";
         return false;
     }
-    tokenGroupManager.get()->ResetTokenGroups();
+    tokenGroupManager->ResetTokenGroups();
 
     uiInterface.ShowProgress("Reindexing token database...", 0, false);
 
@@ -172,7 +174,7 @@ bool ReindexTokenDB(std::string &strError) {
             strError = "Error writing token database to disk";
             return false;
         }
-        tokenGroupManager.get()->AddTokenGroups(vTokenGroups);
+        tokenGroupManager->AddTokenGroups(vTokenGroups);
         vTokenGroups.clear();
 
         pindex = ::ChainActive().Next(pindex);

@@ -231,14 +231,25 @@ bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CToken
     return true;
 }
 
-bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+bool CheckGroupConfigurationTxBase(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
-    if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
+    if (pindexPrev->nHeight + 1 < Params().GetConsensus().ATPStartHeight) {
+        return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false, REJECT_INVALID, "premature-op_group-tx");
     }
-
     if (!IsAnyOutputGroupedCreation(tx)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-tx");
+    }
+    return true;
+}
+
+bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+{
+    if (!CheckGroupConfigurationTxBase(tx, pindexPrev, state, view)) {
+        return false;
+    }
+
+    if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     CTokenGroupDescriptionRegular tgDesc;
@@ -258,12 +269,12 @@ bool CheckGroupConfigurationTxRegular(const CTransaction& tx, const CBlockIndex*
 
 bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
-    if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
+    if (!CheckGroupConfigurationTxBase(tx, pindexPrev, state, view)) {
+        return false;
     }
 
-    if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-tx");
+    if (tx.nType != TRANSACTION_GROUP_CREATION_MGT) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     CTokenGroupDescriptionMGT tgDesc;
@@ -286,12 +297,12 @@ bool CheckGroupConfigurationTxMGT(const CTransaction& tx, const CBlockIndex* pin
 
 bool CheckGroupConfigurationTxNFT(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
 {
-    if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
+    if (!CheckGroupConfigurationTxBase(tx, pindexPrev, state, view)) {
+        return false;
     }
 
-    if (!IsAnyOutputGroupedCreation(tx)) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-tx");
+    if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
     }
 
     CTokenGroupDescriptionNFT tgDesc;

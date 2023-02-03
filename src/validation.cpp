@@ -231,7 +231,6 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 
 std::unique_ptr<CBlockTreeDB> pblocktree;
 std::unique_ptr<CZerocoinDB> zerocoinDB;
-std::unique_ptr<CTokenDB> pTokenDB;
 std::unique_ptr<CBettingsView> bettingsView;
 
 // See definition for documentation
@@ -1670,10 +1669,8 @@ int ApplyTxInUndo(Coin&& undo, CCoinsViewCache& view, const COutPoint& out)
 
 /** Undo the effects of this block (with given index) on the UTXO set represented by coins.
  *  When FAILED is returned, view is left in an indeterminate state. */
-DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache, bool fDisconnectTokens)
+DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache)
 {
-    std::vector<CTokenGroupID> toRemoveTokenGroupIDs;
-
     AssertLockHeld(cs_main);
     assert(m_quorum_block_processor);
 
@@ -1815,17 +1812,8 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
                 }
 
             }
-            if (IsAnyOutputGroupedCreation(tx) && fDisconnectTokens) {
-                CTokenGroupID toRemoveTokenGroupID;
-                if (tokenGroupManager.get()->RemoveTokenGroup(tx, toRemoveTokenGroupID))
-                    toRemoveTokenGroupIDs.push_back(toRemoveTokenGroupID);
-            }
             // At this point, all of txundo.vprevout should have been moved out.
         }
-    }
-    if (!pTokenDB->EraseTokenGroupBatch(toRemoveTokenGroupIDs)) {
-        AbortNode("Failed to erase token group creations");
-        return DISCONNECT_FAILED;
     }
 
     if (fSpentIndex) {
@@ -2239,8 +2227,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     //! Zerocoin
     std::vector<std::pair<libzerocoin::CoinSpend, uint256> > vSpends;
     std::vector<std::pair<libzerocoin::PublicCoin, uint256> > vMints;
-    //! ATP
-    std::vector<CTokenGroupCreation> newTokenGroups;
 
     bool fDIP0001Active_context = pindex->nHeight >= Params().GetConsensus().DIP0001Height;
     bool fV18Active_context = pindex->nHeight >= Params().GetConsensus().V18DeploymentHeight;
@@ -2346,15 +2332,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             }
             
             if (IsAnyOutputGroupedCreation(*tx)) {
-                if (pindex->nHeight < chainparams.GetConsensus().ATPStartHeight) {
-                    return state.Invalid(ValidationInvalidReason::TX_PREMATURE_SPEND, false, REJECT_INVALID, "premature-op_group-tx");
-                }
-                CTokenGroupCreation newTokenGroupCreation;
-                if (CreateTokenGroup(tx, block.GetHash(), newTokenGroupCreation)) {
-                    newTokenGroups.push_back(newTokenGroupCreation);
-                } else {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-op-group");
-                }
             }
 
             // Check that zWAGERR mints are not already known
@@ -2621,11 +2598,8 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     if (fTimestampIndex)
         if (!pblocktree->WriteTimestampIndex(CTimestampIndexKey(pindex->nTime, pindex->GetBlockHash())))
             return AbortNode(state, "Failed to write timestamp index");
-    if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
-        return AbortNode(state, "Failed to write token creation data");
-    if (!tokenGroupManager.get()->AddTokenGroups(newTokenGroups)) {
-        return AbortNode(state, "Failed to add token creation data");
-    }
+
+    tokenGroupManager->ApplyTokensFromBlock();
 
     assert(pindex->phashBlock);
     // add this block to the view's block chain
@@ -4985,7 +4959,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
         if (nCheckLevel >= 3 && (coins.DynamicMemoryUsage() + ::ChainstateActive().CoinsTip().DynamicMemoryUsage()) <= ::ChainstateActive().m_coinstip_cache_size_bytes) {
             assert(coins.GetBestBlock() == pindex->GetBlockHash());
-            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins, bettingsViewCache, nCheckLevel > 3);
+            DisconnectResult res = ::ChainstateActive().DisconnectBlock(block, pindex, coins, bettingsViewCache);
             if (res == DISCONNECT_FAILED) {
                 return error("VerifyDB(): *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
@@ -5024,6 +4998,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
                 return error("VerifyDB(): *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             if (!::ChainstateActive().ConnectBlock(block, state, pindex, coins, bettingsViewCache, chainparams))
                 return error("VerifyDB(): *** found unconnectable block at %d, hash=%s (%s)", pindex->nHeight, pindex->GetBlockHash().ToString(), FormatStateMessage(state));
+            coins.Flush();
             bettingsViewCache.Flush();
         }
     }
@@ -5052,8 +5027,6 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
             pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
 
-    std::vector<CTokenGroupCreation> newTokenGroups;
-
     for (const CTransactionRef& tx : block.vtx) {
         if (!tx->IsCoinBase()) {
             for (const CTxIn &txin : tx->vin) {
@@ -5062,23 +5035,8 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
         }
         // Pass check = true as every addition may be an overwrite.
         AddCoins(inputs, *tx, pindex->nHeight, true);
-
-        if (IsAnyOutputGroupedCreation(*tx)) {
-            if (pindex->nHeight >= params.GetConsensus().ATPStartHeight) {
-                CTokenGroupCreation newTokenGroupCreation;
-                if (CreateTokenGroup(tx, block.GetHash(), newTokenGroupCreation)) {
-                    newTokenGroups.push_back(newTokenGroupCreation);
-                } else {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-op-group");
-                }
-            }
-        }
     }
-    if (!pTokenDB->WriteTokenGroupsBatch(newTokenGroups))
-        return AbortNode(state, "Failed to write token creation data");
-    if (!tokenGroupManager.get()->AddTokenGroups(newTokenGroups)) {
-        return AbortNode(state, "Failed to add token creation data");
-    }
+    tokenGroupManager->ApplyTokensFromBlock();
 
     return true;
 }

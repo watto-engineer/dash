@@ -10,6 +10,7 @@
 #include "tokens/tokengroupconfiguration.h"
 
 #include <functional>
+#include <sync.h>
 #include <unordered_map>
 
 class CBlockIndex;
@@ -17,19 +18,27 @@ class CTokenGroupManager;
 class UniValue;
 
 extern std::shared_ptr<CTokenGroupManager> tokenGroupManager;
+extern CCriticalSection cs_main;
 
 // TokenGroup Class
 // Keeps track of all of the token groups
 class CTokenGroupManager
 {
+public:
+    CCriticalSection cs;
+
 private:
     std::map<CTokenGroupID, CTokenGroupCreation> mapTokenGroups;
     std::unique_ptr<CTokenGroupCreation> tgMGTCreation;
     std::unique_ptr<CTokenGroupCreation> tgGVTCreation;
 
+    // Processed, added and databased while locked by cs_main
+    std::vector<CTokenGroupCreation> newTokenGroups;
+
 public:
     CTokenGroupManager();
 
+    void GetNewTokenGroups(std::vector<CTokenGroupCreation>& ret) { ret = newTokenGroups; };
     bool AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups);
     bool RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemoveTokenGroupID);
     void ResetTokenGroups();
@@ -40,6 +49,7 @@ public:
     bool GetTokenGroupIdByTicker(std::string strTicker, CTokenGroupID &tokenGroupID);
     bool GetTokenGroupIdByName(std::string strName, CTokenGroupID &tokenGroupID);
     std::map<CTokenGroupID, CTokenGroupCreation> GetMapTokenGroups() { return mapTokenGroups; };
+
 
     bool StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation);
     void ClearManagementTokenGroups();
@@ -63,6 +73,10 @@ public:
     std::string TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID);
 
     bool CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex);
+
+    bool CollectTokensFromBlock(const CBlock& block, const CBlockIndex* pindex, CValidationState& _state, const CCoinsViewCache& view, bool fJustCheck);
+    void ApplyTokensFromBlock();
+    bool UndoBlock(const CBlock& block, const CBlockIndex* pindex);
 };
 
 #endif
