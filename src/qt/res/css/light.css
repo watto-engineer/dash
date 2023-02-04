@@ -43,7 +43,7 @@ QDialog,
 QMainWindow,
 QMessageBox
 WalletFrame {
-    background-color: ##b70000;;;
+    background-color: #b70000;
 }
 
 QWidget { /* override text selection background color for all text widgets */
@@ -76,7 +76,7 @@ QComboBox,
 QPlainTextEdit,
 QLineEdit {
     background-color: #eaeaec;
-    border-color: ##b70000;;;
+    border-color: #b70000;
     color: #fcfcfc;
 }
 
@@ -96,7 +96,7 @@ QComboBox:checked,
 QComboBox:focus,
 QPlainTextEdit:focus,
 QLineEdit:focus {
-    background-color: #454545;;
+    background-color: #454545;
     border-color: #f8f6f6;
 }
 
@@ -106,7 +106,7 @@ QComboBox:disabled,
 QPlainTextEdit:disabled,
 QLineEdit:disabled {
     background-color: #eaeaec;
-    border-color: #454545;;
+    border-color: #454545;
     color: #AAAAAA;
 }
 
@@ -166,7 +166,7 @@ QCalendarWidget,
 #qt_calendar_nextmonth:hover,
 #qt_calendar_monthbutton:hover,
 #qt_calendar_yearbutton:hover {
-    background-color: #454545;;
+    background-color: #454545;
 }
 
 #qt_calendar_prevmonth {
@@ -186,7 +186,7 @@ QCalendarWidget QWidget {
 
 QCalendarWidget QAbstractItemView:enabled {
     color: #fcfcfc;
-    selection-background-color: #454545;;
+    selection-background-color: #454545;
     selection-color: #fcfcfc;
 }
 
@@ -247,7 +247,7 @@ QComboBox::item:alternate {
 }
 
 QComboBox::item:selected {
-    background-color: #f2f2f2;;
+    background-color: #f2f2f2;
 }
 
 QComboBox::down-arrow {
@@ -277,7 +277,7 @@ QHeaderView
 ******************************************************/
 
 QHeaderView::section { /* Table Header Sections */
-    background-color: ##b70000;
+    background-color: #b70000;
     border-color: #ffffff;
     color: #fff;
 }
@@ -307,7 +307,7 @@ QMenu::item {
 }
 
 QMenu::item:selected:!disabled {
-    background-color: #f2f0f0;;
+    background-color: #f2f0f0;
 }
 
 QMenu::item:disabled {
@@ -337,7 +337,7 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-    background-color: ##b70000;;;
+    background-color: #b70000;
 }
 
 /******************************************************
@@ -353,7 +353,7 @@ QPushButton
 ******************************************************/
 
 QPushButton {
-    background-color: #b70000;;
+    background-color: #b70000;
     color: #ffffff;
 }
 
@@ -460,7 +460,7 @@ QPushButton - Special case, tabbar replacement buttons
 /* Sign/Verify dialog buttons */
 #btnSignMessage,
 #btnVerifyMessage {
-    border-color: ##b70000;;;
+    border-color: #b70000;
     color: #ffffff;
 }
 
@@ -606,8 +606,8 @@ QTableView::item { /* Table Item */
 }
 
 QTableView::item:selected { /* Table Item Selected */
-    background-color: #454545;;
-    border-color: #454545;;
+    background-color: #454545;
+    border-color: #454545;
     color: #fcfcfc;
 }
 
@@ -789,7 +789,7 @@ QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:selected,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::item:checked,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:selected,
 QDialog#CoinControlDialog .CoinControlTreeWidget#treeWidget::branch:checked  {
-    background-color: #454545;;
+    background-color: #454545;
     color: #fcfcfc;
 }
 
@@ -888,10 +888,6 @@ RPCConsole QTableView {
     color: #fcfcfc;
 }
 
-RPCConsole QWidget#detailWidget {
-    background-color: #f2f2f4;
-}
-
 #rpcAutoCompleter {
     background-color: #eaeaec;
     border-color: #dcdcdc;
@@ -902,7 +898,7 @@ RPCConsole QWidget#detailWidget {
 }
 
 #rpcAutoCompleter::item:selected {
-    background-color: #454545;;
+    background-color: #454545;
     color: #fcfcfc;
 }
 
@@ -983,7 +979,7 @@ QScrollBar::handle:horizontal {
 }
 QScrollBar:handle:horizontal:hover,
 QScrollBar:handle:vertical:hover {
-    background-color: #454545;;
+    background-color: #454545;
 }
 QScrollBar:handle:horizontal:pressed,
 QScrollBar:handle:vertical:pressed {
@@ -999,7 +995,7 @@ QScrollBar::add-line:vertical:hover,
 QScrollBar::sub-line:vertical:hover,
 QScrollBar::add-line:horizontal:hover,
 QScrollBar::sub-line:horizontal:hover {
-    background-color: #454545;;
+    background-color: #454545;
 }
 QScrollBar::add-line:vertical:pressed,
 QScrollBar::sub-line:vertical:pressed,
