@@ -46,6 +46,9 @@ QMainWindow,
 QMessageBox
 WalletFrame {
     background-color:#f8f6f6;
+    border-top:0px solid #000;
+    margin:0;
+    padding:0;
 }
 
 QWidget { /* override text selection background color for all text widgets */
@@ -79,7 +82,9 @@ QComboBox,
 QPlainTextEdit,
 QLineEdit {
     border:1px solid #b70000;
+    padding: 3px 5px 3px 5px;
     background:#fcfcfc;
+    min-height:25px;
     color:#818181;
 }
 
@@ -667,7 +672,7 @@ QTextEdit {
 QToolBar / QToolButton
 ******************************************************/
 
- QToolBar {
+QToolBar {
     background-color: #212121;
 }
 
@@ -826,14 +831,6 @@ EditAddressDialog
 /***** No dark.css specific coloring here yet *****/
 
 /******************************************************
-GovernanceList
-******************************************************/
-
-GovernanceList QTableView {
-    color: #c7c7c7;
-}
-
-/******************************************************
 HelpMessageDialog
 ******************************************************/
 
@@ -913,10 +910,6 @@ QWidget#RPCConsole { /* RPC Console Dialog Box */
 
 RPCConsole QTableView {
     color: #c7c7c7;
-}
-
-RPCConsole QWidget#detailWidget {
-    background-color: #323233;
 }
 
 #rpcAutoCompleter {
