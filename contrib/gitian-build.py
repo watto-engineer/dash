@@ -36,7 +36,7 @@ def setup():
     if not os.path.isdir('wagerr'):
         subprocess.check_call(['git', 'clone', 'https://github.com/wagerr/wagerr.git'])
     os.chdir('gitian-builder')
-    make_image_prog = ['bin/make-base-vm', '--distro', 'debian' '--suite', 'bullseye', '--arch', 'amd64']
+    make_image_prog = ['bin/make-base-vm', '--distro', 'debian', '--suite', 'bullseye', '--arch', 'amd64']
     if args.docker:
         make_image_prog += ['--docker']
     elif args.lxc:
