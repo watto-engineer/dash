@@ -45,6 +45,10 @@ public:
         TGFilterNameUniqueness(tgDesc, tgCreation->tokenGroupInfo.associatedGroup);
         return true;
     }
+    bool operator()(CTokenGroupDescriptionBetting& tgDesc) const {
+        TGFilterURLCharacters(tgDesc);
+        return true;
+    }
 };
 
 bool CTokenGroupCreation::ValidateDescription() {
@@ -101,6 +105,7 @@ void TGFilterURLCharacters(T& tgDesc) {
 template void TGFilterURLCharacters(CTokenGroupDescriptionRegular& tgDesc);
 template void TGFilterURLCharacters(CTokenGroupDescriptionMGT& tgDesc);
 template void TGFilterURLCharacters(CTokenGroupDescriptionNFT& tgDesc);
+template void TGFilterURLCharacters(CTokenGroupDescriptionBetting& tgDesc);
 
 // Checks that the token description data fulfils context dependent criteria
 // Such as: no reserved names, no double names
@@ -210,6 +215,7 @@ bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &to
 template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionRegular& tgDesc);
 template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionMGT& tgDesc);
 template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionNFT& tgDesc);
+template bool GetTokenConfigurationParameters(const CTransaction &tx, CTokenGroupInfo &tokenGroupInfo, CTokenGroupDescriptionBetting& tgDesc);
 
 bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CTokenGroupCreation &newTokenGroupCreation) {
     CTokenGroupInfo tokenGroupInfo;
@@ -225,6 +231,10 @@ bool CreateTokenGroup(const CTransactionRef tx, const uint256& blockHash, CToken
         newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tokenGroupDescription), tokenGroupStatus);
     } else if (tx->nType == TRANSACTION_GROUP_CREATION_NFT) {
         CTokenGroupDescriptionNFT tokenGroupDescription;
+        if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
+        newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tokenGroupDescription), tokenGroupStatus);
+    } else if (tx->nType == TRANSACTION_GROUP_CREATION_BETTING) {
+        CTokenGroupDescriptionBetting tokenGroupDescription;
         if (!GetTokenConfigurationParameters(*tx, tokenGroupInfo, tokenGroupDescription)) return false;
         newTokenGroupCreation = CTokenGroupCreation(tx, blockHash, tokenGroupInfo, std::make_shared<CTokenGroupDescriptionVariant>(tokenGroupDescription), tokenGroupStatus);
     }
@@ -314,6 +324,34 @@ bool CheckGroupConfigurationTxNFT(const CTransaction& tx, const CBlockIndex* pin
     }
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionNFT::CURRENT_VERSION) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-version");
+    }
+
+    return true;
+}
+
+bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+{
+    if (!CheckGroupConfigurationTxBase(tx, pindexPrev, state, view)) {
+        return false;
+    }
+
+    if (tx.nType != TRANSACTION_GROUP_CREATION_BETTING) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-type");
+    }
+
+    CTokenGroupDescriptionBetting tgDesc;
+    if (!GetTxPayload(tx, tgDesc)) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-payload");
+    }
+    // Check BLS signature
+    /*
+    if (!tgDesc.vchData.size() > MAX_TX_NFT_DATA) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-data");
+    }
+    */
+
+    if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionBetting::CURRENT_VERSION) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-version");
     }
 

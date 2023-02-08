@@ -580,27 +580,30 @@ public:
 std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut);
 
 template<typename BetTx>
-CScript EncodeBettingTx(const BetTx& bettingTx, CBettingTxHeader header) {
+bool EncodeBettingTxPayload(const CBettingTxHeader& header, const BetTx& bettingTx, std::vector<unsigned char>& betData) {
+    betData.clear();
     switch (header.version) {
         case BetTxVersion4:
         {
             CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-            ss << (uint8_t) BTX_PREFIX << (uint8_t) BetTxVersion4 << (uint8_t) header.txType << bettingTx;
-            std::vector<unsigned char> betData;
+            ss << (uint8_t) BTX_PREFIX << (uint8_t) header.version << (uint8_t) header.txType << bettingTx;
             for (auto it = ss.begin(); it < ss.end(); ++it) {
                 betData.emplace_back((unsigned char)(*it));
             }
-            CScript betScript = CScript() << OP_RETURN << betData;
-            return betScript;
+            return true;
         }
         case BetTxVersion5:
         {
-            return CScript();
+            CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+            ss << (uint8_t) BTX_PREFIX << (uint8_t) header.version << (uint8_t) header.txType << bettingTx;
+            for (auto it = ss.begin(); it < ss.end(); ++it) {
+                betData.emplace_back((unsigned char)(*it));
+            }
+            return true;
         }
         default:
-            break;
+            return false;
     }
-    return CScript();
 }
 
 #endif

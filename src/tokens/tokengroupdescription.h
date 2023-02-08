@@ -11,6 +11,7 @@
 #include "script/script.h"
 #include <primitives/transaction.h>
 #include "uint256.h"
+#include <tinyformat.h>
 #include <univalue.h>
 
 #include <boost/variant.hpp>
@@ -210,7 +211,76 @@ public:
     }
 };
 
-typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT, CTokenGroupDescriptionNFT> CTokenGroupDescriptionVariant;
+class CTokenGroupDescriptionBetting
+{
+public:
+    static const uint16_t CURRENT_VERSION = 1;
+    static const int SPECIALTX_TYPE = TRANSACTION_GROUP_CREATION_BETTING;
+
+    uint16_t nVersion{CURRENT_VERSION};
+
+    uint32_t nEventId; // Unique ID, referring to either a peerless event or a field bet event
+    std::string strDocumentUrl; // E.g. wagerr://api/bet/events?eventId=120841
+    uint256 documentHash;
+
+    uint8_t signerType; // '1' when signed by a MGT token, '2' when signed by an ORACLE token, '3' when signed by a LLMQ
+    uint256 signerHash; // hash of the signer ID (either token ID or quorum hash)
+    CBLSPublicKey blsPubKey; // BLS Public Key that enables signing
+    CBLSSignature blsSig; // BLS Signature over nVersion, nEventId, strDocumentUrl, documentHash, signerType, signerHash and blsPubKey
+
+    CTokenGroupDescriptionBetting() {
+        SetNull();
+    };
+    CTokenGroupDescriptionBetting(uint32_t nEventId, std::string strDocumentUrl, uint256 documentHash, uint8_t signerType, uint256 signerHash, CBLSPublicKey blsPubKey, CBLSSignature blsSig) :
+        nEventId(nEventId), strDocumentUrl(strDocumentUrl), documentHash(documentHash), signerType(signerType), signerHash(signerHash), blsPubKey(blsPubKey), blsSig(blsSig) { };
+
+    void SetNull() {
+        nEventId = 0;
+        strDocumentUrl = "";
+        documentHash = uint256();
+        signerType = 0;
+        signerHash = uint256();
+        blsPubKey = CBLSPublicKey();
+        blsSig = CBLSSignature();
+    }
+
+    SERIALIZE_METHODS(CTokenGroupDescriptionBetting, obj)
+    {
+        READWRITE(obj.nVersion);
+        READWRITE(obj.nEventId);
+        READWRITE(obj.strDocumentUrl);
+        READWRITE(obj.documentHash);
+        READWRITE(obj.signerType);
+        READWRITE(obj.signerHash);
+        READWRITE(obj.blsPubKey);
+        READWRITE(obj.blsSig);
+    }
+    void ToJson(UniValue& obj) const;
+    void WriteHashable(CHashWriter& ss) const {
+        ss << nVersion;
+        ss << nEventId;
+        ss << strDocumentUrl;
+        ss << documentHash;
+        ss << signerType;
+        ss << signerHash;
+        ss << blsPubKey;
+        ss << blsSig;
+    }
+
+    bool operator==(const CTokenGroupDescriptionBetting &c)
+    {
+        return (nVersion == c.nVersion &&
+                nEventId == c.nEventId &&
+                strDocumentUrl == c.strDocumentUrl &&
+                documentHash == c.documentHash &&
+                signerType == c.signerType &&
+                signerHash == c.signerHash &&
+                blsPubKey == c.blsPubKey &&
+                blsSig == c.blsSig);
+    }
+};
+
+typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT, CTokenGroupDescriptionNFT, CTokenGroupDescriptionBetting> CTokenGroupDescriptionVariant;
 class tgdesc_to_json : public boost::static_visitor<UniValue>
 {
 private:
@@ -236,6 +306,12 @@ public:
         tgDesc.ToJson(obj, fFull);
         return obj;
     }
+    UniValue operator()(CTokenGroupDescriptionBetting& tgDesc) const
+    {
+        UniValue obj(UniValue::VOBJ);
+        tgDesc.ToJson(obj);
+        return obj;
+    }
 };
 inline UniValue tgDescToJson(CTokenGroupDescriptionVariant& tgDesc, const bool& fFull = false) {
     return boost::apply_visitor(tgdesc_to_json(fFull), tgDesc);
@@ -251,6 +327,9 @@ public:
         return tgDesc.strTicker;
     }
     std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return "";
+    }
+    std::string operator()(CTokenGroupDescriptionBetting& tgDesc) const {
         return "";
     }
 };
@@ -272,6 +351,9 @@ public:
     std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
         return tgDesc.strName;
     }
+    std::string operator()(CTokenGroupDescriptionBetting& tgDesc) const {
+        return strprintf("%d", tgDesc.nEventId);
+    }
 };
 inline std::string tgDescGetName(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_name(), tgDesc);
@@ -286,6 +368,9 @@ public:
         return tgDesc.strDocumentUrl;
     }
     std::string operator()(CTokenGroupDescriptionNFT& tgDesc) const {
+        return tgDesc.strDocumentUrl;
+    }
+    std::string operator()(CTokenGroupDescriptionBetting& tgDesc) const {
         return tgDesc.strDocumentUrl;
     }
 };
@@ -305,6 +390,9 @@ public:
     uint256 operator()(CTokenGroupDescriptionNFT& tgDesc) const {
         return tgDesc.documentHash;
     }
+    uint256 operator()(CTokenGroupDescriptionBetting& tgDesc) const {
+        return tgDesc.documentHash;
+    }
 };
 inline uint256 tgDescGetDocumentHash(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_document_hash(), tgDesc);
@@ -321,6 +409,9 @@ public:
     }
     uint8_t operator()(CTokenGroupDescriptionNFT& tgDesc) const {
         return 0;
+    }
+    uint8_t operator()(CTokenGroupDescriptionBetting& tgDesc) const {
+        return 8;
     }
  };
 inline uint8_t tgDescGetDecimalPos(CTokenGroupDescriptionVariant& tgDesc) {
@@ -342,6 +433,9 @@ public:
     CAmount operator()(CTokenGroupDescriptionNFT& tgDesc) const {
         return COINFromDecimalPos(0);
     }
+    CAmount operator()(CTokenGroupDescriptionBetting& tgDesc) const {
+        return COINFromDecimalPos(8);
+    }
 };
 inline CAmount tgDescGetCoinAmount(CTokenGroupDescriptionVariant& tgDesc) {
     return boost::apply_visitor(tgdesc_get_coin_amount(), tgDesc);
@@ -354,5 +448,6 @@ inline std::string GetStringFromChars(const std::vector<unsigned char> chars, co
 bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, bool &confirmed);
 bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, bool &stickyMelt, bool &confirmed);
 bool ParseGroupDescParamsNFT(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, bool &confirmed);
+bool ParseGroupDescParamsBetting(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, bool &confirmed);
 
 #endif

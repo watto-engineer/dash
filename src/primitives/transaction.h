@@ -25,6 +25,7 @@ enum {
     TRANSACTION_GROUP_CREATION_REGULAR = 8,
     TRANSACTION_GROUP_CREATION_MGT = 9,
     TRANSACTION_GROUP_CREATION_NFT = 10,
+    TRANSACTION_GROUP_CREATION_BETTING = 11,
 };
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */

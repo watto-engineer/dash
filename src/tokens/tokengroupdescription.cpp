@@ -46,6 +46,19 @@ void CTokenGroupDescriptionNFT::ToJson(UniValue& obj, const bool& fFull) const
     }
 }
 
+void CTokenGroupDescriptionBetting::ToJson(UniValue& obj) const
+{
+    obj.clear();
+    obj.setObject();
+    obj.pushKV("event_id", (uint64_t)nEventId);
+    obj.pushKV("metadata_url", strDocumentUrl);
+    obj.pushKV("metadata_hash", documentHash.ToString());
+    obj.pushKV("signer_type", (int)signerType);
+    obj.pushKV("signer_hash", signerHash.ToString());
+    obj.pushKV("bls_pubkey", blsPubKey.ToString());
+    obj.pushKV("bls_signature", blsSig.ToString());
+}
+
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
     {
