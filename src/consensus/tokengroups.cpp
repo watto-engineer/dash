@@ -332,7 +332,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
             continue;
 
         CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
+        if (!tokenGroupManager.get()->MatchesORAT(parentgrp))
             continue;
 
         std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();
@@ -354,7 +354,7 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
             continue;
 
         CTokenGroupID parentgrp = tokenGrp.associatedGroup.parentGroup();
-        if (!tokenGroupManager.get()->MatchesGVT(parentgrp))
+        if (!tokenGroupManager.get()->MatchesORAT(parentgrp))
             continue;
 
         std::vector<unsigned char> subgroupData = tokenGrp.associatedGroup.GetSubGroupData();

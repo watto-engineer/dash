@@ -37,14 +37,14 @@ class TokenTest (BitcoinTestFramework):
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         MGTBLS=self.nodes[0].bls("generate")
-        GVTBLS=self.nodes[0].bls("generate")
+        ORATBLS=self.nodes[0].bls("generate")
         XWAGERRBLS=self.nodes[0].bls("generate")
         PARTBLS=self.nodes[0].bls("generate")
         LiveBLS=self.nodes[0].bls("generate")
         HulkBLS=self.nodes[0].bls("generate")
         self.log.info("MGTBLS %s" % MGTBLS["public"])
         MGTAddr=self.nodes[0].getnewaddress()
-        GVTAddr=self.nodes[0].getnewaddress()
+        ORATAddr=self.nodes[0].getnewaddress()
         XWAGERRAddr=self.nodes[0].getnewaddress()
         PARTAddr=self.nodes[0].getnewaddress()
         LIVEAddr=self.nodes[0].getnewaddress()
@@ -145,18 +145,18 @@ class TokenTest (BitcoinTestFramework):
         self.log.info("Blockhash block 200 %s" % LIVE_BlockHash)
         self.log.info("\nTransaction ID %s" % LIVETrans)
         self.log.info("Transaction Details %s" % self.nodes[0].gettokentransaction(LIVETrans, LIVE_BlockHash))
-        self.log.info("\nList tokens since block 200 GVT\n%s" % self.nodes[0].listtokenssinceblock(LIVEGroup_ID, LIVE_BlockHash))
-        tokenGVTUnspent=self.nodes[0].listunspenttokens(GVTGroup_ID)
-        newGVT=self.nodes[0].getnewaddress()
-        self.log.info("Send tokens to new address %s" % self.nodes[0].sendtoken(GVTGroup_ID, newGVT, 2))
+        self.log.info("\nList tokens since block 200 ORAT\n%s" % self.nodes[0].listtokenssinceblock(LIVEGroup_ID, LIVE_BlockHash))
+        tokenORATUnspent=self.nodes[0].listunspenttokens(ORATGroup_ID)
+        newORAT=self.nodes[0].getnewaddress()
+        self.log.info("Send tokens to new address %s" % self.nodes[0].sendtoken(ORATGroup_ID, newORAT, 2))
         self.nodes[0].generate(1)
         self.log.info(self.nodes[1].getaddressbalance)
-        subgroupID=self.nodes[0].getsubgroupid(GVTGroup_ID,"credit")
+        subgroupID=self.nodes[0].getsubgroupid(ORATGroup_ID,"credit")
         self.log.info("Subgroup Info %s " % self.nodes[0].tokeninfo('groupid',subgroupID))
-        self.log.info("\nUnspent Tokens GVT Token\n%s\n" % tokenGVTUnspent)
+        self.log.info("\nUnspent Tokens ORAT Token\n%s\n" % tokenORATUnspent)
         tokenReceiveAddr=self.nodes[1].getnewaddress()
-        rawTxid=tokenGVTUnspent[0]['txid']
-        rawVout=tokenGVTUnspent[0]['vout']
+        rawTxid=tokenORATUnspent[0]['txid']
+        rawVout=tokenORATUnspent[0]['vout']
         rawAddr=tokenReceiveAddr
         rawAmount=0.01
         self.log.info("txid %s" % rawTxid)
@@ -166,7 +166,7 @@ class TokenTest (BitcoinTestFramework):
         inputs=[{ "txid" : rawTxid, "vout" : rawVout }]
         inputs = []
         outputs={ rawAddr : rawAmount }
-        token={ "groupid" : GVTGroup_ID, "token_amount" : 0.1 }
+        token={ "groupid" : ORATGroup_ID, "token_amount" : 0.1 }
         self.log.info(str(inputs))
         self.log.info(outputs)
         self.log.info(token)

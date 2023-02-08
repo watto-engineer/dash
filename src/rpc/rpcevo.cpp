@@ -176,12 +176,12 @@ static CBLSSecretKey ParseBLSSecretKey(const std::string& hexKey, const std::str
 
 #ifdef ENABLE_WALLET
 
-bool GetGVTCredits(CWallet* pwallet, std::vector<COutput>& coins) {
+bool GetORATCredits(CWallet* pwallet, std::vector<COutput>& coins) {
 
-    // Get grpID for GVT.credit
-    CTokenGroupID grpID(tokenGroupManager->GetGVTID(), "credit");
+    // Get grpID for ORAT.credit
+    CTokenGroupID grpID(tokenGroupManager->GetORATID(), "credit");
 
-    // Find GVT.credit coins
+    // Find ORAT.credit coins
     coins.clear();
 
     pwallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
@@ -196,12 +196,12 @@ bool GetGVTCredits(CWallet* pwallet, std::vector<COutput>& coins) {
     return true;
 }
 
-bool GetGVTRevoke(CWallet* pwallet, std::vector<COutput>& coins) {
+bool GetORATRevoke(CWallet* pwallet, std::vector<COutput>& coins) {
 
-    // Get grpID for GVT.revoke
-    CTokenGroupID grpID(tokenGroupManager.get()->GetGVTID(), "revoke");
+    // Get grpID for ORAT.revoke
+    CTokenGroupID grpID(tokenGroupManager.get()->GetORATID(), "revoke");
 
-    // Find GVT.revoke coins
+    // Find ORAT.revoke coins
     coins.clear();
 
     pwallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {

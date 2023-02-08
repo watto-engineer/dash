@@ -30,7 +30,7 @@ public:
 private:
     std::map<CTokenGroupID, CTokenGroupCreation> mapTokenGroups;
     std::unique_ptr<CTokenGroupCreation> tgMGTCreation;
-    std::unique_ptr<CTokenGroupCreation> tgGVTCreation;
+    std::unique_ptr<CTokenGroupCreation> tgORATCreation;
 
     // Processed, added and databased while locked by cs_main
     std::vector<CTokenGroupCreation> newTokenGroups;
@@ -55,15 +55,15 @@ public:
     void ClearManagementTokenGroups();
 
     bool MatchesMGT(CTokenGroupID tgID);
-    bool MatchesGVT(CTokenGroupID tgID);
+    bool MatchesORAT(CTokenGroupID tgID);
 
     bool ManagementTokensCreated();
 
     CTokenGroupID GetMGTID() { return tgMGTCreation->tokenGroupInfo.associatedGroup; };
-    CTokenGroupID GetGVTID() { return tgGVTCreation->tokenGroupInfo.associatedGroup; };
+    CTokenGroupID GetORATID() { return tgORATCreation->tokenGroupInfo.associatedGroup; };
 
     bool MGTTokensCreated() { return tgMGTCreation ? true : false; };
-    bool GVTTokensCreated() { return tgGVTCreation ? true : false; };
+    bool ORATTokensCreated() { return tgORATCreation ? true : false; };
 
     uint16_t GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId);
     unsigned int GetTokenTxStats(const CTransactionRef &tx, const CCoinsViewCache& view, const CTokenGroupID &tgId, uint16_t &nTokenCount, CAmount &nTokenMint);

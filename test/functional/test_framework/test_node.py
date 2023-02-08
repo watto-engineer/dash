@@ -154,7 +154,7 @@ class TestNode():
             AddressKeyPair('yLPUundzTpvjU8KYVyM4Zmnr4REf3FFvhZ', 'cRVeRmRaYuEYP9HbCZFsf1ifYYZ4KQD9rttRoTNb9wjPzhvRwqMb'),
             AddressKeyPair('yLRhHqau58AS1ALtnaowv1Pyztxi1Q6fXG', 'cNYFW52pJswYbfPR9fpiRpWHEQygg5tyMih2ASPsgMgPy9SUSSEV'),
             AddressKeyPair('yLRwHeMkXwYrkDzC4q12vej243AyTeWiPm', 'cRqfZ3dAp8BJUcGhSv7ueCXNGbki1bpcXEKk5dEJN344H52GuHQY'),
-            AddressKeyPair('yLTMCXJhG1mpaWhbHcsr7zUt9wDWuQSPSk', 'cVWGbeCT5QcVGVTL5NuiLs9JfL8HFDb9PN5Gq2xudw6ZsDFeDy1V'),
+            AddressKeyPair('yLTMCXJhG1mpaWhbHcsr7zUt9wDWuQSPSk', 'cVWGbeCT5QcVORATL5NuiLs9JfL8HFDb9PN5Gq2xudw6ZsDFeDy1V'),
             AddressKeyPair('yLU9vxiAWUdiKKxn6EazLDFq9WXrK2T7RP', 'cVCzrzfxMhUMxV34UhTmdmntAqHvosAuNo2KUZsiHZSKLm73g35o'),
     ]
 

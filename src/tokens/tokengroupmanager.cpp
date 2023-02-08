@@ -33,8 +33,8 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
     if (!tgMGTCreation && ticker == "MGT") {
         this->tgMGTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
-    } else if (!tgGVTCreation && ticker == "GVT") {
-        this->tgGVTCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
+    } else if (!tgORATCreation && ticker == "ORAT") {
+        this->tgORATCreation = std::unique_ptr<CTokenGroupCreation>(new CTokenGroupCreation((tokenGroupCreation)));
         return true;
     }
     return false;
@@ -42,7 +42,7 @@ bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGro
 
 void CTokenGroupManager::ClearManagementTokenGroups() {
     tgMGTCreation.reset();
-    tgGVTCreation.reset();
+    tgORATCreation.reset();
 }
 
 bool CTokenGroupManager::MatchesMGT(CTokenGroupID tgID) {
@@ -50,9 +50,9 @@ bool CTokenGroupManager::MatchesMGT(CTokenGroupID tgID) {
     return tgID == tgMGTCreation->tokenGroupInfo.associatedGroup;
 }
 
-bool CTokenGroupManager::MatchesGVT(CTokenGroupID tgID) {
-    if (!tgGVTCreation) return false;
-    return tgID == tgGVTCreation->tokenGroupInfo.associatedGroup;
+bool CTokenGroupManager::MatchesORAT(CTokenGroupID tgID) {
+    if (!tgORATCreation) return false;
+    return tgID == tgORATCreation->tokenGroupInfo.associatedGroup;
 }
 
 bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& newTokenGroups) {
@@ -108,8 +108,8 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
     if (hasNewTokenGroup) {
         if (MatchesMGT(tokenGroupInfo.associatedGroup)) {
             tgMGTCreation.reset();
-        } else if (MatchesGVT(tokenGroupInfo.associatedGroup)) {
-            tgGVTCreation.reset();
+        } else if (MatchesORAT(tokenGroupInfo.associatedGroup)) {
+            tgORATCreation.reset();
         }
 
         auto iter = mapTokenGroups.find(tokenGroupInfo.associatedGroup);
@@ -180,7 +180,7 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
 }
 
 bool CTokenGroupManager::ManagementTokensCreated() {
-    return MGTTokensCreated() && GVTTokensCreated();
+    return MGTTokensCreated() && ORATTokensCreated();
 }
 
 uint16_t CTokenGroupManager::GetTokensInBlock(const CBlock& block, const CTokenGroupID& tgId) {
