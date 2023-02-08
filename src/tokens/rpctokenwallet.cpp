@@ -46,8 +46,8 @@ static GroupAuthorityFlags ParseAuthorityParams(const JSONRPCRequest& request, u
             flags |= GroupAuthorityFlags::RESCRIPT;
         else if (sflag == "subgroup")
             flags |= GroupAuthorityFlags::SUBGROUP;
-        else if (sflag == "configure")
-            flags |= GroupAuthorityFlags::CONFIGURE;
+        else if (sflag == "wagerr")
+            flags |= GroupAuthorityFlags::WAGERR;
         else if (sflag == "all")
             flags |= GroupAuthorityFlags::ALL;
         else
@@ -1339,8 +1339,8 @@ extern UniValue droptokenauthorities(const JSONRPCRequest& request)
                 authoritiesToDrop |= GroupAuthorityFlags::RESCRIPT;
             else if (sflag == "subgroup")
                 authoritiesToDrop |= GroupAuthorityFlags::SUBGROUP;
-            else if (sflag == "configure")
-                authoritiesToDrop |= GroupAuthorityFlags::CONFIGURE;
+            else if (sflag == "wagerr")
+                authoritiesToDrop |= GroupAuthorityFlags::WAGERR;
             else if (sflag == "all")
                 authoritiesToDrop |= GroupAuthorityFlags::ALL;
             else

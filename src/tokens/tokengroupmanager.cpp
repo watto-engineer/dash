@@ -354,6 +354,7 @@ bool CTokenGroupManager::CollectTokensFromBlock(const CBlock& block, const CBloc
             case TRANSACTION_GROUP_CREATION_REGULAR:
             case TRANSACTION_GROUP_CREATION_MGT:
             case TRANSACTION_GROUP_CREATION_NFT:
+            case TRANSACTION_GROUP_CREATION_BETTING:
             {
                 CTokenGroupCreation newTokenGroupCreation;
                 if (!CreateTokenGroup(ptx, block.GetHash(), newTokenGroupCreation)) {

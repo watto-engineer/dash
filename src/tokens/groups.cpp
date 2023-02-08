@@ -40,9 +40,9 @@ std::string EncodeGroupAuthority(const GroupAuthorityFlags flags) {
             if (sflags != "") sflags += " ";
             sflags += "subgroup";
         }
-        if (hasCapability(flags, GroupAuthorityFlags::CONFIGURE)) {
+        if (hasCapability(flags, GroupAuthorityFlags::WAGERR)) {
             if (sflags != "") sflags += " ";
-            sflags += "configure";
+            sflags += "wagerr";
         }
     }
     return sflags;
@@ -323,11 +323,19 @@ bool CTokenGroupID::hasFlag(TokenGroupIdFlags flag) const {
 }
 
 std::string CTokenGroupID::encodeFlags() const {
-    std::string sflags = "none";
+    std::string sflags = "";
     if (data.size() < CTokenGroupID::PARENT_GROUP_ID_SIZE) return sflags;
 
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::MGT_TOKEN)) {
         sflags = "management";
+    }
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::NFT_TOKEN)) {
+        if (sflags != "") sflags += " ";
+        sflags += "nft";
+    }
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::BETTING_TOKEN)) {
+        if (sflags != "") sflags += " ";
+        sflags += "betting";
     }
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::STICKY_MELT)) {
         if (sflags != "") sflags += " ";

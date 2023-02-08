@@ -20,6 +20,7 @@ enum class TokenGroupIdFlags : uint8_t
     STICKY_MELT = 1U << 2, // group can always melt tokens
     MGT_TOKEN = 1U << 3, // management tokens are created from management outputs
     NFT_TOKEN = 1U << 4, // NFT tokens have limited capabilities
+    BETTING_TOKEN = 1U << 5, // Betting tokens need to pay betting fees and can be redeemed
 
     DEFAULT = 0
 };
@@ -136,11 +137,12 @@ enum class GroupAuthorityFlags : uint64_t
     CCHILD = 1ULL << 60, // Can create controller outputs
     RESCRIPT = 1ULL << 59, // Can change the redeem script
     SUBGROUP = 1ULL << 58,
-    CONFIGURE = 1ULL << 57, // (reserved)
+    WAGERR = 1ULL << 57, // (reserved)
 
     NONE = 0,
-    ALL = CTRL | MINT | MELT | CCHILD | RESCRIPT | SUBGROUP | CONFIGURE,
+    ALL = CTRL | MINT | MELT | CCHILD | RESCRIPT | SUBGROUP,
     ALL_NFT = CTRL | MINT,
+    ALL_BETTING = CTRL | SUBGROUP | WAGERR,
     ALL_BITS = 0xffffULL << (64 - 16)
 };
 
@@ -266,10 +268,10 @@ public:
                (GroupAuthorityFlags::CTRL | GroupAuthorityFlags::SUBGROUP);
     }
     // return true if this object allows (re)configuration of the tokengroup).
-    bool allowsConfig() const
+    bool isWagerr() const
     {
-        return (controllingGroupFlags() & (GroupAuthorityFlags::CTRL | GroupAuthorityFlags::CONFIGURE)) ==
-               (GroupAuthorityFlags::CTRL | GroupAuthorityFlags::CONFIGURE);
+        return (controllingGroupFlags() & (GroupAuthorityFlags::CTRL | GroupAuthorityFlags::WAGERR)) ==
+               (GroupAuthorityFlags::CTRL | GroupAuthorityFlags::WAGERR);
     }
 
     bool isInvalid() const { return invalid; };

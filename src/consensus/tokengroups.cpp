@@ -153,6 +153,10 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
             gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
         }
+        if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
+            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT; // Melt restrictions: after event close
+            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MINT; // Mint restrictions: before event close, fees must be paid
+        }
         if (tokenGrp.associatedGroup != NoGroup)
         {
             gBalance[tokenGrp.associatedGroup].numInputs += 1;
@@ -219,6 +223,12 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
                 mintGrp << tgDesc;
+            } else if (tx.nType == TRANSACTION_GROUP_CREATION_BETTING) {
+                CTokenGroupDescriptionBetting tgDesc;
+                if (!GetTxPayload(tx, tgDesc)) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
+                }
+                mintGrp << tgDesc;
             }
             mintGrp << (((uint64_t)bal.ctrlOutputPerms) & ~((uint64_t)GroupAuthorityFlags::ALL_BITS));
             CTokenGroupID newGrpId(mintGrp.GetHash());
@@ -249,6 +259,13 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     }
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
+                // Betting token
+                if (newGrpId.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
+                    if (tx.nType != TRANSACTION_GROUP_CREATION_BETTING) {
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a betting token group");
+                    }
+                    bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL_BETTING;
+                }
                 // NFT token
                 if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_NFT) {
@@ -259,6 +276,9 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                 // Invalid combination token
                 if (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "Cannot have both the Management and NFT flag");
+                }
+                if (newGrpId.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) && (newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) || newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN))) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "Invalid combination of flags");
                 }
 
                 if (newGrpId.hasFlag(TokenGroupIdFlags::STICKY_MELT))

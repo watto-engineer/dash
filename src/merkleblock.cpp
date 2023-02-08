@@ -47,6 +47,7 @@ CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter* filter, const std:
             TRANSACTION_GROUP_CREATION_REGULAR,
             TRANSACTION_GROUP_CREATION_MGT,
             TRANSACTION_GROUP_CREATION_NFT,
+            TRANSACTION_GROUP_CREATION_BETTING,
     };
 
     for (unsigned int i = 0; i < block.vtx.size(); i++)

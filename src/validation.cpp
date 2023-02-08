@@ -408,6 +408,7 @@ bool ContextualCheckTransaction(const CTransaction& tx, CValidationState &state,
                 tx.nType != TRANSACTION_GROUP_CREATION_REGULAR &&
                 tx.nType != TRANSACTION_GROUP_CREATION_MGT &&
                 tx.nType != TRANSACTION_GROUP_CREATION_NFT &&
+                tx.nType != TRANSACTION_GROUP_CREATION_BETTING &&
                 tx.nType != TRANSACTION_MNHF_SIGNAL) {
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-type");
             }
@@ -415,7 +416,7 @@ bool ContextualCheckTransaction(const CTransaction& tx, CValidationState &state,
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-cb-type");
 
             if (IsAnyOutputGroupedCreation(tx) &&
-                    (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR && tx.nType != TRANSACTION_GROUP_CREATION_MGT && tx.nType != TRANSACTION_GROUP_CREATION_NFT))
+                    (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR && tx.nType != TRANSACTION_GROUP_CREATION_MGT && tx.nType != TRANSACTION_GROUP_CREATION_NFT && tx.nType != TRANSACTION_GROUP_CREATION_BETTING))
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-cb-type");
         } else if (tx.nType != TRANSACTION_NORMAL) {
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-type");
@@ -1457,6 +1458,20 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                     if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
                         return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("NFT mints the wrong amount (%d instead of %d)",
                                     (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
+                    }
+                }
+                // Validate betting mint amount
+                if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) && mintMeltItem.second.output > 0) {
+                    CTokenGroupCreation tgCreation;
+                    if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
+                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
+                    }
+                    CTokenGroupDescriptionBetting *tgDesc = boost::get<CTokenGroupDescriptionBetting>(tgCreation.pTokenGroupDescription.get());
+                    int64_t nMintAmount = (mintMeltItem.second.output - mintMeltItem.second.input);
+                    auto nMintEventId = tgDesc->nEventId;
+                    if (1!=2) {
+                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Betting mints the wrong amount (%d instead of %d)",
+                                    (mintMeltItem.second.output - mintMeltItem.second.input), 1), REJECT_INVALID, "op_group-bad-mint");
                     }
                 }
             }
