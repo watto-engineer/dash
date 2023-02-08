@@ -21,6 +21,8 @@
         <file alias="transaction_5">res/icons/transaction5.png</file>
         <file alias="transaction_abandoned">res/icons/transaction_abandoned.png</file>
         <file alias="transaction_locked">res/icons/transaction_locked.png</file>
+        <file alias="tor">res/icons/tor.png</file>
+        <file alias="tor2">res/icons/tor2.png</file>
         <file alias="eye">res/icons/eye.png</file>
         <file alias="eye_minus">res/icons/eye_minus.png</file>
         <file alias="eye_plus">res/icons/eye_plus.png</file>

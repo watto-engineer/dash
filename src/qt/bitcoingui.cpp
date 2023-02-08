@@ -40,6 +40,7 @@
 #include <ui_interface.h>
 #include <util/system.h>
 #include <util/translation.h>
+#include <net.h>
 
 #include <QAction>
 #include <QApplication>
@@ -66,7 +67,6 @@
 #include <QUrlQuery>
 #include <QVBoxLayout>
 #include <QWindow>
-
 
 const std::string BitcoinGUI::DEFAULT_UIPLATFORM =
 #if defined(Q_OS_MAC)
@@ -154,6 +154,7 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const NetworkStyle* networkStyle,
     labelConnectionsIcon = new GUIUtil::ClickableLabel();
     labelProxyIcon = new GUIUtil::ClickableLabel();
     labelBlocksIcon = new GUIUtil::ClickableLabel();
+    labelOnionIcon = new QLabel();
     if(enableWallet)
     {
         frameBlocksLayout->addStretch();
@@ -166,12 +167,21 @@ BitcoinGUI::BitcoinGUI(interfaces::Node& node, const NetworkStyle* networkStyle,
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelConnectionsIcon);
     frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelOnionIcon);
+    frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
 
     // Hide the spinner/synced icon by default to avoid
     // that the spinner starts before we have any connections
     labelBlocksIcon->hide();
+
+    // TOR icon
+    QTimer *timerOnionIcon = new QTimer(labelOnionIcon);
+    connect(timerOnionIcon, SIGNAL(timeout()), this, SLOT(updateOnionIcon()));
+    //QTimer::singleShot(1000, this, SLOT(updateOnionIcon()));
+    timerOnionIcon->start(1000);
+    updateOnionIcon();
 
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
@@ -820,6 +830,7 @@ void BitcoinGUI::setClientModel(ClientModel *_clientModel, interfaces::BlockAndH
         rpcConsole->setClientModel(_clientModel, tip_info->block_height, tip_info->block_time, tip_info->block_hash, tip_info->verification_progress);
 
         updateProxyIcon();
+        updateOnionIcon();
 
 #ifdef ENABLE_WALLET
         if(walletFrame)
@@ -1211,6 +1222,7 @@ void BitcoinGUI::updateNetworkState()
     case 6: case 7: icon = "connect_3"; break;
     default: icon = "connect_4"; color = GUIUtil::ThemedColor::GREEN; break;
     }
+    updateOnionIcon();
 
     labelBlocksIcon->setVisible(count > 0);
     updateProgressBarVisibility();
@@ -1257,6 +1269,33 @@ void BitcoinGUI::updateNetworkState()
     }
 }
 
+void BitcoinGUI::updateOnionIcon()
+{
+    // fTorEnabled is an extern defined in netaddress.h
+    bool onion_enabled = fTorEnabled;
+
+    std::string ipAddress;
+
+    LOCK(cs_mapLocalHost);
+    for (const std::pair<CNetAddr, LocalServiceInfo> &item : mapLocalHost)
+    {
+        ipAddress = item.first.ToString();
+    }
+    QString ipAddress_q = QString::fromStdString(ipAddress);
+    if (ipAddress.empty() || ipAddress.substr(ipAddress.length() - 6, 6).compare(".onion") != 0)
+    {
+        onion_enabled = false;
+    }
+    if (!onion_enabled) {
+        labelOnionIcon->setPixmap(GUIUtil::getIcon("tor2", GUIUtil::ThemedColor::RED).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        labelOnionIcon->setToolTip(tr("Tor is <b>disabled</b>"));
+    } else {
+        labelOnionIcon->setPixmap(GUIUtil::getIcon("tor", GUIUtil::ThemedColor::GREEN).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        labelOnionIcon->setToolTip(tr("Tor is <b>enabled</b>: %1").arg(ipAddress_q));
+    }
+    labelOnionIcon->show();
+}
+
 void BitcoinGUI::setNumConnections(int count)
 {
     updateNetworkState();
@@ -1265,6 +1304,7 @@ void BitcoinGUI::setNumConnections(int count)
 void BitcoinGUI::setNetworkActive(bool networkActive)
 {
     updateNetworkState();
+    updateOnionIcon();
 }
 
 void BitcoinGUI::updateHeadersSyncProgressLabel()

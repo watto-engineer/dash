@@ -180,6 +180,8 @@ RES_ICONS = \
   qt/res/icons/transaction5.png \
   qt/res/icons/transaction_abandoned.png \
   qt/res/icons/transaction_locked.png \
+  qt/res/icons/tor.png \
+  qt/res/icons/tor2.png \
   qt/res/icons/connect1_16.png \
   qt/res/icons/connect2_16.png \
   qt/res/icons/connect3_16.png \
