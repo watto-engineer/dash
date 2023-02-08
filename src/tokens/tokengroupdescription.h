@@ -66,14 +66,6 @@ public:
         READWRITE(obj.nDecimalPos);
     }
     void ToJson(UniValue& obj) const;
-    void WriteHashable(CHashWriter& ss) const {
-        ss << nVersion;
-        ss << strTicker;
-        ss << strName;
-        ss << strDocumentUrl;
-        ss << documentHash;
-        ss << nDecimalPos;
-    }
 
     bool operator==(const CTokenGroupDescriptionRegular &c)
     {
@@ -127,14 +119,6 @@ public:
         READWRITE(obj.blsPubKey);
     }
     void ToJson(UniValue& obj) const;
-    void WriteHashable(CHashWriter& ss) const {
-        ss << nVersion;
-        ss << strTicker;
-        ss << strName;
-        ss << strDocumentUrl;
-        ss << documentHash;
-        ss << nDecimalPos;
-    }
 
     bool operator==(const CTokenGroupDescriptionMGT &c)
     {
@@ -190,16 +174,6 @@ public:
     }
     void ToJson(UniValue& obj, const bool& fFull = false) const;
 
-    void WriteHashable(CHashWriter& ss) const {
-        ss << nVersion;
-        ss << strName;
-        ss << nMintAmount;
-        ss << strDocumentUrl;
-        ss << documentHash;
-        ss << vchData;
-        ss << strDataFilename;
-    }
-
     bool operator==(const CTokenGroupDescriptionNFT &c)
     {
         return (strName == c.strName &&
@@ -244,6 +218,10 @@ public:
         blsSig = CBLSSignature();
     }
 
+    uint256 GetSignatureHash() const;
+    bool Sign(const CBLSSecretKey& key);
+    bool CheckSignature() const;
+
     SERIALIZE_METHODS(CTokenGroupDescriptionBetting, obj)
     {
         READWRITE(obj.nVersion);
@@ -252,20 +230,13 @@ public:
         READWRITE(obj.documentHash);
         READWRITE(obj.signerType);
         READWRITE(obj.signerHash);
-        READWRITE(obj.blsPubKey);
-        READWRITE(obj.blsSig);
+
+        if (!(s.GetType() & SER_GETHASH)) {
+            READWRITE(obj.blsPubKey);
+            READWRITE(obj.blsSig);
+        }
     }
     void ToJson(UniValue& obj) const;
-    void WriteHashable(CHashWriter& ss) const {
-        ss << nVersion;
-        ss << nEventId;
-        ss << strDocumentUrl;
-        ss << documentHash;
-        ss << signerType;
-        ss << signerHash;
-        ss << blsPubKey;
-        ss << blsSig;
-    }
 
     bool operator==(const CTokenGroupDescriptionBetting &c)
     {

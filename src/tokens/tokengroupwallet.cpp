@@ -642,7 +642,7 @@ CTokenGroupID findGroupId(const COutPoint &input, const TokenGroupDescription& t
         // mask off any flags in the nonce
         nonce &= ~((uint64_t)GroupAuthorityFlags::ALL_BITS);
         hasher << input;
-        tgDesc->WriteHashable(hasher);
+        hasher << tgDesc;
         hasher << nonce;
         ret = hasher.GetHash();
     } while (ret.bytes()[31] != (uint8_t)flags);
@@ -651,3 +651,4 @@ CTokenGroupID findGroupId(const COutPoint &input, const TokenGroupDescription& t
 template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
 template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
 template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);
+template CTokenGroupID findGroupId(const COutPoint &input, const std::shared_ptr<CTokenGroupDescriptionBetting>& tgDesc, TokenGroupIdFlags flags, uint64_t &nonce);

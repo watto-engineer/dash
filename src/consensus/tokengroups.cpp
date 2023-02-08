@@ -206,19 +206,19 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                 if (!GetTxPayload(tx, tgDesc)) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
-                tgDesc.WriteHashable(mintGrp);
+                mintGrp << tgDesc;
             } else if (tx.nType == TRANSACTION_GROUP_CREATION_MGT) {
                 CTokenGroupDescriptionMGT tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
-                tgDesc.WriteHashable(mintGrp);
+                mintGrp << tgDesc;
             } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
                 CTokenGroupDescriptionNFT tgDesc;
                 if (!GetTxPayload(tx, tgDesc)) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-protx-payload");
                 }
-                tgDesc.WriteHashable(mintGrp);
+                mintGrp << tgDesc;
             }
             mintGrp << (((uint64_t)bal.ctrlOutputPerms) & ~((uint64_t)GroupAuthorityFlags::ALL_BITS));
             CTokenGroupID newGrpId(mintGrp.GetHash());

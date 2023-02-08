@@ -6,6 +6,7 @@
 #include "tokens/tokengroupdescription.h"
 
 #include <consensus/consensus.h>
+#include <logging.h>
 #include "util/strencodings.h"
 #include <rpc/protocol.h>
 #include <rpc/server.h>
@@ -58,6 +59,34 @@ void CTokenGroupDescriptionBetting::ToJson(UniValue& obj) const
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
     obj.pushKV("bls_signature", blsSig.ToString());
 }
+
+uint256 CTokenGroupDescriptionBetting::GetSignatureHash() const
+{
+    return SerializeHash(*this);
+}
+
+bool CTokenGroupDescriptionBetting::Sign(const CBLSSecretKey& key)
+{
+    CBLSSignature sig = key.Sign(GetSignatureHash());
+    if (!sig.IsValid()) {
+        return false;
+    }
+    blsSig = sig;
+    return true;
+}
+
+bool CTokenGroupDescriptionBetting::CheckSignature() const
+{
+    if (!blsPubKey.IsValid()) {
+        return false;
+    }
+    if (!blsSig.VerifyInsecure(blsPubKey, GetSignatureHash())) {
+        LogPrintf("CTokenGroupDescriptionBetting::CheckSignature -- VerifyInsecure() failed\n");
+        return false;
+    }
+    return true;
+}
+
 
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
