@@ -15,15 +15,15 @@
 class CReward {
 public:
     typedef enum RewardType_t {
-        REWARD_COINBASE,
-        REWARD_COINSTAKE,
-        REWARD_MASTERNODE,
-        REWARD_OPERATOR,
-        REWARD_BETTING,
+        REWARD_COINBASE     = 0x01,
+        REWARD_COINSTAKE    = 0x02,
+        REWARD_MASTERNODE   = 0x03,
+        REWARD_OPERATOR     = 0x04,
+        REWARD_BETTING      = 0x05,
 
-        REWARD_BURN,
-        REWARD_TOTAL,
-        REWARD_UNDEFINED
+        REWARD_BURN         = 0x06,
+        REWARD_TOTAL        = 0x07,
+        REWARD_UNDEFINED    = 0x00
     } RewardType;
 
     RewardType type;

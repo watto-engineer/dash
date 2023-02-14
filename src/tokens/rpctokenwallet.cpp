@@ -809,7 +809,7 @@ extern UniValue configuremanagementtoken(const JSONRPCRequest& request)
             "8. \"confirm_send\"        (boolean, optional, default=false) the configuration transaction will be sent\n"
             "\n"
             "\nExamples:\n" +
-            HelpExampleCli("configuremanagementtoken", "\"MGT\" \"Management Token\" \"https://raw.githubusercontent.com/wagerr/ATP-descriptions/master/WAGERR-testnet-MGT.json\" 969d29b4cd99ee7c6c188068c9f6f8f4051daa37f124a327ed86774d760dba74 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 4 false true") +
+            HelpExampleCli("configuremanagementtoken", "\"MGT\" \"Management Token\" 4 \"https://raw.githubusercontent.com/wagerr/ATP-descriptions/master/WAGERR-testnet-MGT.json\" 969d29b4cd99ee7c6c188068c9f6f8f4051daa37f124a327ed86774d760dba74 039872a8730f548bc6065b2e36b0cf7691745a8783d908e0ee2cdd3279ac762b80102b0f13bd91d8582d757f58960fc1 false true") +
             "\n"
         );
 
@@ -1049,6 +1049,117 @@ extern UniValue configurenft(const JSONRPCRequest& request)
     authKeyReservation.KeepDestination();
     UniValue ret(UniValue::VOBJ);
     ret.pushKV("groupID", EncodeTokenGroup(grpID));
+    ret.pushKV("transaction", tx->GetHash().GetHex());
+    return ret;
+}
+
+extern UniValue configurebettoken(const JSONRPCRequest& request)
+{
+     if (request.fHelp || request.params.size() < 4 || request.params.size() > 6)
+        throw std::runtime_error(
+            "configurebettoken \"event_id\" \"signer_type\" \"signer_hash\" \"bls_pubkey\" (\"bls_signature\" confirm_send ) \n"
+            "\n"
+            "Configures a new token type.\n"
+            "\nArguments:\n"
+            "1. \"event_id\"      (string, required) the event ID\n"
+            "2. \"signer_type\"   (number, required) the signer type; 1 if signed with a token key, 2 if signed by oracles\n"
+            "3. \"signer_hash\"   (base64, required) the hash corresponding to the signer\n"
+            "4. \"bls_pubkey\"    (string, required) the public key corresponding to the secret key used for signing\n"
+            "5. \"bls_signature\" (string, required) hex encoded signature\n"
+            "6. \"confirm_send\"  (boolean, optional, default=false) the configuration transaction will be sent\n"
+            "\n"
+            "\nExamples:\n" +
+            HelpExampleCli("configurebettoken", "\"John Doe concert tickets - Garden of Eden tour\" 300 \"https://yourtickettomusic.com/nft/{id}.json\" d49f449afe7548d428c1c317a79e3411b2dcf932d7a4880c832333b3f7c7fd24 \"WW91ciB0aWNrZXQ=\" \"file.txt\" true") +
+            "\n"
+        );
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
+    LOCK(pwallet->cs_wallet);
+
+    unsigned int curparam = 0;
+    bool confirmed = false;
+
+    COutput coin(nullptr, 0, 0, false, false, false);
+
+    {
+        std::vector<COutput> coins;
+        CAmount lowest = MAX_MONEY;
+        pwallet->FilterCoins(coins, [&lowest](const CWalletTx *tx, const CTxOut *out) {
+            CTokenGroupInfo tg(out->scriptPubKey);
+            // although its possible to spend a grouped input to produce
+            // a single mint group, I won't allow it to make the tx construction easier.
+            if ((tg.associatedGroup == NoGroup) && (out->nValue < lowest))
+            {
+                lowest = out->nValue;
+                return true;
+            }
+            return false;
+        });
+
+        if (0 == coins.size())
+        {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "No coins available in the wallet");
+        }
+        coin = coins[coins.size() - 1];
+    }
+
+    uint64_t grpNonce = 0;
+
+    std::vector<COutput> chosenCoins;
+    chosenCoins.push_back(coin);
+
+    std::shared_ptr<CTokenGroupDescriptionBetting> tgDesc;
+    if (!ParseGroupDescParamsBetting(request, curparam, tgDesc, confirmed)) {
+        return false;
+    }
+
+    if (tgDesc->blsSig.IsValid() && !tgDesc->CheckSignature()) {
+        std::string strError = strprintf("Unable to verify bls signature");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    LegacyScriptPubKeyMan* spk_man = pwallet->GetLegacyScriptPubKeyMan();
+    if (!spk_man) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "This type of wallet does not support this command");
+    }
+    spk_man->TopUpKeyPool();
+
+    CTxDestination authDest;
+    ReserveDestination authKeyReservation(pwallet);
+    if (!authKeyReservation.GetReservedDestination(authDest, true)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error: Keypool ran out, please call keypoolrefill first");
+        return false;
+    }
+
+    TokenGroupIdFlags tgFlags = TokenGroupIdFlags::BETTING_TOKEN;
+    CTokenGroupID grpID = findGroupId(coin.GetOutPoint(), tgDesc, tgFlags, grpNonce);
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("groupID", EncodeTokenGroup(grpID));
+    ret.pushKV("description_hash", tgDesc->GetSignatureHash().ToString());
+    UniValue tgDescJson(UniValue::VOBJ);
+    tgDesc->ToJson(tgDescJson);
+    ret.pushKV("description", tgDescJson);
+    if (!confirmed) {
+        return ret;
+    }
+
+    CScript script = GetScriptForDestination(authDest, grpID, (CAmount)GroupAuthorityFlags::ALL_BETTING | grpNonce);
+    CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+    std::vector<CRecipient> outputs;
+    outputs.push_back(recipient);
+
+    CTransactionRef tx;
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet, tgDesc);
+
+    authKeyReservation.KeepDestination();
     ret.pushKV("transaction", tx->GetHash().GetHex());
     return ret;
 }
@@ -1861,7 +1972,8 @@ static const CRPCCommand commands[] =
     { "tokens",             "configuretoken",           &configuretoken,            {} },
     { "tokens",             "configuremanagementtoken", &configuremanagementtoken,  {} },
     { "tokens",             "configurenft",             &configurenft,              {} },
-    { "tokens",             "signtokenmetadata",     &signtokenmetadata,      {"data","address","verbose"} },
+    { "tokens",             "configurebettoken",        &configurebettoken,         {} },
+    { "tokens",             "signtokenmetadata",        &signtokenmetadata,         {"data","address","verbose"} },
     { "tokens",             "createtokenauthorities",   &createtokenauthorities,    {} },
     { "tokens",             "listtokenauthorities",     &listtokenauthorities,      {} },
     { "tokens",             "droptokenauthorities",     &droptokenauthorities,      {} },

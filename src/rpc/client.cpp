@@ -268,6 +268,14 @@ static const CRPCConvertParam vRPCConvertParams[] =
     {"getpayoutinfo", 0},
     {"getpayoutinfosince", 0},
     {"getpayoutinfosince", 1},
+    { "createeventpayload", 0, "event_id" },
+    { "createeventpayload", 1, "start_time" },
+    { "createeventpayload", 2, "sport_id" },
+    { "createeventpayload", 3, "tournament_id" },
+    { "createeventpayload", 4, "stage" },
+    { "createeventpayload", 5, "home_team_id" },
+    { "createeventpayload", 6, "away_team_id" },
+    { "createeventpayload", 7, "version"},
 };
 // clang-format on
 

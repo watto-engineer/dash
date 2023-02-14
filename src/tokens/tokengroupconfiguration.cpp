@@ -46,7 +46,6 @@ public:
         return true;
     }
     bool operator()(CTokenGroupDescriptionBetting& tgDesc) const {
-        TGFilterURLCharacters(tgDesc);
         return true;
     }
 };
@@ -105,7 +104,6 @@ void TGFilterURLCharacters(T& tgDesc) {
 template void TGFilterURLCharacters(CTokenGroupDescriptionRegular& tgDesc);
 template void TGFilterURLCharacters(CTokenGroupDescriptionMGT& tgDesc);
 template void TGFilterURLCharacters(CTokenGroupDescriptionNFT& tgDesc);
-template void TGFilterURLCharacters(CTokenGroupDescriptionBetting& tgDesc);
 
 // Checks that the token description data fulfils context dependent criteria
 // Such as: no reserved names, no double names
@@ -343,6 +341,39 @@ bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex*
     CTokenGroupDescriptionBetting tgDesc;
     if (!GetTxPayload(tx, tgDesc)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-payload");
+    }
+    switch (tgDesc.signerType)
+    {
+        case 1:
+        {
+            // Management Key
+            if (tokenGroupManager->MGTTokensCreated()) {
+                CHashWriter hasher(SER_DISK, CLIENT_VERSION);
+                hasher << tokenGroupManager->GetMGTID();
+                if (hasher.GetHash() != tgDesc.signerHash) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
+                }
+                CTokenGroupCreation tgCreation;
+                if (!tokenGroupManager.get()->GetTokenGroupCreation(tokenGroupManager->GetMGTID(), tgCreation)) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
+                }
+                CTokenGroupDescriptionMGT *mgtDesc = nullptr;
+                try {
+                    mgtDesc = boost::get<CTokenGroupDescriptionMGT>(tgCreation.pTokenGroupDescription.get());
+                } catch (...) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
+                }
+                if (tgDesc.blsPubKey != mgtDesc->blsPubKey) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-pubkey");
+                }
+                if (!tgDesc.CheckSignature()) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signature");
+                }
+            }
+            break;
+        }
+        default:
+            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signertype");
     }
     // Check BLS signature
     /*

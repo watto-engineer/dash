@@ -1036,6 +1036,55 @@ UniValue listchaingamesevents(const JSONRPCRequest& request)
     return ret;
 }
 
+UniValue createeventpayload(const JSONRPCRequest& request)
+{
+    RPCHelpMan{"createeventpayload",
+        "\nCreate the oracle tx payload for creating a peerless event\n",
+        {
+            {"event_id", RPCArg::Type::NUM, RPCArg::Optional::NO, "The event ID"},
+            {"start_time", RPCArg::Type::NUM, RPCArg::Optional::NO, "The start time"},
+            {"sport_id", RPCArg::Type::NUM, RPCArg::Optional::NO, "The sport ID"},
+            {"tournament_id", RPCArg::Type::NUM, RPCArg::Optional::NO, "The tournament ID"},
+            {"stage", RPCArg::Type::NUM, RPCArg::Optional::NO, "The stage"},
+            {"home_team_id", RPCArg::Type::NUM, RPCArg::Optional::NO, "The home team ID"},
+            {"away_team_id", RPCArg::Type::NUM, RPCArg::Optional::NO, "The away team ID"},
+            {"version", RPCArg::Type::NUM, /* default*/ "2", "The betting tx format version number; '2' for Wagerr protocol version 5, '1' for earlier version."},
+        },
+        RPCResult{
+            RPCResult::Type::STR_HEX, "payload", "The hex encoded payload."
+        },
+        RPCExamples{
+            HelpExampleCli("sendtoaddress", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\" 0.1")
+    + HelpExampleCli("sendtoaddress", "\"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\" 0.1 \"donation\" \"seans outpost\"")
+        },
+    }.Check(request);
+
+    uint8_t nVersion = BetTxVersion5;
+    if (request.params.size() >= 8) {
+        int nVersionRequested = request.params[7].get_int();
+        if (nVersionRequested >=1 && nVersionRequested <= 2) {
+            nVersion = nVersionRequested;
+        } else {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameters: wrong version number");
+        }
+    }
+    CBettingTxHeader betTxHeader = CBettingTxHeader(nVersion, plEventTxType);
+
+    CPeerlessEventTx eventTx;
+    eventTx.nEventId = static_cast<uint32_t>(request.params[0].get_int64());
+    eventTx.nStartTime = static_cast<uint32_t>(request.params[1].get_int64());
+    eventTx.nSport = static_cast<uint16_t>(request.params[2].get_int64());
+    eventTx.nTournament = static_cast<uint16_t>(request.params[3].get_int64());
+    eventTx.nStage = static_cast<uint16_t>(request.params[4].get_int64());
+    eventTx.nHomeTeam = static_cast<uint32_t>(request.params[5].get_int64());
+    eventTx.nAwayTeam = static_cast<uint32_t>(request.params[6].get_int64());
+
+    std::vector<unsigned char> betData;
+    EncodeBettingTxPayload(betTxHeader, eventTx, betData);
+
+    return HexStr(betData);
+}
+
 static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
@@ -1052,6 +1101,8 @@ static const CRPCCommand commands[] =
     { "betting",            "getfieldeventliability",   &getfieldeventliability,    {} },
     { "betting",            "getbetbytxid",             &getbetbytxid,              {} },
     { "betting",            "listbetsdb",               &listbetsdb,                {} },
+
+    { "betting",            "createeventpayload",       &createeventpayload,        {"event_id", "start_time", "sport_id", "tournament_id", "stage", "home_team_id", "away_team_id", "version"} },
 };
 
 void RegisterBettingRPCCommands(CRPCTable &t)

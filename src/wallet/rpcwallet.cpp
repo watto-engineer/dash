@@ -4133,52 +4133,6 @@ UniValue walletcreatefundedpsbt(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue createeventpayload(const JSONRPCRequest& request)
-{
-    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
-    if (!wallet) return NullUniValue;
-    CWallet* const pwallet = wallet.get();
-
-    if (request.fHelp || request.params.size() < 6 || request.params.size() > 8)
-        throw std::runtime_error(
-            "createevent  start_time sport_id tournament_id stage home_team_id away_team_id [version] [event_id] )\n" +
-            HelpRequiringPassphrase(pwallet) +
-            "\nArguments:\n"
-            "\nResult:\n"
-            "\"rawtransaction\"  (string) The hex encoded raw transaction.\n"
-            "\nExamples:\n" +
-            HelpExampleCli("createeventpayload", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
-            HelpExampleRpc("createeventpayload", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
-
-    uint8_t nWBP = Params().GetConsensus().GetWBPVersion(::ChainActive().Height());
-    uint8_t nVersion;
-    if (request.params.size() > 6) {
-        int nVersionRequested = request.params[6].get_int();
-        if (nVersionRequested >=1 && nVersionRequested <= 2) {
-            nVersion = nVersionRequested;
-        }
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameters: wrong version number");
-
-    } else {
-        nVersion = nWBP >= 5 ? BetTxVersion5 : BetTxVersion4;
-    }
-    CBettingTxHeader betTxHeader = CBettingTxHeader(nVersion, plEventTxType);
-
-    CPeerlessEventTx eventTx;
-    eventTx.nEventId = request.params.size() > 7 ? static_cast<uint32_t>(request.params[7].get_int64()) : 0;
-    eventTx.nStartTime = static_cast<uint32_t>(request.params[0].get_int64());
-    eventTx.nSport = static_cast<uint16_t>(request.params[1].get_int64());
-    eventTx.nTournament = static_cast<uint16_t>(request.params[2].get_int64());
-    eventTx.nStage = static_cast<uint16_t>(request.params[3].get_int64());
-    eventTx.nHomeTeam = static_cast<uint32_t>(request.params[4].get_int64());
-    eventTx.nAwayTeam = static_cast<uint32_t>(request.params[5].get_int64());
-
-    std::vector<unsigned char> betData;
-    EncodeBettingTxPayload(betTxHeader, eventTx, betData);
-
-    return HexStr(betData);
-}
-
 UniValue placebet(const JSONRPCRequest& request)
 {
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);

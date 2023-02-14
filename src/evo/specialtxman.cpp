@@ -56,6 +56,8 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
             return true;
         case TRANSACTION_GROUP_CREATION_NFT:
             return CheckGroupConfigurationTxNFT(tx, pindexPrev, state, view);
+        case TRANSACTION_GROUP_CREATION_BETTING:
+            return CheckGroupConfigurationTxBetting(tx, pindexPrev, state, view);
         case TRANSACTION_MNHF_SIGNAL:
             return pindexPrev->nHeight + 1 >= Params().GetConsensus().DIP0024Height && CheckMNHFTx(tx, pindexPrev, state);
         }

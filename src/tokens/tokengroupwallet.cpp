@@ -398,6 +398,8 @@ template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &ch
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionMGT>& ptgDesc);
 template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionNFT>& ptgDesc);
+template void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
+    CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet, const std::shared_ptr<CTokenGroupDescriptionBetting>& ptgDesc);
 
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet)

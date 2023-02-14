@@ -52,8 +52,6 @@ void CTokenGroupDescriptionBetting::ToJson(UniValue& obj) const
     obj.clear();
     obj.setObject();
     obj.pushKV("event_id", (uint64_t)nEventId);
-    obj.pushKV("metadata_url", strDocumentUrl);
-    obj.pushKV("metadata_hash", documentHash.ToString());
     obj.pushKV("signer_type", (int)signerType);
     obj.pushKV("signer_hash", signerHash.ToString());
     obj.pushKV("bls_pubkey", blsPubKey.ToString());
@@ -131,20 +129,6 @@ std::string ConsumeParamDocumentURL(const JSONRPCRequest& request, unsigned int 
     return strDocumentUrl;
 }
 
-uint256 ConsumeParamDocumentHash(const JSONRPCRequest& request, unsigned int &curparam) {
-    if (curparam >= request.params.size())
-    {
-        // If you have a URL to the TDD, you need to have a hash or the token creator
-        // could change the document without holders knowing about it.
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
-    }
-    std::string strCurparamValue = request.params[curparam].get_str();
-    uint256 documentHash;
-    documentHash.SetHex(strCurparamValue);
-    curparam++;
-    return documentHash;
-}
-
 uint8_t ConsumeParamDecimalPos(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
     {
@@ -161,6 +145,53 @@ uint8_t ConsumeParamDecimalPos(const JSONRPCRequest& request, unsigned int &curp
     return (uint8_t)nDecimalPos32;
 }
 
+uint32_t ConsumeParamEventID(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    int32_t nEventID;
+    if (!ParseInt32(strCurparamValue, &nEventID)) {
+        std::string strError = strprintf("Parameter %s is invalid", strCurparamValue);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    // Check if event exists
+    curparam++;
+    return nEventID;
+}
+
+uint8_t ConsumeParamSignerType(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    int32_t signerType32;
+    if (!ParseInt32(strCurparamValue, &signerType32) || signerType32 > 2 || signerType32 < 0) {
+        std::string strError = strprintf("Parameter %s is invalid - valid values are between 0 and 2", strCurparamValue);
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    curparam++;
+    return (uint8_t)signerType32;
+}
+
+uint256 ConsumeParamHash(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        // If you have a URL to the TDD, you need to have a hash or the token creator
+        // could change the document without holders knowing about it.
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: token description document hash");
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    uint256 hash;
+    hash.SetHex(strCurparamValue);
+    curparam++;
+    return hash;
+}
+
 CBLSPublicKey ConsumeParamBLSPublicKey(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
     {
@@ -175,6 +206,29 @@ CBLSPublicKey ConsumeParamBLSPublicKey(const JSONRPCRequest& request, unsigned i
     }
     curparam++;
     return blsPubKey;
+}
+
+CBLSSignature ConsumeParamBLSSignature(const JSONRPCRequest& request, unsigned int &curparam) {
+    if (curparam >= request.params.size())
+    {
+        std::string strError = strprintf("Not enough paramaters");
+        throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+    }
+    std::string strCurparamValue = request.params[curparam].get_str();
+    bool fInvalid = false;
+    std::vector<unsigned char> vchSig = DecodeBase64(strCurparamValue.c_str(), &fInvalid);
+
+    if (fInvalid) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Malformed base64 encoding");
+    }
+
+    CBLSSignature blsSig;
+    blsSig.SetByteVector(vchSig);
+    if (!blsSig.IsValid()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("bls_signature must be a valid BLS signature, not %s", strCurparamValue));
+    }
+    curparam++;
+    return blsSig;
 }
 
 std::vector<unsigned char> ConsumeParamNFTData(const JSONRPCRequest& request, unsigned int &curparam) {
@@ -237,7 +291,7 @@ bool ParseGroupDescParamsRegular(const JSONRPCRequest& request, unsigned int &cu
     std::string strName = ConsumeParamName(request, curparam);
     uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
-    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    uint256 documentHash = ConsumeParamHash(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionRegular>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash);
 
@@ -263,7 +317,7 @@ bool ParseGroupDescParamsMGT(const JSONRPCRequest& request, unsigned int &curpar
     std::string strName = ConsumeParamName(request, curparam);
     uint8_t nDecimalPos = ConsumeParamDecimalPos(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
-    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    uint256 documentHash = ConsumeParamHash(request, curparam);
     CBLSPublicKey blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionMGT>(strTicker, strName, nDecimalPos, strDocumentUrl, documentHash, blsPubKey);
@@ -299,11 +353,42 @@ bool ParseGroupDescParamsNFT(const JSONRPCRequest& request, unsigned int &curpar
     std::string strName = ConsumeParamName(request, curparam);
     uint64_t nMintAmount = ConsumeParamMintAmount(request, curparam);
     std::string strDocumentUrl = ConsumeParamDocumentURL(request, curparam);
-    uint256 documentHash = ConsumeParamDocumentHash(request, curparam);
+    uint256 documentHash = ConsumeParamHash(request, curparam);
     std::vector<unsigned char> vchData = ConsumeParamNFTData(request, curparam);
     std::string strDataFilename = ConsumeParamFilename(request, curparam);
 
     tgDesc = std::make_shared<CTokenGroupDescriptionNFT>(strName, nMintAmount, strDocumentUrl, documentHash, vchData, strDataFilename);
+
+    if (curparam >= request.params.size())
+    {
+        return true;
+    }
+    if (request.params[curparam].get_str() == "true") {
+        confirmed = true;
+        return true;
+    }
+    return true;
+}
+
+bool ParseGroupDescParamsBetting(const JSONRPCRequest& request, unsigned int &curparam, std::shared_ptr<CTokenGroupDescriptionBetting>& tgDesc, bool &confirmed)
+{
+    std::string strCurparamValue;
+
+    confirmed = false;
+
+    uint32_t nEventId = ConsumeParamEventID(request, curparam);
+    uint8_t signerType = ConsumeParamSignerType(request, curparam);
+    uint256 signerHash = ConsumeParamHash(request, curparam);
+    CBLSPublicKey blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
+    CBLSSignature blsSig = CBLSSignature();
+
+    tgDesc = std::make_shared<CTokenGroupDescriptionBetting>(nEventId, signerType, signerHash, blsPubKey, blsSig);
+
+    if (curparam >= request.params.size())
+    {
+        return true;
+    }
+    tgDesc->blsSig = ConsumeParamBLSSignature(request, curparam);
 
     if (curparam >= request.params.size())
     {

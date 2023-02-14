@@ -1349,6 +1349,47 @@ static UniValue bls_fromsecret(const JSONRPCRequest& request)
     return ret;
 }
 
+static void bls_sign_help(const JSONRPCRequest& request)
+{
+    RPCHelpMan{"bls sign",
+        "\nn a hash and return the signature.\n",
+        {
+            {"hash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The hash to sign"},
+            {"secret", RPCArg::Type::STR, RPCArg::Optional::NO, "The BLS secret key"},
+        },
+        RPCResult{
+            RPCResult::Type::OBJ, "", "",
+            {
+                {RPCResult::Type::STR_HEX, "signature", "BLS signature"},
+            }},
+        RPCExamples{
+            HelpExampleCli("bls sign", "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
+        },
+    }.Check(request);
+}
+
+static UniValue bls_sign(const JSONRPCRequest& request)
+{
+    bls_sign_help(request);
+
+    uint256 hash;
+    hash.SetHex(request.params[0].get_str());
+
+    CBLSSecretKey sk;
+    if (!sk.SetHexStr(request.params[1].get_str())) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Secret key must be a valid hex string of length %d", sk.SerSize*2));
+    }
+
+    CBLSSignature sig = sk.Sign(hash);
+    if (!sig.IsValid()) {
+        return false;
+    }
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("signature", EncodeBase64(sig.ToByteVector()));
+    ret.pushKV("public", sk.GetPublicKey().ToString());
+    return ret;
+}
+
 [[ noreturn ]] static void bls_help()
 {
     RPCHelpMan{"bls",
@@ -1356,7 +1397,8 @@ static UniValue bls_fromsecret(const JSONRPCRequest& request)
         "To get help on individual commands, use \"help bls command\".\n"
         "\nAvailable commands:\n"
         "  generate          - Create a BLS secret/public key pair\n"
-        "  fromsecret        - Parse a BLS secret key and return the secret/public key pair\n",
+        "  fromsecret        - Parse a BLS secret key and return the secret/public key pair\n"
+        "  sign              - Sign a hash and return the signature\n",
         {
             {"command", RPCArg::Type::STR, RPCArg::Optional::NO, "The command to execute"},
         },
@@ -1374,6 +1416,8 @@ static UniValue _bls(const JSONRPCRequest& request)
         return bls_generate(new_request);
     } else if (command == "blsfromsecret") {
         return bls_fromsecret(new_request);
+    } else if (command == "blssign") {
+        return bls_sign(new_request);
     } else {
         bls_help();
     }

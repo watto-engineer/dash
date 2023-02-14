@@ -136,14 +136,11 @@ public:
                 }
                 // Added -- insert at the right position
                 std::vector<TransactionRecord> vToInsert = TransactionRecord::decomposeTransaction(wallet, wtx);
-                QList<TransactionRecord> toInsert;
-                toInsert.reserve(vToInsert.size());
-                std::copy(vToInsert.begin(), vToInsert.end(), std::back_inserter(toInsert));
-                if(!toInsert.isEmpty()) /* only if something to insert */
+                if(vToInsert.size()> 0) /* only if something to insert */
                 {
-                    parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex+toInsert.size()-1);
+                    parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex+vToInsert.size()-1);
                     int insert_idx = lowerIndex;
-                    for (const TransactionRecord &rec : toInsert)
+                    for (const TransactionRecord &rec : vToInsert)
                     {
                         cachedWallet.insert(insert_idx, rec);
                         insert_idx += 1;
