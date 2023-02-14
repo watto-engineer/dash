@@ -456,6 +456,8 @@ public:
         consensus.nPowTargetSpacing = 1 * 60; // Wagerr: 1 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
+
+        // Other
         consensus.nMaturityV1 = 15;
         consensus.nMaturityV2 = 10;
         // The best chain should have at least this much work.
@@ -662,6 +664,7 @@ public:
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.V18DeploymentHeight = 600;
         consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
+        consensus.BIP34Hash = uint256();
         consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
         consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
         consensus.CSVHeight = consensus.V18DeploymentHeight;
@@ -955,18 +958,11 @@ public:
         consensus.CSVHeight = consensus.V18DeploymentHeight;
         consensus.BIP147Height = consensus.V18DeploymentHeight;
         consensus.DIP0001Height = 2000;
-        consensus.DIP0003Height = 210;
+        consensus.DIP0003Height = consensus.V18DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = 500;
         consensus.DIP0003EnforcementHash = uint256();
         consensus.DIP0008Height = 432;
         consensus.DIP0024Height = consensus.V18DeploymentHeight;
-        consensus.BRRHeight = 2500; // see block_reward_reallocation_tests
-        consensus.MinBIP9WarningHeight = 0;
-        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
-        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
-        consensus.fPowAllowMinDifficultyBlocks = true;
-        consensus.fPowNoRetargeting = true;
 
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
@@ -974,13 +970,38 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
 
+        consensus.BRRHeight = 2500; // see block_reward_reallocation_tests
+        consensus.MinBIP9WarningHeight = 576;
+
+        // Proof of work parameters
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // Wagerr: 2.5 minutes
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = true;
+
+        // Other
+        consensus.nMaturityV1 = 100;
+        consensus.nMaturityV2 = 60;
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x00");
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x00");
 
         // Wagerr specific parameters
-        // Proof of Stake parameters
+        consensus.nWagerrProtocolV1StartHeight = 251; // Betting protocol v1 activation block
+        consensus.nWagerrProtocolV2StartHeight = 251; // Betting protocol v2 activation block
+        consensus.nWagerrProtocolV3StartHeight = 300; // Betting protocol v3 activation block
+        consensus.nWagerrProtocolV4StartHeight = 500; // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV5StartHeight = 500; // Betting protocol v5 activation block
+        consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
+        consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight; // Reduced block maturity required for spending coinstakes and betting payouts
+        consensus.nKeysRotateHeight = 270; // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 251;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = 400;
         consensus.nBlockTimeProtocolV2 = 500;
+        consensus.ATPStartHeight = consensus.V18DeploymentHeight;
 
         // Proof of stake parameters
         consensus.posLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
@@ -991,18 +1012,14 @@ public:
         consensus.nTimeSlotLength = 15;
         consensus.nPosTargetTimespan_V2 = 2 * consensus.nTimeSlotLength * 60; // 30 minutes
         consensus.nStakeMinDepth = 1;
-        consensus.nStakeMinAge = 60 * 60; // 1 hour
+        consensus.nStakeMinAge = 0;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
         consensus.nBlockStakeModifierV2 = consensus.V18DeploymentHeight;
-        consensus.ATPStartHeight = consensus.V18DeploymentHeight;
 
         // ATP parameters
         consensus.WagerrAddrPrefix = "wagerrreg";
         consensus.strTokenManagementKey = "TDn9ZfHrYvRXyXC6KxRgN6ZRXgJH2JKZWe"; // TCH8Qby7krfugb2sFWzHQSEmTxBgzBSLkgPtt5EUnzDqfaX9dcsS
         consensus.nOpGroupNewRequiredConfirmations = 1;
-        // Other
-        consensus.nMaturityV1 = 100;
-        consensus.nMaturityV2 = 60;
         // Zerocoin
         consensus.nZerocoinRequiredStakeDepth = 200;
         consensus.nZerocoinStartHeight = std::numeric_limits<int>::max();
