@@ -50,6 +50,7 @@ public:
     bool GetTokenGroupIdByName(std::string strName, CTokenGroupID &tokenGroupID);
     std::map<CTokenGroupID, CTokenGroupCreation> GetMapTokenGroups() { return mapTokenGroups; };
 
+    template <typename CTokenGroupDescription> bool GetTokenGroupDescription(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescription>& tgDesc);
 
     bool StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation);
     void ClearManagementTokenGroups();

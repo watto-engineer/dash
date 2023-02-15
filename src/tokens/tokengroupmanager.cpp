@@ -179,6 +179,24 @@ bool CTokenGroupManager::GetTokenGroupIdByName(std::string strName, CTokenGroupI
     return false;
 }
 
+template <typename CTokenGroupDescription> bool CTokenGroupManager::GetTokenGroupDescription(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescription>& tgDesc) {
+    CTokenGroupCreation tgCreation;
+    if (!GetTokenGroupCreation(tgID, tgCreation)) {
+        return false;
+    }
+    try {
+        CTokenGroupDescription desc = boost::get<CTokenGroupDescription>(*tgCreation.pTokenGroupDescription);
+        tgDesc = std::make_shared<CTokenGroupDescription>(desc);
+    } catch (...) {
+        return false;
+    }
+    return true;
+}
+template bool CTokenGroupManager::GetTokenGroupDescription<CTokenGroupDescriptionRegular>(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescriptionRegular>& tgDesc);
+template bool CTokenGroupManager::GetTokenGroupDescription<CTokenGroupDescriptionMGT>(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescriptionMGT>& tgDesc);
+template bool CTokenGroupManager::GetTokenGroupDescription<CTokenGroupDescriptionNFT>(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescriptionNFT>& tgDesc);
+template bool CTokenGroupManager::GetTokenGroupDescription<CTokenGroupDescriptionBetting>(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescriptionBetting>& tgDesc);
+
 bool CTokenGroupManager::ManagementTokensCreated() {
     return MGTTokensCreated() && ORATTokensCreated();
 }

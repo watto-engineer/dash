@@ -8,6 +8,7 @@
 
 #include "amount.h"
 #include <bls/bls.h>
+#include <evo/verifiable.h>
 #include "script/script.h"
 #include <primitives/transaction.h>
 #include "uint256.h"
@@ -185,7 +186,7 @@ public:
     }
 };
 
-class CTokenGroupDescriptionBetting
+class CTokenGroupDescriptionBetting : public Verifiable
 {
 public:
     static const uint16_t CURRENT_VERSION = 1;
@@ -195,7 +196,7 @@ public:
 
     uint32_t nEventId; // Unique ID, referring to either a peerless event or a field bet event
 
-    uint8_t signerType; // '1' when signed by a MGT token, '2' when signed by an ORACLE token, '3' when signed by a LLMQ
+    SignerType signerType; // '1' when signed by a MGT token, '2' when signed by an ORACLE token, '3' when signed by a LLMQ
     uint256 signerHash; // hash of the signer ID (either token ID or quorum hash)
     CBLSPublicKey blsPubKey; // BLS Public Key that enables signing
     CBLSSignature blsSig; // BLS Signature over nVersion, nEventId, strDocumentUrl, documentHash, signerType, signerHash and blsPubKey
@@ -203,20 +204,23 @@ public:
     CTokenGroupDescriptionBetting() {
         SetNull();
     };
-    CTokenGroupDescriptionBetting(uint32_t nEventId, uint8_t signerType, uint256 signerHash, CBLSPublicKey blsPubKey, CBLSSignature blsSig) :
+    CTokenGroupDescriptionBetting(uint32_t nEventId, SignerType signerType, uint256 signerHash, CBLSPublicKey blsPubKey, CBLSSignature blsSig) :
         nEventId(nEventId), signerType(signerType), signerHash(signerHash), blsPubKey(blsPubKey), blsSig(blsSig) { };
 
     void SetNull() {
         nEventId = 0;
-        signerType = 0;
+        signerType = SignerType::UNKNOWN;
         signerHash = uint256();
         blsPubKey = CBLSPublicKey();
         blsSig = CBLSSignature();
     }
 
-    uint256 GetSignatureHash() const;
+    virtual SignerType GetSignerType() const { return signerType; };
+    virtual uint256 GetSignerHash() const { return signerHash; };
+    virtual CBLSPublicKey GetBlsPubKey() const { return blsPubKey; };
+    virtual CBLSSignature GetBlsSignature() const { return blsSig; };
+    virtual uint256 GetSignatureHash() const;
     bool Sign(const CBLSSecretKey& key);
-    bool CheckSignature() const;
 
     SERIALIZE_METHODS(CTokenGroupDescriptionBetting, obj)
     {
@@ -244,6 +248,7 @@ public:
 };
 
 typedef boost::variant<CTokenGroupDescriptionRegular, CTokenGroupDescriptionMGT, CTokenGroupDescriptionNFT, CTokenGroupDescriptionBetting> CTokenGroupDescriptionVariant;
+
 class tgdesc_to_json : public boost::static_visitor<UniValue>
 {
 private:

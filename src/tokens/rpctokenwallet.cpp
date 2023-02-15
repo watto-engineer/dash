@@ -1062,8 +1062,8 @@ extern UniValue configurebettoken(const JSONRPCRequest& request)
             "Configures a new token type.\n"
             "\nArguments:\n"
             "1. \"event_id\"      (string, required) the event ID\n"
-            "2. \"signer_type\"   (number, required) the signer type; 1 if signed with a token key, 2 if signed by oracles\n"
-            "3. \"signer_hash\"   (base64, required) the hash corresponding to the signer\n"
+            "2. \"signer_type\"   (number, required) the signer type; 1 if signed with the MGT token key, 2 if signed with the ORAT token key, 3 if signed by oracles\n"
+            "3. \"signer_ID\"     (string, required) the ID corresponding to the signer; a group ID when signed with a token key, and a LLMQ hash when signed by oracles\n"
             "4. \"bls_pubkey\"    (string, required) the public key corresponding to the secret key used for signing\n"
             "5. \"bls_signature\" (string, required) hex encoded signature\n"
             "6. \"confirm_send\"  (boolean, optional, default=false) the configuration transaction will be sent\n"
@@ -1121,8 +1121,7 @@ extern UniValue configurebettoken(const JSONRPCRequest& request)
     if (!ParseGroupDescParamsBetting(request, curparam, tgDesc, confirmed)) {
         return false;
     }
-
-    if (tgDesc->blsSig.IsValid() && !tgDesc->CheckSignature()) {
+    if (tgDesc->blsSig.IsValid() && !tgDesc->blsSig.VerifyInsecure(tgDesc->blsPubKey, tgDesc->GetSignatureHash())) {
         std::string strError = strprintf("Unable to verify bls signature");
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }

@@ -187,6 +187,7 @@ BITCOIN_CORE_H = \
   evo/specialtx.h \
   flushablestorage/flushablestorage.h \
   evo/specialtxman.h \
+  evo/verifiable.h \
   dsnotificationinterface.h \
   governance/governance.h \
   governance/classes.h \
@@ -793,6 +794,7 @@ libbitcoin_common_a_SOURCES = \
   consensus/tokengroups.cpp \
   core_read.cpp \
   core_write.cpp \
+  evo/verifiable.cpp \
   hdchain.cpp \
   invalid.cpp \
   key.cpp \

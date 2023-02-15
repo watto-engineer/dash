@@ -5,11 +5,14 @@
 
 #include "tokens/tokengroupdescription.h"
 
+#include <clientversion.h>
 #include <consensus/consensus.h>
 #include <logging.h>
 #include "util/strencodings.h"
 #include <rpc/protocol.h>
 #include <rpc/server.h>
+#include <script/tokengroup.h>
+#include <tokens/groups.h>
 
 void CTokenGroupDescriptionRegular::ToJson(UniValue& obj) const
 {
@@ -72,19 +75,6 @@ bool CTokenGroupDescriptionBetting::Sign(const CBLSSecretKey& key)
     blsSig = sig;
     return true;
 }
-
-bool CTokenGroupDescriptionBetting::CheckSignature() const
-{
-    if (!blsPubKey.IsValid()) {
-        return false;
-    }
-    if (!blsSig.VerifyInsecure(blsPubKey, GetSignatureHash())) {
-        LogPrintf("CTokenGroupDescriptionBetting::CheckSignature -- VerifyInsecure() failed\n");
-        return false;
-    }
-    return true;
-}
-
 
 std::string ConsumeParamTicker(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
@@ -162,7 +152,7 @@ uint32_t ConsumeParamEventID(const JSONRPCRequest& request, unsigned int &curpar
     return nEventID;
 }
 
-uint8_t ConsumeParamSignerType(const JSONRPCRequest& request, unsigned int &curparam) {
+SignerType ConsumeParamSignerType(const JSONRPCRequest& request, unsigned int &curparam) {
     if (curparam >= request.params.size())
     {
         std::string strError = strprintf("Not enough paramaters");
@@ -175,7 +165,42 @@ uint8_t ConsumeParamSignerType(const JSONRPCRequest& request, unsigned int &curp
         throw JSONRPCError(RPC_INVALID_PARAMS, strError);
     }
     curparam++;
-    return (uint8_t)signerType32;
+    return (SignerType)signerType32;
+}
+
+uint256 ConsumeParamSignerHash(const JSONRPCRequest& request, unsigned int &curparam, const SignerType signerType) {
+    if (curparam >= request.params.size())
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Missing parameter: signer ID");
+    }
+    std::string signerID = request.params[curparam].get_str();
+    curparam++;
+
+    uint256 signerHash;
+    switch (signerType) {
+        case SignerType::MGT:
+        case SignerType::ORAT:
+        {
+            CTokenGroupID grpID = GetTokenGroup(signerID);
+            if (!grpID.isUserGroup()) {
+                throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid parameter: No group specified");
+            }
+            CHashWriter hasher(SER_DISK, CLIENT_VERSION);
+            hasher << grpID.parentGroup();
+            signerHash = hasher.GetHash();
+        }
+        case SignerType::LLMQ:
+        {
+            signerHash.SetHex(signerID);
+        }
+        default:
+        {
+            std::string strError = strprintf("Invalid signer");
+            throw JSONRPCError(RPC_INVALID_PARAMS, strError);
+        }
+    }
+
+    return signerHash;
 }
 
 uint256 ConsumeParamHash(const JSONRPCRequest& request, unsigned int &curparam) {
@@ -377,8 +402,8 @@ bool ParseGroupDescParamsBetting(const JSONRPCRequest& request, unsigned int &cu
     confirmed = false;
 
     uint32_t nEventId = ConsumeParamEventID(request, curparam);
-    uint8_t signerType = ConsumeParamSignerType(request, curparam);
-    uint256 signerHash = ConsumeParamHash(request, curparam);
+    SignerType signerType = ConsumeParamSignerType(request, curparam);
+    uint256 signerHash = ConsumeParamSignerHash(request, curparam, signerType);
     CBLSPublicKey blsPubKey = ConsumeParamBLSPublicKey(request, curparam);
     CBLSSignature blsSig = CBLSSignature();
 

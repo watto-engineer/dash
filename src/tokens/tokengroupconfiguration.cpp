@@ -342,40 +342,6 @@ bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex*
     if (!GetTxPayload(tx, tgDesc)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-payload");
     }
-    switch (tgDesc.signerType)
-    {
-        case 1:
-        {
-            // Management Key
-            if (tokenGroupManager->MGTTokensCreated()) {
-                CHashWriter hasher(SER_DISK, CLIENT_VERSION);
-                hasher << tokenGroupManager->GetMGTID();
-                if (hasher.GetHash() != tgDesc.signerHash) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
-                }
-                CTokenGroupCreation tgCreation;
-                if (!tokenGroupManager.get()->GetTokenGroupCreation(tokenGroupManager->GetMGTID(), tgCreation)) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
-                }
-                CTokenGroupDescriptionMGT *mgtDesc = nullptr;
-                try {
-                    mgtDesc = boost::get<CTokenGroupDescriptionMGT>(tgCreation.pTokenGroupDescription.get());
-                } catch (...) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signer");
-                }
-                if (tgDesc.blsPubKey != mgtDesc->blsPubKey) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-pubkey");
-                }
-                if (!tgDesc.CheckSignature()) {
-                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signature");
-                }
-            }
-            break;
-        }
-        default:
-            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-token-signertype");
-    }
-    // Check BLS signature
     /*
     if (!tgDesc.vchData.size() > MAX_TX_NFT_DATA) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-data");
@@ -384,6 +350,10 @@ bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex*
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionBetting::CURRENT_VERSION) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-version");
+    }
+    // Check BLS signature
+    if (!tgDesc.VerifyBLSSignature(state)) {
+        return false;
     }
 
     return true;

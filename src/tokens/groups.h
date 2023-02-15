@@ -15,12 +15,11 @@
 enum class TokenGroupIdFlags : uint8_t
 {
     NONE = 0,
-    SAME_SCRIPT = 1U, // covenants/ encumberances -- output script template must match input
-    BALANCE_BCH = 1U << 1, // group inputs and outputs must balance both tokens and BCH
-    STICKY_MELT = 1U << 2, // group can always melt tokens
-    MGT_TOKEN = 1U << 3, // management tokens are created from management outputs
-    NFT_TOKEN = 1U << 4, // NFT tokens have limited capabilities
-    BETTING_TOKEN = 1U << 5, // Betting tokens need to pay betting fees and can be redeemed
+    STICKY_MELT = 1U, // group can always melt tokens
+    MGT_TOKEN = 1U << 1, // management tokens are created from management outputs
+    NFT_TOKEN = 1U << 2, // NFT tokens have limited capabilities
+    BETTING_TOKEN = 1U << 3, // Betting tokens need to pay betting fees and can be redeemed
+    PARLAY_TOKEN = 1U << 4, // Covenant to have and keep an accompanying set of betting tokens (with atomic payout)
 
     DEFAULT = 0
 };
