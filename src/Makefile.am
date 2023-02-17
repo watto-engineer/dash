@@ -137,7 +137,8 @@ BITCOIN_CORE_H = \
   betting/bet_v2.h \
   betting/bet_v3.h \
   betting/bet_v4.h \
- betting/oracles.h \
+  betting/events.h \
+  betting/oracles.h \
   betting/quickgames/dice.h \
   betting/quickgames/qgview.h \
   bip39.h \
@@ -784,6 +785,7 @@ libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
+  betting/events.cpp \
   betting/quickgames/dice.cpp \
   bip39.cpp \
   wagerraddrenc.cpp \

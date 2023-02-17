@@ -799,7 +799,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         // DoS scoring a node for non-critical errors, e.g. duplicate keys because a TX is received that was already
         // mined
         // NOTE: we use UTXO here and do NOT allow mempool txes as masternode collaterals
-        if (!CheckSpecialTx(tx, ::ChainActive().Tip(), state, ::ChainstateActive().CoinsTip(), true))
+        if (!CheckSpecialTx(tx, ::ChainActive().Tip(), state, ::ChainstateActive().CoinsTip(), bettingsViewCache, true))
             return false;
 
         if (pool.existsProviderTxConflict(tx)) {
@@ -2247,7 +2247,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     bool fV18Active_context = pindex->nHeight >= Params().GetConsensus().V18DeploymentHeight;
 
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
-    if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, view, fJustCheck, fScriptChecks)) {
+    if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, view, bettingsViewCache, fJustCheck, fScriptChecks)) {
         return error("ConnectBlock(WAGERR): ProcessSpecialTxsInBlock for block %s failed with %s",
                      pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
@@ -5025,7 +5025,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
 }
 
 /** Apply the effects of a block on the utxo cache, ignoring that it may already have been applied. */
-bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& inputs, const CChainParams& params)
+bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& inputs, CBettingsView& bettingsViewCache, const CChainParams& params)
 {
     assert(m_quorum_block_processor);
 
@@ -5037,7 +5037,7 @@ bool CChainState::RollforwardBlock(const CBlockIndex* pindex, CCoinsViewCache& i
 
     // MUST process special txes before updating UTXO to ensure consistency between mempool and block processing
     CValidationState state;
-    if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, inputs, false /*fJustCheck*/, false /*fScriptChecks*/)) {
+    if (!ProcessSpecialTxsInBlock(block, pindex, *m_quorum_block_processor, state, inputs, bettingsViewCache, false /*fJustCheck*/, false /*fScriptChecks*/)) {
         return error("RollforwardBlock(WAGERR): ProcessSpecialTxsInBlock for block %s failed with %s",
             pindex->GetBlockHash().ToString(), FormatStateMessage(state));
     }
@@ -5120,7 +5120,7 @@ bool CChainState::ReplayBlocks(const CChainParams& params)
         const CBlockIndex* pindex = pindexNew->GetAncestor(nHeight);
         LogPrintf("Rolling forward %s (%i)\n", pindex->GetBlockHash().ToString(), nHeight);
         uiInterface.ShowProgress(_("Replaying blocks...").translated, (int) ((nHeight - nForkHeight) * 100.0 / (pindexNew->nHeight - nForkHeight)) , false);
-        if (!RollforwardBlock(pindex, cache, params)) return false;
+        if (!RollforwardBlock(pindex, cache, bettingsViewCache, params)) return false;
     }
 
     cache.SetBestBlock(pindexNew->GetBlockHash());

@@ -6,6 +6,7 @@
 #include "tokens/tokengroupconfiguration.h"
 #include "tokens/tokengroupmanager.h"
 
+#include <betting/events.h>
 #include <chain.h>
 #include <consensus/consensus.h>
 #include <evo/specialtx.h>
@@ -328,7 +329,7 @@ bool CheckGroupConfigurationTxNFT(const CTransaction& tx, const CBlockIndex* pin
     return true;
 }
 
-bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view)
+bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view, const CBettingsView& bettingsView)
 {
     if (!CheckGroupConfigurationTxBase(tx, pindexPrev, state, view)) {
         return false;
@@ -342,11 +343,13 @@ bool CheckGroupConfigurationTxBetting(const CTransaction& tx, const CBlockIndex*
     if (!GetTxPayload(tx, tgDesc)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-protx-payload");
     }
-    /*
-    if (!tgDesc.vchData.size() > MAX_TX_NFT_DATA) {
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-data");
+    CBetEvent event;
+    if (!CreateBetEventFromDB(bettingsView, tgDesc.nEventId, event)) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-event");
+    };
+    if (!event.IsOpen(bettingsView, pindexPrev->nTime)) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-event");
     }
-    */
 
     if (tgDesc.nVersion == 0 || tgDesc.nVersion > CTokenGroupDescriptionBetting::CURRENT_VERSION) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-version");

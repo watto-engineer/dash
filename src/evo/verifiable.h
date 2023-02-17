@@ -5,15 +5,16 @@
 #ifndef BITCOIN_EVO_VERIFIABLE_H
 #define BITCOIN_EVO_VERIFIABLE_H
 
-#include <uint256.h>
+#include <array>
 #include <serialize.h>
 #include <string_view>
+#include <uint256.h>
 
 class CBLSPublicKey;
 class CBLSSignature;
 class CValidationState;
 
-enum SignerType : uint8_t {
+enum class SignerType : uint8_t {
     UNKNOWN = 0x00,
     MGT     = 0x01,
     ORAT    = 0x02, // unimplemented
@@ -22,8 +23,8 @@ enum SignerType : uint8_t {
 };
 template<> struct is_serializable_enum<SignerType> : std::true_type {};
 
-constexpr std::array<std::string_view, SignerType::LAST+1> makeSignerTypeDefs() {
-    std::array<std::string_view, SignerType::LAST+1> arr = {
+constexpr std::array<std::string_view, static_cast<uint8_t>(SignerType::LAST)+1> makeSignerTypeDefs() {
+    std::array<std::string_view, static_cast<uint8_t>(SignerType::LAST)+1> arr = {
         "UNKNOWN",
         "MGT",
         "ORAT",
@@ -31,7 +32,6 @@ constexpr std::array<std::string_view, SignerType::LAST+1> makeSignerTypeDefs() 
     };
     return arr;
 }
-
 [[maybe_unused]] static constexpr auto signerTypeDefs = makeSignerTypeDefs();
 
 class Verifiable {

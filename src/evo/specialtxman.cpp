@@ -20,7 +20,7 @@
 #include <primitives/block.h>
 #include <validation.h>
 
-bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view, bool check_sigs)
+bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state, const CCoinsViewCache& view, const CBettingsView& bettingsViewCache, bool check_sigs)
 {
     AssertLockHeld(cs_main);
 
@@ -48,16 +48,11 @@ bool CheckSpecialTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVali
         case TRANSACTION_GROUP_CREATION_REGULAR:
             return CheckGroupConfigurationTxRegular(tx, pindexPrev, state, view);
         case TRANSACTION_GROUP_CREATION_MGT:
-            if (!CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view))
-            {
-                CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
-                return false;
-            }
-            return true;
+            return CheckGroupConfigurationTxMGT(tx, pindexPrev, state, view);
         case TRANSACTION_GROUP_CREATION_NFT:
             return CheckGroupConfigurationTxNFT(tx, pindexPrev, state, view);
         case TRANSACTION_GROUP_CREATION_BETTING:
-            return CheckGroupConfigurationTxBetting(tx, pindexPrev, state, view);
+            return CheckGroupConfigurationTxBetting(tx, pindexPrev, state, view, bettingsViewCache);
         case TRANSACTION_MNHF_SIGNAL:
             return pindexPrev->nHeight + 1 >= Params().GetConsensus().DIP0024Height && CheckMNHFTx(tx, pindexPrev, state);
         }
@@ -88,6 +83,7 @@ bool ProcessSpecialTx(const CTransaction& tx, const CBlockIndex* pindex, CValida
     case TRANSACTION_GROUP_CREATION_REGULAR:
     case TRANSACTION_GROUP_CREATION_MGT:
     case TRANSACTION_GROUP_CREATION_NFT:
+    case TRANSACTION_GROUP_CREATION_BETTING:
         return true; // handled per block
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
@@ -115,6 +111,7 @@ bool UndoSpecialTx(const CTransaction& tx, const CBlockIndex* pindex)
     case TRANSACTION_GROUP_CREATION_REGULAR:
     case TRANSACTION_GROUP_CREATION_MGT:
     case TRANSACTION_GROUP_CREATION_NFT:
+    case TRANSACTION_GROUP_CREATION_BETTING:
         return true; // handled per block
     case TRANSACTION_MNHF_SIGNAL:
         return true; // handled per block
@@ -124,7 +121,7 @@ bool UndoSpecialTx(const CTransaction& tx, const CBlockIndex* pindex)
 }
 
 bool ProcessSpecialTxsInBlock(const CBlock& block, const CBlockIndex* pindex, llmq::CQuorumBlockProcessor& quorum_block_processor,
-                              CValidationState& state, const CCoinsViewCache& view, bool fJustCheck, bool fCheckCbTxMerleRoots)
+                              CValidationState& state, const CCoinsViewCache& view, const CBettingsView& bettingsViewCache, bool fJustCheck, bool fCheckCbTxMerleRoots)
 {
     AssertLockHeld(cs_main);
 
@@ -137,7 +134,7 @@ bool ProcessSpecialTxsInBlock(const CBlock& block, const CBlockIndex* pindex, ll
         int64_t nTime1 = GetTimeMicros();
 
         for (const auto& ptr_tx : block.vtx) {
-            if (!CheckSpecialTx(*ptr_tx, pindex->pprev, state, view, fCheckCbTxMerleRoots)) {
+            if (!CheckSpecialTx(*ptr_tx, pindex->pprev, state, view, bettingsViewCache, fCheckCbTxMerleRoots)) {
                 // pass the state returned by the function above
                 return false;
             }

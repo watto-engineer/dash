@@ -335,7 +335,8 @@ static std::string SignAndSendSpecialTx(const JSONRPCRequest& request, const CMu
     LOCK(cs_main);
 
     CValidationState state;
-    if (!CheckSpecialTx(CTransaction(tx), ::ChainActive().Tip(), state, ::ChainstateActive().CoinsTip(), true)) {
+    CBettingsView bettingsViewDummy = CBettingsView();
+    if (!CheckSpecialTx(CTransaction(tx), ::ChainActive().Tip(), state, ::ChainstateActive().CoinsTip(), bettingsViewDummy, true)) {
         throw std::runtime_error(FormatStateMessage(state));
     }
     } // cs_main
