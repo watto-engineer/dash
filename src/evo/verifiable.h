@@ -22,12 +22,17 @@ enum SignerType : uint8_t {
 };
 template<> struct is_serializable_enum<SignerType> : std::true_type {};
 
-[[maybe_unused]] static constexpr std::array<std::string_view, SignerType::LAST+1> signerTypeDefs = {
-    "UNKNOWN",
-    "MGT",
-    "ORAT",
-    "LLMQ"
-};
+constexpr std::array<std::string_view, SignerType::LAST+1> makeSignerTypeDefs() {
+    std::array<std::string_view, SignerType::LAST+1> arr = {
+        "UNKNOWN",
+        "MGT",
+        "ORAT",
+        "LLMQ"
+    };
+    return arr;
+}
+
+[[maybe_unused]] static constexpr auto signerTypeDefs = makeSignerTypeDefs();
 
 class Verifiable {
 public:
