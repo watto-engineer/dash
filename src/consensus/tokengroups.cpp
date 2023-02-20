@@ -308,7 +308,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         }
         if (bal.input < bal.output)
         {
-            if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT))
+            if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT) && !hasCapability(bal.ctrlPerms, GroupAuthorityFlags::WAGERR))
             {
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
                     "Group output exceeds input, but no mint permission");

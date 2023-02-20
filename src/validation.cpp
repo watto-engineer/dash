@@ -76,6 +76,7 @@
 #include <statsd_client.h>
 
 #include <betting/bet.h>
+#include <betting/token_mint.h>
 #include "betting/bet_db.h"
 
 #include <tokens/tokendb.h>
@@ -1432,6 +1433,9 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                 return state.Invalid(ValidationInvalidReason::TX_CONFLICT, error("Inputs unavailable"), REJECT_INVALID, "tx-no-index");
             if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
                 return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
+
+            if (!CheckBetMints(tx, state, inputs, tgMintMeltBalance))
+                return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
 
             //Check that all token transactions paid their fees
             if (IsAnyOutputGrouped(tx)) {
