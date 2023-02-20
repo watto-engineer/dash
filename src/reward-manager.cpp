@@ -25,6 +25,8 @@ CRewardManager::CRewardManager() :
 bool CRewardManager::IsReady(CConnman& connman) {
     if (!fEnableRewardManager) return false;
 
+    if (GetTime() < nBackoffUntilTime) return false;
+
     if (pwallet == nullptr || pwallet->IsLocked()) {
         return false;
     }
@@ -173,13 +175,13 @@ void CRewardManager::AutocombineDust() {
 
 void CRewardManager::DoMaintenance(CConnman& connman) {
     if (!IsReady(connman)) {
-        UninterruptibleSleep(std::chrono::milliseconds{5 * 1000}); // Wait 5 minutes
+        nBackoffUntilTime = GetTime() + 300;
         return;
     }
 
     if (IsAutoCombineEnabled()) {
         AutocombineDust();
-        int randsleep = GetRandInt(30 * 1000);
-        UninterruptibleSleep(std::chrono::milliseconds{randsleep});
+        int randsleep = GetRandInt(30);
+        nBackoffUntilTime = GetTime() + randsleep + 30;
     }
 }

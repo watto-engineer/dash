@@ -30,7 +30,7 @@
 std::shared_ptr<CStakingManager> stakingManager;
 
 CStakingManager::CStakingManager(std::shared_ptr<CWallet> pwalletIn) :
-        nMintableLastCheck(0), fMintableCoins(false), fLastLoopOrphan(false), nExtraNonce(0), // Currently unused
+        nBackoffUntilTime(0), nMintableLastCheck(0), fMintableCoins(false), fLastLoopOrphan(false), nExtraNonce(0), // Currently unused
         fEnableStaking(false), fEnableWAGERRStaking(false), nReserveBalance(0), pwallet(pwalletIn),
         nHashInterval(22), nLastCoinStakeSearchInterval(0), nLastCoinStakeSearchTime(GetAdjustedTime()) {}
 
@@ -275,11 +275,13 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
 {
     if (!fEnableStaking) return; // Should never happen
 
+    if (GetTime() < nBackoffUntilTime) return;
+
     CBlockIndex* pindexPrev = ::ChainActive().Tip();
     bool fHaveConnections = connman.GetNodeCount(CConnman::CONNECTIONS_ALL) > 0;
     if (pwallet->IsLocked(true) || !pindexPrev || !masternodeSync->IsSynced() || !fHaveConnections || nReserveBalance >= pwallet->GetBalance().m_mine_trusted) {
         nLastCoinStakeSearchInterval = 0;
-        UninterruptibleSleep(std::chrono::milliseconds{10 * 1000});
+        nBackoffUntilTime = GetTime() + 100;
         return;
     }
 
@@ -290,7 +292,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
     if (!fPosPhase) {
         // no POS for at least 1 block
         nLastCoinStakeSearchInterval = 0;
-        UninterruptibleSleep(std::chrono::milliseconds{10 * 1000});
+        nBackoffUntilTime = GetTime() + 120;
         return;
     }
 
@@ -304,7 +306,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
         if (    (!fTimeV2 && nTime < tipHashTime + 22) ||
                 (fTimeV2 && GetTimeSlot(nTime) <= tipHashTime) )
         {
-            UninterruptibleSleep(std::chrono::milliseconds{std::min(nHashInterval - (nTime - tipHashTime), (int64_t)5) * 1000});
+            nBackoffUntilTime = GetTime() + 5;
             return;
         }
     }
@@ -315,13 +317,12 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
         // No mintable coins
         nLastCoinStakeSearchInterval = 0;
         LogPrint(BCLog::STAKING, "%s: No mintable coins, waiting..\n", __func__);
-        UninterruptibleSleep(std::chrono::milliseconds{5 * 1000});
+        nBackoffUntilTime = GetTime() + 120;
         return;
     }
 
     int64_t nSearchTime = GetAdjustedTime();
     if (nSearchTime < nLastCoinStakeSearchTime) {
-        UninterruptibleSleep(std::chrono::milliseconds{(nLastCoinStakeSearchTime - nSearchTime) * 1000}); // Wait
         return;
     } else {
         nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
@@ -341,7 +342,7 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
             pblocktemplate = BlockAssembler(*sporkManager, *governance, *llmq::quorumBlockProcessor, *llmq::chainLocksHandler, *llmq::quorumInstantSendManager, mempool, Params()).CreateNewBlock(CScript(), coinstakeTxPtr, coinstakeInputPtr, nCoinStakeTime, pwallet.get());
         } catch (const std::exception& e) {
             LogPrint(BCLog::STAKING, "%s: error creating block, waiting.. - %s", __func__, e.what());
-            UninterruptibleSleep(std::chrono::milliseconds{1 * 60 * 1000}); // Wait 1 minute
+            nBackoffUntilTime = GetTime() + 120;
             return;
         }
     } else {
@@ -377,6 +378,6 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
     if (!chainman.ProcessNewBlock(Params(), shared_pblock, true, nullptr)) {
         fLastLoopOrphan = true;
         LogPrint(BCLog::STAKING, "%s: ProcessNewBlock, block not accepted", __func__);
-        UninterruptibleSleep(std::chrono::milliseconds{10 * 1000}); // Wait 10 seconds
+        nBackoffUntilTime = GetTime() + 120;
     }
 }

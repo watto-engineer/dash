@@ -26,6 +26,8 @@ public:
 private:
     CWallet* pwallet = nullptr;
 
+    int64_t nBackoffUntilTime;
+
 public:
     CRewardManager();
 

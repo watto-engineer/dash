@@ -33,6 +33,8 @@ private:
     const CBlockIndex* tipIndex{nullptr};
     std::shared_ptr<CWallet> pwallet = nullptr;
 
+    int64_t nBackoffUntilTime;
+
     std::map<unsigned int, unsigned int> mapHashedBlocks;
 
     int64_t nMintableLastCheck;
