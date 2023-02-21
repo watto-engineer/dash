@@ -139,7 +139,7 @@ BITCOIN_CORE_H = \
   betting/bet_v4.h \
   betting/events.h \
   betting/oracles.h \
-  betting/token_mint.h \
+  betting/mint.h \
   betting/quickgames/dice.h \
   betting/quickgames/qgview.h \
   bip39.h \
@@ -420,7 +420,7 @@ libbitcoin_server_a_SOURCES = \
   betting/bet_v3.cpp \
   betting/bet_v4.cpp \
   betting/oracles.cpp \
-  betting/token_mint.cpp \
+  betting/mint.cpp \
   blockencodings.cpp \
   blockfilter.cpp \
   chain.cpp \

@@ -74,8 +74,10 @@ bool IsMGTInput(CScript script) {
     return false;
 }
 
-bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance)
+bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance)
 {
+    nWagerrIn = 0;
+    nWagerrOut = 0;
     gBalance.clear();
 
     // Tokens minted from the tokenGroupManagement address can create management tokens
@@ -154,8 +156,9 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
         }
         if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
-            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT; // Melt restrictions: after event close
-            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MINT; // Mint restrictions: before event close, fees must be paid
+            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::WAGERR; // Mint restrictions: before event close: fees must be paid; Melt restrictions: after event close
+        } else {
+            gBalance[tokenGrp.associatedGroup].ctrlPerms &= ~GroupAuthorityFlags::WAGERR;
         }
         if (tokenGrp.associatedGroup != NoGroup)
         {
@@ -313,6 +316,20 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
                     "Group output exceeds input, but no mint permission");
             }
+            if (hasCapability(bal.ctrlPerms, GroupAuthorityFlags::WAGERR)) {
+                if (bal.numInputs > 0 || bal.numOutputs > 1 || gBalance.size() > 1) {
+                    return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-bet-mint",
+                        "Bet mints must have 1 token output");
+                }
+                if (!txo.first.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)) {
+                    if (gBalance.size() > 1) {
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-bet-mint",
+                            "Only parlay bets can mint multiple bet tokens");
+                    }
+                }
+            }
+            // Regular bet mints must have 1 output and 0 token inputs
+            // Parlay bets must have n outputs with parly bits and 0 token inputs
             if (txo.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && hasCapability(bal.allowedCtrlOutputPerms, GroupAuthorityFlags::MINT)) {
                 // Redundant
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",

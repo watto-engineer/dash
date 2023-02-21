@@ -1225,6 +1225,7 @@ static bool MaybePunishNode(NodeId nodeid, const CValidationState& state, bool v
     case ValidationInvalidReason::TX_BAD_SPECIAL:
     case ValidationInvalidReason::TX_CONFLICT_LOCK:
     case ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY:
+    case ValidationInvalidReason::TX_BAD_BET:
         {
             // TODO: Handle this much more gracefully (10 DoS points is super arbitrary)
             LOCK(cs_main);

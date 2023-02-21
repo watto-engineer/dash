@@ -76,7 +76,7 @@
 #include <statsd_client.h>
 
 #include <betting/bet.h>
-#include <betting/token_mint.h>
+#include <betting/mint.h>
 #include "betting/bet_db.h"
 
 #include <tokens/tokendb.h>
@@ -237,7 +237,7 @@ std::unique_ptr<CBettingsView> bettingsView;
 // See definition for documentation
 static void FindFilesToPruneManual(ChainstateManager& chainman, std::set<int>& setFilesToPrune, int nManualPruneHeight);
 static void FindFilesToPrune(ChainstateManager& chainman, std::set<int>& setFilesToPrune, uint64_t nPruneAfterHeight);
-bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks = nullptr);
+bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CBettingsView& bettingsViewCache, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks = nullptr);
 static FILE* OpenUndoFile(const FlatFilePos &pos, bool fReadOnly = false);
 static FlatFileSeq BlockFileSeq();
 static FlatFileSeq UndoFileSeq();
@@ -514,7 +514,7 @@ static void UpdateMempoolForReorg(DisconnectedBlockTransactions& disconnectpool,
 
 // Used to avoid mempool polluting consensus critical paths if CCoinsViewMempool
 // were somehow broken and returning the wrong scriptPubKeys
-static bool CheckInputsFromMempoolAndCache(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& view, const CTxMemPool& pool,
+static bool CheckInputsFromMempoolAndCache(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& view, const CBettingsView& bettingsViewCache, const CTxMemPool& pool,
                  unsigned int flags, PrecomputedTransactionData& txdata) EXCLUSIVE_LOCKS_REQUIRED(cs_main) {
     AssertLockHeld(cs_main);
 
@@ -546,7 +546,7 @@ static bool CheckInputsFromMempoolAndCache(const CTransaction& tx, CValidationSt
     }
 
     // Call CheckInputs() to cache signature and script validity against current tip consensus rules.
-    return CheckInputs(tx, state, view, true, flags, /* cacheSigStore = */ true, /* cacheFullSciptStore = */ true, txdata);
+    return CheckInputs(tx, state, view, bettingsViewCache, true, flags, /* cacheSigStore = */ true, /* cacheFullSciptStore = */ true, txdata);
 }
 
 /**
@@ -812,7 +812,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
         PrecomputedTransactionData txdata;
-        if (!CheckInputs(tx, state, view, true, scriptVerifyFlags, true, false, txdata)) {
+        if (!CheckInputs(tx, state, view, bettingsViewCache, true, scriptVerifyFlags, true, false, txdata)) {
             assert(IsTransactionReason(state.GetReason()));
             return false; // state filled in by CheckInputs
         }
@@ -833,10 +833,14 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         // invalid blocks (using TestBlockValidity), however allowing such
         // transactions into the mempool can be exploited as a DoS attack.
         unsigned int currentBlockScriptVerifyFlags = GetBlockScriptFlags(::ChainActive().Tip(), chainparams.GetConsensus());
-        if (!CheckInputsFromMempoolAndCache(tx, state, view, pool, currentBlockScriptVerifyFlags, txdata)) {
+        if (!CheckInputsFromMempoolAndCache(tx, state, view, bettingsViewCache, pool, currentBlockScriptVerifyFlags, txdata)) {
             return error("%s: BUG! PLEASE REPORT THIS! CheckInputs failed against latest-block but not STANDARD flags %s, %s",
                     __func__, hash.ToString(), FormatStateMessage(state));
         }
+
+
+        if (!CheckBetMints(tx, state, view, bettingsViewCache))
+            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
 
         if (!CheckBettingTx(view, bettingsViewCache, tx, ::ChainActive().Height())) {
             return error("AcceptToMemoryPool: Error when betting TX checking!");
@@ -1421,21 +1425,19 @@ void InitScriptExecutionCache() {
  *
  * Non-static (and re-declared) in src/test/txvalidationcache_tests.cpp
  */
-bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CBettingsView& bettingsViewCache, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck> *pvChecks) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
     if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs())
     {
         if ((unsigned int)::ChainActive().Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) {
             std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
+            CAmount nWagerrIn, nWagerrOut;
             CBlockIndex* pindexPrev = LookupBlockIndex(inputs.GetBestBlock());
             if (!pindexPrev)
                 return state.Invalid(ValidationInvalidReason::TX_CONFLICT, error("Inputs unavailable"), REJECT_INVALID, "tx-no-index");
-            if (!CheckTokenGroups(tx, state, inputs, tgMintMeltBalance))
+            if (!CheckTokenGroups(tx, state, inputs, nWagerrIn, nWagerrOut, tgMintMeltBalance))
                 return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
-
-            if (!CheckBetMints(tx, state, inputs, tgMintMeltBalance))
-                return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
 
             //Check that all token transactions paid their fees
             if (IsAnyOutputGrouped(tx)) {
@@ -1462,20 +1464,6 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
                     if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
                         return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("NFT mints the wrong amount (%d instead of %d)",
                                     (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
-                    }
-                }
-                // Validate betting mint amount
-                if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) && mintMeltItem.second.output > 0) {
-                    CTokenGroupCreation tgCreation;
-                    if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
-                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
-                    }
-                    CTokenGroupDescriptionBetting *tgDesc = boost::get<CTokenGroupDescriptionBetting>(tgCreation.pTokenGroupDescription.get());
-                    int64_t nMintAmount = (mintMeltItem.second.output - mintMeltItem.second.input);
-                    auto nMintEventId = tgDesc->nEventId;
-                    if (1!=2) {
-                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Betting mints the wrong amount (%d instead of %d)",
-                                    (mintMeltItem.second.output - mintMeltItem.second.input), 1), REJECT_INVALID, "op_group-bad-mint");
                     }
                 }
             }
@@ -2384,7 +2372,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
             std::vector<CScriptCheck> vChecks;
             bool fCacheResults = fJustCheck; /* Don't cache results if we're actually connecting blocks (still consult the cache, though) */
-            if (fScriptChecks && !CheckInputs(*tx, state, view, fScriptChecks, flags, fCacheResults, fCacheResults, txsdata[i], g_parallel_script_checks ? &vChecks : nullptr)) {
+            if (fScriptChecks && !CheckInputs(*tx, state, view, bettingsViewCache, fScriptChecks, flags, fCacheResults, fCacheResults, txsdata[i], g_parallel_script_checks ? &vChecks : nullptr)) {
                 if (state.GetReason() == ValidationInvalidReason::TX_NOT_STANDARD) {
                     // CheckInputs may return NOT_STANDARD for extra flags we passed,
                     // but we can't return that, as it's not defined for a block, so

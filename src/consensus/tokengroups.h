@@ -39,7 +39,7 @@ public:
 };
 
 // Verify that the token groups in this transaction properly balance
-bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance);
+bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance);
 
 bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const CCoinsViewCache& view, const CTokenGroupID tgID);
 bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidationState& state, const CCoinsViewCache& view, CAmount& nCredit, CAmount& nDebit);

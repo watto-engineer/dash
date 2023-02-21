@@ -46,6 +46,7 @@ enum class ValidationInvalidReason {
     TX_PREMATURE_SPEND,       //!< transaction spends a coinbase too early, or violates locktime/sequence locks
     TX_BAD_SPECIAL,           //!< special transaction violates some rules that are not enough for insta-ban
     // Wagerr specific:
+    TX_BAD_BET,
     TX_RESTRICTED_FUNCTIONALITY,
     /**
      * Tx already in mempool or conflicts with a tx in the chain
@@ -66,6 +67,8 @@ inline bool IsTransactionReason(ValidationInvalidReason r)
            r == ValidationInvalidReason::TX_PREMATURE_SPEND ||
            r == ValidationInvalidReason::TX_MISSING_INPUTS ||
            r == ValidationInvalidReason::TX_BAD_SPECIAL ||
+           r == ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY ||
+           r == ValidationInvalidReason::TX_BAD_BET ||
            r == ValidationInvalidReason::TX_CONFLICT ||
            r == ValidationInvalidReason::TX_CONFLICT_LOCK ||
            r == ValidationInvalidReason::TX_MEMPOOL_POLICY;
