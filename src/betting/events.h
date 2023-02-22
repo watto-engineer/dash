@@ -43,7 +43,6 @@ public:
     CBetEvent(const BetEventType type, const uint32_t nEventId) : type(type), nEventId(nEventId) { };
 
     bool IsOpen(const CBettingsView& bettingsViewCache, uint32_t nTime);
-
 };
 
 bool CreateBetEventFromDB(const CBettingsView& bettingsViewCache, const uint32_t nEventId, CBetEvent& event);

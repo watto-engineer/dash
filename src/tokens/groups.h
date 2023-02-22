@@ -285,8 +285,10 @@ public:
 // Return true if an output or any output in this transaction is part of a group
 bool IsOutputGrouped(const CTxOut &txout);
 bool IsOutputGroupedAuthority(const CTxOut &txout);
+bool IsOutputGroupedBet(const CTxOut &txout);
 bool IsAnyOutputGrouped(const CTransaction &tx);
 bool IsAnyOutputGroupedAuthority(const CTransaction &tx);
+bool IsAnyOutputGroupedBet(const CTransaction &tx);
 bool IsAnyOutputGroupedCreation(const CTransaction &tx, const TokenGroupIdFlags tokenGroupIdFlags = TokenGroupIdFlags::NONE);
 bool GetGroupedCreationOutput(const CTransaction &tx, CTxOut &creationOutput, const TokenGroupIdFlags = TokenGroupIdFlags::NONE);
 

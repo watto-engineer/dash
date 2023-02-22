@@ -18,6 +18,7 @@ class CTransaction;
 class CBlock;
 class UniValue;
 class JSONRPCRequest;
+class CBettingTx;
 
 enum WagerrBettingProtocolNr {
     WBP01 = 1,
@@ -31,6 +32,7 @@ enum WagerrBettingProtocolNr {
 bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayoutsIn, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward);
 
 /** Check Betting Tx when try accept tx to memory pool **/
+bool CheckBettingTx(const CBettingsView& bettingsViewCache, const std::unique_ptr<CBettingTx> bettingTx, CAmount betAmount, bool validOracleTx, const int height);
 bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
 
 /** Parse the transaction for betting data **/

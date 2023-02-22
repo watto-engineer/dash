@@ -10,6 +10,8 @@
 #include <script/script.h>
 #include <serialize.h>
 #include <streams.h>
+#include <util/memory.h>
+#include <version.h>
 
 class CTxOut;
 class CTransaction;
@@ -47,6 +49,7 @@ typedef enum BetTxTypes{
     fParlayBetTxType         = 0x14,  // Field parlay bet transaction type identifier.
     fUpdateMarginTxType      = 0x15,  // Field event update margin transaction type identifier
     fUpdateModifiersTxType   = 0x16,  // Field event update modifiers transaction type identifier.
+    unknownBetTxType         = 0xff,
 } BetTxTypes;
 
 bool HasOpReturnOutput(const CTransaction &tx);
@@ -576,6 +579,22 @@ public:
         READWRITE(obj.vEventIds);
     }
 };
+
+template<typename BettingTxTypeName>
+std::unique_ptr<BettingTxTypeName> DeserializeBettingTx(CDataStream &ss)
+{
+    BettingTxTypeName bettingTx;
+    if (ss.size() < ::GetSerializeSize(bettingTx, PROTOCOL_VERSION))
+        return nullptr;
+    ss >> bettingTx;
+    // check buffer stream is empty after deserialization
+    if (!ss.empty())
+        return nullptr;
+    else
+        return MakeUnique<BettingTxTypeName>(bettingTx);
+}
+
+std::unique_ptr<CBettingTx> DeserializeBettingTxFromType(CDataStream& ss, BetTxTypes type);
 
 std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut);
 

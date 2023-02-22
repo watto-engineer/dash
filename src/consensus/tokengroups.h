@@ -12,6 +12,7 @@
 #include "tokens/groups.h"
 #include <unordered_map>
 
+class CBlockIndex;
 class CCoinsViewCache;
 
 /** Transaction cannot be committed on my fork */
@@ -40,6 +41,7 @@ public:
 
 // Verify that the token groups in this transaction properly balance
 bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance);
+bool CheckTokens(const CTransactionRef &tx, CValidationState &state, const CCoinsViewCache &view, const int nHeight, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance);
 
 bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const CCoinsViewCache& view, const CTokenGroupID tgID);
 bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidationState& state, const CCoinsViewCache& view, CAmount& nCredit, CAmount& nDebit);

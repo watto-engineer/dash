@@ -725,6 +725,24 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
             return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
         }
 
+        CAmount nWagerrIn, nWagerrOut;
+        std::unordered_map<CTokenGroupID, CTokenGroupBalance> gBalance;
+        if (!CheckTokens(ptx, state, view, ::ChainActive().Height(), nWagerrIn, nWagerrOut, gBalance)) {
+            return false;
+        }
+        std::shared_ptr<RegularBetMintRequest> regularBetMintRequest;
+        if (!GetBetMintRequest(ptx, state, bettingsViewCache, nWagerrIn - nWagerrOut, gBalance, regularBetMintRequest)) {
+            return false;
+        }
+        /*
+        if (!ValidateRegularBetMintRequest(bettingsViewCache)) {
+            return false;
+        }
+        */
+        if (regularBetMintRequest) {
+            nFees -= regularBetMintRequest->GetBetCosts();
+        }
+
         // Check for non-standard pay-to-script-hash in inputs
         if (fRequireStandard && !AreInputsStandard(tx, view))
             return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "bad-txns-nonstandard-inputs");
@@ -839,12 +857,12 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         }
 
 
-        if (!CheckBetMints(tx, state, view, bettingsViewCache))
-            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
-
         if (!CheckBettingTx(view, bettingsViewCache, tx, ::ChainActive().Height())) {
             return error("AcceptToMemoryPool: Error when betting TX checking!");
         }
+
+        if (regularBetMintRequest && !regularBetMintRequest->Validate(state, bettingsViewCache, ::ChainActive().Height()))
+            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
 
         if (test_accept) {
             // Tx was accepted, but not added
@@ -1430,45 +1448,6 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::local_time();
     if (!tx.IsCoinBase() && !tx.HasZerocoinSpendInputs())
     {
-        if ((unsigned int)::ChainActive().Tip()->nHeight >= Params().GetConsensus().ATPStartHeight) {
-            std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
-            CAmount nWagerrIn, nWagerrOut;
-            CBlockIndex* pindexPrev = LookupBlockIndex(inputs.GetBestBlock());
-            if (!pindexPrev)
-                return state.Invalid(ValidationInvalidReason::TX_CONFLICT, error("Inputs unavailable"), REJECT_INVALID, "tx-no-index");
-            if (!CheckTokenGroups(tx, state, inputs, nWagerrIn, nWagerrOut, tgMintMeltBalance))
-                return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
-
-            //Check that all token transactions paid their fees
-            if (IsAnyOutputGrouped(tx)) {
-                if (!tokenGroupManager.get()->CheckFees(tx, tgMintMeltBalance, state, pindexPrev)) {
-                    return state.Invalid(ValidationInvalidReason::TX_MEMPOOL_POLICY, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
-                }
-                if (!tokenGroupManager.get()->ManagementTokensCreated()){
-                    for (const CTxOut &txout : tx.vout)
-                    {
-                        CTokenGroupInfo grp(txout.scriptPubKey);
-                        if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
-                            return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
-                        }
-                    }
-                }
-            }
-            for (std::pair<CTokenGroupID, CTokenGroupBalance> mintMeltItem : tgMintMeltBalance) {
-                if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && mintMeltItem.second.output > 0) {
-                    CTokenGroupCreation tgCreation;
-                    if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
-                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
-                    }
-                    CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(tgCreation.pTokenGroupDescription.get());
-                    if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
-                        return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("NFT mints the wrong amount (%d instead of %d)",
-                                    (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
-                    }
-                }
-            }
-        }
-
         if (pvChecks)
             pvChecks->reserve(tx.vin.size());
 
@@ -2280,6 +2259,18 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
                               state.GetRejectCode(), state.GetRejectReason(), state.GetDebugMessage());
                 }
                 return error("%s: Consensus::CheckTxInputs: %s, %s", __func__, tx->GetHash().ToString(), FormatStateMessage(state));
+            }
+            CAmount nWagerrIn, nWagerrOut;
+            std::unordered_map<CTokenGroupID, CTokenGroupBalance> gBalance;
+            if (!CheckTokens(tx, state, view, pindex->nHeight, nWagerrIn, nWagerrOut, gBalance)) {
+                return false;
+            }
+            std::shared_ptr<RegularBetMintRequest> regularBetMintRequest;
+            if (!GetBetMintRequest(tx, state, bettingsViewCache, nWagerrIn - nWagerrOut, gBalance, regularBetMintRequest)) {
+                return false;
+            }
+            if (regularBetMintRequest) {
+                txfee -= regularBetMintRequest->GetBetCosts();
             }
             nFees += txfee;
             if (!MoneyRange(nFees)) {

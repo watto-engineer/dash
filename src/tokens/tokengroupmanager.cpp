@@ -301,7 +301,7 @@ std::string CTokenGroupManager::TokenValueFromAmount(const CAmount& amount, cons
     }
 }
 
-bool CTokenGroupManager::CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex) {
+bool CTokenGroupManager::CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state) {
     if (!tgMGTCreation) return true;
     // A token group creation costs 5x the standard TX fee
     // A token mint transaction costs 2x the standard TX fee

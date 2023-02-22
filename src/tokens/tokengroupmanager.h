@@ -73,7 +73,7 @@ public:
     CAmount AmountFromTokenValue(const UniValue& value, const CTokenGroupID& tgID);
     std::string TokenValueFromAmount(const CAmount& amount, const CTokenGroupID& tgID);
 
-    bool CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state, const CBlockIndex* pindex);
+    bool CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state);
 
     bool CollectTokensFromBlock(const CBlock& block, const CBlockIndex* pindex, CValidationState& _state, const CCoinsViewCache& view, bool fJustCheck);
     void ApplyTokensFromBlock();

@@ -60,9 +60,15 @@ bool IsOutputGrouped(const CTxOut &txout) {
 
 bool IsOutputGroupedAuthority(const CTxOut &txout) {
     CTokenGroupInfo grp(txout.scriptPubKey);
-    if (grp.invalid)
-        return true;
     if (grp.associatedGroup != NoGroup && grp.isAuthority())
+        return true;
+
+    return false;
+}
+
+bool IsOutputGroupedBet(const CTxOut &txout) {
+    CTokenGroupInfo grp(txout.scriptPubKey);
+    if (grp.associatedGroup != NoGroup && grp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN))
         return true;
 
     return false;
@@ -84,6 +90,17 @@ bool IsAnyOutputGroupedAuthority(const CTransaction &tx) {
     for (const CTxOut &txout : tx.vout)
     {
         if (IsOutputGroupedAuthority(txout)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool IsAnyOutputGroupedBet(const CTransaction &tx) {
+    for (const CTxOut &txout : tx.vout)
+    {
+        if (IsOutputGroupedBet(txout)) {
             return true;
         }
     }
@@ -340,6 +357,14 @@ std::string CTokenGroupID::encodeFlags() const {
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::STICKY_MELT)) {
         if (sflags != "") sflags += " ";
         sflags += "sticky_melt";
+    }
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::BETTING_TOKEN)) {
+        if (sflags != "") sflags += " ";
+        sflags += "betting";
+    }
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::PARLAY_TOKEN)) {
+        if (sflags != "") sflags += " ";
+        sflags += "betting";
     }
     return sflags;
 }

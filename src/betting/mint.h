@@ -6,6 +6,7 @@
 #define WAGERR_BET_TOKEN_MINT_H
 
 #include <amount.h>
+#include <betting/events.h>
 #include <consensus/tokengroups.h>
 #include <primitives/transaction.h>
 #include <tokens/groups.h>
@@ -20,38 +21,42 @@ class CValidationState;
 class RegularBetMintRequest {
 private:
     CTransactionRef tx;
+    CBetEvent betEvent;
+    std::vector<unsigned char> betData;
+    CAmount nBetCosts = 0;
     CTokenGroupID tgID;
-    CTokenGroupBalance tgMintMeltBalanceItem;
     CTokenGroupCreation tgCreation;
-    CAmount nWagerrIn = 0;
-    CAmount nWagerrOut = 0;
-    CAmount nWagerrSpent = 0;
-    uint32_t nEventID = 0;
-
-    // Calculated by SetBetCosts() (after event updates are processed)
-    CAmount nWagerrBetCosts = 0;
-    CAmount nWagerrFees = 0;
+    CTokenGroupBalance tgMintMeltBalanceItem;
 
     bool isValid = false;
 public:
 
     RegularBetMintRequest() {};
 
-    RegularBetMintRequest(const CAmount nWagerrIn, const CAmount nWagerrOut, const uint32_t nEventID, const CTokenGroupID& tgID, const CTokenGroupBalance& tgMintMeltBalanceItem) :
-        tx(tx), nWagerrIn(nWagerrIn), nWagerrOut(nWagerrOut), nWagerrSpent(nWagerrIn - nWagerrOut), nEventID(nEventID), tgID(tgID), tgCreation(tgCreation)
-    {};
+    RegularBetMintRequest(const CTransactionRef& tx, const uint32_t nEventID, const CAmount nWGRSpent, const CTokenGroupID& tgID, const CTokenGroupCreation& tgCreation, const CTokenGroupBalance& tgMintMeltBalanceItem) :
+        tx(tx), betEvent(betEvent), nBetCosts(nWGRSpent), tgID(tgID), tgCreation(tgCreation), tgMintMeltBalanceItem(tgMintMeltBalanceItem)
+    {
+        betData = tgID.GetSubGroupData();
+    };
 
     CTokenGroupDescriptionBetting* GetTokenGroupDescription();
 
-    bool SetBetCosts(const CBettingsView& bettingsViewCache);
-    void Validate();
+    template<typename BettingTxTypeName>
+    std::unique_ptr<BettingTxTypeName> GetBettingTx();
+
+    bool GetOdds(const CBettingsView& bettingsViewCache, uint32_t& nOdds);
+
+    CAmount GetBetCosts() { return nBetCosts; };
+    bool ValidateBetCosts(const CBettingsView& bettingsViewCache);
+    bool Validate(CValidationState &state, const CBettingsView& bettingsViewCache, const int nHeight);
     bool IsValid() {
         return isValid;
     }
 };
 
-bool CreateRegularBetMintRequest(const CTransactionRef& tx,  CValidationState &state, const CAmount nWagerrIn, const CAmount nWagerrOut, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, RegularBetMintRequest& req);
+bool CreateRegularBetMintRequest(const CTransactionRef& tx,  CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, RegularBetMintRequest& req);
 
-bool CheckBetMints(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CBettingsView& bettingsViewCache);
+bool CheckBetMints(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CAmount nWagerrIn, const CAmount nWagerrOut, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance);
+bool GetBetMintRequest(const CTransactionRef& tx, CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, std::shared_ptr<RegularBetMintRequest>& regularBetMintRequest);
 
 #endif // WAGERR_BET_TOKEN_MINT_H

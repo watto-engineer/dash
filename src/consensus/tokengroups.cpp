@@ -4,6 +4,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <clientversion.h>
+#include <chain.h>
 #include "coins.h"
 #include "consensus/tokengroups.h"
 #include "key_io.h"
@@ -14,6 +15,7 @@
 #include "rpc/server.h"
 #include <streams.h>
 #include "tokens/tokengroupmanager.h"
+#include <util/system.h>
 
 bool AnyInputsGrouped(const CTransaction &transaction, const int nHeight, const CCoinsViewCache& view, const CTokenGroupID tgID) {
     bool anyInputsGrouped = false;
@@ -76,10 +78,6 @@ bool IsMGTInput(CScript script) {
 
 bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCoinsViewCache &view, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance)
 {
-    nWagerrIn = 0;
-    nWagerrOut = 0;
-    gBalance.clear();
-
     // Tokens minted from the tokenGroupManagement address can create management tokens
     bool anyInputsGroupManagement = false;
 
@@ -401,6 +399,50 @@ bool GetTokenBalance(const CTransaction& tx, const CTokenGroupID& tgID, CValidat
             continue;
 
         nDebit += tokenGrp.quantity;
+    }
+    return true;
+}
+
+// Verify that the token balance rules are observed and return token transactions
+bool CheckTokens(const CTransactionRef &tx, CValidationState &state, const CCoinsViewCache &view, const int nHeight, CAmount& nWagerrIn, CAmount& nWagerrOut, std::unordered_map<CTokenGroupID, CTokenGroupBalance>& gBalance) {
+    nWagerrIn = 0;
+    nWagerrOut = 0;
+    gBalance.clear();
+
+    if ((unsigned int)nHeight >= Params().GetConsensus().ATPStartHeight) {
+        std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
+        CAmount nWagerrIn, nWagerrOut;
+        if (!CheckTokenGroups(*tx, state, view, nWagerrIn, nWagerrOut, tgMintMeltBalance))
+            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
+
+        //Check that all token transactions paid their fees
+        if (IsAnyOutputGrouped(*tx)) {
+            if (!tokenGroupManager.get()->CheckFees(*tx, tgMintMeltBalance, state)) {
+                return state.Invalid(ValidationInvalidReason::TX_MEMPOOL_POLICY, error("Token transaction does not pay enough XDM fees"), REJECT_MALFORMED, "token-group-imbalance");
+            }
+            if (!tokenGroupManager.get()->ManagementTokensCreated()){
+                for (const CTxOut &txout : tx->vout)
+                {
+                    CTokenGroupInfo grp(txout.scriptPubKey);
+                    if ((grp.invalid || grp.associatedGroup != NoGroup) && !grp.associatedGroup.hasFlag(TokenGroupIdFlags::MGT_TOKEN)) {
+                        return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false, REJECT_NONSTANDARD, "op_group-before-mgt-tokens");
+                    }
+                }
+            }
+        }
+        for (std::pair<CTokenGroupID, CTokenGroupBalance> mintMeltItem : tgMintMeltBalance) {
+            if (mintMeltItem.first.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && mintMeltItem.second.output > 0) {
+                CTokenGroupCreation tgCreation;
+                if (!tokenGroupManager.get()->GetTokenGroupCreation(mintMeltItem.first, tgCreation)) {
+                    return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("Unable to find token group %s", EncodeTokenGroup(mintMeltItem.first)), REJECT_INVALID, "op_group-bad-mint");
+                }
+                CTokenGroupDescriptionNFT *tgDesc = boost::get<CTokenGroupDescriptionNFT>(tgCreation.pTokenGroupDescription.get());
+                if (tgDesc->nMintAmount != (mintMeltItem.second.output - mintMeltItem.second.input)) {
+                    return state.Invalid(ValidationInvalidReason::TX_BAD_SPECIAL, error("NFT mints the wrong amount (%d instead of %d)",
+                                (mintMeltItem.second.output - mintMeltItem.second.input), tgDesc->nMintAmount), REJECT_INVALID, "op_group-bad-mint");
+                }
+            }
+        }
     }
     return true;
 }

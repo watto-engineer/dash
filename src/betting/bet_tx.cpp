@@ -4,9 +4,6 @@
 
 #include <betting/bet_tx.h>
 #include <betting/bet_common.h>
-#include <streams.h>
-#include <util/memory.h>
-#include <version.h>
 
 bool HasOpReturnOutput(const CTransaction &tx) {
     for (size_t i = 0; i < tx.vout.size(); i++) {
@@ -16,20 +13,6 @@ bool HasOpReturnOutput(const CTransaction &tx) {
         }
     }
     return false;
-}
-
-template<typename BettingTxTypeName>
-std::unique_ptr<CBettingTx> DeserializeBettingTx(CDataStream &ss)
-{
-    BettingTxTypeName bettingTx;
-    if (ss.size() < ::GetSerializeSize(bettingTx, PROTOCOL_VERSION))
-        return nullptr;
-    ss >> bettingTx;
-    // check buffer stream is empty after deserialization
-    if (!ss.empty())
-        return nullptr;
-    else
-        return MakeUnique<BettingTxTypeName>(bettingTx);
 }
 
 std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
@@ -59,9 +42,13 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
     if (header.prefix != BTX_PREFIX ||
             header.version != BetTxVersion_CURRENT)
         return nullptr;
+    
+    return DeserializeBettingTxFromType(ss, (BetTxTypes) header.txType);
+}
 
+std::unique_ptr<CBettingTx> DeserializeBettingTxFromType(CDataStream& ss, BetTxTypes type) {
     // deserialize opcode data to tx classes
-    switch ((BetTxTypes) header.txType)
+    switch (type)
     {
         case mappingTxType:
             return DeserializeBettingTx<CMappingTx>(ss);
