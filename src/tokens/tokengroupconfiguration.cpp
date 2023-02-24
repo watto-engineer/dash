@@ -61,7 +61,6 @@ bool CTokenGroupCreation::ValidateDescription() {
 template <typename T>
 void TGFilterTickerCharacters(T& tgDesc) {
     std::regex regexTicker("^[a-zA-Z0-9]+$"); // only letters and numbers
-    std::regex regexUrl(R"((https?|ftp)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
 
@@ -92,7 +91,7 @@ template void TGFilterNameCharacters(CTokenGroupDescriptionNFT& tgDesc);
 
 template <typename T>
 void TGFilterURLCharacters(T& tgDesc) {
-    std::regex regexUrl(R"((http?|ftp|wagerr)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
+    std::regex regexUrl(R"((https?|ftp|wagerr)://(-\.)?([^\s/?\.#-]+\.?)+(/[^\s]*)?$)");
 
     std::smatch matchResult;
 
