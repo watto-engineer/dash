@@ -981,8 +981,8 @@ public:
         consensus.fPowNoRetargeting = true;
 
         // Other
-        consensus.nMaturityV1 = 100;
-        consensus.nMaturityV2 = 60;
+        consensus.nMaturityV1 = 10;
+        consensus.nMaturityV2 = 4;
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
         // By default assume that the signatures in ancestors of this block are valid.
@@ -992,7 +992,7 @@ public:
         consensus.nWagerrProtocolV1StartHeight = 251; // Betting protocol v1 activation block
         consensus.nWagerrProtocolV2StartHeight = 251; // Betting protocol v2 activation block
         consensus.nWagerrProtocolV3StartHeight = 300; // Betting protocol v3 activation block
-        consensus.nWagerrProtocolV4StartHeight = 500; // Betting protocol v4 activation block
+        consensus.nWagerrProtocolV4StartHeight = 400; // Betting protocol v4 activation block
         consensus.nWagerrProtocolV5StartHeight = 500; // Betting protocol v5 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight; // Reduced block maturity required for spending coinstakes and betting payouts
