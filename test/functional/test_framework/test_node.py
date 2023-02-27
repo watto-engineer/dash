@@ -276,9 +276,9 @@ class TestNode():
             time.sleep(1.0 / poll_per_s)
         self._raise_assertion_error("Unable to connect to wagerrd")
 
-    def generate(self, nblocks):
-        self.log.debug("TestNode.generate() dispatches `generate` call to `generatetoaddress`")
-        return self.generate(nblocks=nblocks)
+    #def generate(self, nblocks):
+    #    self.log.debug("TestNode.generate() dispatches `generate` call to `generatetoaddress`")
+    #    return self.generate(nblocks=nblocks)
 
     def get_wallet_rpc(self, wallet_name):
         if self.use_cli:
