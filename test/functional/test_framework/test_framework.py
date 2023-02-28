@@ -413,7 +413,6 @@ class WagerrTestFramework(metaclass=WagerrTestMetaClass):
             except JSONRPCException as e:
                 assert str(e).startswith('Method not found')
                 continue
-            breakpoint()
             #n.importprivkey(privkey=n.get_deterministic_priv_key().key, label='coinbase')
 
     def run_test(self):
