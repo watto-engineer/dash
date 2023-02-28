@@ -5,7 +5,7 @@
 
 from test_framework.betting_opcode import *
 from test_framework.authproxy import JSONRPCException
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error, sync_blocks
 from distutils.dir_util import copy_tree, remove_tree
 from decimal import *
@@ -61,7 +61,7 @@ def make_field_odds(probability_percent):
         return 0
     return int((1 / (probability_percent / 100)) * ODDS_DIVISOR)
 
-class HybridBettingTest(BitcoinTestFramework):
+class HybridBettingTest(WagerrTestFramework):
     def get_node_setting(self, node_index, setting_name):
         with open(os.path.join(self.nodes[node_index].datadir, "wagerr.conf"), 'r', encoding='utf8') as f:
             for line in f:
