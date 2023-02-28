@@ -56,8 +56,6 @@ class AddressIndexTest(WagerrTestFramework):
         mining_address = self.nodes[0].getnewaddress()
         sendto_address = self.nodes[1].getnewaddress()
         self.nodes[0].generate(105)
-        for n in range(self.num_nodes):
-            self.restart_node(n)
         connect_nodes(self.nodes[0], 1)
         connect_nodes(self.nodes[0], 2)
         connect_nodes(self.nodes[0], 3)
