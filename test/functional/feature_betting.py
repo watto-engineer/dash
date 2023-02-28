@@ -214,7 +214,7 @@ class BettingTest(WagerrTestFramework):
         # add sports to mapping
         for id in range(len(sport_names)):
             mapping_opcode = make_mapping(SPORT_MAPPING, id, sport_names[id])
-            self.node[1].settxfee(0.0003160)
+            self.nodes[1].settxfee(0.0003160)
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
 
         # generate block for unlocking used Oracle's UTXO
