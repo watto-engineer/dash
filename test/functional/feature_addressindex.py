@@ -73,6 +73,7 @@ class AddressIndexTest(WagerrTestFramework):
         balance0 = self.nodes[1].getaddressbalance(sendto_address)
         balance_mining = self.nodes[1].getaddressbalance(mining_address)
         assert_equal(balance0["balance"], 0)
+        breakpoint
         assert_equal(balance_mining["balance"], 947940000 * COIN)
         assert_equal(balance_mining["balance_immature"], 150000 * COIN)
         assert_equal(balance_mining["balance_spendable"], 947790000 * COIN)
