@@ -51,6 +51,7 @@ from .util import (
     set_node_times,
     set_timeout_scale,
     satoshi_round,
+    sync_blocks,
     wait_until,
     get_chain_folder,
 )
