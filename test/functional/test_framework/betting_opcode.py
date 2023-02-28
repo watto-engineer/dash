@@ -245,7 +245,7 @@ def post_opcode(node, opcode, address):
     change = float(spend)
     # Create the output JSON
     outputs = {address: change, 'data': opcode}
-    node.settxfee('0.00003160')
+    node.settxfee('0.00031600')
     # Create the raw transaction.
     trx = node.createrawtransaction(inputs, outputs)
     # Sign the raw transaction.
