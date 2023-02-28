@@ -69,7 +69,22 @@ bool IsParlayBetMintRequest(const CAmount nWGRSpent, const std::unordered_map<CT
     return true;
 }
 
-bool CheckBetMints(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance) {
+// A bet mint must not include fees
+bool GetBetMintRequest(const CTransactionRef& tx, CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, std::shared_ptr<RegularBetMintRequest>& regularBetMintRequest) {
+    // If there are any bet token mints, the tx must be validated
+    regularBetMintRequest = nullptr;
+    if (!BetTokensMinted(tgMintMeltBalance)) return true;
+
+    if (IsRegularBetMintRequest(nWGRSpent, tgMintMeltBalance)) {
+        // Validate regular bet
+        RegularBetMintRequest req;
+        if (!CreateRegularBetMintRequest(tx, state, bettingsViewCache, nWGRSpent, tgMintMeltBalance, req)) {
+            return false;
+        }
+        regularBetMintRequest = std::make_shared<RegularBetMintRequest>(req);
+    } else if (IsParlayBetMintRequest(nWGRSpent, tgMintMeltBalance)) {
+        return state.Invalid(ValidationInvalidReason::TX_BAD_BET, error("Not yet implemented"), REJECT_INVALID, "op_group-bad-mint");
+    }
     return state.Invalid(ValidationInvalidReason::TX_BAD_BET, error("No valid bet mint transaction found"), REJECT_INVALID, "op_group-bad-mint");
 }
 
@@ -78,11 +93,6 @@ CTokenGroupDescriptionBetting* RegularBetMintRequest::GetTokenGroupDescription()
         return nullptr;
     CTokenGroupDescriptionBetting *tgDesc = boost::get<CTokenGroupDescriptionBetting>(tgCreation.pTokenGroupDescription.get());
     return tgDesc;
-}
-
-bool RegularBetMintRequest::ValidateBetCosts(const CBettingsView& bettingsViewCache) {
-
-    return false;
 }
 
 template<typename BettingTxTypeName>
@@ -135,23 +145,4 @@ bool RegularBetMintRequest::Validate(CValidationState &state, const CBettingsVie
     
 
     return IsValid();
-}
-
-// A bet mint must not include fees
-bool GetBetMintRequest(const CTransactionRef& tx, CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, std::shared_ptr<RegularBetMintRequest>& regularBetMintRequest) {
-    // If there are any bet token mints, the tx must be validated
-    regularBetMintRequest = nullptr;
-    if (!BetTokensMinted(tgMintMeltBalance)) return true;
-
-    if (IsRegularBetMintRequest(nWGRSpent, tgMintMeltBalance)) {
-        // Validate regular bet
-        RegularBetMintRequest req;
-        if (!CreateRegularBetMintRequest(tx, state, bettingsViewCache, nWGRSpent, tgMintMeltBalance, req)) {
-            return false;
-        }
-        regularBetMintRequest = std::make_shared<RegularBetMintRequest>(req);
-    } else if (IsParlayBetMintRequest(nWGRSpent, tgMintMeltBalance)) {
-        return state.Invalid(ValidationInvalidReason::TX_BAD_BET, error("Not yet implemented"), REJECT_INVALID, "op_group-bad-mint");
-    }
-    return state.Invalid(ValidationInvalidReason::TX_BAD_BET, error("No valid bet mint transaction found"), REJECT_INVALID, "op_group-bad-mint");
 }

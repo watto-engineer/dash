@@ -2235,6 +2235,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     {
         const CTransactionRef tx = block.vtx[i];
         const uint256 txhash = tx->GetHash();
+        std::shared_ptr<RegularBetMintRequest> regularBetMintRequest;
 
         nInputs += tx->vin.size();
 
@@ -2265,7 +2266,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             if (!CheckTokens(tx, state, view, pindex->nHeight, nWagerrIn, nWagerrOut, gBalance)) {
                 return false;
             }
-            std::shared_ptr<RegularBetMintRequest> regularBetMintRequest;
             if (!GetBetMintRequest(tx, state, bettingsViewCache, nWagerrIn - nWagerrOut, gBalance, regularBetMintRequest)) {
                 return false;
             }
@@ -2384,9 +2384,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
                 LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
             } else  {
+            CheckBettingTx(view, bettingsViewCache, *tx, pindex->nHeight);
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, error("ConnectBlock() : error when betting TX checking"), REJECT_INVALID, "bad-tx-bet");
             }
         }
+        if (regularBetMintRequest && !regularBetMintRequest->Validate(state, bettingsViewCache, ::ChainActive().Height()))
+            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
 
         if (fAddressIndex) {
             for (unsigned int k = 0; k < tx->vout.size(); k++) {

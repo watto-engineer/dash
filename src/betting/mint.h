@@ -47,16 +47,14 @@ public:
     bool GetOdds(const CBettingsView& bettingsViewCache, uint32_t& nOdds);
 
     CAmount GetBetCosts() { return nBetCosts; };
-    bool ValidateBetCosts(const CBettingsView& bettingsViewCache);
     bool Validate(CValidationState &state, const CBettingsView& bettingsViewCache, const int nHeight);
     bool IsValid() {
         return isValid;
     }
 };
 
-bool CreateRegularBetMintRequest(const CTransactionRef& tx,  CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, RegularBetMintRequest& req);
+bool CreateRegularBetMintRequest(const CTransactionRef& tx, CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, RegularBetMintRequest& req);
 
-bool CheckBetMints(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, const CAmount nWagerrIn, const CAmount nWagerrOut, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance);
 bool GetBetMintRequest(const CTransactionRef& tx, CValidationState &state, const CBettingsView& bettingsViewCache, const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, std::shared_ptr<RegularBetMintRequest>& regularBetMintRequest);
 
 #endif // WAGERR_BET_TOKEN_MINT_H
