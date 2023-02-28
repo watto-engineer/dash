@@ -241,6 +241,7 @@ def get_utxo_list(node, address, min_amount=WGR_TX_FEE):
 def post_opcode(node, opcode, address):
     # Get unspent outputs to use as inputs (spend).
     inputs, spend = get_utxo_list(node, address)
+    node.settxfee(0.0003160)
     # Calculate the change by subtracting the transaction fee from the UTXO's value.
     change = float(spend)
     # Create the output JSON
