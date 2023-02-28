@@ -175,10 +175,19 @@ bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCach
                     uint256 hashBlock;
                     CTxDestination address;
                     CTransactionRef txPrev = GetTransaction(nullptr, nullptr,  txin.prevout.hash, Params().GetConsensus(), hashBlock, true);
-                    if (!txPrev || !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, address)) {
-                        return false;
+                    if (txPrev) {
+                        if (!ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, address)) {
+                            LogPrintf("%s - Unable to get address for %s in %s\n", __func__, HexStr(txPrev->vout[txin.prevout.n].scriptPubKey), txin.prevout.hash.ToString());
+                            return false;
+                        }
+                        fValidOracle = IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height);
+                    } else {
+                        const Coin& coin = view.AccessCoin(txin.prevout);
+                        fValidOracle = IsValidOraclePrevTxOut(coin.out, height);
+                        if (!fValidOracle) {
+                            LogPrintf("%s - Invalid oracle tx %s at height %d\n", __func__, txin.prevout.hash.ToString(), coin.nHeight);
+                        }
                     }
-                    fValidOracle = IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height);
                     break;
                 }
                 default:
@@ -756,13 +765,17 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
         if (!txPrev || !ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
             for (const auto& blockTx : block.vtx) {
                 if (blockTx->GetHash() == txin.prevout.hash) {
-                    if (!ExtractDestination(blockTx->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
-                        return;
-                    } else {
-                        txPrev = blockTx;
-                        break;
-                    }
+                    txPrev = blockTx;
+                    break;
                 }
+            }
+            if (!txPrev) {
+                const Coin& coin = view.AccessCoin(txin.prevout);
+                if (!ExtractDestination(coin.out.scriptPubKey, prevAddr)) {
+                    return;
+                }
+            } else if (!ExtractDestination(txPrev->vout[txin.prevout.n].scriptPubKey, prevAddr)) {
+                return;
             }
         }
         address = prevAddr;
