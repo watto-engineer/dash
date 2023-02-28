@@ -179,6 +179,7 @@ bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCach
                         return false;
                     }
                     fValidOracle = IsValidOraclePrevTxOut(txPrev->vout[txin.prevout.n], height);
+                    break;
                 }
                 default:
                 {
@@ -727,7 +728,7 @@ bool CheckBettingTx(const CBettingsView& bettingsViewCache, const std::unique_pt
             }
         }
     }
-    return false;
+    return true;
 }
 
 void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const CBlockIndex* pindex, const CBlock &block, const bool wagerrProtocolV3)
