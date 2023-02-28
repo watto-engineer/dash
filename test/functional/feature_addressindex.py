@@ -62,7 +62,7 @@ class AddressIndexTest(WagerrTestFramework):
         connect_nodes(self.nodes[0], 2)
         disconnect_nodes(self.nodes[0], 3)
         connect_nodes(self.nodes[0], 3)
-        #self.sync_all()
+        self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
         assert_equal(chain_height, 105)
