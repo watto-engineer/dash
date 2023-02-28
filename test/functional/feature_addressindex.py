@@ -56,6 +56,7 @@ class AddressIndexTest(WagerrTestFramework):
         mining_address = self.nodes[0].getnewaddress()
         sendto_address = self.nodes[1].getnewaddress()
         self.nodes[0].generate(105)
+        self.nodes[0].restart()
         self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
