@@ -435,11 +435,46 @@ class WagerrTestFramework(metaclass=WagerrTestMetaClass):
 
     # Public helper methods. These can be accessed by the subclass test scripts.
 
-    def add_nodes(self, num_nodes, extra_args=None, *, rpchost=None, binary=None):
-        """Instantiate TestNode objects.
+#    def add_nodes(self, num_nodes, extra_args=None, *, rpchost=None, binary=None):
+#        """Instantiate TestNode objects.
+#
+    #    Should only be called once after the nodes have been specified in
+    #    set_test_params()."""
+    #    if self.bind_to_localhost_only:
+    #        extra_confs = [["bind=127.0.0.1"]] * num_nodes
+    #    else:
+    #        extra_confs = [[]] * num_nodes
+    #    if extra_args is None:
+    #        extra_args = [[]] * num_nodes
+    #    if binary is None:
+    #        binary = [self.options.bitcoind] * num_nodes
+    #    assert_equal(len(extra_confs), num_nodes)
+    #    assert_equal(len(extra_args), num_nodes)
+    #    assert_equal(len(binary), num_nodes)
+    #    old_num_nodes = len(self.nodes)
+    #    for i in range(num_nodes):
+    #        self.nodes.append(TestNode(
+    #            old_num_nodes + i,
+    #            get_datadir_path(self.options.tmpdir, old_num_nodes + i),
+    #            self.extra_args_from_options,
+    #            chain=self.chain,
+    #            rpchost=rpchost,
+    #            timewait=self.rpc_timeout,
+    #            timeout_factor=self.options.timeout_factor,
+    #            bitcoind=binary[i],
+    #            bitcoin_cli=self.options.bitcoincli,
+    #            mocktime=self.mocktime,
+    #            coverage_dir=self.options.coveragedir,
+    #            cwd=self.options.tmpdir,
+    #            extra_conf=extra_confs[i],
+    #            extra_args=extra_args[i],
+    #            use_cli=self.options.usecli,
+    #            start_perf=self.options.perf,
+    #            use_valgrind=self.options.valgrind,
+    #        ))
 
-        Should only be called once after the nodes have been specified in
-        set_test_params()."""
+    def add_nodes(self, num_nodes, extra_args=None, rpchost=None, timewait=None, binary=None, stderr=None):
+        """Instantiate TestNode objects"""
         if self.bind_to_localhost_only:
             extra_confs = [["bind=127.0.0.1"]] * num_nodes
         else:
@@ -453,25 +488,7 @@ class WagerrTestFramework(metaclass=WagerrTestMetaClass):
         assert_equal(len(binary), num_nodes)
         old_num_nodes = len(self.nodes)
         for i in range(num_nodes):
-            self.nodes.append(TestNode(
-                old_num_nodes + i,
-                get_datadir_path(self.options.tmpdir, old_num_nodes + i),
-                self.extra_args_from_options,
-                chain=self.chain,
-                rpchost=rpchost,
-                timewait=self.rpc_timeout,
-                timeout_factor=self.options.timeout_factor,
-                bitcoind=binary[i],
-                bitcoin_cli=self.options.bitcoincli,
-                mocktime=self.mocktime,
-                coverage_dir=self.options.coveragedir,
-                cwd=self.options.tmpdir,
-                extra_conf=extra_confs[i],
-                extra_args=extra_args[i],
-                use_cli=self.options.usecli,
-                start_perf=self.options.perf,
-                use_valgrind=self.options.valgrind,
-            ))
+            self.nodes.append(TestNode(old_num_nodes + i, get_datadir_path(self.options.tmpdir, old_num_nodes + i), self.extra_args_from_options, chain=self.chain, rpchost=rpchost, timewait=timewait, bitcoind=binary[i], bitcoin_cli=self.options.bitcoincli, stderr=stderr, mocktime=self.mocktime, coverage_dir=self.options.coveragedir, extra_conf=extra_confs[i], extra_args=extra_args[i], use_cli=self.options.usecli))
 
     def start_node(self, i, *args, **kwargs):
         """Start a wagerrd"""
