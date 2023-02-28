@@ -5,7 +5,7 @@ import os
 import struct
 import subprocess
 from test_framework.util import bytes_to_hex_str
-from test_framework.mininode import COIN
+from test_framework.messages import COIN
 
 OPCODE_PREFIX = 42
 
