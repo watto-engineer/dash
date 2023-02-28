@@ -13,7 +13,7 @@ from test_framework.messages import COIN, COutPoint, CTransaction, CTxIn, CTxOut
 from test_framework.test_framework import WagerrTestFramework
 from test_framework.test_node import ErrorMatch
 from test_framework.script import CScript, OP_CHECKSIG, OP_DUP, OP_EQUAL, OP_EQUALVERIFY, OP_HASH160
-from test_framework.util import assert_equal, connect_nodes
+from test_framework.util import assert_equal, connect_nodes, connect_nodes_bi
 
 class AddressIndexTest(WagerrTestFramework):
 
@@ -56,8 +56,12 @@ class AddressIndexTest(WagerrTestFramework):
         mining_address = self.nodes[0].getnewaddress()
         sendto_address = self.nodes[1].getnewaddress()
         self.nodes[0].generate(105)
-        self.nodes[0].restart()
-        self.sync_all()
+        for n in range(self.num_nodes):
+            self.restart_node(n)
+        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes_bi(self.nodes, 0, 2)
+        connect_nodes_bi(self.nodes, 0, 3)
+        #self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
         assert_equal(chain_height, 105)
