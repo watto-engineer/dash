@@ -383,40 +383,28 @@ class WagerrTestFramework(metaclass=WagerrTestMetaClass):
             connect_nodes(self.nodes[i + 1], i)
         self.sync_all()
 
-    #def setup_nodes(self):
-    #    """Override this method to customize test node setup"""
-    #    extra_args = None
-    #    if hasattr(self, "extra_args"):
-    #        extra_args = self.extra_args
-    #    self.add_nodes(self.num_nodes, extra_args)
-    #    self.start_nodes()
-    #    self.import_deterministic_coinbase_privkeys()
-    #    if not self.setup_clean_chain:
-    #        for n in self.nodes:
-    #            assert_equal(n.getblockchaininfo()["blocks"], 199)
-    #        # To ensure that all nodes are out of IBD, the most recent block
-    #        # must have a timestamp not too old (see IsInitialBlockDownload()).
-    #        self.log.debug('Generate a block with current mocktime')
-    #        self.bump_mocktime(156 * 200)
-    #        block_hash = self.nodes[0].generate(1)[0]
-    #        block = self.nodes[0].getblock(blockhash=block_hash, verbosity=0)
-    #        for n in self.nodes:
-    #            n.submitblock(block)
-    #            chain_info = n.getblockchaininfo()
-    #            assert_equal(chain_info["blocks"], 200)
-    #            assert_equal(chain_info["initialblockdownload"], False)
-
     def setup_nodes(self):
         """Override this method to customize test node setup"""
         extra_args = None
-        stderr = None
         if hasattr(self, "extra_args"):
             extra_args = self.extra_args
-        if hasattr(self, "stderr"):
-            stderr = self.stderr
-        self.add_nodes(self.num_nodes, extra_args, stderr=stderr)
+        self.add_nodes(self.num_nodes, extra_args)
         self.start_nodes()
-
+        self.import_deterministic_coinbase_privkeys()
+        if not self.setup_clean_chain:
+            for n in self.nodes:
+                assert_equal(n.getblockchaininfo()["blocks"], 199)
+            # To ensure that all nodes are out of IBD, the most recent block
+            # must have a timestamp not too old (see IsInitialBlockDownload()).
+            self.log.debug('Generate a block with current mocktime')
+            self.bump_mocktime(156 * 200)
+            block_hash = self.nodes[0].generate(1)[0]
+            block = self.nodes[0].getblock(blockhash=block_hash, verbosity=0)
+            for n in self.nodes:
+                n.submitblock(block)
+                chain_info = n.getblockchaininfo()
+                assert_equal(chain_info["blocks"], 200)
+                assert_equal(chain_info["initialblockdownload"], False)
 
     def import_deterministic_coinbase_privkeys(self):
         for n in self.nodes:
