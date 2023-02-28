@@ -428,7 +428,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V18DeploymentHeight = 1100000;
+        consensus.V18DeploymentHeight = 1110000;
         consensus.BIP34Height = 3963;
         consensus.BIP34Hash = uint256S("0000065432f43b3efb23bd0f63fe33d00d02a5f36233fe1b982c08274d58ef12");
         consensus.BIP65Height = 600;
