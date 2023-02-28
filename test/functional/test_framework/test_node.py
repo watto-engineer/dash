@@ -159,6 +159,7 @@ class TestNode():
     ]
 
     def get_deterministic_priv_key(self):
+        breakpoint()
         """Return a deterministic priv key in base58, that only depends on the node's index"""
         assert len(self.PRIV_KEYS) == MAX_NODES
         return self.PRIV_KEYS[self.index]
