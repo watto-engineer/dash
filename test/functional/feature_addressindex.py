@@ -75,7 +75,7 @@ class AddressIndexTest(WagerrTestFramework):
         assert_equal(balance0["balance"], 0)
         breakpoint()
         assert_equal(balance_mining["balance"], 196610471 * COIN)
-        assert_equal(balance_mining["balance_immature"], 2500000 * COIN)
+        assert_equal(balance_mining["immature_balance"], 2500000 * COIN)
         #assert_equal(balance_mining["balance_spendable"], 947790000 * COIN)
 
         # Check p2pkh and p2sh address indexes
