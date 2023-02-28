@@ -414,7 +414,7 @@ class WagerrTestFramework(metaclass=WagerrTestMetaClass):
                 assert str(e).startswith('Method not found')
                 continue
             breakpoint()
-            n.importprivkey(privkey=n.get_deterministic_priv_key().key, label='coinbase')
+            #n.importprivkey(privkey=n.get_deterministic_priv_key().key, label='coinbase')
 
     def run_test(self):
         """Tests must override this method to define test logic"""
