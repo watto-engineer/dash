@@ -75,10 +75,10 @@ class BettingTest(WagerrTestFramework):
         node.wait_for_rpc_connection()
 
     def set_test_params(self):
-        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'] ]
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00001', '-mintxfee=0.01', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00001', '-mintxfee=0.01', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00001', '-mintxfee=0.01', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00001', '-mintxfee=0.01', '-paytxfee=0.01'] ]
 
         self.setup_clean_chain = True
         self.num_nodes = 4
@@ -207,7 +207,6 @@ class BettingTest(WagerrTestFramework):
 
         self.nodes[0].generate(1)
         self.sync_all()
-        breakpoint()
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingname, "abc123", 0)
 
