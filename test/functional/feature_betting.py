@@ -207,7 +207,7 @@ class BettingTest(WagerrTestFramework):
 
         self.nodes[0].generate(1)
         self.sync_all()
-
+        breakpoint()
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingname, "abc123", 0)
 
