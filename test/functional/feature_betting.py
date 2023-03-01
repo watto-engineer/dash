@@ -75,10 +75,10 @@ class BettingTest(WagerrTestFramework):
         node.wait_for_rpc_connection()
 
     def set_test_params(self):
-        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.000001', '-mintxfee=0.0000001', '-paytxfee=0.01'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.000001', '-mintxfee=0.0000001', '-paytxfee=0.01'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.000001', '-mintxfee=0.0000001', '-paytxfee=0.01'],
-                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.000001', '-mintxfee=0.0000001', '-paytxfee=0.01'] ]
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00000001', '-mintxfee=0.000000001', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00000001', '-mintxfee=0.000000001', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00000001', '-mintxfee=0.000000001', '-paytxfee=0.01'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH', '-minrelaytxfee=0.00000001', '-mintxfee=0.000000001', '-paytxfee=0.01'] ]
 
         self.setup_clean_chain = True
         self.num_nodes = 4
