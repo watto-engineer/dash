@@ -249,7 +249,7 @@ def post_opcode(node, opcode, address):
     trx = node.createrawtransaction(inputs, outputs)
     breakpoint()
     # Add a fee rate
-    node.fundrawtransaction(trx, {'feeRate':'0.03'})
+    #node.fundrawtransaction(trx, {'feeRate':'0.03'})
     # Sign the raw transaction.
     trx = node.signrawtransactionwithwallet(trx)
     return node.sendrawtransaction(trx['hex'], maxfeerate=0)
