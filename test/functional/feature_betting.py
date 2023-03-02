@@ -569,8 +569,8 @@ class BettingTest(WagerrTestFramework):
         player2_total_bet = 0
 
         # place bet to ml event 3 with incorrect amounts
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 3, outcome_away_win, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 3, outcome_away_win, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 3, outcome_away_win, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 3, outcome_away_win, 10001)
         # place bet to ml event 3: DOTA2 - EPICENTER Major - Virtus Pro vs Team Liquid
         # player 1 bet to Team Liquid with odds 17000
         player1_bet = 100
