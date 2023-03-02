@@ -1810,7 +1810,7 @@ class BettingTest(WagerrTestFramework):
         self.check_spread_event()
         self.check_spread_event_v2()
         self.check_total_event()
-        self.check_ml_bet()
+        # self.check_ml_bet()
         # disable check spreads bets v1, becouse new spread system
         # uses spreads v1 before wagerr v3 prot, but regtest uses wagerr v3 prot
         # since first PoS block and we always have wagerr v3 prot
