@@ -401,11 +401,11 @@ class BettingTest(WagerrTestFramework):
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingname, "abc123", 0)
 
-        for id in range(len(sport_names)):
-            mapping_opcode = make_mapping(INDIVIDUAL_SPORT_MAPPING, id, sport_names[id])
-            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
-        self.nodes[0].generate(1)
-        sync_blocks(self.nodes)
+        #for id in range(len(sport_names)):
+        #   mapping_opcode = make_mapping(INDIVIDUAL_SPORT_MAPPING, id, sport_names[id])
+        #   post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+        #elf.nodes[0].generate(1)
+        #ync_blocks(self.nodes)
 
         for id in range(len(round_names)):
             mapping_opcode = make_mapping(ROUND_MAPPING, id, round_names[id])
