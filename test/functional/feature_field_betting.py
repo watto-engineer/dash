@@ -413,11 +413,11 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        for id in range(len(contender_names)):
-            mapping_opcode = make_mapping(CONTENDER_MAPPING, id, contender_names[id])
-            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
-        self.nodes[0].generate(1)
-        sync_blocks(self.nodes)
+        #for id in range(len(contender_names)):
+        #    mapping_opcode = make_mapping(CONTENDER_MAPPING, id, contender_names[id])
+        #    post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+        #self.nodes[0].generate(1)
+        #sync_blocks(self.nodes)
 
         for id in range(len(tournament_names)):
             mapping_opcode = make_mapping(TOURNAMENT_MAPPING, id, tournament_names[id])
