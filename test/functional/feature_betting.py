@@ -888,7 +888,9 @@ class BettingTest(WagerrTestFramework):
         self.log.info("Check Total Bets...")
 
         global player1_total_bet
+        player1_total_bet = 0
         global player2_total_bet
+        player2_total_bet = 0
 
         assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 24)
         assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 10001)
