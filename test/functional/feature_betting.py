@@ -713,8 +713,8 @@ class BettingTest(WagerrTestFramework):
         global player1_total_bet
         global player2_total_bet
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 0, outcome_spread_home, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 0, outcome_spread_home, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 0, outcome_spread_home, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 0, outcome_spread_home, 10001)
         # place spread bet to event 0: UEFA Champions League, expect that event result will be 2:0 for home team
         # player 1 bet to spread home, mean that home will win with spread points for away = 1
         player1_bet = 300
@@ -731,8 +731,8 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 0, outcome_spread_home, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 0, outcome_spread_home, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 0, outcome_spread_home, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 0, outcome_spread_home, 10001)
         # player 2 bet to spread home, mean that home will win with spread points for away = 2
         # for our results it means refund
         player2_bet = 200
@@ -791,8 +791,8 @@ class BettingTest(WagerrTestFramework):
         global player1_total_bet
         global player2_total_bet
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 10001)
 
         # place spread bet to event 4: EPICENTER Major, expect that event result will be 2:0 for away team
         # current spread event is: points=-250, homeOdds=27000, awayOdds=13000
@@ -811,8 +811,8 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 4, outcome_spread_home, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 4, outcome_spread_home, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 4, outcome_spread_home, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 4, outcome_spread_home, 10001)
         # player 2 bet to spread home, mean that home will win with 2 extra scores
         # for our results it means refund
         player2_bet = 200
@@ -890,8 +890,8 @@ class BettingTest(WagerrTestFramework):
         global player1_total_bet
         global player2_total_bet
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_over, 10001)
         # place spread bet to event 2: PGL Major Krakow
         # player 1 bet to total over with odds 21000
         player1_bet = 200
@@ -908,8 +908,8 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 2, outcome_total_under, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_under, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 2, outcome_total_under, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 2, outcome_total_under, 10001)
         # player 2 bet to total under with odds 17000
         player2_bet = 200
         player2_total_bet = player2_total_bet + player2_bet
@@ -1027,7 +1027,7 @@ class BettingTest(WagerrTestFramework):
         self.sync_all()
 
          # player 1 make express to nonexistent events
-        assert_raises_rpc_error(-31, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
+        assert_raises_rpc_error(-131, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
             [
                 {'eventId': 5, 'outcome': outcome_home_win},
                 {'eventId': 6, 'outcome': outcome_home_win},
@@ -1036,7 +1036,7 @@ class BettingTest(WagerrTestFramework):
 
         # player 1 make express to events 6, 7, 81 - home win
         player1_bet = 200
-        assert_raises_rpc_error(-31, "Error: event 81 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
+        assert_raises_rpc_error(-131, "Error: event 81 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
             [
                 {'eventId': 6, 'outcome': outcome_home_win},
                 {'eventId': 7, 'outcome': outcome_home_win},
@@ -1122,7 +1122,7 @@ class BettingTest(WagerrTestFramework):
         # bets to resulted events shouldn't accepted to memory pool after parlay starting height
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
         # bets to nonexistent events shouldn't accepted to memory pool
-        assert_raises_rpc_error(-31, "Error: there is no such Event: {}".format(800), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 800, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        assert_raises_rpc_error(-131, "Error: there is no such Event: {}".format(800), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 800, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
 
         # creating existed mapping
         mapping_opcode = make_mapping(TEAM_MAPPING, 0, "anotherTeamName")
@@ -1605,7 +1605,7 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
             self.nodes[1].placebet, event_id, outcome_away_win, 100)
 
         self.nodes[2].placebet(event_id, outcome_home_win, 25)
@@ -1613,9 +1613,9 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
             self.nodes[1].placeparlaybet, [{'eventId':event_id, 'outcome': outcome_away_win}], 100)
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
 
         self.nodes[2].placeparlaybet([{'eventId':event_id, 'outcome': outcome_home_win}], 25)
@@ -1635,18 +1635,18 @@ class BettingTest(WagerrTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
             self.nodes[1].placebet, event_id, outcome_away_win, 100)
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
             self.nodes[1].placebet, event_id, outcome_home_win, 100)
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
             self.nodes[1].placebet, event_id, outcome_draw, 100)
 
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_home_win}], 100)
-        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+        assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_draw}], 100)
 
         self.log.info("Check Zero Odds Bets Success")
