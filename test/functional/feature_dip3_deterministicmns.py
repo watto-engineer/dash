@@ -75,9 +75,9 @@ class DIP3Test(WagerrTestFramework):
 
         # We have hundreds of blocks to sync here, give it more time
         self.log.info("syncing blocks for all nodes")
-        for n in range(self.num_nodes):
-            self.stop_node(n)
-            self.start_node(n)
+        #for n in range(self.num_nodes):
+        #    self.stop_node(n)
+        #    self.start_node(n)
 
         for n in range(self.num_nodes -1 ):
             self.connect_nodes(self.nodes[0], (n+1))
