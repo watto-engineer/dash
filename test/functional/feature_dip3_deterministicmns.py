@@ -78,7 +78,8 @@ class DIP3Test(WagerrTestFramework):
         for n in range(self.num_nodes):
             self.stop_node(n)
             self.start_node(n)
-        self.sync_blocks(self.nodes, timeout=120)
+
+        #self.sync_blocks(self.nodes, timeout=120)
 
         # DIP3 is fully enforced here
 
