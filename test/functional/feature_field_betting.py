@@ -6,7 +6,7 @@
 from test_framework.betting_opcode import *
 from test_framework.authproxy import JSONRPCException
 from test_framework.test_framework import WagerrTestFramework
-from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error, sync_blocks
+from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error, sync_blocks, connect_nodes
 from distutils.dir_util import copy_tree, remove_tree
 from decimal import *
 import pprint
@@ -373,6 +373,9 @@ class BettingTest(WagerrTestFramework):
             self.nodes[0].sendtoaddress(node4Addr, 2000)
 
         self.nodes[0].generate(51)
+        for n in range(self.num_nodes -1 ):
+            connect_nodes(self.nodes[0], (n+1))
+
         self.sync_all()
 
         for n in range(self.num_nodes):
