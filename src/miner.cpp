@@ -559,6 +559,8 @@ void BlockAssembler::addPackageTxs(int &nPackagesSelected, int &nDescendantsUpda
     const int64_t MAX_CONSECUTIVE_FAILURES = 1000;
     int64_t nConsecutiveFailed = 0;
 
+    uint64_t blockSize = 0;
+
     while (mi != m_mempool.mapTx.get<ancestor_score>().end() || !mapModifiedTx.empty()) {
         // First try to find a new transaction in mapTx to evaluate.
         if (mi != m_mempool.mapTx.get<ancestor_score>().end() &&
@@ -606,7 +608,7 @@ void BlockAssembler::addPackageTxs(int &nPackagesSelected, int &nDescendantsUpda
             packageSigOps = modit->nSigOpCountWithAncestors;
         }
 
-        if (packageFees < blockMinFeeRate.GetFee(packageSize)) {
+        if (packageFees < blockMinFeeRate.GetFee(packageSize) && packageSize + blockSize > DEFAULT_BLOCK_PRIORITY_SIZE) {
             // Everything else we might consider has a lower fee rate
             return;
         }
@@ -648,6 +650,8 @@ void BlockAssembler::addPackageTxs(int &nPackagesSelected, int &nDescendantsUpda
 
         // This transaction will make it in; reset the failed counter.
         nConsecutiveFailed = 0;
+
+        blockSize += packageSize;
 
         // Package can be added. Sort the entries in a valid order.
         std::vector<CTxMemPool::txiter> sortedEntries;
