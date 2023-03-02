@@ -594,8 +594,8 @@ class BettingTest(WagerrTestFramework):
         self.sync_all()
 
         #player 2 bet to Team Liquid with incorrect bets.
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 3, outcome_away_win, 24)
-        assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 3, outcome_away_win, 10001)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 3, outcome_away_win, 24)
+        assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 3, outcome_away_win, 10001)
         #player 2 bet to Team Liquid with odds 14000
         player2_bet = 200
         player2_total_bet = player2_total_bet + player2_bet
