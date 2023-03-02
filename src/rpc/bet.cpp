@@ -684,7 +684,7 @@ UniValue getfieldeventliability(const JSONRPCRequest& request)
 
 UniValue listbetsdb(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 2)
+    if (request.fHelp || request.params.size() > 2)
         throw std::runtime_error(
             "listbetsdb\n"
             "\nGet bets form bets DB.\n"
