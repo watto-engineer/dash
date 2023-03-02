@@ -12,7 +12,7 @@ from decimal import Decimal
 from test_framework.blocktools import create_block, create_coinbase, get_masternode_payment
 from test_framework.messages import CCbTx, COIN, CTransaction, FromHex, ToHex, uint256_to_string
 from test_framework.test_framework import WagerrTestFramework
-from test_framework.util import assert_equal, connect_nodes, force_finish_mnsync, get_bip9_status, p2p_port, connect_nodes, disconnect_nodes
+from test_framework.util import assert_equal, connect_nodes, force_finish_mnsync, get_bip9_status, p2p_port
 
 WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
 
@@ -75,8 +75,11 @@ class DIP3Test(WagerrTestFramework):
 
         # We have hundreds of blocks to sync here, give it more time
         self.log.info("syncing blocks for all nodes")
+        for n in range(self.num_nodes):
+            self.stop_node(n)
+            self.start_node(n)
+
         for n in range(self.num_nodes -1 ):
-            self.disconnect_nodes(self.nodes[0], (n+1))
             self.connect_nodes(self.nodes[0], (n+1))
 
         self.sync_blocks(self.nodes, timeout=120)
