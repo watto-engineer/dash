@@ -373,8 +373,11 @@ class BettingTest(WagerrTestFramework):
             self.nodes[0].sendtoaddress(node4Addr, 2000)
 
         self.nodes[0].generate(51)
+        for r in range(self.num_nodes):
+            self.stop_node(r)
+            self.start_node(r)
+
         for n in range(self.num_nodes -1 ):
-            disconnect_nodes(self.nodes[0], (n+1))
             connect_nodes(self.nodes[0], (n+1))
 
         self.sync_all()
