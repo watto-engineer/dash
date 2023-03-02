@@ -80,7 +80,7 @@ class DIP3Test(WagerrTestFramework):
         #    self.start_node(n)
 
         for n in range(self.num_nodes -1 ):
-            self.connect_nodes(self.nodes[0], (n+1))
+            connect_nodes(self.nodes[0], (n+1))
 
         self.sync_blocks(self.nodes, timeout=120)
 
