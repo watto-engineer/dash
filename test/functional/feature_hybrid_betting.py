@@ -172,7 +172,7 @@ class HybridBettingTest(WagerrTestFramework):
     def check_mapping(self):
         self.log.info("Check Mapping...")
 
-        self.nodes[0].generate(99)
+        self.nodes[0].generate(299)
         sync_blocks(self.nodes)
 
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
