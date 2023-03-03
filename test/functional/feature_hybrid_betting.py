@@ -186,6 +186,7 @@ class HybridBettingTest(WagerrTestFramework):
         sync_blocks(self.nodes)
 
         # add field sports to mapping
+        breakpoint()
         for id in range(len(field_sport_names)):
             mapping_opcode = make_mapping(INDIVIDUAL_SPORT_MAPPING, id, field_sport_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
