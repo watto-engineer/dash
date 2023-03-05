@@ -244,7 +244,7 @@ bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifi
     nStakeModifierTime = pindexFrom->GetBlockTime();
     // Fixed stake modifier only for regtest
     if (Params().NetworkIDString() == CBaseChainParams::REGTEST) {
-        nStakeModifier = pindexFrom->nStakeModifier;
+        nStakeModifier = pindexFrom->GetBlockTime();
         return true;
     }
     const CBlockIndex* pindex = pindexFrom;
