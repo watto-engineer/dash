@@ -950,7 +950,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 100;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V18DeploymentHeight = 300;
+        consensus.V18DeploymentHeight = 500;
         consensus.BIP34Height = 500; // BIP34 activated on regtest (Used in functional tests)
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = consensus.V18DeploymentHeight; // BIP65 activated on regtest (Used in rpc activation tests)
@@ -961,7 +961,7 @@ public:
         consensus.DIP0003Height = consensus.V18DeploymentHeight;
 //        consensus.DIP0003EnforcementHeight = 500;
         consensus.DIP0003EnforcementHash = uint256();
-        consensus.DIP0008Height = 432;
+        consensus.DIP0008Height = 532;
         consensus.DIP0024Height = consensus.V18DeploymentHeight;
 
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
@@ -993,14 +993,14 @@ public:
         consensus.nWagerrProtocolV2StartHeight = 251; // Betting protocol v2 activation block
         consensus.nWagerrProtocolV3StartHeight = 300; // Betting protocol v3 activation block
         consensus.nWagerrProtocolV4StartHeight = 400; // Betting protocol v4 activation block
-        consensus.nWagerrProtocolV5StartHeight = 500; // Betting protocol v5 activation block
+        consensus.nWagerrProtocolV5StartHeight = consensus.V18DeploymentHeight; // Betting protocol v5 activation block
         consensus.nQuickGamesEndHeight = consensus.nWagerrProtocolV3StartHeight;
         consensus.nMaturityV2StartHeight = consensus.nWagerrProtocolV3StartHeight; // Reduced block maturity required for spending coinstakes and betting payouts
         consensus.nKeysRotateHeight = 270; // Rotate spork key, oracle keys and fee payout keys
         consensus.nPosStartHeight = 251;
         consensus.nBlockStakeModifierV1A = consensus.nPosStartHeight;
-        consensus.nBlockStakeModifierV2 = 400;
-        consensus.nBlockTimeProtocolV2 = 500;
+        consensus.nBlockStakeModifierV2 = 350;
+        consensus.nBlockTimeProtocolV2 = 280;
         consensus.ATPStartHeight = consensus.V18DeploymentHeight;
 
         // Proof of stake parameters
