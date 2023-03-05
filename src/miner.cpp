@@ -320,6 +320,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         pCoinstakeTx->vout[1].nValue += blockReward.GetCoinstakeReward().amount;
 
         bool fSplit = SplitCoinstakeVouts(pCoinstakeTx, blockReward, nSplitValue);
+        if (fDIP0003Active_context) {
+        } else {
+            pCoinstakeTx->vout.insert(pCoinstakeTx->vout.end(), vExpectedTxOuts.begin(), vExpectedTxOuts.end());
+        }
         pCoinstakeTx->vout.insert(pCoinstakeTx->vout.end(), pblocktemplate->voutMasternodePayments.begin(), pblocktemplate->voutMasternodePayments.end());
 
         // Sign for Wagerr
