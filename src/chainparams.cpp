@@ -662,7 +662,7 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.V18DeploymentHeight = 600;
+        consensus.V18DeploymentHeight = 500;
         consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
