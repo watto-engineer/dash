@@ -107,7 +107,6 @@ class BettingTest(WagerrTestFramework):
     def setup_network(self):
         self.log.info("Setup Network")
         self.setup_nodes()
-        self.connect_network()
 
     def save_cache(self, force=False):
         dir_names = dict()
@@ -170,6 +169,12 @@ class BettingTest(WagerrTestFramework):
                 # minting must process to sigle address
                 #assert_equal(address, prevAddr)
             prevAddr = address
+        connect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[0], 3)
+        self.sync_all()
+        self.log.info("Synced...")
+
 
         for i in range(20):
             self.nodes[0].sendtoaddress(WGR_WALLET_ORACLE['addr'], 2000)
@@ -178,17 +183,6 @@ class BettingTest(WagerrTestFramework):
             self.nodes[0].sendtoaddress(self.players[1], 2000)
 
         self.nodes[0].generate(51)
-
-        for n in range(self.num_nodes):
-            self.stop_node(n)
-            self.start_node(n, ["-reindex"])
-
-        disconnect_nodes(self.nodes[0], 1)
-        connect_nodes(self.nodes[0], 1)
-        disconnect_nodes(self.nodes[0], 2)
-        connect_nodes(self.nodes[0], 2)
-        disconnect_nodes(self.nodes[0], 3)
-        connect_nodes(self.nodes[0], 3)
         self.sync_all()
 
         for n in range(self.num_nodes):
