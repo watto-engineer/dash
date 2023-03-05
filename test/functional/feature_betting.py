@@ -218,6 +218,15 @@ class BettingTest(WagerrTestFramework):
         # generate block for unlocking used Oracle's UTXO
         self.sync_all()
         self.nodes[0].generate(1)
+        for n in range(self.num_nodes):
+            self.stop_node(n)
+            self.start_node(n)
+        disconnect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 1)
+        disconnect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[0], 2)
+        disconnect_nodes(self.nodes[0], 3)
+        connect_nodes(self.nodes[0], 3)
         self.sync_all()
 
         # add rounds to mapping
