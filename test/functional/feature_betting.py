@@ -181,7 +181,7 @@ class BettingTest(WagerrTestFramework):
 
         for n in range(self.num_nodes):
             self.stop_node(n)
-            self.start_node(n)
+            self.start_node(n, "-reindex")
 
         disconnect_nodes(self.nodes[0], 1)
         connect_nodes(self.nodes[0], 1)
