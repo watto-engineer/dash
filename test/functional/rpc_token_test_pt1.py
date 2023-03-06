@@ -27,7 +27,7 @@ class TokenTest (WagerrTestFramework):
         self.extra_args = [["-debug"],["-debug"]]
 
     def run_test(self):
-        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes(self.nodes, 0, 1)
         tmpdir=self.options.tmpdir
         self.log.info("Generating Tokens...")
         self.nodes[0].generate(100)
