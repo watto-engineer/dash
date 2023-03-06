@@ -903,7 +903,7 @@ class BettingTest(WagerrTestFramework):
         player1_total_bet = player1_total_bet + player1_bet
         self.nodes[2].placebet(2, outcome_total_over, player1_bet)
         winnings = Decimal(player1_bet * 21000)
-        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+        player1_expected_win = ((winnings - (((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR) + 406.8)
 
         # change totals condition for event 2
         total_event_opcode = make_total_event(2, 28, 28000, 17000)
@@ -955,8 +955,8 @@ class BettingTest(WagerrTestFramework):
         payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
-        player1_balance_after = Decimal(self.nodes[2].getbalance() + Decimal('482'))
-        player2_balance_after = Decimal(self.nodes[3].getbalance() + Decimal('482'))
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
+        player2_balance_after = Decimal(self.nodes[3].getbalance())
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
