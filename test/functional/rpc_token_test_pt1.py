@@ -26,6 +26,7 @@ class TokenTest (WagerrTestFramework):
         self.num_nodes = 2
         self.mn_count = 2
         self.extra_args = [["-debug"],["-debug"]]
+        self.fast_dip3_enforcement = True
 
     def run_test(self):
         connect_nodes(self.nodes, 0, 1)
