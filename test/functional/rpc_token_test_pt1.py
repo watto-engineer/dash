@@ -51,8 +51,7 @@ class TokenTest (WagerrTestFramework):
         PARTAddr=self.nodes[0].getnewaddress()
         LIVEAddr=self.nodes[0].getnewaddress()
         HulkAddr=self.nodes[0].getnewaddress()
-        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "https://www.google.com", "0", "4", MGTBLS["public"], "false", "true")
-        self.nodes[0].generate(1)
+        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0",  MGTBLS["public"], "false", "true")
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
