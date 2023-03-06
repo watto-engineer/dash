@@ -955,8 +955,8 @@ class BettingTest(WagerrTestFramework):
         payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
-        player1_balance_after = Decimal(self.nodes[2].getbalance() + Decimal('406.8'))
-        player2_balance_after = Decimal(self.nodes[3].getbalance() + Decimal('406.8'))
+        player1_balance_after = Decimal(self.nodes[2].getbalance() + Decimal('482'))
+        player2_balance_after = Decimal(self.nodes[3].getbalance() + Decimal('482'))
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
