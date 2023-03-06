@@ -5,7 +5,7 @@
 """Test the functionality of all CLI commands.
 
 """
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 
 from test_framework.util import *
 
@@ -20,7 +20,7 @@ import subprocess
 WAGERR_TX_FEE = 0.001
 WAGERR_AUTH_ADDR = "TDn9ZfHrYvRXyXC6KxRgN6ZRXgJH2JKZWe"
 
-class TokenTest (BitcoinTestFramework):
+class TokenTest (WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
