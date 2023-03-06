@@ -45,6 +45,7 @@ class TokenTest (WagerrTestFramework):
         LiveBLS=self.nodes[0].bls("generate")
         HulkBLS=self.nodes[0].bls("generate")
         self.log.info("MGTBLS %s" % MGTBLS["public"])
+        self.log.info("ORTBLS %s" % ORATBLS["public"])
         MGTAddr=self.nodes[0].getnewaddress()
         ORATAddr=self.nodes[0].getnewaddress()
         XWAGERRAddr=self.nodes[0].getnewaddress()
