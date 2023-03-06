@@ -24,7 +24,7 @@ class TokenTest (WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
-        #self.extra_args = [["-debug"],["-debug"]]
+        self.extra_args = [["-debug"],["-debug"]]
 
     def run_test(self):
         connect_nodes_bi(self.nodes, 0, 1)
