@@ -55,7 +55,7 @@ from .util import (
     get_chain_folder,
 )
 
-WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
+WAGERR_AUTH_ADDR = "TDn9ZfHrYvRXyXC6KxRgN6ZRXgJH2JKZWe"
 
 class TestStatus(Enum):
     PASSED = 1
@@ -1011,12 +1011,12 @@ class WagerrTestFramework(WagerrTestFramework):
         spork4height=500
         if not self.fast_dip3_enforcement:
             spork4height = self.nodes[0].getblockcount() + 1
-            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", spork4height)
+            self.nodes[0].sporkupdate`("SPORK_4_DIP0003_ENFORCED", spork4height)
             self.wait_for_sporks_same()
             while self.nodes[0].getblockcount() < spork4height:
                 self.nodes[0].generate(10)
         else:
-            self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 50)
+            self.nodes[0].sporkupdate("SPORK_4_DIP0003_ENFORCED", 50)
             self.wait_for_sporks_same()
         self.sync_all()
 
@@ -1039,7 +1039,7 @@ class WagerrTestFramework(WagerrTestFramework):
             force_finish_mnsync(self.nodes[i + 1])
 
         # Enable InstantSend (including block filtering) and ChainLocks by default
-        self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", spork4height)
+        self.nodes[0].sporkupdate("SPORK_4_DIP0003_ENFORCED", spork4height)
         self.nodes[0].sporkupdate("SPORK_2_INSTANTSEND_ENABLED", 0)
         self.nodes[0].sporkupdate("SPORK_3_INSTANTSEND_BLOCK_FILTERING", 0)
         self.nodes[0].sporkupdate("SPORK_19_CHAINLOCKS_ENABLED", 0)
@@ -1296,7 +1296,7 @@ class WagerrTestFramework(WagerrTestFramework):
         wait_until(check_dkg_comitments, timeout=timeout, sleep=1)
 
     def wait_for_quorum_list(self, quorum_hash, nodes, timeout=15, sleep=2, llmq_type_name="llmq_test"):
-        self.nodes[0].spork("SPORK_4_DIP0003_ENFORCED", 10)
+        self.nodes[0].sporkupdate("SPORK_4_DIP0003_ENFORCED", 10)
         def wait_func():
             self.log.info("quorums: " + str(self.nodes[0].quorum("list")))
             if quorum_hash in self.nodes[0].quorum("list")[llmq_type_name]:
