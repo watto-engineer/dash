@@ -955,7 +955,7 @@ class BettingTest(WagerrTestFramework):
         payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
-
+        breakpoint()
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
 
