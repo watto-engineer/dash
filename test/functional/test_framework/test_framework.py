@@ -1011,7 +1011,7 @@ class WagerrTestFramework(WagerrTestFramework):
         spork4height=500
         if not self.fast_dip3_enforcement:
             spork4height = self.nodes[0].getblockcount() + 1
-            self.nodes[0].sporkupdate`("SPORK_4_DIP0003_ENFORCED", spork4height)
+            self.nodes[0].sporkupdate("SPORK_4_DIP0003_ENFORCED", spork4height)
             self.wait_for_sporks_same()
             while self.nodes[0].getblockcount() < spork4height:
                 self.nodes[0].generate(10)
