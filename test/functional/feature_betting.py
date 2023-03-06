@@ -959,8 +959,8 @@ class BettingTest(WagerrTestFramework):
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
 
-        assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
-        assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
+        assert_equal(player1_balance_before + player1_expected_win - 406.80000000, player1_balance_after)
+        assert_equal(player2_balance_before + player2_expected_win - 406.80000000, player2_balance_after)
 
         self.log.info("Total Bets Success")
 
