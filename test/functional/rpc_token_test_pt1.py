@@ -52,10 +52,16 @@ class TokenTest (WagerrTestFramework):
         LIVEAddr=self.nodes[0].getnewaddress()
         HulkAddr=self.nodes[0].getnewaddress()
         MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0",  MGTBLS["public"], "false", "true")
+        ORAT=self.nodes[0].configuremanagementtoken( "ORATT", "ORAT", "4", "https://www.google.com", "0",  ORATBLS["public"], "false", "true")
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
+        self.log.info("ORAT %s" % ORAT)
+        ORATGroup_ID=ORAT['groupID']
         self.nodes[0].generate(100)
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
+        self.nodes[0].minttoken(ORATGroup_ID, ORATAddr, '82')
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         mintaddr=self.nodes[0].getnewaddress()
