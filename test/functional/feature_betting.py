@@ -903,7 +903,7 @@ class BettingTest(WagerrTestFramework):
         player1_total_bet = player1_total_bet + player1_bet
         self.nodes[2].placebet(2, outcome_total_over, player1_bet)
         winnings = Decimal(player1_bet * 21000)
-        player1_expected_win = ((winnings - (((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR) + 406.8)
+        player1_expected_win = ((winnings - (((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR) + Decimal('406.8'))
 
         # change totals condition for event 2
         total_event_opcode = make_total_event(2, 28, 28000, 17000)
