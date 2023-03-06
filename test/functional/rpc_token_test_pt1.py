@@ -29,7 +29,7 @@ class TokenTest (WagerrTestFramework):
         self.fast_dip3_enforcement = False
 
     def run_test(self):
-        connect_nodes(0, 1)
+        connect_nodes(self.nodes[0], 1)
         tmpdir=self.options.tmpdir
         self.log.info("Generating Tokens...")
         self.nodes[0].generate(100)
