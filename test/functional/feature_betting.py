@@ -934,7 +934,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -943,7 +943,6 @@ class BettingTest(WagerrTestFramework):
         listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
-        blockhash = self.nodes[0].generate(5)
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
         height = block['height']
@@ -958,8 +957,8 @@ class BettingTest(WagerrTestFramework):
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
         #breakpoint()
-        assert_equal((player1_balance_before + player1_expected_win - Decimal('406.8')), (player1_balance_after))
-        assert_equal((player2_balance_before + player2_expected_win - Decimal('406.8')), (player2_balance_after))
+        assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
+        assert_equal(player2_balance_before + player2_expected_win , player2_balance_after)
 
         self.log.info("Total Bets Success")
 
