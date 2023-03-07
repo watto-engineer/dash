@@ -25,7 +25,7 @@ class TokenTest (WagerrTestFramework):
         self.setup_clean_chain = True
         self.num_nodes = 1
         self.mn_count = 0
-        self.extra_args = []
+        self.extra_args = [[""]]
         self.fast_dip3_enforcement = False
 
     def run_test(self):
