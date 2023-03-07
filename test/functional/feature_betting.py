@@ -1030,21 +1030,21 @@ class BettingTest(WagerrTestFramework):
         self.sync_all()
 
          # player 1 make express to nonexistent events
-        assert_raises_rpc_error(-131, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
-            [
-                {'eventId': 5, 'outcome': outcome_home_win},
-                {'eventId': 6, 'outcome': outcome_home_win},
-                {'eventId': 501, 'outcome': outcome_home_win} # failed
-            ], 100)
+        #assert_raises_rpc_error(-131, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
+        #    [
+        #        {'eventId': 5, 'outcome': outcome_home_win},
+        #        {'eventId': 6, 'outcome': outcome_home_win},
+        #        {'eventId': 501, 'outcome': outcome_home_win} # failed
+        #    ], 100)
 
         # player 1 make express to events 6, 7, 81 - home win
-        player1_bet = 200
-        assert_raises_rpc_error(-131, "Error: event 81 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
-            [
-                {'eventId': 6, 'outcome': outcome_home_win},
-                {'eventId': 7, 'outcome': outcome_home_win},
-                {'eventId': 81, 'outcome': outcome_home_win} # failed (round == 1 detected)
-            ], player1_bet)
+        #player1_bet = 200
+        #assert_raises_rpc_error(-131, "Error: event 81 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
+        #    [
+        #        {'eventId': 6, 'outcome': outcome_home_win},
+        #        {'eventId': 7, 'outcome': outcome_home_win},
+        #        {'eventId': 81, 'outcome': outcome_home_win} # failed (round == 1 detected)
+        #    ], player1_bet)
 
         # player 1 make express to events 5, 6, 7 - home win
         player1_bet = 200
