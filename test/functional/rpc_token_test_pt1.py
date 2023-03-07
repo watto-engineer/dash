@@ -54,6 +54,7 @@ class TokenTest (WagerrTestFramework):
         HulkAddr=self.nodes[0].getnewaddress()
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(100)
+        self.nodes[0].generate(100)
         #breakpoint()
         MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0",  MGTBLS["public"], "false", "true")
         self.log.info("MGT %s" % MGT)
