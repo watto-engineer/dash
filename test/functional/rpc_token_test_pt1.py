@@ -56,6 +56,7 @@ class TokenTest (WagerrTestFramework):
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
         self.nodes[0].generate(100)
+        breakpoint()
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
