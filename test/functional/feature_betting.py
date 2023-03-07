@@ -617,7 +617,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -686,7 +686,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player2_balance_before = Decimal(self.nodes[3].getbalance())
@@ -731,7 +731,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 0, outcome_spread_home, 24)
@@ -758,7 +758,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -811,7 +811,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         assert_raises_rpc_error(-131, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[3].placebet, 4, outcome_spread_home, 24)
@@ -841,7 +841,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -1091,7 +1091,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -1194,7 +1194,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -1292,7 +1292,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -1492,7 +1492,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
@@ -1781,9 +1781,9 @@ class BettingTest(WagerrTestFramework):
             result_opcode = make_result(event['event_id'], EVENT_CLOSED, 0, 0)
             post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all([ self.nodes[:3] ])
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all([ self.nodes[:3] ])
 
         assert_equal(len(self.nodes[0].listevents(True)), 0)
