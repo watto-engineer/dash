@@ -1216,7 +1216,7 @@ class BettingTest(WagerrTestFramework):
 
         #player1_balance_after = Decimal(self.nodes[2].getbalance())
         player1_balance_after = self.nodes[2].getwalletinfo()['balance'] + self.nodes[2].getwalletinfo()['immature_balance']
-
+        breakpoint()
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
 
         # return back
