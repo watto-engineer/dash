@@ -25,7 +25,7 @@ public:
     CTokenGroupBalance()
         : ctrlPerms(GroupAuthorityFlags::NONE), allowedCtrlOutputPerms(GroupAuthorityFlags::NONE),
           allowedSubgroupCtrlOutputPerms(GroupAuthorityFlags::NONE), ctrlOutputPerms(GroupAuthorityFlags::NONE),
-          input(0), output(0), numOutputs(0)
+          input(0), output(0), numInputs(0), numOutputs(0)
     {
     }
     // CTokenGroupInfo groups; // possible groups

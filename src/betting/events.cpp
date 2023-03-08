@@ -34,8 +34,8 @@ bool CBetEvent::IsOpen(const CBettingsView& bettingsViewCache, uint32_t nTime) {
             if (!bettingsViewCache.events->Read(eventKey, eventDBItem)) {
                 return false;
             }
-            if (eventDBItem.nStartTime >= nTime) {
-                return error("past event start time");
+            if (nTime >= eventDBItem.nStartTime) {
+                return error("past event start time (%d vs %d", eventDBItem.nStartTime, nTime);
             }
             break;
         }
@@ -49,8 +49,8 @@ bool CBetEvent::IsOpen(const CBettingsView& bettingsViewCache, uint32_t nTime) {
             if (!bettingsViewCache.fieldEvents->Read(eventKey, eventDBItem)) {
                 return false;
             }
-            if (eventDBItem.nStartTime >= nTime) {
-                return error("past event start time");
+            if (nTime >= eventDBItem.nStartTime) {
+                return error("past event start time (%d vs %d", eventDBItem.nStartTime, nTime);
             }
             break;
         }

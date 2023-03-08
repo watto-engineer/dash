@@ -66,6 +66,11 @@ public:
             SER_WRITE(obj, tgDesc = boost::get<CTokenGroupDescriptionNFT>(*obj.pTokenGroupDescription));
             READWRITE(tgDesc);
             SER_READ(obj, obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc));
+        } else if (obj.creationTransaction->nType == TRANSACTION_GROUP_CREATION_BETTING) {
+            CTokenGroupDescriptionBetting tgDesc;
+            SER_WRITE(obj, tgDesc = boost::get<CTokenGroupDescriptionBetting>(*obj.pTokenGroupDescription));
+            READWRITE(tgDesc);
+            SER_READ(obj, obj.pTokenGroupDescription = std::make_shared<CTokenGroupDescriptionVariant>(tgDesc));
         }
     }
     bool operator==(const CTokenGroupCreation &c)

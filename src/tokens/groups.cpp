@@ -343,7 +343,12 @@ std::string CTokenGroupID::encodeFlags() const {
     std::string sflags = "";
     if (data.size() < CTokenGroupID::PARENT_GROUP_ID_SIZE) return sflags;
 
+    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::STICKY_MELT)) {
+        if (sflags != "") sflags += " ";
+        sflags += "sticky_melt";
+    }
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::MGT_TOKEN)) {
+        if (sflags != "") sflags += " ";
         sflags = "management";
     }
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::NFT_TOKEN)) {
@@ -354,17 +359,9 @@ std::string CTokenGroupID::encodeFlags() const {
         if (sflags != "") sflags += " ";
         sflags += "betting";
     }
-    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::STICKY_MELT)) {
-        if (sflags != "") sflags += " ";
-        sflags += "sticky_melt";
-    }
-    if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::BETTING_TOKEN)) {
-        if (sflags != "") sflags += " ";
-        sflags += "betting";
-    }
     if (hasTokenGroupIdFlag((TokenGroupIdFlags)data[31], TokenGroupIdFlags::PARLAY_TOKEN)) {
         if (sflags != "") sflags += " ";
-        sflags += "betting";
+        sflags += "parlay";
     }
     return sflags;
 }

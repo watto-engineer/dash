@@ -150,17 +150,19 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             // Track what permissions this transaction has
             gBalance[tokenGrp.associatedGroup].ctrlPerms |= temp;
         }
-        if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
-            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
-        }
-        if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
-            gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::WAGERR; // Mint restrictions: before event close: fees must be paid; Melt restrictions: after event close
-        } else {
-            gBalance[tokenGrp.associatedGroup].ctrlPerms &= ~GroupAuthorityFlags::WAGERR;
-        }
         if (tokenGrp.associatedGroup != NoGroup)
         {
             gBalance[tokenGrp.associatedGroup].numInputs += 1;
+
+            if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
+                gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
+            }
+            if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
+                gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::WAGERR; // Mint restrictions: before event close: fees must be paid; Melt restrictions: after event close
+            } else {
+                gBalance[tokenGrp.associatedGroup].ctrlPerms &= ~GroupAuthorityFlags::WAGERR;
+            }
+
             if (!tokenGrp.isAuthority())
             {
                 if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
@@ -241,7 +243,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                         "Multiple grouped outputs created during group creation transaction");
 
                 // Regular token
-                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN)) {
+                if (!newGrpId.hasFlag(TokenGroupIdFlags::MGT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::NFT_TOKEN) && !newGrpId.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_REGULAR) {
                         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a regular token group");
                     }

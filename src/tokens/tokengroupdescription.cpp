@@ -188,10 +188,12 @@ uint256 ConsumeParamSignerHash(const JSONRPCRequest& request, unsigned int &curp
             CHashWriter hasher(SER_DISK, CLIENT_VERSION);
             hasher << grpID.parentGroup();
             signerHash = hasher.GetHash();
+            break;
         }
         case SignerType::LLMQ:
         {
             signerHash.SetHex(signerID);
+            break;
         }
         default:
         {
