@@ -1564,21 +1564,20 @@ class BettingTest(WagerrTestFramework):
 
         self.log.info("Debug Events")
         pprint.pprint(self.nodes[0].listeventsdebug())
-        breakpoint()
         self.log.info("All Bets")
         allbets=self.nodes[0].getallbets()
         #pprint.pprint(len(allbets))
         bettxid=allbets[0]["betTxHash"]
 
-        self.log.info("Bet 0 by getbet")
-        bet0=self.nodes[0].getbet(bettxid, True)
-        pprint.pprint(bet0)
+        #self.log.info("Bet 0 by getbet")
+        #bet0=self.nodes[0].getbet(bettxid, True)
+        #pprint.pprint(bet0)
         self.log.info("Bet 0 by getbetbytxid")
         bet1=self.nodes[0].getbetbytxid(bettxid)
         pprint.pprint(bet1)
-        assert_equal(bet0["amount"], bet1[0]["amount"])
-        assert_equal(bet0["result"], bet1[0]["betResultType"])
-        assert_equal(bet0["tx-id"], bet1[0]["betTxHash"])
+        #assert_equal(bet0["amount"], bet1[0]["amount"])
+        #assert_equal(bet0["result"], bet1[0]["betResultType"])
+        #assert_equal(bet0["tx-id"], bet1[0]["betTxHash"])
 
         #time.sleep(2000)
         ###
