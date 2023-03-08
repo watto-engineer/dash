@@ -1553,7 +1553,7 @@ class BettingTest(WagerrTestFramework):
                     betpay2 = betpay2 + mybets[bet]['payout']
             else:
                 self.log.info("Too Many Nodes")
-
+        breakpoint()
         #self.log.info("Total Amount Bet Player 1 %s" % player1_total_bet)
         assert_equal(betam1, player1_total_bet)
         #self.log.info("Total Amount Won Player 1 %s" % betpay1)
