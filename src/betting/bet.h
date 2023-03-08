@@ -43,5 +43,6 @@ CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsVi
 bool BettingUndo(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx);
 
 UniValue getbetbytxid(const JSONRPCRequest& request);
+UniValue getbet(const JSONRPCRequest& request);
 
 #endif // WAGERR_BET_H

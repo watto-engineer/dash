@@ -1099,6 +1099,7 @@ static const CRPCCommand commands[] =
     { "betting",            "getalleventliabilities",   &getalleventliabilities,    {} },
     { "betting",            "geteventliability",        &geteventliability,         {} },
     { "betting",            "getfieldeventliability",   &getfieldeventliability,    {} },
+    { "betting",            "getbet",                   &getbet,                    {} },
     { "betting",            "getbetbytxid",             &getbetbytxid,              {} },
     { "betting",            "listbetsdb",               &listbetsdb,                {} },
 

@@ -5456,8 +5456,6 @@ UniValue getbetbytxid(const JSONRPCRequest& request)
                 "\nExamples:\n" +
                 HelpExampleCli("getbetbytxid", "1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d"));
 
-    const NodeContext& node = EnsureNodeContext(request.context);
-
     uint256 txHash;
     txHash.SetHex(request.params[0].get_str());
 
@@ -5998,7 +5996,6 @@ static const CRPCCommand commands[] =
     { "betting",            "listchaingamesbets",               &listchaingamesbets,            {} },
     { "betting",            "listfieldevents",                  &listfieldevents,               {} },
     { "betting",            "getallbets",                       &getallbets,                    {} },
-    { "betting",            "getbet",                           &getbet,                        {} },
     { "betting",            "getmybets",                        &getmybets,                     {} },
     { "betting",            "getmyqgbets",                      &getmyqgbets,                   {} },
     { "betting",            "getallqgbets",                     &getallqgbets,                  {} },
