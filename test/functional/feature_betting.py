@@ -679,6 +679,7 @@ class BettingTest(WagerrTestFramework):
         gotliability=liability["moneyline-draw-liability"]
         assert_equal(gotliability, Decimal(1137))
         gotliability=liability["moneyline-home-liability"]
+        breakpoint()
         assert_equal(gotliability, Decimal(312))
 
         # close event 1
