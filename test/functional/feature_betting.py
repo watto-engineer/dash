@@ -675,6 +675,7 @@ class BettingTest(WagerrTestFramework):
 
         #self.log.info("Event Liability")
         #pprint.pprint(self.nodes[0].geteventliability(1))
+        breakpoint()
         liability=self.nodes[0].geteventliability(1)
         gotliability=liability["moneyline-draw-liability"]
         assert_equal(gotliability, Decimal(1137))
