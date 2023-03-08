@@ -1564,7 +1564,7 @@ class BettingTest(WagerrTestFramework):
 
         self.log.info("Debug Events")
         pprint.pprint(self.nodes[0].listeventsdebug())
-
+        breakpoint()
         self.log.info("All Bets")
         allbets=self.nodes[0].getallbets()
         #pprint.pprint(len(allbets))
