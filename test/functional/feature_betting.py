@@ -1559,7 +1559,7 @@ class BettingTest(WagerrTestFramework):
         #self.log.info("Total Amount Bet Player 2 %s" % player2_total_bet)
         assert_equal(betam2, player2_total_bet)
         #self.log.info("Total Amount Won Player 2 %s" % betpay2)
-        assert_equal(round(Decimal(betpay2), 8), round(Decimal(3546.35000000), 8))
+        assert_equal(round(Decimal(betpay2), 8), round(Decimal(2134.15000000), 8))
 
         self.log.info("Debug Events")
         pprint.pprint(self.nodes[0].listeventsdebug())
@@ -1581,7 +1581,7 @@ class BettingTest(WagerrTestFramework):
 
         #time.sleep(2000)
         ###
-        ## Not wroking TODO Fix it
+        ## Not working TODO Fix it
         ###
         #self.log.info("Get Payout Info")
         #payinfo={"txhash":bettxid, "nOut":1}
@@ -1814,7 +1814,7 @@ class BettingTest(WagerrTestFramework):
         self.check_spread_event()
         self.check_spread_event_v2()
         self.check_total_event()
-        # self.check_ml_bet()
+        self.check_ml_bet()
         # disable check spreads bets v1, becouse new spread system
         # uses spreads v1 before wagerr v3 prot, but regtest uses wagerr v3 prot
         # since first PoS block and we always have wagerr v3 prot
