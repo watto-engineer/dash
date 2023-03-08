@@ -1658,7 +1658,6 @@ class BettingTest(WagerrTestFramework):
     def check_zeroing_odds(self):
         self.log.info("Check zeroing odds...")
         self.log.info("Generate to Protocol V4 start height")
-        breakpoint()
         self.nodes[0].generate(27)
         saved_events = {}
         for i, node in enumerate(self.nodes):
