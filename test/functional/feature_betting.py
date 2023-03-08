@@ -1606,7 +1606,7 @@ class BettingTest(WagerrTestFramework):
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
@@ -1614,7 +1614,7 @@ class BettingTest(WagerrTestFramework):
 
         self.nodes[2].placebet(event_id, outcome_home_win, 25)
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
@@ -1624,7 +1624,7 @@ class BettingTest(WagerrTestFramework):
 
         self.nodes[2].placeparlaybet([{'eventId':event_id, 'outcome': outcome_home_win}], 25)
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         homeOdds = 0
@@ -1636,7 +1636,7 @@ class BettingTest(WagerrTestFramework):
                                                 drawOdds)
         post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         assert_raises_rpc_error(-131, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
