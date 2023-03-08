@@ -679,6 +679,7 @@ class BettingTest(WagerrTestFramework):
         gotliability=liability["moneyline-draw-liability"]
         assert_equal(gotliability, Decimal(1137))
         gotliability=liability["moneyline-home-liability"]
+        breakpoint()
         assert_equal(gotliability, Decimal(312))
 
         # close event 1
@@ -956,7 +957,6 @@ class BettingTest(WagerrTestFramework):
         check_bet_payouts_info(listbets, payoutsInfo)
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-        #breakpoint()
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win , player2_balance_after)
 
