@@ -670,12 +670,11 @@ class BettingTest(WagerrTestFramework):
         winnings = Decimal(player2_bet * self.odds_events[1]['drawOdds'])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
-        self.nodes[3].generate(1)
+        self.nodes[3].generate(5S)
         self.sync_all()
 
         #self.log.info("Event Liability")
         #pprint.pprint(self.nodes[0].geteventliability(1))
-        breakpoint()
         liability=self.nodes[0].geteventliability(1)
         gotliability=liability["moneyline-draw-liability"]
         assert_equal(gotliability, Decimal(1137))
