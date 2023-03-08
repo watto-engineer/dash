@@ -1665,7 +1665,7 @@ class BettingTest(WagerrTestFramework):
             for event in node.listevents():
                 saved_events[i][event['event_id']] = event
 
-        self.stop_node(3)
+        #self.stop_node(3)
 
         for i, node in enumerate(self.nodes[:3]):
             for event in node.listevents():
