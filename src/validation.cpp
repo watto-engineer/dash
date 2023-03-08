@@ -4111,8 +4111,10 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
 
     // Check timestamp
 //    if (block.GetBlockTime() > nAdjustedTime + MAX_FUTURE_BLOCK_TIME_POW)
-    if (block.GetBlockTime() > pindexPrev->MaxFutureBlockTime(nAdjustedTime, consensusParams))
-        return state.Invalid(ValidationInvalidReason::BLOCK_TIME_FUTURE, false, REJECT_INVALID, "time-too-new", strprintf("block timestamp too far in the future %d %d", block.GetBlockTime(), nAdjustedTime + 2 * 60 * 60));
+    int64_t nMaxFutureBlockTime = pindexPrev->MaxFutureBlockTime(nAdjustedTime, consensusParams);
+    if (block.GetBlockTime() > nMaxFutureBlockTime && Params().NetworkIDString() != CBaseChainParams::REGTEST) {
+        return state.Invalid(ValidationInvalidReason::BLOCK_TIME_FUTURE, false, REJECT_INVALID, "time-too-new", strprintf("block timestamp too far in the future %d %d", block.GetBlockTime(), nMaxFutureBlockTime));
+    }
 
     // Check blocktime mask
     if (!IsValidBlockTimeStamp(block.GetBlockTime(), nHeight, consensusParams) && Params().NetworkIDString() != CBaseChainParams::REGTEST)
