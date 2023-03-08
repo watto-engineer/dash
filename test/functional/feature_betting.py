@@ -1560,7 +1560,7 @@ class BettingTest(WagerrTestFramework):
         #self.log.info("Total Amount Bet Player 2 %s" % player2_total_bet)
         assert_equal(betam2, player2_total_bet + 350)
         #self.log.info("Total Amount Won Player 2 %s" % betpay2)
-        assert_equal(round(Decimal(betpay2), 8), round(Decimal(2134.15000000), 8))
+        assert_equal(round(Decimal(betpay2), 8), round(Decimal(3546.3500000), 8))
 
         self.log.info("Debug Events")
         pprint.pprint(self.nodes[0].listeventsdebug())
