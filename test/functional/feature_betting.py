@@ -1186,7 +1186,7 @@ class BettingTest(WagerrTestFramework):
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         self.sync_all()
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(5)
         self.sync_all()
 
         # place result for event 7: Gambit wins with score 16:14
