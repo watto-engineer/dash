@@ -413,9 +413,9 @@ bool CheckTokens(const CTransactionRef &tx, CValidationState &state, const CCoin
 
     if ((unsigned int)nHeight >= Params().GetConsensus().ATPStartHeight) {
         std::unordered_map<CTokenGroupID, CTokenGroupBalance> tgMintMeltBalance;
-        CAmount nWagerrIn, nWagerrOut;
-        if (!CheckTokenGroups(*tx, state, view, nWagerrIn, nWagerrOut, tgMintMeltBalance))
-            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Token group inputs and outputs do not balance"), REJECT_MALFORMED, "token-group-imbalance");
+        if (!CheckTokenGroups(*tx, state, view, nWagerrIn, nWagerrOut, tgMintMeltBalance)) {
+            return false; // State was set in CheckTokenGroups
+        }
 
         //Check that all token transactions paid their fees
         if (IsAnyOutputGrouped(*tx)) {
