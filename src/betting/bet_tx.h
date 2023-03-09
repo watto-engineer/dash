@@ -357,7 +357,10 @@ public:
 
     SERIALIZE_METHODS(CPeerlessBetTx, obj)
     {
-        READWRITE(obj.nEventId);
+        // Do not serialize nEventID when the 
+        if (!((s.GetType() & SER_NETWORK) && (s.GetVersion() == BetTxVersion5))) {
+            READWRITE(obj.nEventId);
+        }
         READWRITE(obj.nOutcome);
     }
 };
@@ -584,9 +587,11 @@ template<typename BettingTxTypeName>
 std::unique_ptr<BettingTxTypeName> DeserializeBettingTx(CDataStream &ss)
 {
     BettingTxTypeName bettingTx;
-    if (ss.size() < ::GetSerializeSize(bettingTx, PROTOCOL_VERSION))
+    try {
+        ss >> bettingTx;
+    } catch (...) {
         return nullptr;
-    ss >> bettingTx;
+    }
     // check buffer stream is empty after deserialization
     if (!ss.empty())
         return nullptr;
@@ -604,7 +609,7 @@ bool EncodeBettingTxPayload(const CBettingTxHeader& header, const BetTx& betting
     switch (header.version) {
         case BetTxVersion4:
         {
-            CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+            CDataStream ss(SER_NETWORK, BetTxVersion4);
             ss << (uint8_t) BTX_PREFIX << (uint8_t) header.version << (uint8_t) header.txType << bettingTx;
             for (auto it = ss.begin(); it < ss.end(); ++it) {
                 betData.emplace_back((unsigned char)(*it));
@@ -613,8 +618,8 @@ bool EncodeBettingTxPayload(const CBettingTxHeader& header, const BetTx& betting
         }
         case BetTxVersion5:
         {
-            CDataStream ss(SER_NETWORK, CLIENT_VERSION);
-            ss << (uint8_t) BTX_PREFIX << (uint8_t) header.version << (uint8_t) header.txType << bettingTx;
+            CDataStream ss(SER_NETWORK, BetTxVersion5);
+            ss << bettingTx;
             for (auto it = ss.begin(); it < ss.end(); ++it) {
                 betData.emplace_back((unsigned char)(*it));
             }

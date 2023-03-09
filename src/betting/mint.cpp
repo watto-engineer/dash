@@ -111,18 +111,23 @@ bool RegularBetMintRequest::GetOdds(const CBettingsView& bettingsViewCache, uint
     {
         case BetEventType::PEERLESS:
         {
-            std::unique_ptr<CPeerlessBetTx> betTx = GetBettingTx<CPeerlessBetTx>();
-            CPeerlessExtendedEventDB plEvent;
+            auto betTx = GetBettingTx<CPeerlessBetTx>();
             // Find the event in DB
-            if (!bettingsViewCache.events->Read(EventKey{betEvent.nEventId}, plEvent)) {
-                return false;
-            }
-            nOdds = GetBetPotentialOdds(CPeerlessLegDB{betEvent.nEventId, OutcomeType::moneyLineAwayWin}, plEvent);
+            CPeerlessExtendedEventDB plEvent;
+            if (!bettingsViewCache.events->Read(EventKey{betEvent.nEventId}, plEvent)) return false;
+            CPeerlessLegDB legDB = CPeerlessLegDB{betEvent.nEventId, (OutcomeType)betTx->nOutcome};
+            nOdds = GetBetPotentialOdds(legDB, plEvent);
             return true;
         }
         case BetEventType::FIELD:
         {
             auto betTx = GetBettingTx<CFieldBetTx>();
+            // Find the event in DB
+            CFieldEventDB fEvent;
+            if (!bettingsViewCache.fieldEvents->Read(EventKey{betEvent.nEventId}, fEvent)) return false;
+            CFieldLegDB legDB = CFieldLegDB{betEvent.nEventId, (FieldBetOutcomeType)betTx->nOutcome, betTx->nContenderId};
+            nOdds = GetBetPotentialOdds(legDB, fEvent);
+            return true;
         }
     }
     return false;
@@ -142,7 +147,14 @@ bool RegularBetMintRequest::Validate(CValidationState &state, const CBettingsVie
     if (!GetOdds(bettingsViewCache, nOdds)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bad-event");
     };
+    CAmount nPayout, nBurn;
+    if (!CalculatePayoutBurnAmounts(GetBetCosts(), nOdds, nPayout, nBurn)) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bet-bad-odds");
+    }
     
-
+    if (nPayout != tgMintMeltBalanceItem.output - tgMintMeltBalanceItem.input) {
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-bet-bad-costs");
+    };
+    isValid = true;
     return IsValid();
 }

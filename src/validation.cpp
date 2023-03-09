@@ -2603,7 +2603,9 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         if (!pblocktree->WriteTimestampIndex(CTimestampIndexKey(pindex->nTime, pindex->GetBlockHash())))
             return AbortNode(state, "Failed to write timestamp index");
 
-    tokenGroupManager->ApplyTokensFromBlock();
+    if (!tokenGroupManager->ApplyTokensFromBlock()) {
+        return AbortNode(state, "Failed to add token to database");
+    }
 
     assert(pindex->phashBlock);
     // add this block to the view's block chain
