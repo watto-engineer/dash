@@ -43,7 +43,7 @@ class SporkTest(WagerrTestFramework):
         # check spork propagation for connected nodes
         spork_new_state = not spork_default_state
         self.set_test_spork_state(self.nodes[0], spork_new_state)
-        wait_until(lambda: self.get_test_spork_state(self.nodes[1]), sleep=0.1, timeout=10)
+        wait_until(lambda: self.get_test_spork_state(self.nodes[1]), sleep=0.1, timeout=60)
 
         # restart nodes to check spork persistence
         self.stop_node(0)

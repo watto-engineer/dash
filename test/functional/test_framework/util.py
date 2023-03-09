@@ -6,7 +6,7 @@
 """Helpful routines for regression testing."""
 
 from base64 import b64encode
-from binascii import unhexlify
+from binascii import hexlify, unhexlify
 from decimal import Decimal, ROUND_DOWN
 import hashlib
 from subprocess import CalledProcessError
@@ -210,6 +210,9 @@ def EncodeDecimal(o):
 
 def count_bytes(hex_string):
     return len(bytearray.fromhex(hex_string))
+
+def bytes_to_hex_str(byte_str):
+    return hexlify(byte_str).decode('ascii')
 
 def hash256(byte_str):
     sha256 = hashlib.sha256()
@@ -480,6 +483,23 @@ def isolate_node(node, timeout=5):
 def reconnect_isolated_node(node, node_num):
     node.setnetworkactive(True)
     connect_nodes(node, node_num)
+
+def sync_blocks(rpc_connections, *, wait=1, timeout=60):
+    """
+    Wait until everybody has the same tip.
+
+    sync_blocks needs to be called with an rpc_connections set that has least
+    one node already synced to the latest, stable tip, otherwise there's a
+    chance it might return before all nodes are stably synced.
+    """
+    timeout *= Options.timeout_scale
+    stop_time = time.time() + timeout
+    while time.time() <= stop_time:
+        best_hash = [x.getbestblockhash() for x in rpc_connections]
+        if best_hash.count(best_hash[0]) == len(rpc_connections):
+            return
+        time.sleep(wait)
+    raise AssertionError("Block sync timed out:{}".format("".join("\n  {!r}".format(b) for b in best_hash)))
 
 def force_finish_mnsync(node):
     """

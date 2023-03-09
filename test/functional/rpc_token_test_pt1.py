@@ -5,7 +5,7 @@
 """Test the functionality of all CLI commands.
 
 """
-from test_framework.test_framework import BitcoinTestFramework
+from test_framework.test_framework import WagerrTestFramework
 
 from test_framework.util import *
 
@@ -18,20 +18,22 @@ import os
 import subprocess
 
 WAGERR_TX_FEE = 0.001
-WAGERR_AUTH_ADDR = "TJA37d7KPVmd5Lqa2EcQsptcfLYsQ1Qcfk"
+WAGERR_AUTH_ADDR = "TDn9ZfHrYvRXyXC6KxRgN6ZRXgJH2JKZWe"
 
-class TokenTest (BitcoinTestFramework):
+class TokenTest (WagerrTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
-        #self.extra_args = [["-debug"],["-debug"]]
+        self.mn_count = 0
+        self.extra_args = [["-debug"], ["-debug"]]
+        self.fast_dip3_enforcement = False
 
     def run_test(self):
-        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes(self.nodes[0], 1)
         tmpdir=self.options.tmpdir
         self.log.info("Generating Tokens...")
         self.nodes[0].generate(100)
-        self.nodes[0].importprivkey("TGVmKzjo3A4TJeBjU95VYZERj5sUq5BM68rv5UzT5KVszdgy5JCK")
+        self.nodes[0].importprivkey("TCH8Qby7krfugb2sFWzHQSEmTxBgzBSLkgPtt5EUnzDqfaX9dcsS")
         self.nodes[0].generate(100)
         self.nodes[0].generate(100)
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
@@ -43,22 +45,33 @@ class TokenTest (BitcoinTestFramework):
         LiveBLS=self.nodes[0].bls("generate")
         HulkBLS=self.nodes[0].bls("generate")
         self.log.info("MGTBLS %s" % MGTBLS["public"])
+        self.log.info("ORATBLS %s" % ORATBLS["public"])
         MGTAddr=self.nodes[0].getnewaddress()
         ORATAddr=self.nodes[0].getnewaddress()
         XWAGERRAddr=self.nodes[0].getnewaddress()
         PARTAddr=self.nodes[0].getnewaddress()
         LIVEAddr=self.nodes[0].getnewaddress()
         HulkAddr=self.nodes[0].getnewaddress()
-        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "https://www.google.com", "0", "4", MGTBLS["public"], "false", "true")
-        self.nodes[0].generate(1)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
+        self.nodes[0].generate(100)
+        self.nodes[0].generate(100)
+        MGT=self.nodes[0].configuremanagementtoken( "MGT", "Management", "4", "https://www.google.com", "0",  MGTBLS["public"], "false", "true")
         self.log.info("MGT %s" % MGT)
         MGTGroup_ID=MGT['groupID']
+        self.nodes[0].generate(100)
+        breakpoint()
         self.nodes[0].minttoken(MGTGroup_ID, MGTAddr, '82')
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         mintaddr=self.nodes[0].getnewaddress()
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].minttoken(MGTGroup_ID, mintaddr, 500)
+        self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
+        self.nodes[0].generate(1)
+        ORAT=self.nodes[0].configuremanagementtoken( "ORAT", "ORAT", "4", "https://www.google.com", "0",  ORATBLS["public"], "false", "true")
+        self.log.info("ORAT %s" % ORAT)
+        ORATGroup_ID=ORAT['groupID']
+        self.nodes[0].minttoken(ORATGroup_ID, ORATAddr, '82')
         self.nodes[0].sendtoaddress(WAGERR_AUTH_ADDR, 10)
         self.nodes[0].generate(1)
         XWAGERRTok=self.nodes[0].configuremanagementtoken("XWAGERR", "ExtraWagerr", "https://github.com/wagerr/ATP-descriptions/blob/master/WAGERR-testnet-XWAGERR.json","f5125a90bde180ef073ce1109376d977f5cbddb5582643c81424cc6cc842babd","0", XWAGERRBLS["public"], "true", "true")

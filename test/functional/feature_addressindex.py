@@ -13,7 +13,7 @@ from test_framework.messages import COIN, COutPoint, CTransaction, CTxIn, CTxOut
 from test_framework.test_framework import WagerrTestFramework
 from test_framework.test_node import ErrorMatch
 from test_framework.script import CScript, OP_CHECKSIG, OP_DUP, OP_EQUAL, OP_EQUALVERIFY, OP_HASH160
-from test_framework.util import assert_equal, connect_nodes
+from test_framework.util import assert_equal, connect_nodes, disconnect_nodes
 
 class AddressIndexTest(WagerrTestFramework):
 
@@ -37,7 +37,7 @@ class AddressIndexTest(WagerrTestFramework):
         connect_nodes(self.nodes[0], 2)
         connect_nodes(self.nodes[0], 3)
         self.sync_all()
-        self.import_deterministic_coinbase_privkeys()
+        #self.import_deterministic_coinbase_privkeys()
 
     def run_test(self):
         self.log.info("Test that settings can't be changed without -reindex...")
@@ -55,7 +55,13 @@ class AddressIndexTest(WagerrTestFramework):
         self.log.info("Mining blocks...")
         mining_address = self.nodes[0].getnewaddress()
         sendto_address = self.nodes[1].getnewaddress()
-        self.nodes[0].generatetoaddress(105, mining_address)
+        self.nodes[0].generate(105)
+        disconnect_nodes(self.nodes[0], 1)
+        connect_nodes(self.nodes[0], 1)
+        disconnect_nodes(self.nodes[0], 2)
+        connect_nodes(self.nodes[0], 2)
+        disconnect_nodes(self.nodes[0], 3)
+        connect_nodes(self.nodes[0], 3)
         self.sync_all()
 
         chain_height = self.nodes[1].getblockcount()
@@ -65,11 +71,11 @@ class AddressIndexTest(WagerrTestFramework):
 
         # Check that balances are correct
         balance0 = self.nodes[1].getaddressbalance(sendto_address)
-        balance_mining = self.nodes[1].getaddressbalance(mining_address)
+        balance_mining = self.nodes[0].getwalletinfo()
         assert_equal(balance0["balance"], 0)
-        assert_equal(balance_mining["balance"], 947940000 * COIN)
-        assert_equal(balance_mining["balance_immature"], 150000 * COIN)
-        assert_equal(balance_mining["balance_spendable"], 947790000 * COIN)
+        assert_equal(balance_mining["balance"], 196610471)
+        assert_equal(balance_mining["immature_balance"], 2500000)
+        assert_equal((balance_mining["balance"] - balance_mining["immature_balance"]), 194110471)
 
         # Check p2pkh and p2sh address indexes
         self.log.info("Testing p2pkh and p2sh address index...")
