@@ -3301,10 +3301,7 @@ static bool NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
 static void LimitValidationInterfaceQueue(int nHeight) LOCKS_EXCLUDED(cs_main) {
     AssertLockNotHeld(cs_main);
 
-    // Added while betting requires txindex
-    int WBPVersion = Params().GetConsensus().GetWBPVersion(nHeight);
-    int callbacksLimit = g_txindex && WBPVersion <= 4 && WBPVersion > 0 ? 1 : 10;
-    if (GetMainSignals().CallbacksPending() > callbacksLimit) {
+    if (GetMainSignals().CallbacksPending() > 10) {
         SyncWithValidationInterfaceQueue();
     }
 }

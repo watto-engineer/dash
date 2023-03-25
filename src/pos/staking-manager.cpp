@@ -329,8 +329,6 @@ void CStakingManager::DoMaintenance(CConnman& connman, ChainstateManager& chainm
         nLastCoinStakeSearchTime = nSearchTime;
     }
 
-    pwallet->BlockUntilSyncedToCurrentChain();
-
     // Create new block
     std::shared_ptr<CMutableTransaction> coinstakeTxPtr = std::shared_ptr<CMutableTransaction>(new CMutableTransaction);
     std::shared_ptr<CStakeInput> coinstakeInputPtr = nullptr;
