@@ -190,6 +190,7 @@ public:
     // Wagerr specific fields
     int64_t nMint{0};
     int64_t nMoneySupply{0};
+    std::vector<uint32_t> vResultIDs{};
 
     //! zerocoin specific fields
     std::map<libzerocoin::CoinDenomination, uint16_t> mapZerocoinSupply{};
@@ -463,6 +464,9 @@ public:
 
         READWRITE(obj.nMint);
         READWRITE(obj.nMoneySupply);
+        if (obj.nVersion <= 7) {
+            READWRITE(obj.vResultIDs);
+        }
         READWRITE(VARINT(obj.nFlags));
         if(obj.nVersion > 3 && obj.nVersion < 7) {
             READWRITE(obj.nAccumulatorCheckpoint);

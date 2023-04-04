@@ -36,11 +36,11 @@ bool CheckBettingTx(const CBettingsView& bettingsViewCache, const std::unique_pt
 bool CheckBettingTx(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
 
 /** Parse the transaction for betting data **/
-void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewCache, const CTransactionRef& tx, const CBlockIndex* pindex, const CBlock &block, const bool wagerrProtocolV3);
+void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewCache, std::vector<uint32_t>& vCurResultIDs, const CTransactionRef& tx, const CBlockIndex* pindex, const CBlock &block, const bool wagerrProtocolV3);
 
-CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts);
+CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CBlockIndex* pindexPrev, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts);
 
-bool BettingUndo(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, int height, const std::vector<CTransactionRef>& vtx);
+bool BettingUndo(const CCoinsViewCache &view, CBettingsView& bettingsViewCache, const CBlockIndex* pindex, const std::vector<CTransactionRef>& vtx);
 
 UniValue getbetbytxid(const JSONRPCRequest& request);
 UniValue getbet(const JSONRPCRequest& request);

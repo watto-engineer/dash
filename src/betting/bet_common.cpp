@@ -142,47 +142,53 @@ std::vector<CPeerlessResultDB> GetPLResults(const CCoinsViewCache &view, const C
 }
 
 /**
- * Check a given block to see if it contains a Field result TX.
+ * Check a given block to see if it contains a Peerless result TX.
  *
- * @return results vector.
+ * @return results true if successful and false on error.
  */
-std::vector<CFieldResultDB> GetFieldResults(const CCoinsViewCache &view, int nLastBlockHeight)
+ bool GetPLResultsFromDB(const CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CPeerlessResultDB>& results)
 {
-    std::vector<CFieldResultDB> results;
-
-    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
-
-    // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = ::ChainActive()[nLastBlockHeight];
-
-    CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex, Params().GetConsensus());
-
-    for (CTransactionRef tx : block.vtx) {
-        if (tx->vout.size() > 2) continue;
-
-        // Look for result OP RETURN code in the tx vouts.
-        for (const CTxOut &txOut : tx->vout) {
-
-            auto bettingTx = ParseBettingTx(txOut);
-
-            if (bettingTx == nullptr || bettingTx->GetTxType() != fResultTxType) continue;
-
-            // Ensure the result TX has been posted by Oracle wallet.
-            if (!IsValidOracleTx(view, tx, nLastBlockHeight)) continue;
-
-            CFieldResultTx* resultTx = (CFieldResultTx *)bettingTx.get();
-
-            LogPrint(BCLog::BETTING, "Result for field event %lu was found...\n", resultTx->nEventId);
-
-            // Store the result if its a valid result OP CODE.
-            results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->contendersResults);
-            if (!fMultipleResultsAllowed) return results;
-        }
+    if (!pindexPrev) {
+        return false;
     }
 
-    return results;
+    bool fMultipleResultsAllowed = (pindexPrev->nHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
+
+    for (uint32_t nEventId : pindexPrev->vResultIDs) {
+        LogPrint(BCLog::BETTING, "Retrieving result for event %lu...\n", nEventId);
+        CPeerlessResultDB res;
+        if (!bettingsViewCache.results->Read(ResultKey{nEventId}, res)) {
+            continue;
+        }
+        results.emplace_back(res);
+        if (!fMultipleResultsAllowed) return true;
+    }
+    return true;
+}
+
+/**
+ * Check a given block to see if it contains a Field result TX.
+ *
+ * @return results true if successful and false on error.
+ */
+ bool GetFieldResultsFromDB(const CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CFieldResultDB>& results)
+{
+    if (!pindexPrev) {
+        return false;
+    }
+
+    bool fMultipleResultsAllowed = (pindexPrev->nHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight());
+
+    for (uint32_t nEventId : pindexPrev->vResultIDs) {
+        LogPrint(BCLog::BETTING, "Retrieving result for event %lu...\n", nEventId);
+        CFieldResultDB res;
+        if (!bettingsViewCache.fieldResults->Read(ResultKey{nEventId}, res)) {
+            continue;
+        }
+        results.emplace_back(res);
+        if (!fMultipleResultsAllowed) return true;
+    }
+    return true;
 }
 
 /**
