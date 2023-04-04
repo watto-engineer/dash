@@ -58,14 +58,19 @@ uint32_t GetBetSearchStartHeight(int nHeight) {
  *
  * @return payout vector, payouts info vector.
  */
-void GetPLBetPayoutsV3(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+bool GetPLBetPayoutsV3(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    const int nLastBlockHeight = nNewBlockHeight - 1;
+    const int nLastBlockHeight = pindexPrev->nHeight;
+    const int nNewBlockHeight = nLastBlockHeight + 1;
 
     uint64_t refundOdds{BET_ODDSDIVISOR};
 
     // Get all the results posted in the prev block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(view, block, nLastBlockHeight);
+    std::vector<CPeerlessResultDB> results;
+    if (!GetPLResultsFromDB(bettingsViewCache, pindexPrev, results)) {
+        LogPrint(BCLog::BETTING, "Unable to find the peerless results in the DB\n");
+        return false;
+    }
 
     bool fWagerrProtocolV3 = nLastBlockHeight >= Params().GetConsensus().WagerrProtocolV3StartHeight();
 
@@ -261,7 +266,7 @@ void GetPLBetPayoutsV3(const CCoinsViewCache &view, const CBlock& block, CBettin
     }
 
     LogPrint(BCLog::BETTING, "Finished generating payouts...\n");
-
+    return true;
 }
 
 /**
@@ -512,11 +517,14 @@ void GetCGLottoBetPayoutsV3(const CBlock& block, const CCoinsViewCache &view, CB
  * But coin tx outs were undid early in native bitcoin core.
  * @return
  */
-bool UndoPLBetPayouts(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, int height)
+bool UndoPLBetPayouts(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev)
 {
-    int nCurrentHeight = ::ChainActive().Height();
+    int nCurrentHeight = pindexPrev->nHeight + 1;
     // Get all the results posted in the previous block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(view, block, height - 1);
+    std::vector<CPeerlessResultDB> results;
+    if (!GetPLResultsFromDB(bettingsViewCache, pindexPrev, results)) {
+        return false;
+    };
 
     LogPrintf("Start undo payouts...\n");
 

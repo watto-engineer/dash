@@ -264,7 +264,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
         CCoinsViewCache &view = ::ChainstateActive().CoinsTip();
         CBettingsView bettingsViewCache(bettingsView.get());
-        nBetPayout += GetBettingPayouts(view, bettingsViewCache, nHeight, mExpectedPayouts);
+        nBetPayout += GetBettingPayouts(view, bettingsViewCache, pindexPrev, mExpectedPayouts);
 
         switch (Params().GetConsensus().GetWBPVersion(nHeight)) {
             case WBP05:

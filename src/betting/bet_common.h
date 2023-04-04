@@ -10,7 +10,9 @@
 #include <base58.h>
 #include <amount.h>
 
+class CBettingsView;
 class CBlock;
+class CBlockIndex;
 class CCoinsViewCache;
 class CPeerlessResultDB;
 class CChainGamesResultDB;
@@ -202,11 +204,11 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
 
 /** Check a given block to see if it contains a Peerless result TX. **/
 std::vector<CPeerlessResultDB> GetPLResults(const CCoinsViewCache &view, const CBlock& block, int nLastBlockHeight);
+/** Check a given block index to see if it contains a Peerless result TX. **/
+bool GetPLResultsFromDB(const CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CPeerlessResultDB>& results);
 
-/**
- * Check a given block to see if it contains a Field result TX.
- */
-std::vector<CFieldResultDB> GetFieldResults(const CCoinsViewCache &view, int nLastBlockHeight);
+/** Check a given block index to see if it contains a Field result TX. **/
+bool GetFieldResultsFromDB(const CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CFieldResultDB>& results);
 
 /** Find chain games lotto result. **/
 bool GetCGLottoEventResults(const CBlock& block, const CCoinsViewCache &view, const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);

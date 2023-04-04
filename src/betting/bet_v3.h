@@ -22,7 +22,7 @@ class CChainGamesResultDB;
 void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 /** Using betting database for handle bets **/
-void GetPLBetPayoutsV3(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+bool GetPLBetPayoutsV3(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 /* Creates the bet payout vector for all winning Quick Games bets */
 void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
@@ -32,7 +32,7 @@ void GetCGLottoBetPayoutsV3(const CBlock& block, const CCoinsViewCache &view, CB
 
 uint32_t GetBetSearchStartHeight(int nHeight);
 
-bool UndoPLBetPayouts(const CCoinsViewCache &view, const CBlock& block, CBettingsView &bettingsViewCache, int height);
+bool UndoPLBetPayouts(const CCoinsViewCache &view, CBettingsView &bettingsViewCache, const CBlockIndex* pindexPrev);
 bool UndoQGBetPayouts(CBettingsView &bettingsViewCache, int height);
 
 #endif // WAGERR_V3_BET_H

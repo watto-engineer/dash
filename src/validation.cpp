@@ -1821,7 +1821,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
     }
 
     /* Undo betting data */
-    if (!BettingUndo(view, bettingsViewCache, pindex->nHeight, block.vtx))
+    if (!BettingUndo(view, bettingsViewCache, pindex, block.vtx))
         return DISCONNECT_FAILED;
 
     // move best block pointer to prevout block
@@ -2495,7 +2495,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     case WBP02:
         {
             std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
-            CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->nHeight, mExpectedPayouts);
+            CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->pprev, mExpectedPayouts);
             blockReward.AddReward(CReward::REWARD_BETTING, nExpectedBetMint);
 
             nTime5_3a = GetTimeMicros(); nTimeBetRewards += nTime5_3a - nTime5_2;
@@ -2503,7 +2503,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
             if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
                 std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
-                CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->nHeight, mExpectedPayouts);
+                CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->pprev, mExpectedPayouts);
                 IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount);
 
                 if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
@@ -2566,13 +2566,15 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         return true;
 
     // Look through the block for any events, results or mapping TX.
+    std::vector<uint32_t> vCurResultIDs;
     if (pindex->nHeight > chainparams.GetConsensus().WagerrProtocolV2StartHeight()) {
         for (unsigned int i = 0; i < block.vtx.size(); i++)
         {
             const CTransactionRef tx = block.vtx[i];
-            ProcessBettingTx(view, bettingsViewCache, tx, pindex, block, pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV3StartHeight());
+            ProcessBettingTx(view, bettingsViewCache, vCurResultIDs, tx, pindex, block, pindex->nHeight >= chainparams.GetConsensus().WagerrProtocolV3StartHeight());
         }
     }
+    pindex->vResultIDs = vCurResultIDs;
 
     if (!WriteUndoDataForBlock(blockundo, state, pindex, chainparams))
         return false;
