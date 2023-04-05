@@ -44,6 +44,8 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
 void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins, const std::vector<CRecipient> &outputs,
     CAmount totalGroupedNeeded, CTokenGroupID grpID, CWallet *wallet);
 
+void ConstructBetTx(CTransactionRef &txNew, const CRecipient &output, CAmount totalBetAmountNeeded, CWallet *wallet);
+
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet);
 void GroupSend(CTransactionRef &txNew, const CTokenGroupID &grpID, const std::vector<CRecipient> &outputs,
     CAmount totalNeeded, CWallet *wallet);

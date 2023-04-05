@@ -83,7 +83,11 @@ bool CTokenDB::LoadTokensFromDB(std::string& strError) {
     std::vector<CTokenGroupCreation> vTokenGroups;
     FindTokenGroups(vTokenGroups, strError);
 
-    tokenGroupManager->AddTokenGroups(vTokenGroups);
+    if (!tokenGroupManager->AddTokenGroups(vTokenGroups)) {
+        strError = "Unable to add unique token identifier";
+        return false;
+    }
+
     return true;
 }
 
@@ -174,7 +178,10 @@ bool ReindexTokenDB(std::string &strError) {
             strError = "Error writing token database to disk";
             return false;
         }
-        tokenGroupManager->AddTokenGroups(vTokenGroups);
+        if (!tokenGroupManager->AddTokenGroups(vTokenGroups)) {
+            strError = "Unable to add unique token identifier";
+            return false;
+        }
         vTokenGroups.clear();
 
         pindex = ::ChainActive().Next(pindex);

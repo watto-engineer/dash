@@ -1604,6 +1604,110 @@ extern UniValue minttoken(const JSONRPCRequest& request)
     return tx->GetHash().GetHex();
 }
 
+extern UniValue mintbet(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1)
+        throw std::runtime_error(
+            "mintbet \"groupid\" \"wagerraddress\" quantity \n"
+            "\nMint new tokens.\n"
+            "\nArguments:\n"
+            "1. \"groupID\"     (string, required) the group identifier\n"
+            "2. \"address\"     (string, required) the destination address\n"
+            "3. \"amount\"      (numeric, required) the amount of tokens desired\n"
+            "\n"
+            "\nExample:\n" +
+            HelpExampleCli("minttoken", "wagerrreg1zwm0kzlyptdmwy3849fd6z5epesnjkruqlwlv02u7y6ymf75nk4qs6u85re gMngqs6eX1dUd8dKdwPqGJchc1S3e6b9Cx 40") +
+            "\n"
+        );
+
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    if (!wallet) return NullUniValue;
+    CWallet* const pwallet = wallet.get();
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
+    LOCK2(pwallet->cs_wallet, cs_main); // 1) to maintain locking order 2) because I am reserving UTXOs for use in a tx
+
+    EnsureWalletIsUnlocked(pwallet);
+
+    CTokenGroupID grpID;
+    CAmount totalTokensNeeded = 0;
+    unsigned int curparam = 0;
+    std::vector<CRecipient> outputs;
+    // Get data from the parameter line. this fills grpId and adds 1 output for the correct # of tokens
+    curparam = ParseGroupAddrValue(request, curparam, grpID, outputs, totalTokensNeeded, true);
+
+    if (outputs.empty())
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "No destination address or payment amount");
+    }
+    if (curparam != request.params.size())
+    {
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Improper number of parameters, did you forget the payment amount?");
+    }
+
+    CCoinControl coinControl;
+    coinControl.fAllowOtherInputs = true; // Allow a normal WAGERR input for change
+    std::string strError;
+
+    // Now find a mint authority
+    std::vector<COutput> coins;
+    int nOptions = pwallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+        CTokenGroupInfo tg(out->scriptPubKey);
+        if ((tg.associatedGroup == grpID) && tg.allowsMint())
+        {
+            return true;
+        }
+        return false;
+    });
+
+    // if its a subgroup look for a parent authority that will work
+    // As an idiot-proofing step, we only allow parent authorities that can be renewed, but that is a
+    // preference coded in this wallet, not a group token requirement.
+    if ((nOptions == 0) && (grpID.isSubgroup()))
+    {
+        // if its a subgroup look for a parent authority that will work
+        nOptions = pwallet->FilterCoins(coins, [grpID](const CWalletTx *tx, const CTxOut *out) {
+            CTokenGroupInfo tg(out->scriptPubKey);
+            if (tg.isAuthority() && tg.allowsRenew() && tg.allowsSubgroup() && tg.allowsMint() &&
+                (tg.associatedGroup == grpID.parentGroup()))
+            {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    if (nOptions == 0)
+    {
+        strError = "To mint coins, an authority output with mint capability is needed.";
+        throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strError);
+    }
+    COutput authority(nullptr, 0, 0, false, false, false);
+
+    // Just pick the first one for now.
+    for (auto coin : coins)
+    {
+        authority = coin;
+        break;
+    }
+
+    std::vector<COutput> chosenCoins;
+    chosenCoins.push_back(authority);
+
+    ReserveDestination childAuthorityKey(pwallet);
+    RenewAuthority(authority, outputs, childAuthorityKey);
+
+    // I don't "need" tokens even though they are in the output because I'm minting, which is why
+    // the token quantities are 0
+    CTransactionRef tx;
+    ConstructTx(tx, chosenCoins, outputs, 0, grpID, pwallet);
+    childAuthorityKey.KeepDestination();
+    return tx->GetHash().GetHex();
+}
+
 extern UniValue melttoken(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1)

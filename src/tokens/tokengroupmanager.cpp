@@ -22,6 +22,7 @@ std::shared_ptr<CTokenGroupManager> tokenGroupManager;
 
 CTokenGroupManager::CTokenGroupManager() {
     mapTokenGroups.clear();
+    mapBetTokens.clear();
 }
 
 bool CTokenGroupManager::StoreManagementTokenGroups(CTokenGroupCreation tokenGroupCreation) {
@@ -71,6 +72,18 @@ bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& 
         bool fInsertedNew = ret.second;
         if (!fInsertedNew) {
             LogPrint(BCLog::TOKEN, "%s - Double token creation with tokenGroupID %s.\n", __func__, EncodeTokenGroup(tokenGroupCreationRet.tokenGroupInfo.associatedGroup));
+            return false;
+        }
+        if (tokenGroupCreation.creationTransaction->nType == TRANSACTION_GROUP_CREATION_BETTING) {
+            CTokenGroupDescriptionBetting tgDesc;
+            tgDesc = boost::get<CTokenGroupDescriptionBetting>(*tokenGroupCreation.pTokenGroupDescription);
+            auto retBet = mapBetTokens.insert(std::pair<uint32_t, CTokenGroupID>(tgDesc.nEventId, tokenGroupCreation.tokenGroupInfo.associatedGroup));
+
+            bool fInsertedNew = retBet.second;
+            if (!fInsertedNew) {
+                LogPrint(BCLog::TOKEN, "%s - Double event token creation with tokenGroupID %s.\n", __func__, EncodeTokenGroup(tokenGroupCreationRet.tokenGroupInfo.associatedGroup));
+                return false;
+            }
         }
     }
     return true;
@@ -78,6 +91,7 @@ bool CTokenGroupManager::AddTokenGroups(const std::vector<CTokenGroupCreation>& 
 
 void CTokenGroupManager::ResetTokenGroups() {
     mapTokenGroups.clear();
+    mapBetTokens.clear();
     ClearManagementTokenGroups();
 
     CTokenGroupInfo tgInfoWAGERR(NoGroup, (CAmount)GroupAuthorityFlags::ALL);
@@ -103,6 +117,16 @@ bool CTokenGroupManager::RemoveTokenGroup(CTransaction tx, CTokenGroupID &toRemo
     } else if (tx.nType == TRANSACTION_GROUP_CREATION_NFT) {
         CTokenGroupDescriptionNFT tgDesc;
         hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+    } else if (tx.nType == TRANSACTION_GROUP_CREATION_BETTING) {
+        CTokenGroupDescriptionBetting tgDesc;
+        hasNewTokenGroup = GetTokenConfigurationParameters(tx, tokenGroupInfo, tgDesc);
+
+        if (hasNewTokenGroup) {
+            auto iter = mapBetTokens.find(tgDesc.nEventId);
+            if (iter != mapBetTokens.end()) {
+                mapBetTokens.erase(iter);
+            }
+        }
     }
 
     if (hasNewTokenGroup) {
@@ -133,6 +157,17 @@ bool CTokenGroupManager::GetTokenGroupCreation(const CTokenGroupID& tgID, CToken
     }
     return true;
 }
+
+bool CTokenGroupManager::GetTokenGroupIdByEventID(const uint32_t nEventID, CTokenGroupID& tgID) {
+    auto iter = mapBetTokens.find(nEventID);
+    if (iter != mapBetTokens.end()) {
+        tgID = mapBetTokens.at(nEventID);
+    } else {
+        return false;
+    }
+    return true;
+}
+
 std::string CTokenGroupManager::GetTokenGroupNameByID(CTokenGroupID tokenGroupId) {
     CTokenGroupCreation tokenGroupCreation;
     return GetTokenGroupCreation(tokenGroupId, tokenGroupCreation) ? tgDescGetName(*tokenGroupCreation.pTokenGroupDescription) : "";
@@ -389,15 +424,18 @@ bool CTokenGroupManager::CollectTokensFromBlock(const CBlock& block, const CBloc
     return true;
 }
 
-void CTokenGroupManager::ApplyTokensFromBlock()
+bool CTokenGroupManager::ApplyTokensFromBlock()
 {
     AssertLockHeld(cs_main);
 
     LOCK(cs);
 
     pTokenDB->WriteTokenGroupsBatch(newTokenGroups);
-    tokenGroupManager->AddTokenGroups(newTokenGroups);
+    if (!tokenGroupManager->AddTokenGroups(newTokenGroups)) {
+        return false;
+    };
     newTokenGroups.clear();
+    return true;
 }
 
 bool CTokenGroupManager::UndoBlock(const CBlock& block, const CBlockIndex* pindex)

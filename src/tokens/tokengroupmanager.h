@@ -29,6 +29,7 @@ public:
 
 private:
     std::map<CTokenGroupID, CTokenGroupCreation> mapTokenGroups;
+    std::map<uint32_t, CTokenGroupID> mapBetTokens;
     std::unique_ptr<CTokenGroupCreation> tgMGTCreation;
     std::unique_ptr<CTokenGroupCreation> tgORATCreation;
 
@@ -48,7 +49,9 @@ public:
     std::string GetTokenGroupTickerByID(CTokenGroupID tokenGroupId);
     bool GetTokenGroupIdByTicker(std::string strTicker, CTokenGroupID &tokenGroupID);
     bool GetTokenGroupIdByName(std::string strName, CTokenGroupID &tokenGroupID);
+    bool GetTokenGroupIdByEventID(uint32_t nEventID, CTokenGroupID &tokenGroupID);
     std::map<CTokenGroupID, CTokenGroupCreation> GetMapTokenGroups() { return mapTokenGroups; };
+    std::map<uint32_t, CTokenGroupID> GetMapBetTokens() { return mapBetTokens; };
 
     template <typename CTokenGroupDescription> bool GetTokenGroupDescription(const CTokenGroupID& tgID, std::shared_ptr<CTokenGroupDescription>& tgDesc);
 
@@ -76,7 +79,7 @@ public:
     bool CheckFees(const CTransaction &tx, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance, CValidationState& state);
 
     bool CollectTokensFromBlock(const CBlock& block, const CBlockIndex* pindex, CValidationState& _state, const CCoinsViewCache& view, bool fJustCheck);
-    void ApplyTokensFromBlock();
+    bool ApplyTokensFromBlock();
     bool UndoBlock(const CBlock& block, const CBlockIndex* pindex);
 };
 
