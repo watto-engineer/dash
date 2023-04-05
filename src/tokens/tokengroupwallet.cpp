@@ -482,6 +482,37 @@ void ConstructTx(CTransactionRef &txNew, const std::vector<COutput> &chosenCoins
     groupChangeKeyReservation.KeepDestination();
 }
 
+void ConstructBetTx(CTransactionRef &txNew, const CRecipient &output, CAmount totalBetAmountNeeded, CWallet *wallet)
+{
+    CAmount totalGroupedAvailable = 0;
+
+    CMutableTransaction tx;
+
+    {
+        // Add group outputs based on the passed recipient data to the tx.
+        CTxOut txout(output.nAmount, output.scriptPubKey);
+        tx.vout.push_back(txout);
+
+        int nChangePosRet = -1;
+        bilingual_str strError;
+        bool lockUnspents;
+        std::set<int> setSubtractFeeFromOutputs;
+        CCoinControl coinControl;
+
+        if (!wallet->FundTransaction(tx, totalBetAmountNeeded, nChangePosRet, strError, lockUnspents, setSubtractFeeFromOutputs, coinControl)) {
+            throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
+        }
+
+        if (!wallet->SignTransaction(tx))
+        {
+            throw JSONRPCError(RPC_WALLET_ERROR, "Signing transaction failed");
+        }
+    }
+
+    txNew = MakeTransactionRef(std::move(tx));
+    wallet->CommitTransaction(txNew, {}, {});
+}
+
 void GroupMelt(CTransactionRef &txNew, const CTokenGroupID &grpID, CAmount totalNeeded, CWallet *wallet)
 {
     std::string strError;

@@ -30,6 +30,8 @@
 #include <rpc/util.h>
 #include <transactionrecord.h>
 #include <tokens/tokengroupwallet.h>
+#include <tokens/tokengroupmanager.h>
+#include <script/tokengroup.h>
 #include <script/descriptor.h>
 #include <util/bip32.h>
 #include <util/fees.h>
@@ -4139,7 +4141,7 @@ UniValue placebet(const JSONRPCRequest& request)
     if (!wallet) return NullUniValue;
     CWallet* const pwallet = wallet.get();
 
-    if (request.fHelp || request.params.size() < 3 || request.params.size() > 5)
+    if (request.fHelp || request.params.size() < 3 || request.params.size() > 6)
         throw std::runtime_error(
             "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
             "\nWARNING - Betting closes 20 minutes before event start time.\n"
@@ -4152,9 +4154,10 @@ UniValue placebet(const JSONRPCRequest& request)
             "                                       2 means away team win,\n"
             "                                       3 means a draw."
             "3. amount          (numeric, required) The amount in wgr to send.\n"
-            "4. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "4. destination     (string, required) The wagerr address to send to. Only used after v5 activation.\n"
+            "5. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
-            "5. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "6. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
             "\nResult:\n"
@@ -4196,7 +4199,8 @@ UniValue placebet(const JSONRPCRequest& request)
     if (outcome < moneyLineHomeWin || outcome > totalUnder)
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-    if (::ChainActive().Height() >= Params().GetConsensus().WagerrProtocolV4StartHeight()) {
+    uint8_t nWBPVersion = Params().GetConsensus().GetWBPVersion(::ChainActive().Height());
+    if (nWBPVersion >= 4) {
         CPeerlessExtendedEventDB plEvent;
         if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
@@ -4208,13 +4212,74 @@ UniValue placebet(const JSONRPCRequest& request)
     }
 
     CPeerlessBetTx plBet(eventId, outcome);
-    CBettingTxHeader betTxHeader(BetTxVersion4, plBetTxType);
-    std::vector<unsigned char> betData;
-    EncodeBettingTxPayload(betTxHeader, plBet, betData);
-    CScript betScript = CScript() << OP_RETURN << betData;
+    if (nWBPVersion < 5) {
+        CBettingTxHeader betTxHeader(BetTxVersion4, plBetTxType);
+        std::vector<unsigned char> betData;
+        EncodeBettingTxPayload(betTxHeader, plBet, betData);
+        CScript betScript = CScript() << OP_RETURN << betData;
 
-    CTransactionRef tx = BurnWithData(pwallet, betScript, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue), {} /* fromAccount */);
-    return tx->GetHash().GetHex();
+        CTransactionRef tx = BurnWithData(pwallet, betScript, nAmount, fSubtractFeeFromAmount, coin_control, std::move(mapValue), {} /* fromAccount */);
+        return tx->GetHash().GetHex();
+    } else {
+        if (request.params[3].isNull() || request.params[3].get_str().empty())
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: a destination address for the bet tokens is needed.");
+
+        CTxDestination dest = DecodeDestination(request.params[3].get_str());
+        if (!IsValidDestination(dest)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+        }
+        /*
+        CBettingTxHeader betTxHeader(BetTxVersion5, plBetTxType);
+        std::vector<unsigned char> betData;
+        EncodeBettingTxPayload(betTxHeader, plBet, betData);
+        uint32_t nEventID;
+
+        CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+        ss << (uint8_t) BTX_PREFIX << (uint8_t) header.version << (uint8_t) header.txType << bettingTx;
+        for (auto it = ss.begin(); it < ss.end(); ++it) {
+            betData.emplace_back((unsigned char)(*it));
+        }
+        */
+
+        // Find token group ID
+        CTokenGroupID betGroupID;
+        if (!tokenGroupManager->GetTokenGroupIdByEventID(plBet.nEventId, betGroupID)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: token group for event not found: " + std::to_string(eventId));
+        }
+        // Find subgroup ID
+        CBettingTxHeader betTxHeader(BetTxVersion5, plBetTxType);
+        std::vector<unsigned char> betData;
+        EncodeBettingTxPayload(betTxHeader, plBet, betData);
+        CTokenGroupID betOutcomeID(betGroupID, betData);
+
+        CCoinControl coinControl;
+        coinControl.m_feerate = CFeeRate(0);
+        coinControl.fOverrideFeeRate = true;
+
+        // TODO: Get proper tokenAmount value
+        CAmount tokenAmount = nAmount;
+
+        CScript script = GetScriptForDestination(dest, betOutcomeID, tokenAmount);
+        CRecipient recipientDummy = {script, nAmount, false};
+        CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+
+        std::vector<CRecipient> vecSend;
+        vecSend.push_back(recipient);
+
+        CAmount nFeeRequired;
+        bilingual_str strError;
+        int nChangePosRet = -1;
+        CTransactionRef tx;
+        if (!pwallet->CreateTransaction(vecSend, tx, nFeeRequired, nChangePosRet, strError, coin_control)) {
+            CAmount curBalance = pwallet->GetBalance().m_mine_trusted;
+            if (nAmount + nFeeRequired > curBalance)
+                strError = Untranslated(strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired)));
+            throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
+        }
+        CValidationState state;
+        pwallet->CommitTransaction(tx, std::move(mapValue), {});
+        return tx->GetHash().GetHex();
+    }
 }
 
 UniValue placeparlaybet(const JSONRPCRequest& request)
