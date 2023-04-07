@@ -1408,6 +1408,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                     case plResultTxType:
                     {
                         if (!validOracleTx) break;
+                        if (!wagerrProtocolV3 && vCurResultIDs.size() > 0) break;
 
                         CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
 
@@ -1427,8 +1428,10 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                         if (!bettingsViewCache.results->Write(ResultKey{plResult.nEventId}, plResult)) {
                             if (!wagerrProtocolV3) {
+                                bettingsViewCache.results->Update(ResultKey{plResult.nEventId}, plResult);
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
+                                vCurResultIDs.emplace_back(plResult.nEventId);
                             }
                             LogPrintf("Failed to write result! (%d)\n", bettingTx->GetTxType());
                             break;
@@ -1691,8 +1694,10 @@ CAmount GetBettingPayouts(const CCoinsViewCache &view, CBettingsView& bettingsVi
             GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
             break;
         case WBP02:
+        {
             GetPLBetPayoutsV3(view, bettingsViewCache, pindexPrev, vExpectedPayouts, vPayoutsInfo);
             GetCGLottoBetPayoutsV2(block, view, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+        }
         case WBP01:
         default:
             break;
