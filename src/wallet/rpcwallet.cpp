@@ -4269,7 +4269,6 @@ UniValue placebet(const JSONRPCRequest& request)
         CAmount nFeeRequired;
         bilingual_str strError;
         int nChangePosRet = -1;
-        vecSend.push_back(recipient);
         CTransactionRef tx;
         if (!pwallet->CreateTransaction(vecSend, tx, nFeeRequired, nChangePosRet, strError, coin_control)) {
             CAmount curBalance = pwallet->GetBalance().m_mine_trusted;

@@ -157,12 +157,6 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::STICKY_MELT)) {
                 gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::MELT;
             }
-            if (tokenGrp.associatedGroup.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
-                gBalance[tokenGrp.associatedGroup].ctrlPerms |= GroupAuthorityFlags::WAGERR; // Mint restrictions: before event close: fees must be paid; Melt restrictions: after event close
-            } else {
-                gBalance[tokenGrp.associatedGroup].ctrlPerms &= ~GroupAuthorityFlags::WAGERR;
-            }
-
             if (!tokenGrp.isAuthority())
             {
                 if (std::numeric_limits<CAmount>::max() - gBalance[tokenGrp.associatedGroup].input < amount)
@@ -263,7 +257,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
                     bal.allowedCtrlOutputPerms = bal.ctrlPerms = GroupAuthorityFlags::ALL;
                 }
                 // Betting token
-                if (newGrpId.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
+                if (newGrpId.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) || newGrpId.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)) {
                     if (tx.nType != TRANSACTION_GROUP_CREATION_BETTING) {
                         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "grp-invalid-token-flag", "This is not a betting token group");
                     }
@@ -311,13 +305,13 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
         }
         if (bal.input < bal.output)
         {
-            if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT) && !hasCapability(bal.ctrlPerms, GroupAuthorityFlags::WAGERR))
+            if (!hasCapability(bal.ctrlPerms, GroupAuthorityFlags::MINT) && !(txo.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) || txo.first.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)))
             {
                 return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-mint",
                     "Group output exceeds input, but no mint permission");
             }
-            if (hasCapability(bal.ctrlPerms, GroupAuthorityFlags::WAGERR)) {
-                if (bal.numInputs > 0 || bal.numOutputs > 1 || gBalance.size() > 1) {
+            if (txo.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN) || txo.first.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)) {
+                if (bal.numInputs > 0 || bal.numOutputs > 1) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_GROUP_IMBALANCE, "grp-invalid-bet-mint",
                         "Bet mints must have 1 token output");
                 }
