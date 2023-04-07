@@ -864,14 +864,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                     }
                     if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
                         // should not happen ever
-                        LogPrintf("Failed to update event!\n");
+                        LogPrintf("Failed to update event! (%d)!\n", bettingTx->GetTxType());
                         continue;
                     }
 
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, {plBet}, {plCachedEvent}, blockTime));
                 }
                 else {
-                    LogPrintf("Failed to find event!\n");
+                    LogPrintf("Failed to find event! (%d)!\n", bettingTx->GetTxType());
                 }
                 break;
             }
@@ -937,7 +937,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                         bettingsViewCache.events->Update(eventKey, plEvent);
                     }
                     else {
-                        LogPrintf("Failed to find event!\n");
+                        LogPrintf("Failed to find event! (%d)!\n", bettingTx->GetTxType());
                         continue;
                     }
                 }
@@ -1008,7 +1008,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                 if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
                     // should not happen ever
-                    LogPrintf("Failed to update field event!\n");
+                    LogPrintf("Failed to update field event! (%d)!\n", bettingTx->GetTxType());
                     break;
                 }
 
@@ -1017,7 +1017,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                     FieldBetKey{static_cast<uint32_t>(height), outPoint},
                     CFieldBetDB(betAmount, address, {fLeg}, {fCachedEvent}, blockTime)))
                 {
-                    LogPrintf("Failed to write bet!\n");
+                    LogPrintf("Failed to write bet! (%d)!\n", bettingTx->GetTxType());
                     break;
                 }
 
@@ -1107,14 +1107,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                 LogPrint(BCLog::BETTING, "CChainGamesBetTx: nEventId: %lu,", cgBetTx->nEventId);
                 if (!bettingsView->chainGamesLottoEvents->Exists(EventKey{cgBetTx->nEventId})) {
-                    LogPrintf("Failed to find event!\n");
+                    LogPrintf("Failed to find event! (%d)!\n", bettingTx->GetTxType());
                     continue;
                 }
 
                 if (!bettingsViewCache.chainGamesLottoBets->Write(
                         ChainGamesBetKey{static_cast<uint32_t>(height), outPoint},
                         CChainGamesBetDB{cgBetTx->nEventId, betAmount, address, blockTime})) {
-                    LogPrintf("Failed to write bet!\n");
+                    LogPrintf("Failed to write bet! (%d)!\n", bettingTx->GetTxType());
                     continue;
                 }
                 break;
@@ -1133,7 +1133,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                 if (!bettingsViewCache.quickGamesBets->Write(
                         QuickGamesBetKey{static_cast<uint32_t>(height), outPoint},
                         CQuickGamesBetDB{ (QuickGamesType) qgBetTx->gameType, qgBetTx->vBetInfo, betAmount, address, blockTime})) {
-                    LogPrintf("Failed to write bet!\n");
+                    LogPrintf("Failed to write bet! (%d)!\n", bettingTx->GetTxType());
                 }
                 break;
             }
@@ -1164,7 +1164,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to write new mapping!\n");
+                            LogPrintf("Failed to write new mapping (%d)!\n", bettingTx->GetTxType());
                         }
                         break;
                     }
@@ -1215,14 +1215,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                                 if (!bettingsViewCache.events->Update(eventKey, plEventToPatch)) {
                                     // should not happen ever
-                                    LogPrintf("Failed to update event!\n");
+                                    LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                                 }
                             } else {
                                 if (!wagerrProtocolV3) {
                                     // save failed tx to db, for avoiding undo issues
                                     bettingsViewCache.SaveFailedTx(bettingTxId);
                                 }
-                                LogPrintf("Failed to write new event!\n");
+                                LogPrintf("Failed to write new event! (%d)\n", bettingTx->GetTxType());
                             }
                         }
                         break;
@@ -1251,7 +1251,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                         FieldEventKey eventKey{fEvent.nEventId};
                         if (!bettingsViewCache.fieldEvents->Write(eventKey, fEvent))
-                            LogPrintf("Failed to write new event!\n");
+                            LogPrintf("Failed to write new event! (%d)\n", bettingTx->GetTxType());
 
                         break;
                     }
@@ -1276,10 +1276,10 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             fEvent.CalcOdds();
 
                             if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                                LogPrintf("Failed to update field event!\n");
+                                LogPrintf("Failed to update field event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
-                            LogPrintf("Failed to find field event!\n");
+                            LogPrintf("Failed to find field event! (%d)\n", bettingTx->GetTxType());
                         }
 
                         break;
@@ -1305,10 +1305,10 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             fEvent.CalcOdds();
 
                             if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                                LogPrintf("Failed to update field event!\n");
+                                LogPrintf("Failed to update field event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
-                            LogPrintf("Failed to find field event!\n");
+                            LogPrintf("Failed to find field event! (%d)\n", bettingTx->GetTxType());
                         }
 
                         break;
@@ -1330,10 +1330,10 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             fEvent.CalcOdds();
 
                             if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                                LogPrintf("Failed to update field event!\n");
+                                LogPrintf("Failed to update field event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
-                            LogPrintf("Failed to find field event!\n");
+                            LogPrintf("Failed to find field event! (%d)\n", bettingTx->GetTxType());
                         }
 
                         break;
@@ -1360,10 +1360,10 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             }
 
                             if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
-                                LogPrintf("Failed to update field event!\n");
+                                LogPrintf("Failed to update field event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
-                            LogPrintf("Failed to find field event!\n");
+                            LogPrintf("Failed to find field event! (%d)\n", bettingTx->GetTxType());
                         }
 
                         break;
@@ -1382,7 +1382,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                         CFieldEventDB fieldEvent;
                         if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fieldEvent)) {
-                            LogPrintf("Failed to find field event!\n");
+                            LogPrintf("Failed to find field event! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
 
@@ -1397,7 +1397,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                         }
 
                         if (!bettingsViewCache.fieldResults->Write(FieldResultKey{fEventResult.nEventId}, fEventResult)) {
-                            LogPrintf("Failed to write field result!\n");
+                            LogPrintf("Failed to write field result! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
 
@@ -1421,7 +1421,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
 
@@ -1430,7 +1430,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to write result!\n");
+                            LogPrintf("Failed to write result! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
 
@@ -1457,14 +1457,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                             // Update the event in the DB.
                             if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                                LogPrintf("Failed to update event!\n");
+                                LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
                             if (!wagerrProtocolV3) {
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                         }
                         break;
                     }
@@ -1483,7 +1483,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                         if (!bettingsViewCache.chainGamesLottoEvents->Write(
                                 eventKey,
                                 CChainGamesEventDB{ cgEventTx->nEventId, cgEventTx->nEntryFee })) {
-                            LogPrintf("Failed to write new event!\n");
+                            LogPrintf("Failed to write new event! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
                         break;
@@ -1501,13 +1501,13 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                         LogPrint(BCLog::BETTING, "CChainGamesResultTx: nEventId: %d\n", cgResultTx->nEventId);
 
                         if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
                         if (!bettingsViewCache.chainGamesLottoResults->Write(
                                 ResultKey{cgResultTx->nEventId},
                                 CChainGamesResultDB{ cgResultTx->nEventId })) {
-                            LogPrintf("Failed to write result!\n");
+                            LogPrintf("Failed to write result! (%d)\n", bettingTx->GetTxType());
                             break;
                         }
 
@@ -1534,14 +1534,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             plEvent.ExtractDataFromTx(*plSpreadsEventTx);
                             // Update the event in the DB.
                             if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                                LogPrintf("Failed to update event!\n");
+                                LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
                             if (!wagerrProtocolV3) {
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                         }
                         break;
                     }
@@ -1565,14 +1565,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                             // Update the event in the DB.
                             if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                                LogPrintf("Failed to update event!\n");
+                                LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
                             if (!wagerrProtocolV3) {
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                         }
                         break;
                     }
@@ -1592,14 +1592,14 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             plEvent.ExtractDataFromTx(*plEventPatchTx);
 
                             if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                                LogPrintf("Failed to update event!\n");
+                                LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                         }
                         else {
                             if (!wagerrProtocolV3) {
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
                             }
-                            LogPrintf("Failed to find event!\n");
+                            LogPrintf("Failed to find event! (%d)\n", bettingTx->GetTxType());
                         }
                         break;
                     }
@@ -1631,7 +1631,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
 
                                 // Update the event in the DB.
                                 if (!bettingsViewCache.events->Update(eventKey, plEvent))
-                                    LogPrintf("Failed to update event!\n");
+                                    LogPrintf("Failed to update event! (%d)\n", bettingTx->GetTxType());
                             }
                         }
 
