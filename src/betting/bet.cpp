@@ -1429,6 +1429,7 @@ void ProcessBettingTx(const CCoinsViewCache  &view, CBettingsView& bettingsViewC
                             if (!wagerrProtocolV3) {
                                 // save failed tx to db, for avoiding undo issues
                                 bettingsViewCache.SaveFailedTx(bettingTxId);
+                                vCurResultIDs.emplace_back(plResult.nEventId);
                             }
                             LogPrintf("Failed to write result! (%d)\n", bettingTx->GetTxType());
                             break;
