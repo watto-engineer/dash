@@ -47,24 +47,53 @@ bool BetTokensMinted(const std::unordered_map<CTokenGroupID, CTokenGroupBalance>
 }
 
 bool IsRegularBetMintRequest(const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance) {
-    if (nWGRSpent <= 0) return false;
-    if (tgMintMeltBalance.size() != 1) return false;
+    if (nWGRSpent <= 0){
+        LogPrintf("No WGR spent (%d)\n", nWGRSpent);
+        return false;
+    }
+    if (tgMintMeltBalance.size() != 1){
+        LogPrintf("MintMeltBalance not 1 (%d)\n", tgMintMeltBalance.size());
+        return false;
+    }
     for (std::pair<CTokenGroupID, CTokenGroupBalance> mintMeltItem : tgMintMeltBalance) {
-        if (!mintMeltItem.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) return false;
-        if (mintMeltItem.second.output <= 0) return false;
-        if (mintMeltItem.second.input != 0) return false;
+        if (!mintMeltItem.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) {
+            LogPrintf("No Betting Token flag\n");
+            return false;
+        }
+        if (mintMeltItem.second.numOutputs <= 0) {
+            LogPrintf("token outputs <= 0 (%d)\n", mintMeltItem.second.output);
+            return false;
+        }
+        if (mintMeltItem.second.numInputs != 0) {
+            LogPrintf("token inputs != 0 (%d)\n", mintMeltItem.second.input);
+            return false;
+        }
     }
     return true;
 }
 
 bool IsParlayBetMintRequest(const CAmount nWGRSpent, const std::unordered_map<CTokenGroupID, CTokenGroupBalance>& tgMintMeltBalance) {
-    if (nWGRSpent <= 0) return false;
-    if (tgMintMeltBalance.size() <= 1) return false;
+    if (nWGRSpent <= 0){
+        LogPrintf("No WGR spent (%d)\n", nWGRSpent);
+        return false;
+    }
+    if (tgMintMeltBalance.size() <= 1){
+        LogPrintf("MintMeltBalance not 1 (%d)\n", tgMintMeltBalance.size());
+        return false;
+    }
     for (std::pair<CTokenGroupID, CTokenGroupBalance> mintMeltItem : tgMintMeltBalance) {
-        if (!mintMeltItem.first.hasFlag(TokenGroupIdFlags::BETTING_TOKEN)) return false;
-        if (!mintMeltItem.first.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)) return false;
-        if (mintMeltItem.second.output <= 0) return false;
-        if (mintMeltItem.second.input != 0) return false;
+        if (!mintMeltItem.first.hasFlag(TokenGroupIdFlags::PARLAY_TOKEN)) {
+            LogPrintf("No Parlay Token flag\n");
+            return false;
+        }
+        if (mintMeltItem.second.numOutputs <= 1) {
+            LogPrintf("token outputs <= 1 (%d)\n", mintMeltItem.second.output);
+            return false;
+        }
+        if (mintMeltItem.second.numInputs != 0) {
+            LogPrintf("token inputs != 0 (%d)\n", mintMeltItem.second.input);
+            return false;
+        }
     }
     return true;
 }
