@@ -380,6 +380,78 @@ void TokenTxToJSON(const CTransactionRef& tx, const uint256 hashBlock, UniValue&
     }
 }
 
+static UniValue decoderawtokentransaction(const JSONRPCRequest& request)
+{
+    RPCHelpMan{"decoderawtransaction",
+                "\nReturn a JSON object representing the serialized, hex-encoded transaction.\n",
+                {
+                    {"hexstring", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction hex string"},
+                },
+                RPCResult{
+                    RPCResult::Type::OBJ, "", "",
+                    {
+                        {RPCResult::Type::STR_HEX, "txid", "The transaction id"},
+                        {RPCResult::Type::NUM, "size", "The transaction size"},
+                        {RPCResult::Type::NUM, "version", "The version"},
+                        {RPCResult::Type::NUM, "version", "The type"},
+                        {RPCResult::Type::NUM_TIME, "locktime", "The lock time"},
+                        {RPCResult::Type::ARR, "vin", "",
+                        {
+                            {RPCResult::Type::OBJ, "", "",
+                            {
+                                {RPCResult::Type::STR_HEX, "txid", "The transaction id"},
+                                {RPCResult::Type::NUM, "vout", "The output number"},
+                                {RPCResult::Type::OBJ, "scriptSig", "The script",
+                                {
+                                    {RPCResult::Type::STR, "asm", "asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "hex"},
+                                }},
+                                {RPCResult::Type::NUM, "sequence", "The script sequence number"},
+                            }},
+                        }},
+                        {RPCResult::Type::ARR, "vout", "",
+                        {
+                            {RPCResult::Type::OBJ, "", "",
+                            {
+                                {RPCResult::Type::NUM, "value", "The value in " + CURRENCY_UNIT},
+                                {RPCResult::Type::NUM, "n", "index"},
+                                {RPCResult::Type::OBJ, "scriptPubKey", "",
+                                {
+                                    {RPCResult::Type::STR, "asm", "the asm"},
+                                    {RPCResult::Type::STR_HEX, "hex", "the hex"},
+                                    {RPCResult::Type::NUM, "reqSigs", "The required sigs"},
+                                    {RPCResult::Type::STR, "type", "The type, eg 'pubkeyhash'"},
+                                    {RPCResult::Type::ARR, "addresses", "",
+                                    {
+                                        {RPCResult::Type::STR, "address", "wagerr address"},
+                                    }},
+                                }},
+                            }},
+                        }},
+                        {RPCResult::Type::NUM, "extraPayloadSize", true /*optional*/, "Size of DIP2 extra payload. Only present if it's a special TX"},
+                        {RPCResult::Type::STR_HEX, "extraPayload", true /*optional*/, "Hex-encoded DIP2 extra payload data. Only present if it's a special TX"},
+                    }
+                },
+                RPCExamples{
+                    HelpExampleCli("decoderawtokentransaction", "\"hexstring\"")
+            + HelpExampleRpc("decoderawtokentransaction", "\"hexstring\"")
+                },
+    }.Check(request);
+
+    RPCTypeCheck(request.params, {UniValue::VSTR});
+
+    CMutableTransaction mtx;
+
+    if (!DecodeHexTx(mtx, request.params[0].get_str()))
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+
+    UniValue result(UniValue::VOBJ);
+
+    TokenTxToUniv(MakeTransactionRef(CTransaction(std::move(mtx))), uint256(), result);
+
+    return result;
+}
+
 extern UniValue gettokentransaction(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
@@ -886,6 +958,7 @@ static const CRPCCommand commands[] =
 { //  category              name                        actor (function)            argNames
   //  --------------------- --------------------------  --------------------------  ----------
     { "tokens",             "tokeninfo",                &tokeninfo,                 {} },
+    { "tokens",             "decoderawtokentransaction",&decoderawtokentransaction, {"hexstring"} },
     { "tokens",             "gettokentransaction",      &gettokentransaction,       {} },
     { "tokens",             "getsubgroupid",            &getsubgroupid,             {} },
     { "tokens",             "createrawtokentransaction",&createrawtokentransaction, {} },
