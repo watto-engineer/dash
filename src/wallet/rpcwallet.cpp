@@ -4260,8 +4260,7 @@ UniValue placebet(const JSONRPCRequest& request)
         CAmount tokenAmount = nAmount;
 
         CScript script = GetScriptForDestination(dest, betOutcomeID, tokenAmount);
-        CRecipient recipientDummy = {script, nAmount, false};
-        CRecipient recipient = {script, GROUPED_SATOSHI_AMT, false};
+        CRecipient recipient = {script, nAmount + GROUPED_SATOSHI_AMT, true};
 
         std::vector<CRecipient> vecSend;
         vecSend.push_back(recipient);
@@ -4272,10 +4271,18 @@ UniValue placebet(const JSONRPCRequest& request)
         CTransactionRef tx;
         if (!pwallet->CreateTransaction(vecSend, tx, nFeeRequired, nChangePosRet, strError, coin_control)) {
             CAmount curBalance = pwallet->GetBalance().m_mine_trusted;
-            if (nAmount + nFeeRequired > curBalance)
+            if (nAmount > curBalance)
                 strError = Untranslated(strprintf("Error: This transaction requires a transaction fee of at least %s", FormatMoney(nFeeRequired)));
             throw JSONRPCError(RPC_WALLET_ERROR, strError.translated);
         }
+        CMutableTransaction mtx(*tx);
+        for (size_t x = 0; x <= mtx.vout.size(); x++) {
+            if (IsOutputGrouped(mtx.vout[x])) {
+                mtx.vout[x].nValue = GROUPED_SATOSHI_AMT;
+                break;
+            }
+        }
+        tx = MakeTransactionRef(mtx);
         CValidationState state;
         pwallet->CommitTransaction(tx, std::move(mapValue), {});
         return tx->GetHash().GetHex();
