@@ -23,6 +23,7 @@
 #include <consensus/tx_check.h>
 #include <consensus/tx_verify.h>
 #include <consensus/validation.h>
+#include <core_io.h>
 #include <cuckoocache.h>
 #include <flatfile.h>
 #include <hash.h>
@@ -862,7 +863,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         }
 
         if (regularBetMintRequest && !regularBetMintRequest->Validate(state, bettingsViewCache, ::ChainActive().Height()))
-            return state.Invalid(ValidationInvalidReason::TX_RESTRICTED_FUNCTIONALITY, error("Wrong betting token mint"), REJECT_MALFORMED, "wagerr-bad-token-mint");
+            return false; // state set in Validate()
 
         if (test_accept) {
             // Tx was accepted, but not added
@@ -1358,7 +1359,7 @@ void static ConflictingChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIR
 
 void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CValidationState &state) {
     statsClient.inc("warnings.InvalidBlockFound", 1.0f);
-    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
         pindex->nStatus |= BLOCK_FAILED_VALID;
         m_blockman.m_failed_blocks.insert(pindex);
         setDirtyBlockIndex.insert(pindex);
@@ -2502,13 +2503,29 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3a - nTime5_2), nTimeBetRewards * MICRO, nTimeBetRewards * MILLI / nBlocksTotal);
 
             if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
+                CBlock block;
+                bool fFoundBlock = ReadBlockFromDisk(block, pindex->pprev, Params().GetConsensus());
+                if (!fFoundBlock) {
+                    LogPrintf("Payouts not valid - Unable to read block %d\n", pindex->pprev->nHeight);
+                }
+                LogPrintf("Payouts not valid - previous block: %s\n", block.ToString());
+                for (int x = 0; x < block.vtx.size(); x++) {
+                    LogPrintf("tx[%d]: %s\n", x, EncodeHexTx(*(block.vtx[x])));
+                }
+                if (block.vtx.size() == 0) {
+                    LogPrintf("Payouts not valid - previous block from disk has 0 transactions\n");
+                    return state.Invalid(ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV, error("ConnectBlock() : Unable to verify bet payouts, previous block could have been a cache miss (%i)", pindex->nHeight), REJECT_INVALID, "bad-cb-payout-cache-miss");
+                }
                 std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
                 CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->pprev, mExpectedPayouts);
                 IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount);
 
-                if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
+                if (::ChainstateActive().IsInitialBlockDownload()) {
+                    LogPrintf("Payouts not valid - currently in initial block download\n");
+                    return state.Invalid(ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV, error("ConnectBlock() : Unable to verify bet payouts, could have been a cache miss (%i)", pindex->nHeight), REJECT_INVALID, "bad-cb-payout-cache-miss");
+                } else if (chainparams.NetworkIDString() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().GetConsensus().nSkipBetValidationStart && pindex->nHeight < Params().GetConsensus().nSkipBetValidationEnd)) {
                     LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
-                } else  {
+                } else {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
                 }
             }
@@ -3242,8 +3259,11 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : std::shared_ptr<const CBlock>(), connectTrace, disconnectpool)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
-                    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+                    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
                         InvalidChainFound(vpindexToConnect.front());
+                    }
+                    if (state.GetReason() == ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
+                        setBlockIndexCandidates.clear();
                     }
                     state = CValidationState();
                     fInvalidFound = true;
@@ -4405,7 +4425,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (!CheckBlock(block, state, chainparams.GetConsensus()) ||
         !ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev)) {
         assert(IsBlockReason(state.GetReason()));
-        if (state.IsInvalid() && state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+        if (state.IsInvalid() && state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
             pindex->nStatus |= BLOCK_FAILED_VALID;
             setDirtyBlockIndex.insert(pindex);
         }
