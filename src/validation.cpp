@@ -1358,7 +1358,7 @@ void static ConflictingChainFound(CBlockIndex* pindexNew) EXCLUSIVE_LOCKS_REQUIR
 
 void CChainState::InvalidBlockFound(CBlockIndex *pindex, const CValidationState &state) {
     statsClient.inc("warnings.InvalidBlockFound", 1.0f);
-    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
         pindex->nStatus |= BLOCK_FAILED_VALID;
         m_blockman.m_failed_blocks.insert(pindex);
         setDirtyBlockIndex.insert(pindex);
@@ -2502,6 +2502,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
             LogPrint(BCLog::BENCHMARK, "      - GetBettingPayouts: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5_3a - nTime5_2), nTimeBetRewards * MICRO, nTimeBetRewards * MILLI / nBlocksTotal);
 
             if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount)) {
+                CBlock block;
+                bool fFoundBlock = ReadBlockFromDisk(block, pindex->pprev, Params().GetConsensus());
+                if (fFoundBlock && block.vtx.size() == 0) {
+                    LogPrintf("Unable to verify payouts, but previous block could have been a cache miss %d\n", pindex->pprev->nHeight);
+                    return state.Invalid(ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV, error("ConnectBlock() : Unable to verify bet payouts, previous block could have been a cache miss (%i)", pindex->nHeight), REJECT_INVALID, "bad-cb-payout-cache-miss");
+                }
                 std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
                 CAmount nExpectedBetMint = GetBettingPayouts(view, bettingsViewCache, pindex->pprev, mExpectedPayouts);
                 IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, blockReward.GetTotalRewards().amount, blockReward.GetMasternodeReward().amount);
@@ -3242,7 +3248,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : std::shared_ptr<const CBlock>(), connectTrace, disconnectpool)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
-                    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+                    if (state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
                         InvalidChainFound(vpindexToConnect.front());
                     }
                     state = CValidationState();
@@ -4405,7 +4411,7 @@ bool CChainState::AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CVali
     if (!CheckBlock(block, state, chainparams.GetConsensus()) ||
         !ContextualCheckBlock(block, state, chainparams.GetConsensus(), pindex->pprev)) {
         assert(IsBlockReason(state.GetReason()));
-        if (state.IsInvalid() && state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED) {
+        if (state.IsInvalid() && state.GetReason() != ValidationInvalidReason::BLOCK_MUTATED && state.GetReason() != ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV) {
             pindex->nStatus |= BLOCK_FAILED_VALID;
             setDirtyBlockIndex.insert(pindex);
         }

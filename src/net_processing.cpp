@@ -1239,6 +1239,7 @@ static bool MaybePunishNode(NodeId nodeid, const CValidationState& state, bool v
     case ValidationInvalidReason::TX_PREMATURE_SPEND:
     case ValidationInvalidReason::TX_CONFLICT:
     case ValidationInvalidReason::TX_MEMPOOL_POLICY:
+    case ValidationInvalidReason::BLOCK_CACHE_MISSING_PREV:
         break;
     }
     if (message != "") {
