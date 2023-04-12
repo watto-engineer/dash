@@ -80,10 +80,14 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
 {
     // Tokens minted from the tokenGroupManagement address can create management tokens
     bool anyInputsGroupManagement = false;
+    nWagerrIn = 0;
+    nWagerrOut = 0;
 
     // Iterate through all the outputs constructing the final balances of every group.
     for (const auto &outp : tx.vout)
     {
+        nWagerrOut += outp.nValue;
+
         const CScript &scriptPubKey = outp.scriptPubKey;
         CTokenGroupInfo tokenGrp(scriptPubKey);
         if (tokenGrp.invalid)
@@ -120,6 +124,7 @@ bool CheckTokenGroups(const CTransaction &tx, CValidationState &state, const CCo
             LogPrint(BCLog::TOKEN, "%s - Checking token group for spent coin\n", __func__);
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "already-spent");
         }
+        nWagerrIn += coin.out.nValue;
 
         const CScript &script = coin.out.scriptPubKey;
         anyInputsGroupManagement = anyInputsGroupManagement || IsTokenManagementKey(script);
