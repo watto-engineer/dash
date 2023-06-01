@@ -859,7 +859,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
 
 
         if (!CheckBettingTx(view, bettingsViewCache, tx, ::ChainActive().Height())) {
-            return error("AcceptToMemoryPool: Error when betting TX checking!");
+            return state.Invalid(ValidationInvalidReason::TX_BAD_BET, false, REJECT_INVALID, "invalid betting tx");
         }
 
         if (regularBetMintRequest && !regularBetMintRequest->Validate(state, bettingsViewCache, ::ChainActive().Height()))
