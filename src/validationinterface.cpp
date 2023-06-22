@@ -14,6 +14,13 @@
 
 #include <boost/signals2/signal.hpp>
 
+#include <condition_variable>
+#include <mutex>
+
+std::mutex mtx;
+std::condition_variable cv;
+bool is_drained = false;
+
 struct ValidationInterfaceConnections {
     boost::signals2::scoped_connection UpdatedBlockTip;
     boost::signals2::scoped_connection SynchronousUpdatedBlockTip;
@@ -163,11 +170,14 @@ void CallFunctionInValidationInterfaceQueue(std::function<void ()> func) {
 void SyncWithValidationInterfaceQueue() {
     AssertLockNotHeld(cs_main);
     // Block until the validation queue drains
-    std::promise<void> promise;
-    CallFunctionInValidationInterfaceQueue([&promise] {
-        promise.set_value();
+    std::unique_lock<std::mutex> lock(mtx);
+    CallFunctionInValidationInterfaceQueue([&] {
+        std::lock_guard<std::mutex> lock(mtx);
+        is_drained = true;
+        cv.notify_one();
     });
-    promise.get_future().wait();
+    cv.wait(lock, []{ return is_drained; });
+    is_drained = false;
 }
 
 void CMainSignals::MempoolEntryRemoved(CTransactionRef ptx, MemPoolRemovalReason reason) {

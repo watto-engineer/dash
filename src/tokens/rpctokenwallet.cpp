@@ -578,9 +578,10 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
 
     // Make sure the results are valid at least up to the most recent block
     // the user could have gotten from another RPC command prior to now
-    pwallet->BlockUntilSyncedToCurrentChain();
 
+    pwallet->BlockUntilSyncedToCurrentChain();
     LOCK(pwallet->cs_wallet);
+    EnsureWalletIsUnlocked(pwallet);
 
     unsigned int curparam = 0;
 
@@ -604,7 +605,11 @@ extern UniValue listtokenssinceblock(const JSONRPCRequest& request)
         uint256 blockId;
 
         blockId.SetHex(request.params[curparam].get_str());
-        pindex = LookupBlockIndex(blockId);
+
+        {   // Start of scope for cs_main lock
+            LOCK(cs_main);
+            pindex = LookupBlockIndex(blockId);
+        }   // End of scope for cs_main lock, lock is automatically released here
     }
 
     curparam++;
