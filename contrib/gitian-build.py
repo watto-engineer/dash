@@ -76,7 +76,7 @@ def build():
     if args.macos:
         print('\nCompiling ' + args.version + ' MacOS')
         subprocess.check_call(['wget', '-N', '-P', 'inputs', 'https://bitcoincore.org/depends-sources/sdks/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz'])
-        subprocess.check_output(["echo '66c4d0756e3f5c6303643410c99821db8ec91b600f423b29788d1d7b9f35e2c1 inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz' | sha256sum -c"], shell=True)
+        subprocess.check_output(["echo 'df75d30ecafc429e905134333aeae56ac65fac67cb4182622398fd717df77619 inputs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers.tar.gz' | sha256sum -c"], shell=True)
         subprocess.check_call(['bin/gbuild', '--fetch-tags',  '-j', args.jobs, '-m', args.memory, '--commit', 'wagerr='+args.commit, '--url', 'wagerr='+args.url, '../wagerr/contrib/gitian-descriptors/gitian-osx.yml'])
         subprocess.check_call(['bin/gsign', '-p', args.sign_prog, '--signer', args.signer, '--release', args.version+'-osx-unsigned', '--destination', '../gitian.sigs/', '../wagerr/contrib/gitian-descriptors/gitian-osx.yml'])
         subprocess.check_call('mv build/out/wagerr-*-osx-unsigned.tar.gz inputs/', shell=True)
