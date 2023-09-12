@@ -2056,6 +2056,19 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     }
 
+    {
+        const MapCheckpoints checkpoints = chainparams.Checkpoints().mapCheckpoints;
+        MapCheckpoints::const_iterator i = checkpoints.find(pindex->nHeight);
+        if (i != checkpoints.end() && block.GetHash() != i->second) {
+            return state.Invalid(ValidationInvalidReason::BLOCK_CHECKPOINT, error("%s: rejected by checkpoint lock-in (height %d)", __func__, pindex->nHeight), REJECT_CHECKPOINT, "bad-fork-prior-to-checkpoint");
+        }
+        const MapCheckpoints staleCheckpoints = chainparams.Checkpoints().mapStaleCheckpoints;
+        MapCheckpoints::const_iterator j = staleCheckpoints.find(pindex->nHeight);
+        if (j != staleCheckpoints.end() && block.GetHash() == j->second) {
+            return state.Invalid(ValidationInvalidReason::BLOCK_CHECKPOINT, error("%s: rejected by stale checkpoint lock-in (height %d)", __func__, pindex->nHeight), REJECT_CHECKPOINT, "bad-fork-prior-to-checkpoint");
+        }
+    }
+
     if (pindex->pprev && pindex->phashBlock && m_clhandler->HasConflictingChainLock(pindex->nHeight, pindex->GetBlockHash())) {
         return state.Invalid(ValidationInvalidReason::BLOCK_CHAINLOCK, error("%s: conflicting with chainlock", __func__), REJECT_INVALID, "bad-chainlock");
     }

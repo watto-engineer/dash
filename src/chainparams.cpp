@@ -393,7 +393,8 @@ public:
                 {732900, uint256S("5d832b3de9b207e03366fb8d4da6265d52015f5d1bd8951a656b5d4508a1da8e")},
                 {891270, uint256S("eedb1794ca9267fb0ef88aff27afdd376ac93a54491a7b812cbad4b6c2e28d25")},
                 {1427000, uint256S("2ee16722a21094f4ae8e371021c28d19268d6058de42e37ea0d4c90273c6a42e")},    // 3693972 1605485238
-            }
+            },
+            {}
         };
 
         chainTxData = ChainTxData{
@@ -627,6 +628,9 @@ public:
                 {469, uint256S("d69d843cd63d333cfa3ff4dc0675fa320d6ef8cab7ab1a73bf8a1482210f93ce")},
                 {1100, uint256S("fa462709a1f3cf81d699ffbd45440204aa4d38de84c2da1fc8b3ff15c3c7a95f")},  // 1588780440
                 {2000, uint256S("a5aab45e4e2345715adf79774d661a5bb9b2a2efd001c339df5678418fb51409")}, // 1588834261
+            },
+            {
+                {1110001, uint256S("dc717d5495fad2b74d1f8f5ce210b982bff70bf6f59d57212c637382b29b9629")},
             }
         };
 
@@ -851,11 +855,12 @@ public:
             400, // OMNO reward permille (40%)
             100); // Dev reward permille (10%)
 
-        checkpointData = (CCheckpointData) {
+        checkpointData = {
             {
                 { 0, uint256S("174db003bb4ce38c3462e7cbd9598ae891011f0043bdaaddeb67d2b42247e530")},
                 { 1, devnetGenesis.GetHash() },
-            }
+            },
+            {}
         };
 
         chainTxData = ChainTxData{
@@ -1146,7 +1151,8 @@ public:
         checkpointData = {
             {
                 {0, uint256S("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec")},
-            }
+            },
+            {}
         };
 
         chainTxData = ChainTxData{
